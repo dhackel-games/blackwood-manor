@@ -12,6 +12,8 @@
 // A handler that returns a string intercepts the default verb; returning null/
 // undefined lets the default behaviour run.
 
+import { renderMap } from "./map.js";
+
 // ---- helpers used by handlers ------------------------------------------------
 function allTreasuresDeposited(ctx) {
   return Object.entries(ctx.world.items)
@@ -202,8 +204,35 @@ function garyAside(ctx) {
   return "\n\n" + pool[Math.floor(Math.random() * pool.length)];
 }
 
+// Is the caller properly lost? Deterministic, never model-decided: if they ask
+// for another hint without having scored since the last one, they're spinning.
+// Two hints with nothing to show for it and Gary offers the map.
+const STUCK_HINTS = 2;
+function noteStuck(ctx) {
+  const prev = ctx.getFlag("scoreAtLastHint");
+  const streak = ctx.getFlag("stuckStreak") || 0;
+  ctx.setFlag("stuckStreak", prev === undefined || ctx.state.score > prev ? 0 : streak + 1);
+  ctx.setFlag("scoreAtLastHint", ctx.state.score);
+  return (ctx.getFlag("stuckStreak") || 0) >= STUCK_HINTS;
+}
+
+// Gary's map offer. Once he's mentioned it he doesn't nag about it again.
+function mapOffer(ctx) {
+  if (ctx.getFlag("usedMap") || ctx.getFlag("mapOffered")) return "";
+  ctx.setFlag("mapOffered", true);
+  return "\n\nOkay, you're properly lost, aren't you. Look — third shift, nothing to do, " +
+    "I sketched the whole house out on the back of a placemat. Type MAP and I'll read it to you. " +
+    "It's not pretty. Neither am I.";
+}
+
 // Wrap the real hint in stage-appropriate framing — the clue is ALWAYS delivered.
 function frameHint(ctx, hint) {
+  const stuck = noteStuck(ctx);
+  const offer = stuck && !ctx.getFlag("onFire") ? mapOffer(ctx) : "";
+  return frameHintText(ctx, hint) + offer;
+}
+
+function frameHintText(ctx, hint) {
   switch (garyStage(ctx)) {
     case 0: return injectHunger(hint);
     case 1: return hint + "\n\n(...sorry. Long night. Ignore me.)";
@@ -284,6 +313,16 @@ function hotlineTalk(ctx, text) {
       "I hear anger. Anger's just fear in a leather jacket. But I have boundaries now — try that again.",
       "That lands as projection, and I forgive you. But let's not, okay? Let's not.",
     ]);
+  }
+  // MAP works on the line too — Gary told you to type it, so it had better work.
+  // He reads his placemat sketch down the phone at you.
+  if (/^(map|map mode|m)$/.test(t) || /\b(show|read|send|fax) (me )?(the )?map\b/.test(t)) {
+    ctx.setFlag("usedMap", true);
+    return say(ctx, [
+      "Hang on, I've got it here somewhere... okay. Picture this. I'm holding up a placemat.",
+      "*paper rustling* Right. This is the placemat. You can't see it, so I'll describe it. Slowly. At ninety-nine cents a minute.",
+      "Okay. Reading you my sketch. Don't judge the handwriting, I did this with a golf pencil.",
+    ]) + "\n\n" + renderMap(ctx);
   }
   if (/\b(hint|help|stuck|clue|next|where|advice|tip)\b/.test(t) || /how (do|to|the heck|am i)/.test(t) || /what.*(do|now|next)/.test(t)) {
     ctx.addScore(-1);
@@ -366,6 +405,8 @@ function hotlineTalk(ctx, text) {
 const CRISIS = /\b(kill(ing)?\s+my\s*self|end(ing)?\s+my\s+life|take\s+my\s+own\s+life|suicid(e|al)|(hurt|harm|cut)(ing)?\s+my\s*self|want\s+to\s+die|wanna\s+die|don'?t\s+want\s+to\s+(live|be\s+here|exist)|no\s+reason\s+to\s+live|end\s+it\s+all|better\s+off\s+dead)\b/;
 
 const MECHANICAL = [
+  /^(map|map mode|m)$/,
+  /\b(show|read|send|fax) (me )?(the )?map\b/,
   /\b(hang\s*up|hangup|good\s*bye|bye|later|never\s*mind|nevermind|leave|go away)\b/,
   /i'?m done/,
   /\b(shut up|screw you|stupid|idiot|jerk|rude|hate you|loser|dumb|useless)\b/,

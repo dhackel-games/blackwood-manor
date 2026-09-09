@@ -332,4 +332,67 @@ const WIN = [
   console.log("OK: burn-up timer, brazier, foods, toilet, badges");
 }
 
+// ---- MAP MODE ---------------------------------------------------------------
+// The map is an orientation aid, never a walkthrough: it must not reveal rooms
+// you haven't entered, and it must NEVER hint at the secret wing or the hidden
+// chamber, which are the best discoveries in the game.
+{
+  const m = createGame(world);
+  const first = m.send("map");
+  assert.match(first, /X Front Gate/, "map marks where you actually are");
+  assert.match(first, /\?\?\?\?\?/, "unvisited rooms are masked");
+  assert.ok(!/UPSTAIRS|GROUND FLOOR|BELOW/.test(first),
+    "floors you've never been to aren't drawn at all");
+  assert.equal((first.match(/X [A-Z]/g) || []).length, 1,
+    "exactly one room is marked with an X (the legend's 'X =' doesn't count)");
+
+  // Footnotes name rooms, so they're spoilers too: no talking about the Grand
+  // Hall / Landing stairs or the well before you've seen the room they're in.
+  for (const word of ["Grand Hall", "Landing", "well"]) {
+    assert.ok(!first.includes(word), `map footnotes don't leak "${word}" at the start`);
+  }
+
+  // Secret rooms stay invisible until stood in — including their connectors.
+  for (const word of ["Passage", "Sanctum", "Hidden Rm", "well", "Well"]) {
+    assert.ok(!first.includes(word), `map does not leak "${word}" at the start`);
+  }
+
+  // Walk in far enough to see the library, and confirm the hidden chamber below
+  // it still isn't hinted at (a lone "(Library)" anchor would give it away).
+  const m2 = createGame(world);
+  m2.state.room = "library";
+  const libMap = m2.send("map");
+  assert.match(libMap, /X Library/, "X follows you to the library");
+  assert.ok(!/BELOW/.test(libMap), "nothing below the library is drawn before you go down");
+  assert.ok(!/Hidden Rm/.test(libMap), "the hidden chamber is never pre-announced");
+
+  // Once you're in the secret wing it IS drawn — the map catches up with you.
+  const m3 = createGame(world);
+  m3.state.room = "hollowPassage";
+  const secretMap = m3.send("map");
+  assert.match(secretMap, /X Passage/, "the secret wing appears once you're standing in it");
+
+  // Gary offers the map when you're spinning your wheels, and only once.
+  const gy = createGame(world);
+  gy.send("call"); gy.send("hint");
+  const offer = gy.send("hint");
+  assert.match(offer, /Type MAP/, "Gary offers the map after repeated fruitless hints");
+  gy.setFlag("mapOffered", true);
+  assert.ok(!/Type MAP/.test(gy.send("hint")), "Gary doesn't nag about the map twice");
+
+  // MAP has to work while you're on the line, because Gary told you to type it.
+  const ph = createGame(world);
+  ph.send("call");
+  const onCall = ph.send("map");
+  assert.ok(ph.getFlag("onCall"), "typing MAP doesn't hang up the call");
+  assert.match(onCall, /X Front Gate/, "Gary reads the map to you down the phone");
+
+  // Scoring a point resets the stuck streak — progress means you're not stuck.
+  const st = createGame(world);
+  st.send("call"); st.send("hint");
+  st.addScore(10);
+  assert.ok(!/Type MAP/.test(st.send("hint")), "making progress clears the stuck streak");
+  console.log("OK: map mode (masking, secrets, X, Gary's offer, on-call map)");
+}
+
 console.log("\nALL WALKTHROUGH TESTS PASSED");

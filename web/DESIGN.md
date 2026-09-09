@@ -403,11 +403,51 @@ for the fire call. Swapping Gary's job is a data edit, not a code change.
   (`Gary sighs and says, "…`), extra paragraphs, and motivational filler. `clean()` strips or
   rejects all of it; returning `""` falls back to the hand-written line, which is always safe.
 - It swears. Hand-written Gary never does, so profanity is **rejected**, not just discouraged.
-- Sessions are cached per instruction-string (max 8) to keep the KV cache warm: ~1.6s first
-  turn, ~0.5s after.
+- *Reusing a session makes him drift.* A cached `LanguageModelSession` is much faster
+  (~0.5s vs ~1.6s) because the KV cache stays warm, but the model follows its own
+  accumulating transcript: by turn ~15 Gary had stopped being broke and was producing
+  mystical free verse about a house he's never entered. Capping turns-per-session reduced it
+  but didn't remove it. **Every request now gets a fresh session.** It costs ~1s, which reads
+  as Gary pausing, and drift becomes structurally impossible.
 
 **Crisis handling.** Late-stage Gary plays therapist as a joke. A real person typing real
 despair is not a joke, so it is handled **deterministically before the meter runs and before
 any model sees the text**: the bit drops, the call ends, nothing is billed, and it points at
 988. `CRISIS` is deliberately narrow — this game is full of "kill the wraith" and "I died
 again", so bare kill/die/dead must not match. Both directions are tested.
+
+
+## 12.15 MAP MODE (v2.3.0)
+
+`web/js/map.js` draws the manor as a hand-sketched floor plan on a torn-out page — Gary's
+placemat. `MAP` (also `M`, `CHART`, `FLOORPLAN`) works in the game *and* on the phone, because
+Gary tells you to type it and a hint line that lies to you is worse than no hint line.
+
+**It orients you; it never solves anything.** That distinction drives every rule:
+
+- Rooms you haven't entered render as `?????`, so you get the *shape* of the house — how many
+  rooms, how they connect — without being handed the contents.
+- The secret wing (`hollowPassage`, `hollowSanctum`) and the hidden chamber (`secretChamber`)
+  are the best discoveries in the game, so they aren't drawn at all until you stand in one.
+  Hiding them leaves gaps in the grid, and a conspicuous gap is itself a spoiler — hence the
+  row compaction in `drawFloor()`.
+- Landmarks like `(Porch)` repeat a room on another floor's panel for orientation. An anchor
+  whose only partner is hidden is dropped: a lone `(Library)` floating in the BELOW panel
+  announces the secret chamber as loudly as drawing it would.
+- Footnotes name rooms ("Grand Hall goes UP to the Landing"), so they're gated behind
+  `footIf` — a floor's note stays hidden until you've seen the room it's about.
+- The room you're standing in always counts as seen, which also covers turn one.
+
+All of the above is asserted in the test suite; the map is easy to make accidentally
+spoiler-y, so the tests are the guard rail.
+
+**Gary offers it when you're actually stuck**, and that judgment is deterministic
+(`noteStuck()` in `world.js`), never the model's: ask for a hint twice without your score
+moving and you're spinning, so he mentions the placemat — once, then never nags again.
+Scoring a point resets the streak.
+
+**Rendering.** The transcript is `white-space: pre-wrap`, which folds ASCII art into confetti
+on a phone, and the TTS voice would cheerfully read the torn edge out loud. `renderMap()`
+wraps its output in a `MAP_MARK` (U+001F) sentinel; `ui.js` splits on it to emit the block in
+its own non-wrapping `.map` element and to strip it from anything sent to `garySpeak()`.
+The `.map` font-size is a `clamp()` on viewport width so the widest panel fits an iPhone.

@@ -60,6 +60,19 @@ body { -webkit-text-size-adjust: 100%; }
   padding-right: 0.5rem;
   position: relative; z-index: 1;
 }
+/* ASCII map: must never wrap or the floor plan turns to confetti. Shrinks to
+   fit a phone, caps at the normal size on desktop, scrolls if it still can't. */
+.map {
+  white-space: pre;
+  word-break: normal;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  font-size: clamp(0.42rem, 2.3vw, 0.95rem);
+  line-height: 1.15;
+  color: var(--green-bright);
+  margin: 0.4rem 0 0.5rem;
+}
+
 #transcript .banner { color: var(--green-bright); }
 #transcript .echo { color: var(--green-bright); opacity: 0.85; }
 #transcript .over { color: var(--green-bright); font-weight: bold; }

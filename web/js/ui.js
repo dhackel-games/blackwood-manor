@@ -6,6 +6,7 @@ import { world } from "./world.js";
 import { saveGame, loadGame, hasSave } from "./save.js";
 import { VERSION, BUILD_DATE } from "./version.js";
 import * as garyBrain from "./gary-brain.js";
+import { MAP_MARK } from "./map.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -64,13 +65,27 @@ to look around. Beware the dark.`;
 const BANNER = window.innerWidth < 640 ? SMALL_BANNER : BIG_BANNER;
 
 // --- terminal output ---
+// Text may contain MAP_MARK-delimited ASCII blocks. Those must not word-wrap,
+// so they're emitted as their own `.map` element; everything else wraps normally.
+function emit(container, text, cls, prefix = "") {
+  let last = null;
+  const parts = String(text).split(MAP_MARK);
+  parts.forEach((part, i) => {
+    const isMap = i % 2 === 1;
+    if (!isMap && !part.trim()) return;
+    const div = document.createElement("div");
+    div.className = isMap ? "map" : (cls || "");
+    div.textContent = (!isMap && prefix ? prefix : "") + (isMap ? part : part.trim());
+    container.appendChild(div);
+    last = div;
+  });
+  container.scrollTop = container.scrollHeight;
+  return last;
+}
+
 function print(text, cls) {
   if (text == null) return;
-  const div = document.createElement("div");
-  if (cls) div.className = cls;
-  div.textContent = text;
-  transcript.appendChild(div);
-  transcript.scrollTop = transcript.scrollHeight;
+  emit(transcript, text, cls);
 }
 
 // --- phone-call screen ---
@@ -82,12 +97,7 @@ function fmtTime(s) {
 }
 function printToPhone(text, cls) {
   if (text == null) return null;
-  const div = document.createElement("div");
-  div.className = cls || "gary";
-  div.textContent = (cls === "you" ? "You: " : "") + text;
-  phoneT.appendChild(div);
-  phoneT.scrollTop = phoneT.scrollHeight;
-  return div;
+  return emit(phoneT, text, cls || "gary", cls === "you" ? "You: " : "");
 }
 function garyLineLabel() {
   const xp = game.state.flags.garyXP || 0;
@@ -140,7 +150,9 @@ if ("speechSynthesis" in window) {
 function garySpeak(text) {
   if (ttsMuted || !text || !("speechSynthesis" in window)) return;
   // strip stage directions like *click* / *chewing* so he doesn't read them aloud
-  const spoken = text.replace(/\*[^*]*\*/g, " ").replace(/\s+/g, " ").trim();
+  // Drop MAP_MARK blocks entirely — nobody wants the torn edge read aloud.
+  const spoken = text.split(MAP_MARK).filter((_, i) => i % 2 === 0).join(" ")
+    .replace(/\*[^*]*\*/g, " ").replace(/\s+/g, " ").trim();
   if (!spoken) return;
   try {
     const u = new SpeechSynthesisUtterance(spoken);

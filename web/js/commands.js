@@ -3,6 +3,8 @@
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
 // returned by ctx.find/ctx.itemsIn (which persist in game state).
 
+import { renderMap } from "./map.js";
+
 export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
@@ -239,6 +241,13 @@ export const commands = {
     if (bill) s += `\nHint Line phone bill: $${(bill / 100).toFixed(2)} — Gary thanks you for your patronage.`;
     return s;
   },
+  // MAP MODE — the torn page Gary faxes you when you're properly lost. Rooms
+  // you haven't entered stay masked, so it orients you without solving anything.
+  map(ctx) {
+    ctx.setFlag("usedMap", true);
+    return renderMap(ctx);
+  },
+
   verbose(ctx) { ctx.setFlag("__verbose", true); return "Maximum verbosity."; },
   brief(ctx) { ctx.setFlag("__verbose", false); return "Brief descriptions."; },
   again() { return null; }, // handled by UI (repeat last); no-op in core
@@ -248,6 +257,7 @@ export const commands = {
       "Move: n s e w  ne nw se sw  up down",
       "  in out   (or: go <dir>)",
       "look (l), examine <x>, search <x>",
+      "map — Gary's floor plan of the manor (MAP MODE)",
       "take <x>, drop <x>, inventory (i)",
       "open / close / unlock <x> with <y>",
       "put <x> in <y>, read <x>",
