@@ -252,6 +252,12 @@ the mansion.
 - **`game.getFlag` returns the raw value** (not coerced to boolean), so numeric flags
   (`phoneBill`, `burnTurns`, `sick`, `high`, `fireTab`, `garyXP`) work.
 - **New parser verbs:** `burn`, `sit`, `use`, `flush` (plus the v1 set).
+- **Command chaining** — `parser.splitCommands()` splits a raw line on `.`, `;`, `,` or a
+  standalone `then`, and `game.send()` runs each part as its own turn (`runOne`), capped at
+  20 per line. The chain **aborts** on an unknown word, on death/victory, or if you pick up
+  the hint line, so a typo can't half-execute the rest. A single command returns its text
+  verbatim; a chain prefixes each result with `> <cmd>` so the transcript stays readable.
+  Input is **not** split while `onCall` — Gary hears your commas.
 
 ## 12.3 Gary, the 1-900 hint line (the centerpiece)
 - `call`/`dial`/`hint` opens a **conversation** (`onCall` routes all input to

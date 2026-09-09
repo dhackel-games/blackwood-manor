@@ -7,7 +7,7 @@
 //   - state.flags holds boolean/other game flags.
 // This keeps games isolated without ever cloning functions.
 
-import { parse } from "./parser.js";
+import { parse, splitCommands } from "./parser.js";
 import { commands } from "./commands.js";
 
 function cloneData(def, id) {
@@ -193,17 +193,12 @@ export function createGame(world) {
   }
 
   // --- main loop -------------------------------------------------------------
-  game.send = (input) => {
-    if (state.dead || state.won) return "The game is over. Type RESTART to play again.";
-    // While on the hint line, everything you type goes to Gary (no world turn passes).
-    if (state.flags.onCall) {
-      if (typeof world.hotlineTalk === "function") return world.hotlineTalk(game, input);
-      state.flags.onCall = false;
-      return "The line goes dead.";
-    }
+  // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
+  // a chained line (parse error, game over, or we just picked up the phone).
+  function runOne(input) {
     const cmd = parse(input);
-    if (cmd.error === "empty") return "I beg your pardon?";
-    if (cmd.error === "unknown-verb") return `I don't know the word "${cmd.word}".`;
+    if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
+    if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
 
     const override = runHandlers(cmd);
     let text;
@@ -211,10 +206,51 @@ export function createGame(world) {
       text = override;
     } else {
       const handler = commands[cmd.verb];
-      text = handler ? handler(game, cmd) : "You can't do that.";
+      const r = handler ? handler(game, cmd) : "You can't do that.";
+      text = r == null ? "You can't do that." : r;
     }
     if (!state.dead && !state.won) tick();
-    return text + suffix();
+    return {
+      text: text + suffix(),
+      stop: state.dead || state.won || !!state.flags.onCall,
+    };
+  }
+
+  const MAX_CHAIN = 20;
+
+  game.send = (input) => {
+    if (state.dead || state.won) return "The game is over. Type RESTART to play again.";
+    // While on the hint line, everything you type goes to Gary verbatim (no
+    // splitting — Gary should hear your commas) and no world turn passes.
+    if (state.flags.onCall) {
+      if (typeof world.hotlineTalk === "function") return world.hotlineTalk(game, input);
+      state.flags.onCall = false;
+      return "The line goes dead.";
+    }
+
+    const parts = splitCommands(input);
+    if (!parts.length) return "I beg your pardon?";
+    if (parts.length === 1) return runOne(parts[0]).text;
+
+    const run = parts.slice(0, MAX_CHAIN);
+    const out = [];
+    let stopped = false;
+    let prev = null;
+    for (let part of run) {
+      // AGAIN/G inside a chain repeats the previous command on the same line.
+      if (/^(again|g)$/i.test(part)) {
+        if (!prev) { out.push(`> ${part}\nNothing to repeat.`); stopped = true; break; }
+        part = prev;
+      }
+      const { text, stop } = runOne(part);
+      out.push(`> ${part}\n${text}`);
+      prev = part;
+      if (stop) { stopped = true; break; }
+    }
+    if (!stopped && parts.length > MAX_CHAIN) {
+      out.push(`(Only the first ${MAX_CHAIN} commands on that line were carried out.)`);
+    }
+    return out.join("\n\n");
   };
 
   // --- save / restore --------------------------------------------------------

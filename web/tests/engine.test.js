@@ -2,7 +2,7 @@
 // Run: node tests/engine.test.js
 import assert from "node:assert";
 import { createGame } from "../js/core.js";
-import { parse } from "../js/parser.js";
+import { parse, splitCommands } from "../js/parser.js";
 
 // ---------- shared fixture ----------
 function fixture() {
@@ -138,6 +138,38 @@ function fixture() {
   assert.match(g.send("pull lever"), /clicks/);
   assert.equal(g.getFlag("leverPulled"), true);
   console.log("OK: handler override");
+}
+
+// ---------- command chaining ----------
+{
+  assert.deepEqual(splitCommands("n; open box; get key"), ["n", "open box", "get key"]);
+  assert.deepEqual(splitCommands("n. s. e"), ["n", "s", "e"]);
+  assert.deepEqual(splitCommands("take key then go north"), ["take key", "go north"]);
+  assert.deepEqual(splitCommands("n, s"), ["n", "s"]);
+  assert.deepEqual(splitCommands("look"), ["look"]);
+  assert.deepEqual(splitCommands("  "), []);
+  // "then" only splits as a standalone word, never inside one.
+  assert.deepEqual(splitCommands("open thenardier"), ["open thenardier"]);
+  console.log("OK: splitCommands");
+
+  // A chained line runs one turn per command.
+  const g = createGame(fixture());
+  const out = g.send("take key; go north");
+  assert.match(out, /> take key/);
+  assert.match(out, /> go north/);
+  assert.equal(g.state.turns, 2);
+  assert.equal(g.state.room, "study");
+
+  // An unknown word aborts the rest of the line rather than half-executing it.
+  const g2 = createGame(fixture());
+  const bad = g2.send("frobnicate key; go north");
+  assert.match(bad, /I don't know the word "frobnicate"/);
+  assert.notEqual(g2.state.room, "study");
+
+  // A single command is returned verbatim, with no "> cmd" prefix.
+  const g3 = createGame(fixture());
+  assert.ok(!g3.send("look").startsWith("> "));
+  console.log("OK: command chaining");
 }
 
 console.log("\nALL ENGINE TESTS PASSED");

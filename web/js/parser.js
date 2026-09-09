@@ -34,6 +34,18 @@ for (const [canon, list] of Object.entries(VERBS)) {
 const ARTICLES = new Set(["the", "a", "an", "some"]);
 const PREPS = new Set(["with", "in", "into", "on", "onto", "at", "to", "from", "under", "behind", "inside"]);
 
+// Split a raw input line into separate commands.
+// Classic-parser separators: "." ";" "," and the word "then".
+// Used by core.send so "n. open mailbox. read letter" runs as three turns.
+export function splitCommands(input) {
+  const raw = (input || "").trim();
+  if (!raw) return [];
+  return raw
+    .split(/\s*[.;,]+\s*|\s+then\s+/i)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 export function parse(input) {
   const raw = (input || "").trim().toLowerCase();
   if (!raw) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
