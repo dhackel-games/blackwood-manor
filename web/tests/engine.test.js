@@ -3,7 +3,7 @@
 import assert from "node:assert";
 import { createGame } from "../js/core.js";
 import { parse, splitCommands } from "../js/parser.js";
-import { clean as garyClean } from "../js/gary-brain.js";
+import { clean as garyClean, isLocalPage } from "../js/gary-brain.js";
 
 // ---------- shared fixture ----------
 function fixture() {
@@ -192,6 +192,35 @@ function fixture() {
   assert.equal(garyClean(''), "");
   assert.equal(garyClean(null), "");
   console.log("OK: gary clean()");
+}
+
+// ---------- Gary's daemon probe must stay off the public site ----------
+{
+  // Chrome gates http://127.0.0.1 behind the Local Network Access permission,
+  // so probing from the deployed site would prompt every visitor to allow
+  // "access to devices on your local network" on a text adventure. Only a page
+  // already served from this machine may look for the daemon.
+  const realLocation = globalThis.location;
+  const setHost = (protocol, hostname) => {
+    Object.defineProperty(globalThis, "location",
+      { value: { protocol, hostname, href: `${protocol}//${hostname}/` }, configurable: true });
+  };
+
+  setHost("https:", "dhackel-games.github.io");
+  assert.equal(isLocalPage(), false, "public site must never probe the daemon");
+  setHost("https:", "example.com");
+  assert.equal(isLocalPage(), false, "no remote origin may probe the daemon");
+
+  for (const h of ["localhost", "127.0.0.1", "::1"]) {
+    setHost("http:", h);
+    assert.equal(isLocalPage(), true, `${h} should probe the daemon`);
+  }
+  setHost("file:", "");
+  assert.equal(isLocalPage(), true, "file:// should probe the daemon");
+
+  if (realLocation === undefined) delete globalThis.location;
+  else Object.defineProperty(globalThis, "location", { value: realLocation, configurable: true });
+  console.log("OK: gary daemon probe scoped to local pages");
 }
 
 console.log("\nALL ENGINE TESTS PASSED");

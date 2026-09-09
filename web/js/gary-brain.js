@@ -14,10 +14,15 @@
 //   2. "daemon"  — Mac browser: local Swift daemon on 127.0.0.1 (see mac/gary-daemon).
 //   3. null      — no model: caller keeps the canned line. Always the fallback.
 //
-// Note: a page served over HTTPS (GitHub Pages) cannot reach a plain-http local
-// daemon — browsers block that as mixed content. Smart Gary therefore works when
-// playing locally over http://localhost or in the native app; the public site
-// gracefully stays canned.
+// Why the daemon is only probed from a LOCAL page (isLocalPage below):
+// Contrary to the obvious guess, this is not a mixed-content limit. Chrome does
+// allow an https: page to reach http://127.0.0.1 — but it now gates loopback
+// behind the Local Network Access permission, so probing from the public site
+// makes a browser ask every stranger who opens a text adventure whether it may
+// "access devices on your local network". That prompt is alarming, looks like
+// malware, and buys nothing: anyone with the daemon is playing locally anyway.
+// (Safari blocks the request outright regardless.) So the public site never
+// probes, and stays canned by choice rather than by accident.
 
 import { profileForStage, buildInstructions } from "./gary-profile.js";
 
@@ -92,12 +97,21 @@ async function daemonAlive() {
 }
 
 /** Detect a provider once. Safe to call repeatedly; never throws. */
+// Only a page already served from this machine may look for the daemon; see the
+// header. Node (no location) counts as local so the test harness can exercise it.
+export function isLocalPage() {
+  if (typeof location === "undefined" || !location.hostname) return true;
+  const h = location.hostname;
+  return h === "localhost" || h === "127.0.0.1" || h === "::1" ||
+         h === "" || h.endsWith(".localhost") || location.protocol === "file:";
+}
+
 export async function detect() {
   if (probed) return provider;
   probed = true;
   try {
     if (hasNativeBridge()) provider = "native";
-    else if (typeof fetch === "function" && await daemonAlive()) provider = "daemon";
+    else if (typeof fetch === "function" && isLocalPage() && await daemonAlive()) provider = "daemon";
   } catch {
     provider = null;
   }

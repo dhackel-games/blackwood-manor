@@ -34,8 +34,12 @@ curl -s http://127.0.0.1:8138/health          # {"ok":true,"model":"available"}
 
 ## Why a daemon?
 
-Safari can't talk to a Swift framework directly, and an **HTTPS page can't call
-`http://127.0.0.1`** (mixed content). So:
+A browser can't talk to a Swift framework directly, so the model is exposed over local HTTP.
+
+The public site deliberately never looks for it. Not because it can't — Chrome does allow an
+`https:` page to reach `http://127.0.0.1` — but because Chrome gates loopback behind the **Local
+Network Access permission**, and probing would prompt every stranger opening a text adventure to
+allow "access to devices on your local network". Safari blocks it outright anyway. So:
 
 - **Local play** (`http://127.0.0.1/…`) → the page reaches this daemon.
 - **The iOS/macOS app** → uses the in-process `GaryBridge` instead; no daemon needed.

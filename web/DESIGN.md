@@ -379,9 +379,16 @@ group 3b asserts this and will fail if a mechanical branch ever becomes model-vo
 | `daemon` | Mac, local play | `POST http://127.0.0.1:8138/gary` (`mac/gary-daemon`) |
 | `null` | public web site | canned lines only |
 
-An **HTTPS page cannot call `http://127.0.0.1`** (mixed content), so the public GitHub Pages
-site is always canned Gary — by design, and indistinguishable from before. Smart Gary happens
-on local play (`Play Blackwood Manor.command` starts the daemon if it's been built) or in the app.
+The public GitHub Pages site is **always canned Gary**, by choice. The obvious guess is that
+this is mixed-content blocking, but it was measured and it isn't: Chrome *does* let an `https:`
+page reach `http://127.0.0.1` (verified — with Chrome's loopback check disabled, the live site
+connected to the daemon and logged `on-device voice active via "daemon" provider`). What Chrome
+now does is gate loopback behind the **Local Network Access permission**. Probing from the public
+site would therefore ask every stranger who opens a text adventure whether it may "access devices
+on your local network" — alarming, malware-shaped, and pointless, since anyone running the daemon
+is playing locally anyway. Safari blocks the request outright regardless. So `isLocalPage()` skips
+the probe unless the page is itself served from localhost. Smart Gary happens on local play
+(`Play Blackwood Manor.command` starts the daemon if it's been built) or in the app.
 
 **Personas** live as pure data in `js/gary-profile.js`. `HINTLINE_STAGES[0..3]` mirror
 `garyStage()` (grumpy → cracking → reluctant therapist → full therapist); `FIREFIGHTER` exists
