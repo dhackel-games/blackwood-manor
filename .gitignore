@@ -1,0 +1,14 @@
+.DS_Store
+.server.pid
+*.server.pid
+
+# iOS build artifacts + generated project
+ios/build/
+ios/BlackwoodManor.xcodeproj/
+ios/Resources/www/
+*.xcuserstate
+DerivedData/
+
+# regenerable / not source
+web/assets/Blackwood.iconset/
+web/Blackwood Manor.app/

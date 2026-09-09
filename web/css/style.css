@@ -1,0 +1,236 @@
+:root {
+  --green: #43ff7a;
+  --green-bright: #b6ffcf;
+  --dim: #1f7a3a;
+  --bg: #050805;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+body { -webkit-text-size-adjust: 100%; }
+
+#crt {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1.25rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  color: var(--green);
+  font-size: 16px;
+  line-height: 1.5;
+  text-shadow: 0 0 4px rgba(67, 255, 122, 0.45);
+}
+
+/* scanlines + vignette */
+#crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-linear-gradient(rgba(0,0,0,0) 0 2px, rgba(0,0,0,0.16) 2px 3px),
+    radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%);
+  animation: flicker 4s infinite steps(60);
+}
+@keyframes flicker { 0%,96%,100%{opacity:1} 97%{opacity:.94} 98%{opacity:.99} }
+@media (prefers-reduced-motion: reduce) { #crt::after { animation: none; } }
+
+/* Always-on status readout */
+#hud {
+  position: relative; z-index: 1;
+  display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end;
+  font-size: 0.8rem; color: var(--dim);
+  padding-bottom: 0.35rem; margin-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(31, 122, 58, 0.5);
+}
+#hud .sep { opacity: 0.6; }
+#hud #hud-bill { color: var(--green); }
+
+#transcript {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding-right: 0.5rem;
+  position: relative; z-index: 1;
+}
+#transcript .banner { color: var(--green-bright); }
+#transcript .echo { color: var(--green-bright); opacity: 0.85; }
+#transcript .over { color: var(--green-bright); font-weight: bold; }
+#transcript div { margin: 0 0 0.15rem; }
+
+/* --- touch controls --- */
+#controls {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.5rem 0 0.4rem;
+  border-top: 1px solid var(--dim);
+  margin-top: 0.4rem;
+}
+#controls .dpad, #controls .verbs { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+#controls button {
+  flex: 0 1 auto;             /* natural width, wrap+center (no giant stretched buttons) */
+  min-width: 3.2rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(67,255,122,0.06);
+  border: 1px solid var(--dim);
+  border-radius: 6px;
+  color: var(--green-bright);
+  font: inherit;
+  font-size: 0.95rem;
+  text-shadow: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#controls button:active { background: rgba(67,255,122,0.22); }
+
+#inputline {
+  position: relative; z-index: 1;
+  display: flex; gap: 0.5rem; align-items: center;
+  margin-top: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--dim);
+  border-radius: 8px;
+  background: rgba(67, 255, 122, 0.05);
+}
+#prompt { color: var(--green-bright); }
+#cmd {
+  flex: 1;
+  min-width: 0;                      /* let it shrink instead of overflowing */
+  background: transparent; border: none;
+  color: var(--green-bright);
+  font: inherit; font-size: 16px;   /* >=16px keeps iOS from zooming on focus */
+  outline: none; caret-color: var(--green); text-shadow: inherit;
+}
+#cmd::placeholder { color: var(--dim); opacity: 1; }
+#go {
+  flex: 0 0 auto;
+  min-height: 2.2rem; padding: 0.35rem 0.9rem;
+  background: rgba(67, 255, 122, 0.1);
+  border: 1px solid var(--dim); border-radius: 6px;
+  color: var(--green-bright); font: inherit; font-size: 0.95rem;
+  text-shadow: inherit; cursor: pointer; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+#go:active { background: rgba(67, 255, 122, 0.25); }
+
+/* thin CRT scrollbar (desktop) */
+#transcript::-webkit-scrollbar { width: 8px; }
+#transcript::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 4px; }
+
+@media (max-width: 600px) {
+  #crt { padding: 0.6rem 0.75rem; }
+  #transcript { font-size: 14px; }        /* transcript can shrink; input stays 16px */
+  #controls button { font-size: 0.9rem; min-height: 2.6rem; }
+}
+
+/* While typing (keyboard up) on touch devices, hide the tap-controls so the
+   transcript gets the full area instead of being squeezed to a sliver. */
+#crt.typing #controls { display: none; }
+
+/* mic / small icon buttons */
+.iconbtn {
+  flex: 0 0 auto; min-height: 2.2rem; min-width: 2.4rem; padding: 0.35rem 0.55rem;
+  background: rgba(67, 255, 122, 0.1); border: 1px solid var(--dim);
+  border-radius: 6px; color: var(--green-bright); font: inherit; font-size: 1.05rem;
+  cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.iconbtn:active { background: rgba(67, 255, 122, 0.25); }
+.iconbtn.listening {
+  background: #b0322a; border-color: #e0483c; color: #fff;
+  animation: micpulse 1s ease-in-out infinite;
+}
+@keyframes micpulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(224,72,60,0.5);} 50%{ box-shadow: 0 0 0 7px rgba(224,72,60,0);} }
+@media (prefers-reduced-motion: reduce) { .iconbtn.listening { animation: none; } }
+
+.linkbtn {
+  background: none; border: none; color: var(--dim); font: inherit; font-size: 0.85rem;
+  cursor: pointer; padding: 0 0.25rem; touch-action: manipulation;
+}
+.linkbtn:active { color: var(--green-bright); }
+
+/* Collapse Gary's big header while typing on the call screen (touch), so the
+   conversation window isn't squeezed to a few lines. */
+#phone.compact .phone-avatar,
+#phone.compact .phone-sub,
+#phone.compact .phone-name { display: none; }
+#phone.compact .phone-header { margin-bottom: 0.1rem; }
+#phone.compact .phone-card { gap: 0.4rem; }
+
+/* ============ The "phone call" screen (Gary's hint line) ============ */
+#phone {
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; align-items: stretch; justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  background: radial-gradient(ellipse at 50% 15%, #0b1c12, #030503 72%);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  color: var(--green);
+  text-shadow: 0 0 4px rgba(67, 255, 122, 0.45);
+  opacity: 0; transform: scale(1.05);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+#phone.show { opacity: 1; transform: scale(1); }
+#phone[hidden] { display: none; }
+
+.phone-card {
+  width: 100%; max-width: 460px;
+  display: flex; flex-direction: column; gap: 0.55rem;
+}
+.phone-header { text-align: center; }
+.phone-num { color: var(--green-bright); font-size: 1.1rem; letter-spacing: 1px; }
+.phone-sub { color: var(--dim); font-size: 0.8rem; }
+.phone-avatar {
+  align-self: center; margin-top: 0.3rem;
+  width: 82px; height: 82px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--dim); background: rgba(67, 255, 122, 0.06);
+  color: var(--green-bright); font-size: 1.2rem; letter-spacing: 2px;
+  animation: ring 1.6s ease-in-out infinite;
+}
+@keyframes ring { 0%,100%{ box-shadow: 0 0 0 0 rgba(67,255,122,0.25);} 50%{ box-shadow: 0 0 0 8px rgba(67,255,122,0);} }
+@media (prefers-reduced-motion: reduce) { .phone-avatar { animation: none; } }
+.phone-name { text-align: center; font-size: 1.15rem; color: var(--green-bright); }
+.phone-status { text-align: center; color: var(--dim); font-size: 0.9rem; }
+
+#phone-transcript {
+  flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  white-space: pre-wrap; word-break: break-word;
+  border: 1px solid var(--dim); border-radius: 10px;
+  padding: 0.6rem 0.7rem; background: rgba(0, 0, 0, 0.35);
+  font-size: 0.95rem; min-height: 4rem;
+}
+#phone-transcript .gary { color: var(--green); margin-bottom: 0.45rem; }
+#phone-transcript .you { color: var(--green-bright); opacity: 0.9; margin-bottom: 0.45rem; }
+#phone-transcript .sys { color: var(--dim); }
+
+.phone-inputline {
+  display: flex; gap: 0.5rem; align-items: center;
+  border: 1px solid var(--dim); border-radius: 8px;
+  padding: 0.5rem 0.6rem; background: rgba(67, 255, 122, 0.05);
+}
+#phone-cmd {
+  flex: 1; min-width: 0; background: transparent; border: none;
+  color: var(--green-bright); font: inherit; font-size: 16px;
+  outline: none; caret-color: var(--green); text-shadow: inherit;
+}
+#phone-cmd::placeholder { color: var(--dim); opacity: 1; }
+#phone-go {
+  flex: 0 0 auto; min-height: 2.2rem; padding: 0.35rem 0.9rem;
+  background: rgba(67, 255, 122, 0.1); border: 1px solid var(--dim);
+  border-radius: 6px; color: var(--green-bright); font: inherit; font-size: 0.95rem;
+  text-shadow: inherit; cursor: pointer; touch-action: manipulation;
+}
+#phone-go:active { background: rgba(67, 255, 122, 0.25); }
+#phone-end {
+  min-height: 3rem; border: none; border-radius: 12px;
+  background: #b0322a; color: #fff; font: inherit; font-size: 1.05rem;
+  font-weight: bold; letter-spacing: 1px; cursor: pointer; touch-action: manipulation;
+  text-shadow: none;
+}
+#phone-end:active { background: #e0483c; }

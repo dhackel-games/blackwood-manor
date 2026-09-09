@@ -1,0 +1,40 @@
+name: BlackwoodManor
+options:
+  bundleIdPrefix: com.dhackel
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  BlackwoodManor:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources/www
+        type: folder          # folder reference -> preserves www/ structure in the bundle
+      - path: Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dhackel.BlackwoodManor
+        PRODUCT_NAME: Blackwood Manor
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Blackwood Manor
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIStatusBarHidden: YES
+        INFOPLIST_KEY_UIStatusBarStyle: UIStatusBarStyleLightContent
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Blackwood Manor uses the microphone so you can speak your commands."
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Blackwood Manor turns what you say into game commands."
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 9W789FP4LG
+        SWIFT_VERSION: "5.0"

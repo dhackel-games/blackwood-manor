@@ -1,0 +1,123 @@
+# Blackwood Manor
+
+A haunted-mansion text adventure in the classic Zork style — pure static files,
+no build step, no server, no dependencies. You've inherited a cursed Victorian
+estate; recover the family heirlooms, deposit them in the reliquary in the Grand
+Hall, and ring the bell to lift the curse and escape alive. Linger in the dark,
+and something finds you.
+
+## Play
+
+Double-click **`Play Blackwood Manor.command`** (the file with the manor icon).
+It starts a tiny local web server and opens the game in your browser. Progress
+auto-saves to your browser.
+
+> Don't open `index.html` directly — Chrome blocks the game's JavaScript modules
+> over `file://`, so it must be served over `http://` (which the launcher does).
+> The first time you double-click the `.command`, macOS may ask you to confirm
+> opening it; click **Open**.
+
+### Commands
+
+- **Move:** `north` / `n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`, `up` / `u`,
+  `down` / `d`, `in`, `out` — or just type the direction.
+- **Look around:** `look` (`l`), `examine <thing>` (`x`), `search <thing>`
+- **Things:** `take <x>`, `drop <x>`, `inventory` (`i`)
+- **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
+  `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
+  `wear`/`remove <x>`, `ring <x>`, `enter <x>`
+- **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
+- **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
+
+### Survival tips (it is a *cruel* game)
+
+- **Never move in the dark.** "It is pitch black. You are likely to be eaten by
+  a grue." is your only warning. Keep a light burning.
+- Your candle's fuel is **finite**, and you have exactly **one match**. Don't
+  waste either — it is possible to strand yourself. `save` often.
+- Some doors, drops, and the crypt are **lethal** without the right preparation.
+
+## Project layout
+
+```
+index.html            the page + terminal DOM
+css/style.css         green-on-black CRT styling
+js/core.js            game state + rules (DOM-free, testable in Node)
+js/parser.js          input -> { verb, dobj, prep, iobj }
+js/commands.js        generic verb handlers
+js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
+js/ui.js              browser terminal adapter
+js/save.js            localStorage save/restore
+tests/engine.test.js  engine unit tests
+tests/walkthrough.js  full winning playthrough + death-path tests
+DESIGN.md / PLAN.md   design doc and implementation plan
+```
+
+## Run the tests
+
+```
+npm test          # or: node tests/walkthrough.js
+```
+
+This plays the entire game to victory and asserts the score, then confirms each
+death trap still fires. Run it after any change to the world.
+
+## Expanding the game (the whole point)
+
+**You only ever edit `js/world.js`.** The engine never needs to change.
+
+### Add a room
+
+```js
+rooms: {
+  conservatory: {
+    name: "Conservatory",
+    desc: "A glass-roofed ruin choked with dead ferns.",
+    exits: { north: "grandHall" },   // and add `south: "conservatory"` to grandHall
+  },
+}
+```
+
+### Add an item
+
+```js
+items: {
+  brassKey: {
+    names: ["key"], adjectives: ["brass"], loc: "conservatory",
+    takeable: true, desc: "A small brass key.",
+  },
+}
+```
+
+Useful item flags: `takeable, fixed, scenery, treasure, points, container,
+openable, open, locked, keyId, capacity, lightSource, lit, fuel, wearable,
+worn, readable, text, edible, drinkable, roomDesc`.
+
+Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
+part of the win condition (all treasures must reach the reliquary).
+
+### Add a puzzle
+
+Attach an `on: { verb(ctx, cmd) }` handler to any room or item. Return a string
+to intercept the default verb; return nothing to let the default run.
+
+```js
+lever: {
+  names: ["lever"], loc: "conservatory", fixed: true, scenery: true,
+  desc: "A brass lever.",
+  on: {
+    pull(ctx) {
+      if (ctx.getFlag("gatePulled")) return "The gate already stands open.";
+      ctx.setFlag("gatePulled");
+      return "With a clang, a hidden gate grinds open.";
+    },
+  },
+}
+```
+
+Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
+`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `find(phrase)`, `moveItem(id,to)`,
+`destroy(id)`, `addScore(n)`, `kill(msg)`, `win(msg)`, `describeRoom()`.
+
+After any change, **run `npm test`** — and update `tests/walkthrough.js` if you
+changed the solution path.

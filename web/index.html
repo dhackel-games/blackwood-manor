@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="apple-mobile-web-app-title" content="Blackwood" />
+  <meta name="theme-color" content="#050805" />
+  <title>Blackwood Manor</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="crt">
+    <!-- Always-visible status: score / turns / phone bill -->
+    <div id="hud">
+      <span id="hud-score">Score 0</span>
+      <span class="sep">·</span>
+      <span id="hud-turns">0 turns</span>
+      <span class="sep">·</span>
+      <span id="hud-bill">&#9742; $0.00</span>
+    </div>
+
+    <div id="transcript" aria-live="polite"></div>
+
+    <!-- Touch controls: tap to run common commands (typing still works) -->
+    <div id="controls">
+      <div class="dpad">
+        <button data-cmd="north">N</button>
+        <button data-cmd="south">S</button>
+        <button data-cmd="east">E</button>
+        <button data-cmd="west">W</button>
+        <button data-cmd="up">Up</button>
+        <button data-cmd="down">Dn</button>
+      </div>
+      <div class="verbs">
+        <button data-cmd="look">Look</button>
+        <button data-prefill="examine ">Examine</button>
+        <button data-prefill="take ">Take</button>
+        <button data-cmd="inventory">Inv</button>
+        <button data-cmd="call">Call</button>
+        <button data-cmd="hint">Hint</button>
+        <button data-cmd="help">Help</button>
+      </div>
+    </div>
+
+    <div id="inputline">
+      <span id="prompt">&gt;</span>
+      <input id="cmd" autocomplete="off" autocapitalize="off"
+             autocorrect="off" spellcheck="false" enterkeyhint="send"
+             placeholder="type command / tap button" aria-label="command input" />
+      <button id="mic" class="iconbtn" aria-label="speak a command" hidden>&#127908;</button>
+      <button id="go" aria-label="submit">Go</button>
+    </div>
+  </div>
+
+  <!-- The 1-900 hint line "phone screen" — shown while you're on a call with Gary -->
+  <div id="phone" hidden>
+    <div class="phone-card">
+      <div class="phone-header">
+        <div class="phone-num">&#9742; 1-900-BLACKWOOD</div>
+        <div class="phone-sub" id="phone-sub">Hint Line &middot; 99&cent;/min</div>
+      </div>
+      <div class="phone-avatar">GARY</div>
+      <div class="phone-name">Gary</div>
+      <div class="phone-status">
+        <span id="phone-timer">00:00</span> &middot; <span id="phone-bill">$0.00</span>
+        <button id="phone-mute" class="linkbtn" aria-label="toggle Gary's voice">&#128263; Gary</button>
+      </div>
+      <div id="phone-transcript" aria-live="polite"></div>
+      <div class="phone-inputline">
+        <button id="phone-mic" class="iconbtn" aria-label="speak to Gary" hidden>&#127908;</button>
+        <input id="phone-cmd" autocomplete="off" autocapitalize="off" autocorrect="off"
+               spellcheck="false" enterkeyhint="send" placeholder="say something to Gary…" aria-label="say to Gary" />
+        <button id="phone-go">Say</button>
+      </div>
+      <button id="phone-end">END CALL</button>
+    </div>
+  </div>
+
+  <script type="module" src="js/ui.js"></script>
+</body>
+</html>
