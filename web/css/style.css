@@ -48,6 +48,8 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #hud .sep { opacity: 0.6; }
 #hud #hud-bill { color: var(--green); }
+/* Build stamp sits hard left; margin-auto pushes score/turns/bill to the right. */
+#hud #hud-version { margin-right: auto; opacity: 0.75; }
 
 #transcript {
   flex: 1;

@@ -4,6 +4,7 @@
 import { createGame } from "./core.js";
 import { world } from "./world.js";
 import { saveGame, loadGame, hasSave } from "./save.js";
+import { VERSION, BUILD_DATE } from "./version.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -21,6 +22,8 @@ let callSeconds = 0;
 const hudScore = document.getElementById("hud-score");
 const hudTurns = document.getElementById("hud-turns");
 const hudBill = document.getElementById("hud-bill");
+const hudVersion = document.getElementById("hud-version");
+if (hudVersion) hudVersion.textContent = `v${VERSION}`;
 
 let game = createGame(world);
 const history = [];
@@ -41,6 +44,7 @@ const BIG_BANNER =
 
               M A N O R
 An Adventure in the Classic Style  ·  © you, for fun
+v${VERSION}  ·  built ${BUILD_DATE}
 
 Type HELP for commands.  Type LOOK to look around.  Beware the dark.`;
 
@@ -51,6 +55,7 @@ const SMALL_BANNER =
 |          M A N O R           |
 +------------------------------+
 An Adventure in the Classic Style
+v${VERSION}  ·  built ${BUILD_DATE}
 
 Type HELP for commands. Type LOOK
 to look around. Beware the dark.`;

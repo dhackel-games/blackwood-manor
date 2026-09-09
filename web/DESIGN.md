@@ -234,7 +234,15 @@ the mansion.
   (`web/.nojekyll` keeps Pages from mangling the JS modules). Repo is public.
 - **Push flow:** the game repo is on David's personal `dhackel-games` GitHub, so pushes need
   `gh auth switch --user dhackel-games` first, then switch back to `dhackel_adobe` (work repos
-  use SSH and are unaffected).
+  use SSH and are unaffected). (Alternative that avoids switching accounts:
+  `git -c credential.helper='!f() { echo username=dhackel-games; echo password=$T; }; f' push`
+  with `T=$(gh auth token -u dhackel-games)`.)
+- **Version stamp:** `web/js/version.js` is the single source of truth (`VERSION`,
+  `BUILD_DATE`). It renders in the intro banner *and* in the always-visible HUD (top left),
+  so you can confirm at a glance which build a browser is actually running. **Bump it in the
+  same commit as any gameplay/engine change**, and keep `web/package.json` in sync. This
+  matters because Pages serves `js/` with `cache-control: max-age=600` — a tab can lag ~10
+  minutes behind a push, so if the HUD version is stale, hard-refresh (Cmd+Shift+R).
 - **iOS:** `ios/` is a SwiftUI + `WKWebView` wrapper bundling `web/` for offline play, with a
   native `app://` scheme handler and a native speech-to-text bridge. Bundle
   `com.dhackel.BlackwoodManor`, team `9W789FP4LG`.
