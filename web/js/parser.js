@@ -20,6 +20,7 @@ const VERBS = {
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter"],
   climb: ["climb", "descend"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give"], pray: ["pray", "perform"],
+  sit: ["sit"], use: ["use"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
   score: ["score"], save: ["save"], restore: ["restore", "load"], restart: ["restart"],

@@ -198,4 +198,60 @@ const WIN = [
   console.log("OK: mailbox/letter/burn + self-immolation + Gary fire call");
 }
 
+// ---------------------------------------------------------------------------
+// 8. Burn-up timer, brazier challenge, kitchen foods, toilet, badges
+// ---------------------------------------------------------------------------
+{
+  // Burn-up: you last a few turns, then you're ash.
+  const g = createGame(world);
+  g.send("light self on fire");
+  let dead = false;
+  for (let i = 0; i < 12 && !dead; i++) { g.send("wait"); dead = g.state.dead; }
+  assert.ok(dead, "staying on fire should eventually kill you");
+
+  // Fire ASCII banner + sick ASCII banner appear in room descriptions.
+  const g2 = createGame(world);
+  g2.send("light self on fire");
+  assert.match(g2.send("look"), /ON   F I R E|🔥/, "fire art shows in the room description");
+
+  // Brazier REQUIRES being on fire; lighting it rewards the ember + puts you out.
+  const g3 = createGame(world);
+  g3.state.room = "garden";
+  assert.match(g3.send("light brazier"), /whole person|hisses/i, "brazier won't light without your own fire");
+  g3.send("light self on fire");
+  assert.match(g3.send("light brazier"), /EMBER STONE/, "on fire, the brazier lights and yields the ember");
+  assert.equal(g3.getFlag("onFire"), false, "lighting the brazier dumps your fire into it");
+  assert.equal(g3.roomOf("emberStone"), "garden", "ember stone appears");
+  assert.equal(g3.getFlag("brazierLit"), true, "brazier is lit");
+
+  // Kitchen foods: high / sick / good.
+  let k = createGame(world); k.state.room = "kitchen";
+  k.send("eat mushrooms"); assert.ok((k.getFlag("high") || 0) > 0, "mushrooms get you high");
+  k = createGame(world); k.state.room = "kitchen";
+  k.send("eat meat"); assert.ok((k.getFlag("sick") || 0) > 0, "rancid meat makes you sick");
+  assert.match(k.send("look"), /VOMITING & DIARRHEA|🤢/, "sick art shows in the room description");
+  k.send("eat cheese"); assert.equal(k.getFlag("sick"), 0, "good cheese cures the sickness");
+  assert.equal(k.getFlag("ateGood"), true, "eating the cheese is recorded for the badge");
+
+  // Sickness is lethal if uncured...
+  const s = createGame(world); s.state.room = "kitchen";
+  s.send("eat meat");
+  let sdead = false;
+  for (let i = 0; i < 25 && !sdead; i++) { s.send("wait"); sdead = s.state.dead; }
+  assert.ok(sdead, "untreated sickness eventually kills you");
+  // ...but the privy toilet cures it.
+  const s2 = createGame(world); s2.state.room = "kitchen";
+  s2.send("eat meat"); s2.state.room = "privy";
+  assert.match(s2.send("use toilet"), /CURED/, "the toilet cures the sickness");
+  assert.equal(s2.getFlag("sick"), 0, "sick flag cleared after the toilet");
+
+  // Win-while-on-fire: 🔥 on the banner + the badge.
+  const w = createGame(world);
+  w.setFlag("onFire", true);
+  const winText = w.win("You step into the dawn.");
+  assert.match(winText, /alive 🔥/, "escape banner gets the fire emoji when ablaze");
+  assert.match(winText, /Frying Pan/, "winning on fire earns the badge");
+  console.log("OK: burn-up timer, brazier, foods, toilet, badges");
+}
+
 console.log("\nALL WALKTHROUGH TESTS PASSED");

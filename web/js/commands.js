@@ -218,6 +218,9 @@ export const commands = {
   },
   give(ctx) { return "There's no one here to give it to."; },
   pray(ctx) { return "Nothing happens. Perhaps something is missing."; },
+  sit(ctx, cmd) { return `You sit. ${cmd.dobj ? "The " + cmd.dobj + " is unmoved by the gesture." : "The floor is cold and unhelpful."}`; },
+  use(ctx, cmd) { return cmd.dobj ? `You can't see a way to use the ${cmd.dobj}.` : "Use what?"; },
+  flush(ctx, cmd) { return "There's nothing here to flush."; },
 
   wait() { return "Time passes."; },
 

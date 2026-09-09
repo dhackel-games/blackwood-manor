@@ -358,21 +358,51 @@ function burnLetter(ctx) {
   );
 }
 
+// --- Burn-up timer: being on fire will consume you if you don't act ----------
+const BURN_LINES = [
+  "You are on fire. It remains, technically, fine.",
+  "The fire creeps up to your eyebrows. Very characterful.",
+  "You now smell like a campfire that people are backing away from.",
+  "This is getting genuinely warm. You should REALLY do something about it.",
+  "⚠️  You're more flame than person now — EXTINGUISH SELF, dump the fire into something, or get Gary's brigade here THIS INSTANT.",
+];
+const BURN_DEATH =
+  "With a final, dignified WHUMP, you go up like dry tinder. When the smoke clears there is only a tasteful " +
+  "pile of ash, a faintly scorched candlestick, and — somewhere, unanswered — a phone ringing off the hook.";
+// Advance the burn by one step. Returns { dead, text }. Called both on world turns
+// (burnTick) AND on every line you say to Gary while ablaze (fireCallTalk).
+function stepBurn(ctx) {
+  const n = (ctx.getFlag("burnTurns") || 0) + 1;
+  ctx.setFlag("burnTurns", n);
+  if (n > (ctx.getFlag("maxBurnTurns") || 0)) ctx.setFlag("maxBurnTurns", n);
+  if (n <= BURN_LINES.length) return { dead: false, text: BURN_LINES[n - 1] };
+  ctx.setFlag("onFire", false);
+  return { dead: true, text: ctx.kill(BURN_DEATH) };
+}
+function burnTick(ctx) {
+  if (!ctx.getFlag("onFire")) return null;
+  if (ctx.getFlag("burnGrace")) { ctx.setFlag("burnGrace", false); return null; } // the turn you ignite is free
+  return stepBurn(ctx).text;
+}
+
 // Self-immolation. Works in any room (see the interceptor injected at the bottom).
 function igniteSelf(ctx) {
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
   ctx.setFlag("onFire", true);
+  ctx.setFlag("burnTurns", 0);
+  ctx.setFlag("burnGrace", true);
   ctx.addScore(-1);
   return (
     "You... set yourself on fire.\n\n" +
     "AHAHAHAHA — YOU'RE ON FIRE! This is fine. This is, if anything, cozy. The portraits on the walls " +
-    "seem to lean in with something like respect.\n\n" +
-    "You are now comprehensively ablaze. You should probably CALL someone about this. Gary, maybe. Gary lives for this."
+    "lean in with something like respect.\n\n" +
+    "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. Put yourself out, " +
+    "dump the fire into something, or make it COUNT. (Gary lives for this.)"
   );
 }
 function putOutSelf(ctx) {
   if (!ctx.getFlag("onFire")) return null; // nothing to douse — let the generic handler answer
-  ctx.setFlag("onFire", false);
+  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
   return "You drop and roll like a responsible adult. The flames sputter out, leaving you smoking, singed, " +
     "and strangely disappointed. You are no longer on fire.";
 }
@@ -404,52 +434,222 @@ function fireGreeting(ctx) {
     "(Fire tab: $" + (tab / 100).toFixed(2) + ". Try telling Gary to CALL THE FIRE DEPARTMENT — or HANG UP, hotshot.)"
   );
 }
+const money$ = (ctx) => "$" + ((ctx.getFlag("fireTab") || 199) / 100).toFixed(2);
+const bumpTab = (ctx) => { ctx.setFlag("fireTab", (ctx.getFlag("fireTab") || 199) + 99); };
+// Gary periodically offers you a glass of water. There is, of course, no water.
+function waterOffer(ctx) {
+  if (Math.random() > 0.5) return "";
+  ctx.setFlag("waterOffered", true);
+  return "\n\nGary: \"...Say. You want a glass of water? ...No? Offer stands.\"";
+}
+// Gary finally eats a pizza — with a coin-flip chance of catastrophe.
+function garyEatsPizza(ctx) {
+  ctx.setFlag("pizzaEaten", true);
+  bumpTab(ctx);
+  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0); // the brigade turns up here too
+  if (Math.random() < 0.5) {
+    ctx.setFlag("garyStricken", true);
+    return (
+      "Gary: \"...you're a SAINT.\" *frantic unwrapping* *the wettest, most enormous bite you have ever heard* " +
+      "\"...mmMPH. Oh. That's the stuff. That's—\"\n\n*a silence*\n\n" +
+      "Gary: \"...oh no. Oh NO. That pizza was a mistake. That pizza was a GRAVE mistake—\" *the line dissolves into " +
+      "the sounds of a biblical, two-ended gastrointestinal reckoning* \"—I NEED THE OTHER BATHROOM, DENISE, MOVE—\" " +
+      "*CLATTER* *distant sprinting*\n\n" +
+      "(Meanwhile the Blackwood Volunteer Fire Brigade wanders in and hoses you down almost as an afterthought. " +
+      "You are OUT. " + money$(ctx) + " on the fire tab. Gary is... indisposed. Say HANG UP.)"
+    );
+  }
+  return (
+    "Gary: \"...you're a SAINT.\" *frantic unwrapping* *an enormous, joyful bite* \"...oh. OH. That's the best thing " +
+    "that's happened to me in YEARS. I could cry. I might cry.\"\n\n" +
+    "\"You're a good person. Genuinely. That's " + money$(ctx) + ", and worth every cent — to ME.\"\n\n" +
+    "(The fire brigade shows up and hoses you down. You are OUT, and Gary is, for one shining moment, happy. Say HANG UP.)"
+  );
+}
+function fireRescue(ctx) {
+  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
+  bumpTab(ctx);
+  return (
+    "Sirens, at last. The Blackwood Volunteer Fire Brigade — one guy, one hose — kicks in the gate and blasts you " +
+    "off your feet with a jet of freezing water. You are OUT. Soaked, steaming, singed to a crisp, but OUT.\n\n" +
+    "Gary: \"There's the fire-department surcharge — " + money$(ctx) + " now. ...So. About that pizza. You never " +
+    "answered. And I am STILL hungry.\"\n\n" +
+    "(You're no longer on fire. " + meter(ctx) + " Say HANG UP whenever you've had your fill of Gary.)"
+  );
+}
 // Gary, while you keep talking to him and continue to be on fire.
+// NOTE: every line you speak while ablaze feeds the fire — yes, even on hold.
 function fireCallTalk(ctx, t) {
-  let tab = ctx.getFlag("fireTab") || 199;
-  let stage = ctx.getFlag("fireStage") || 1;
-  const money = () => "$" + (tab / 100).toFixed(2);
+  const burn = stepBurn(ctx);
+  if (burn.dead) {
+    ctx.setFlag("onCall", false);
+    return "You erupt into a final gout of flame — on hold, no less.\n\n" +
+      "Gary: \"...Hello? Huh. Musta hung up. Rude.\" *click*\n\n" + burn.text;
+  }
+  const tail = "\n\n🔥 " + burn.text + waterOffer(ctx) + "\n\n" + meter(ctx);
+  const stage = ctx.getFlag("fireStage") || 1;
 
+  // You bit on the (nonexistent) glass of water. It costs you a turn — already burned above.
+  // A lone "yes" counts, but "yes, here's pizza money" should NOT be hijacked by the water gag.
+  const bareYes = /^(yes|yeah|yep|yup|sure|ok|okay|please)\b/.test(t) && !/pizza|fire|depart|dept|911|money|pay|help/.test(t);
+  if (ctx.getFlag("waterOffered") && (/\b(water|glass|drink|thirsty|sip)\b/.test(t) || bareYes)) {
+    ctx.setFlag("waterOffered", false);
+    return "Gary: \"Oh — no, we don't actually HAVE any water. I just like asking. It's the asking I enjoy.\"" + tail;
+  }
   // He'll still cough up a real hint. You are, after all, on fire.
   if (/\b(hint|clue|stuck|next)\b/.test(t))
-    return frameHint(ctx, nextHint(ctx)) + "\n\n\"...you're welcome. You're also still on fire.\" " + meter(ctx);
+    return frameHint(ctx, nextHint(ctx)) + "\n\n\"...you're welcome. You're also still on fire.\"" + tail;
 
-  const wantsFD = /(fire\s*dep|fire\s*brigade|fire\s*truck|firemen|fireman|firefighter|911|emergency|ambulance|\bhelp\b|\bsave\b|rescue|put\s*out|douse|\bwater\b|extinguish|hose)/.test(t);
+  const wantsFD = /(fire\s*dep|fire\s*brigade|fire\s*truck|firemen|fireman|firefighter|911|emergency|ambulance|\bhelp\b|\bsave\b|rescue|put\s*out|douse|extinguish|hose)/.test(t);
+  const offersPizza = /\b(pizza|yes|yeah|sure|ok|okay|here|deal|take it|money|pay|cash|tip|buy)\b/.test(t);
 
-  if (stage >= 3) { // the truck finally shows up
-    ctx.setFlag("onFire", false);
-    tab += 99; ctx.setFlag("fireTab", tab);
-    return (
-      "Sirens, at last. The Blackwood Volunteer Fire Brigade — one guy, one hose — kicks in the gate and " +
-      "blasts you off your feet with a jet of freezing water. You are OUT. Soaked, steaming, singed to a crisp, but OUT.\n\n" +
-      "Gary: \"There's the fire-department surcharge — you're at " + money() + " now.\"\n\n" +
-      "\"So. About that pizza. You never answered. And I am STILL hungry.\"\n\n" +
-      "(You're no longer on fire. " + meter(ctx) + " Say HANG UP whenever you've had your fill of Gary.)"
-    );
-  }
+  if (stage >= 3 && offersPizza && !ctx.getFlag("pizzaEaten")) return garyEatsPizza(ctx);
+  if (stage >= 3) return fireRescue(ctx);
   if (wantsFD) { // "Gary, call the fire department!"
-    ctx.setFlag("fireStage", 3);
-    tab += 99; ctx.setFlag("fireTab", tab);
+    ctx.setFlag("fireStage", 3); bumpTab(ctx);
     return (
-      "Gary: \"The fire department. Sure.\" *you hear one finger dial, unbelievably slowly* \"...Okay. They're " +
-      "coming. Eventually. It's a volunteer outfit.\"\n\n" +
-      "\"That's another buck for the call — you're at " + money() + " now.\"\n\n" +
+      "Gary: \"The fire department. Sure.\" *one finger dials, unbelievably slowly* \"...Okay. They're coming. " +
+      "Eventually. It's a volunteer outfit.\"\n\n" +
+      "\"That's another buck — you're at " + money$(ctx) + " now.\"\n\n" +
       "\"Hey — while you're cooking? You got anything on you for a pizza? Large, extra cheese. Costs exactly " +
-      money() + ", would you believe it, and I need it. Haven't eaten since Tuesday and you are LITERALLY a grill.\"\n\n" +
-      meter(ctx)
+      money$(ctx) + ", would you believe it, and I NEED it. Haven't eaten since Tuesday and you are LITERALLY a grill.\"" + tail
     );
   }
-  // On fire, but not asking for help yet. Gary is unmoved.
-  tab += 99; ctx.setFlag("fireTab", tab); ctx.setFlag("fireStage", Math.max(stage, 1));
+  bumpTab(ctx); // dawdling on fire. Gary is unmoved.
   return (
     stagePick(ctx, [
       "Gary: \"Yeah, you mentioned — you're on fire. Bold. Not judging. ...Little judging.\"",
       "Gary: \"Still burning, huh? Commitment. I'll give you that.\"",
       "Gary: \"I hear crackling. That's either you or my dinner, and I don't have dinner.\"",
     ]) +
-    " \"That's " + money() + " on the fire tab, by the way.\"\n\n" +
-    "(You could, you know, ask Gary to CALL THE FIRE DEPARTMENT.) " + meter(ctx)
+    " \"That's " + money$(ctx) + " on the fire tab.\"\n\n(You could ask Gary to CALL THE FIRE DEPARTMENT.)" + tail
   );
+}
+
+// --- Kitchen edibles: one gets you high, one wrecks you, one actually helps --
+const HIGH_LINES = [
+  "The walls breathe, gently. The wallpaper's paisley is trying to tell you something kind.",
+  "Time feels optional. Your hands are, on reflection, magnificent.",
+  "You get the ghosts now. They're just vibes. Everything, really, is vibes.",
+  "A single cobweb becomes, briefly, the most beautiful thing you have ever seen.",
+];
+const SICK_LINES = [
+  "Your stomach lurches. Something down there has Opinions.",
+  "A cold sweat blooms. The gurgling is coming from INSIDE the adventurer.",
+  "You double over. Whatever you ate is staging a full revolt — from both exits.",
+  "Nope. Nope nope nope. You need a bathroom this manor simply does not have.",
+];
+function eatMushrooms(ctx) {
+  ctx.destroy("mushrooms");
+  ctx.setFlag("high", 6);
+  return "You eat the strange mushrooms.\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
+    "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here.";
+}
+function eatMeat(ctx) {
+  ctx.destroy("meat");
+  ctx.setFlag("sick", 20);
+  return "You eat the rancid meat.\n\nInstantly, catastrophically, you understand this was a mistake. Your gut " +
+    "clenches. Something is coming. Something is coming from BOTH DIRECTIONS. (You are now violently ill — find a " +
+    "TOILET or the good cheese soon, or this WILL kill you.)";
+}
+function eatProvisions(ctx) {
+  ctx.destroy("provisions");
+  const wasAfflicted = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
+  ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
+  ctx.setFlag("ateGood", true);
+  ctx.addScore(5);
+  return "You eat the good cheese. Real food, at last.\n\n" +
+    (wasAfflicted ? "Your stomach settles and your head clears — whatever was wrong with you passes. " : "") +
+    "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)";
+}
+
+// --- The ceremonial brazier: only YOUR fire is big enough to light it --------
+function lightBrazier(ctx) {
+  if (ctx.getFlag("brazierLit")) return "The brazier already blazes, throwing gold-and-green light across the garden.";
+  if (!ctx.getFlag("onFire"))
+    return "The moss is grave-damp and the kindling packed tight — a match, even a lit candle, just hisses and dies " +
+      "against it. It would take a far bigger, more reckless flame. Something like... a whole person, say.";
+  ctx.setFlag("brazierLit", true);
+  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
+  ctx.addScore(10);
+  ctx.moveItem("emberStone", "garden");
+  return "You fling your burning self against the brazier — and the fire LEAPS off you into the moss with a WHUMP. " +
+    "You stagger back, smoking but no longer ablaze, as the bowl roars up in gold-and-green flame.\n\n" +
+    "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)\n\n" +
+    "A fair trade: you gave the fire away, and it gave you this.";
+}
+
+const SICK_DEATH =
+  "Your body, having expelled everything it ever contained and several things it never did, finally gives out. " +
+  "You collapse — hollow, dehydrated, and profoundly undignified — on the floor of a haunted house. What a way to go.";
+// --- Per-turn world tick: burn-up + food afflictions -------------------------
+function afflictionTick(ctx) {
+  const out = [];
+  const hi = ctx.getFlag("high") || 0;
+  if (hi > 0) { ctx.setFlag("high", hi - 1); out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]); }
+  const sick = ctx.getFlag("sick") || 0;
+  if (sick > 0) {
+    const left = sick - 1;
+    ctx.setFlag("sick", left);
+    if (left === 0) return ctx.kill(SICK_DEATH);           // ran the full course uncured -> death
+    out.push(SICK_LINES[(left) % SICK_LINES.length]);
+    if (left <= 3) out.push("You are dangerously dehydrated. Find a TOILET or the good cheese NOW.");
+  }
+  return out.length ? out.join("\n") : null;
+}
+function worldTick(ctx) {
+  const parts = [];
+  const b = burnTick(ctx);          // may kill you
+  if (b) parts.push(b);
+  if (ctx.state.dead) return parts.join("\n\n");
+  const a = afflictionTick(ctx);    // may also kill you (sickness runs its course)
+  if (a) parts.push(a);
+  return parts.length ? parts.join("\n\n") : null;
+}
+
+// --- ASCII status art stamped onto every room description --------------------
+const FIRE_ART = [
+  "        )   (   )",
+  "       (   ) (   )      🔥  Y O U   A R E   O N   F I R E  🔥",
+  "        ) (   ) (",
+  "      _(___)_(___)_",
+].join("\n");
+const SICK_ART = [
+  "     \\o/   ~ B L E A R G H ~     🤢  VOMITING & DIARRHEA  🤮",
+  "      |    ~ ~ ~",
+  "     / \\   . : . : .",
+].join("\n");
+function statusBanner(ctx) {
+  const parts = [];
+  if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
+  if ((ctx.getFlag("sick") || 0) > 0) parts.push(SICK_ART);
+  return parts.length ? parts.join("\n") : "";
+}
+
+// --- The privy: sit / use / flush to end the vomiting & diarrhea -------------
+function useToilet(ctx) {
+  if ((ctx.getFlag("sick") || 0) > 0) {
+    ctx.setFlag("sick", 0);
+    return "You reach the privy not one moment too soon. What follows is private, thorough, and — eventually — " +
+      "deeply cathartic. You emerge hollow and trembling, but CURED. The vomiting and diarrhea have passed.";
+  }
+  if ((ctx.getFlag("high") || 0) > 0)
+    return "You sit and contemplate the porcelain for what may be an hour, or an epoch. It is profound. It is also unhelpful.";
+  return "You don't especially need it right now — but you're glad it's here. The old plumbing groans a ghostly groan.";
+}
+
+// --- End-screen achievement badges -------------------------------------------
+function endBadges(ctx) {
+  const b = [];
+  if (ctx.getFlag("onFire"))
+    b.push("🔥 BADGE: \"Out Of The Frying Pan\" — you escaped Blackwood Manor WHILE STILL ON FIRE. Gary is, for once, speechless.");
+  if (ctx.getFlag("brazierLit"))
+    b.push("🕯️ BADGE: \"The Old Ways\" — you lit the ceremonial brazier with your own burning body.");
+  if ((ctx.getFlag("maxBurnTurns") || 0) >= 4)
+    b.push("🥵 BADGE: \"Slow Burn\" — you stayed ablaze for " + ctx.getFlag("maxBurnTurns") + " turns and lived to tell it.");
+  if (ctx.getFlag("ateGood"))
+    b.push("🧀 BADGE: \"Ate Well\" — you found the one thing in that kitchen worth eating.");
+  return b.length ? "\n\n" + b.join("\n") : "";
 }
 
 // ---- the world ---------------------------------------------------------------
@@ -458,6 +658,9 @@ export const world = {
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
   phoneRank,   // hall-of-shame bill rank for the end screen
+  tick: worldTick,   // per-turn: burn-up timer + food afflictions (may kill)
+  statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
+  endBadges,         // win-screen achievement badges
 
   rooms: {
     gate: {
@@ -475,8 +678,9 @@ export const world = {
       desc:
         "Brambles have swallowed what was once a formal garden. A weathered stone statue " +
         "of a robed woman leans amid the weeds, and a crumbling well shaft plunges into " +
-        "blackness. The gate lies back to the west.",
-      exits: { west: "gate" },
+        "blackness. A cold iron brazier stands nearby. An ivy-choked brick privy squats to " +
+        "the east; the gate lies back to the west.",
+      exits: { west: "gate", east: "privy" },
       on: {
         // "down" / "go down" / "climb down" all attempt the well.
         go(ctx, cmd) {
@@ -484,6 +688,14 @@ export const world = {
           return descendWell(ctx);
         },
       },
+    },
+
+    privy: {
+      name: "Ivy-Choked Privy",
+      desc:
+        "A cramped brick outhouse strangled in ivy, containing one heroically old TOILET. Against all " +
+        "odds and several laws of hygiene, it still flushes. The garden lies back to the west.",
+      exits: { west: "garden" },
     },
 
     porch: {
@@ -773,6 +985,52 @@ export const world = {
         "   to the reliquary in the hall, all of them, and the bell rung, or the curse will\n" +
         "   never lift. Do not linger in the dark. And God help you in the crypt.\"",
       on: { burn: burnLetter },
+    },
+
+    // --- the ceremonial brazier + its reward (garden) ---
+    brazier: {
+      names: ["brazier", "firebowl", "bowl"], adjectives: ["iron", "cold", "ceremonial", "old"],
+      loc: "garden", fixed: true,
+      roomDesc: "A cold iron BRAZIER stands on a tripod amid the weeds, heaped with damp moss.",
+      desc: "A cold iron brazier on a rusted tripod, heaped with grave-damp moss and packed black kindling. " +
+        "Old scorch-marks ring its base — it has been lit before, for something. A mere match won't touch moss this wet.",
+      on: { light: lightBrazier, burn: lightBrazier },
+    },
+    emberStone: {
+      names: ["ember", "emberstone", "stone"], adjectives: ["ember", "warm", "glowing"],
+      loc: null, takeable: true, treasure: false,
+      desc: "A smooth grey stone that holds a live coal's warmth and a faint inner glow. It never quite cools.",
+    },
+
+    // --- kitchen edibles: high / sick / help ---
+    mushrooms: {
+      names: ["mushrooms", "mushroom", "fungus"], adjectives: ["strange", "speckled", "purple"],
+      loc: "kitchen", takeable: true, edible: true,
+      roomDesc: "A cluster of speckled purple MUSHROOMS sprouts from the damp windowsill.",
+      desc: "Speckled purple mushrooms, faintly luminous. Eating these is self-evidently a terrible idea.",
+      on: { eat: eatMushrooms },
+    },
+    meat: {
+      names: ["meat", "roast", "ham"], adjectives: ["rancid", "grey", "questionable"],
+      loc: "kitchen", takeable: true, edible: true,
+      roomDesc: "A grey, questionable ROAST sits on the table, humming with flies.",
+      desc: "A joint of grey meat well past any defensible date. It smells like a decision you will regret.",
+      on: { eat: eatMeat },
+    },
+    provisions: {
+      names: ["cheese", "wheel", "provisions", "rations"], adjectives: ["wax", "hard", "good"],
+      loc: "kitchen", takeable: true, edible: true,
+      roomDesc: "A wax-sealed WHEEL OF CHEESE sits untouched in the pantry nook.",
+      desc: "A wax-sealed wheel of hard cheese, somehow still perfectly good. Actual, genuine, edible food.",
+      on: { eat: eatProvisions },
+    },
+    toilet: {
+      names: ["toilet", "commode", "throne", "loo"], adjectives: ["old", "porcelain", "cracked"],
+      loc: "privy", fixed: true,
+      roomDesc: "The TOILET waits, lid up, weirdly inviting.",
+      desc: "A cracked porcelain toilet of tremendous age, miraculously plumbed. In a haunted house it is the least " +
+        "frightening thing by a mile — unless you badly need it, in which case it is salvation itself.",
+      on: { sit: useToilet, use: useToilet, flush: useToilet, enter: useToilet },
     },
     frontDoor: {
       names: ["door"], adjectives: ["front", "oak", "great"], loc: "porch", fixed: true, scenery: true,

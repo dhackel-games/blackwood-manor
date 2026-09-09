@@ -88,10 +88,11 @@ export function createGame(world) {
   };
   game.win = (msg) => {
     state.won = true;
+    const badges = typeof world.endBadges === "function" ? (world.endBadges(game) || "") : "";
     return (msg ? msg + "\n\n" : "") +
-      `    ****  You have escaped Blackwood Manor alive.  ****\n\n` +
+      `    ****  You have escaped Blackwood Manor alive${state.flags.onFire ? " 🔥" : ""}.  ****\n\n` +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
-      phoneBillLine();
+      badges + phoneBillLine();
   };
   game.kill = (msg) => {
     state.dead = true;
@@ -135,6 +136,10 @@ export function createGame(world) {
         }
       }
     }
+    if (typeof world.statusBanner === "function") {
+      const sb = world.statusBanner(game);
+      if (sb) out += "\n" + sb + "\n";
+    }
     return out.trimEnd();
   };
 
@@ -155,6 +160,12 @@ export function createGame(world) {
       pending = "It is pitch black. You are likely to be eaten by a grue.";
     } else {
       grueKill = true;
+    }
+    // Generic per-turn content hook (e.g. the burn-up timer). Returns an optional
+    // message; may call ctx.kill()/ctx.win() to end the game mid-tick.
+    if (typeof world.tick === "function") {
+      const m = world.tick(game);
+      if (m != null) pending = pending ? pending + "\n\n" + m : m;
     }
   }
 
