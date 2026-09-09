@@ -334,7 +334,10 @@ if (!canType) {
 
 // Mute toggle for Gary's voice.
 const muteBtn = document.getElementById("phone-mute");
-function setMuteLabel() { muteBtn.textContent = ttsMuted ? "🔇 Gary: off" : "🔊 Gary: on"; }
+function setMuteLabel() {
+  muteBtn.textContent = ttsMuted ? "🔊 Turn on Gary's voice" : "🔇 Mute Gary";
+  muteBtn.classList.toggle("on", !ttsMuted);
+}
 setMuteLabel();   // reflect the default (muted)
 muteBtn.addEventListener("click", () => {
   ttsMuted = !ttsMuted;
