@@ -163,4 +163,39 @@ const WIN = [
   console.log("OK: bell opens the hidden wing");
 }
 
+// ---------------------------------------------------------------------------
+// 7. Andy's bit: mailbox -> letter -> burn -> light self on fire -> call Gary
+// ---------------------------------------------------------------------------
+{
+  const g = createGame(world);
+  g.send("north");                                   // gate -> porch
+  assert.match(g.send("open mailbox"), /letter/i, "mailbox opens to reveal the letter");
+  assert.equal(g.send("get letter"), "Taken.", "letter is takeable");
+  assert.match(g.send("burn letter"), /alight|ash|flakes/i, "letter can be burned");
+  assert.equal(g.roomOf("letter"), null, "burned letter is destroyed");
+
+  const ablaze = g.send("light self on fire");
+  assert.match(ablaze, /on fire/i, "you can light yourself on fire");
+  assert.equal(g.getFlag("onFire"), true, "onFire flag set");
+
+  const greet = g.send("call gary");                 // dial in while ablaze
+  assert.match(greet, /burning|on fire/i, "Gary notices you're on fire");
+  assert.match(greet, /dollar ninety-nine|1\.99/i, "Gary quotes $1.99 for the on-fire call");
+
+  const fd = g.send("Gary call the fire department!");
+  assert.match(fd, /2\.98/, "fire-department beat lands at $2.98");
+  assert.match(fd, /pizza/i, "...and Gary wants pizza money");
+
+  const rescued = g.send("here's the money");         // resolution beat
+  assert.match(rescued, /fire brigade|hose|OUT/i, "the fire brigade eventually shows up");
+  assert.equal(g.getFlag("onFire"), false, "no longer on fire after the rescue");
+
+  // self-immolation works anywhere; generic lighting stays intact
+  const g2 = createGame(world);
+  assert.match(g2.send("burn self"), /on fire/i, "'burn self' also ignites");
+  assert.match(g2.send("extinguish self"), /no longer on fire/i, "stop-drop-roll puts you out");
+  assert.equal(g2.send("light mailbox"), "You can't light that.", "normal lighting unaffected");
+  console.log("OK: mailbox/letter/burn + self-immolation + Gary fire call");
+}
+
 console.log("\nALL WALKTHROUGH TESTS PASSED");

@@ -202,6 +202,10 @@ export const commands = {
   push(ctx, cmd) { return `Pushing the ${cmd.dobj || "thing"} accomplishes nothing.`; },
   pull(ctx, cmd) { return `You pull the ${cmd.dobj || "thing"}, to no effect.`; },
   attack(ctx, cmd) { return "Violence isn't the answer to this one."; },
+  burn(ctx, cmd) {
+    if (!cmd.dobj) return "Burn what?";
+    return `You can't quite bring yourself to set fire to the ${cmd.dobj}.`;
+  },
   throw(ctx) { return "That would be unwise."; },
   ring(ctx, cmd) { return `You ring the ${cmd.dobj || "thing"}, but nothing answers.`; },
   touch(ctx, cmd) { return "You feel nothing unexpected."; },

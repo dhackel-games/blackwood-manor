@@ -224,6 +224,7 @@ function hotline(ctx) {
   bumpXP(ctx);
   bumpBill(ctx);
   ctx.addScore(-2); // dialing in isn't free, pal
+  if (ctx.getFlag("onFire")) return fireGreeting(ctx);
   const pool = STAGE_INTROS[garyStage(ctx)];
   const intro = pool[(n - 1) % pool.length];
   const tail = garyStage(ctx) >= 2
@@ -243,6 +244,7 @@ function hotlineTalk(ctx, text) {
     const arr = SIGNOFF_STAGE[garyStage(ctx)];
     return arr[Math.floor(Math.random() * arr.length)] + " " + meter(ctx) + billAside(ctx) + " *click*";
   }
+  if (ctx.getFlag("onFire")) return fireCallTalk(ctx, t);
   if (/\b(shut up|screw you|stupid|idiot|jerk|rude|hate you|loser|dumb|useless)\b/.test(t)) {
     const rc = (ctx.getFlag("hotlineRude") || 0) + 1;
     ctx.setFlag("hotlineRude", rc);
@@ -340,6 +342,114 @@ function descendWell(ctx) {
   ctx.moveItem("ancientCoin", "garden");
   return "Bracing against the rope, you descend into the well. At the muddy bottom your " +
     "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.";
+}
+
+// ---------------------- Andy's "light self on fire" gag ----------------------
+// Burning the letter (Zork's leaflet, but arson).
+function burnLetter(ctx) {
+  const l = ctx.item("letter");
+  if (!l || l.loc == null) return "There's no letter to burn — you've already reduced it to ash.";
+  ctx.destroy("letter");
+  ctx.setFlag("letterBurned", true);
+  return (
+    "You don't remember striking a match, but the water-stained letter is suddenly alight. It curls " +
+    "into black flakes and crumbles away — warning, curse, crypt and all.\n\n" +
+    "Somewhere, the house seems to take note. That felt unwise. It felt GREAT, but unwise."
+  );
+}
+
+// Self-immolation. Works in any room (see the interceptor injected at the bottom).
+function igniteSelf(ctx) {
+  if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+  ctx.setFlag("onFire", true);
+  ctx.addScore(-1);
+  return (
+    "You... set yourself on fire.\n\n" +
+    "AHAHAHAHA — YOU'RE ON FIRE! This is fine. This is, if anything, cozy. The portraits on the walls " +
+    "seem to lean in with something like respect.\n\n" +
+    "You are now comprehensively ablaze. You should probably CALL someone about this. Gary, maybe. Gary lives for this."
+  );
+}
+function putOutSelf(ctx) {
+  if (!ctx.getFlag("onFire")) return null; // nothing to douse — let the generic handler answer
+  ctx.setFlag("onFire", false);
+  return "You drop and roll like a responsible adult. The flames sputter out, leaving you smoking, singed, " +
+    "and strangely disappointed. You are no longer on fire.";
+}
+function selfLightInterceptor(ctx, cmd) {
+  const d = (cmd.dobj || "").toLowerCase();
+  const i = (cmd.iobj || "").toLowerCase();
+  if (["self", "myself", "me", "yourself"].includes(d)) return igniteSelf(ctx);
+  if (["fire", "flame", "flames"].includes(d) && !ctx.find(d)) return igniteSelf(ctx); // "light fire"
+  if (!d && i === "fire") return igniteSelf(ctx);                                       // "light on fire"
+  return null; // not self-immolation — fall through to the generic light/burn command
+}
+function selfExtinguishInterceptor(ctx, cmd) {
+  const d = (cmd.dobj || "").toLowerCase();
+  if (ctx.getFlag("onFire") && (["self", "myself", "me", "fire", "flame", "flames"].includes(d) || !d))
+    return putOutSelf(ctx);
+  return null;
+}
+
+// Gary, when you dial in while ablaze.
+function fireGreeting(ctx) {
+  if (!ctx.getFlag("fireTab")) ctx.setFlag("fireTab", 199);
+  ctx.setFlag("fireStage", 1);
+  const tab = ctx.getFlag("fireTab");
+  return (
+    "*click* \"Blackwood Manor Hint Line, ninety-nine cents a—\" *sniff* \"...is something burning?\"\n\n" +
+    "Gary: \"...Oh. It's you. You're on fire.\"\n\n" +
+    "\"Yeah, that's a premium call — being on fire is premium. That's gonna be a dollar ninety-nine.\" " +
+    "*the meter ticks up without the faintest trace of urgency*\n\n" +
+    "(Fire tab: $" + (tab / 100).toFixed(2) + ". Try telling Gary to CALL THE FIRE DEPARTMENT — or HANG UP, hotshot.)"
+  );
+}
+// Gary, while you keep talking to him and continue to be on fire.
+function fireCallTalk(ctx, t) {
+  let tab = ctx.getFlag("fireTab") || 199;
+  let stage = ctx.getFlag("fireStage") || 1;
+  const money = () => "$" + (tab / 100).toFixed(2);
+
+  // He'll still cough up a real hint. You are, after all, on fire.
+  if (/\b(hint|clue|stuck|next)\b/.test(t))
+    return frameHint(ctx, nextHint(ctx)) + "\n\n\"...you're welcome. You're also still on fire.\" " + meter(ctx);
+
+  const wantsFD = /(fire\s*dep|fire\s*brigade|fire\s*truck|firemen|fireman|firefighter|911|emergency|ambulance|\bhelp\b|\bsave\b|rescue|put\s*out|douse|\bwater\b|extinguish|hose)/.test(t);
+
+  if (stage >= 3) { // the truck finally shows up
+    ctx.setFlag("onFire", false);
+    tab += 99; ctx.setFlag("fireTab", tab);
+    return (
+      "Sirens, at last. The Blackwood Volunteer Fire Brigade — one guy, one hose — kicks in the gate and " +
+      "blasts you off your feet with a jet of freezing water. You are OUT. Soaked, steaming, singed to a crisp, but OUT.\n\n" +
+      "Gary: \"There's the fire-department surcharge — you're at " + money() + " now.\"\n\n" +
+      "\"So. About that pizza. You never answered. And I am STILL hungry.\"\n\n" +
+      "(You're no longer on fire. " + meter(ctx) + " Say HANG UP whenever you've had your fill of Gary.)"
+    );
+  }
+  if (wantsFD) { // "Gary, call the fire department!"
+    ctx.setFlag("fireStage", 3);
+    tab += 99; ctx.setFlag("fireTab", tab);
+    return (
+      "Gary: \"The fire department. Sure.\" *you hear one finger dial, unbelievably slowly* \"...Okay. They're " +
+      "coming. Eventually. It's a volunteer outfit.\"\n\n" +
+      "\"That's another buck for the call — you're at " + money() + " now.\"\n\n" +
+      "\"Hey — while you're cooking? You got anything on you for a pizza? Large, extra cheese. Costs exactly " +
+      money() + ", would you believe it, and I need it. Haven't eaten since Tuesday and you are LITERALLY a grill.\"\n\n" +
+      meter(ctx)
+    );
+  }
+  // On fire, but not asking for help yet. Gary is unmoved.
+  tab += 99; ctx.setFlag("fireTab", tab); ctx.setFlag("fireStage", Math.max(stage, 1));
+  return (
+    stagePick(ctx, [
+      "Gary: \"Yeah, you mentioned — you're on fire. Bold. Not judging. ...Little judging.\"",
+      "Gary: \"Still burning, huh? Commitment. I'll give you that.\"",
+      "Gary: \"I hear crackling. That's either you or my dinner, and I don't have dinner.\"",
+    ]) +
+    " \"That's " + money() + " on the fire tab, by the way.\"\n\n" +
+    "(You could, you know, ask Gary to CALL THE FIRE DEPARTMENT.) " + meter(ctx)
+  );
 }
 
 // ---- the world ---------------------------------------------------------------
@@ -662,6 +772,7 @@ export const world = {
         "  \"To whoever inherits this cursed house — the family's heirlooms must be returned\n" +
         "   to the reliquary in the hall, all of them, and the bell rung, or the curse will\n" +
         "   never lift. Do not linger in the dark. And God help you in the crypt.\"",
+      on: { burn: burnLetter },
     },
     frontDoor: {
       names: ["door"], adjectives: ["front", "oak", "great"], loc: "porch", fixed: true, scenery: true,
@@ -907,4 +1018,19 @@ function revealSafe(ctx) {
   ctx.setFlag("safeRevealed");
   ctx.moveItem("safe", "parlor");
   return "You swing the heavy portrait aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE.";
+}
+
+// --- Self-immolation & stop-drop-roll in ANY room (Andy's idea) --------------
+// Inject a light/burn/extinguish interceptor into every room's handler table so
+// the player can set themselves ablaze (or put themselves out) anywhere, without
+// touching the generic engine. Each interceptor tries the self-fire path first,
+// then falls back to any pre-existing room handler (returning null = fall through
+// to the normal command).
+for (const room of Object.values(world.rooms)) {
+  room.on = room.on || {};
+  const pLight = room.on.light, pBurn = room.on.burn, pExt = room.on.extinguish, pOff = room.on.off;
+  room.on.light = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pLight ? pLight(ctx, cmd) : null);
+  room.on.burn = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pBurn ? pBurn(ctx, cmd) : null);
+  room.on.extinguish = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pExt ? pExt(ctx, cmd) : null);
+  room.on.off = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pOff ? pOff(ctx, cmd) : null);
 }
