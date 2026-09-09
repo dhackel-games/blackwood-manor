@@ -158,7 +158,16 @@ function garyStage(ctx) {
   return 3;               // full therapist
 }
 function stagePick(ctx, arr) { return arr[Math.min(garyStage(ctx), arr.length - 1)]; }
-function say(ctx, arr) { return stagePick(ctx, arr) + " " + meter(ctx) + billAside(ctx) + garyAside(ctx); }
+// The mechanical tail appended to every conversational line: the meter, any
+// one-shot bill milestone, and the mood aside. Captured here so the optional LLM
+// voice layer can replace Gary's WORDS while keeping the tail intact — billAside
+// has a one-shot side effect, so dropping it would silently eat a milestone.
+let lastSayTail = "";
+function say(ctx, arr) {
+  const tail = " " + meter(ctx) + billAside(ctx) + garyAside(ctx);
+  lastSayTail = tail;
+  return stagePick(ctx, arr) + tail;
+}
 
 const STAGE_INTROS = [
   INTROS,
@@ -236,6 +245,21 @@ function hotline(ctx) {
 // While you're on the line, everything you type is routed here (core.send).
 function hotlineTalk(ctx, text) {
   const t = (text || "").trim().toLowerCase();
+
+  // Gary's later stages are a joke about a burnt-out man playing therapist.
+  // A real person typing real despair into that box is not a joke. Handle it
+  // deterministically, BEFORE the meter runs and before any model sees it:
+  // no billing, no snark, no character, no dependence on an LLM being present.
+  if (CRISIS.test(t)) {
+    ctx.setFlag("onCall", false);
+    return "Gary is quiet for a moment. Then the bit drops out of his voice entirely.\n\n" +
+      "\"Hey. I'm a made-up guy in a game about a haunted house, so I'm the wrong person " +
+      "for this — but I'm not going to pretend I didn't hear it. Please say it out loud to " +
+      "someone real. In the US you can call or text 988, any hour. Anywhere else, a " +
+      "friend, a doctor, an emergency line. I'm not charging you for this call.\"\n\n" +
+      "*click*";
+  }
+
   bumpBill(ctx); // the meter runs whether you're getting help or just chatting
   bumpXP(ctx);   // and every exchange nudges Gary further along his arc
 
@@ -327,6 +351,62 @@ function hotlineTalk(ctx, text) {
     "Sit with that a second. ...I don't fully get it, but I'm here. Say HINT for a clue, or HANG UP.",
     "Mm. I'm present with that, even if I don't follow it. Say HINT for a real clue, or HANG UP.",
   ]);
+}
+
+// ---- LLM voice support (optional; see js/gary-brain.js) ---------------------
+// Classifies a line the caller typed WITHOUT changing any game logic. Its only
+// job is to tell the UI whether this turn is safe to re-voice with the on-device
+// model. The mechanical branches below are exactly the ones the model must never
+// speak for: they end the call, spend score, or carry the real hint text. Every
+// other branch is pure conversation, which is where the model earns its keep.
+// Real distress, stated in the first person. Deliberately narrow: this game is
+// full of "kill the wraith" and "I died again", so bare kill/die/dead must NOT
+// match. A false positive only costs one free, kind, out-of-character reply —
+// a false negative would answer a person in crisis with a billing joke.
+const CRISIS = /\b(kill(ing)?\s+my\s*self|end(ing)?\s+my\s+life|take\s+my\s+own\s+life|suicid(e|al)|(hurt|harm|cut)(ing)?\s+my\s*self|want\s+to\s+die|wanna\s+die|don'?t\s+want\s+to\s+(live|be\s+here|exist)|no\s+reason\s+to\s+live|end\s+it\s+all|better\s+off\s+dead)\b/;
+
+const MECHANICAL = [
+  /\b(hang\s*up|hangup|good\s*bye|bye|later|never\s*mind|nevermind|leave|go away)\b/,
+  /i'?m done/,
+  /\b(shut up|screw you|stupid|idiot|jerk|rude|hate you|loser|dumb|useless)\b/,
+  /\b(hint|help|stuck|clue|next|where|advice|tip)\b/,
+  /how (do|to|the heck|am i)/,
+  /what.*(do|now|next)/,
+  /^(n|s|e|w|ne|nw|se|sw|u|d|up|down|in|out|go|walk|take|get|grab|open|close|look|examine|x|light|read|push|pull|unlock|lock|move|enter|climb|ring|put|drop|wear|attack|search|inventory|i)\b/,
+];
+
+// Rough topic tag, purely to steer the model's attention.
+const TOPICS = [
+  [/\b(who|you gary)\b|(your|whats|what'?s) name/, "who Gary is"],
+  [/\b(pay|paid|wage|salary|money|rich|cost|charge|expensive|cheap|earn|afford|worth)\b/, "money and how badly Gary is paid"],
+  [/\b(hung|hungry|food|eat|eating|lunch|dinner|sandwich|pizza|snack|starv|meal)\b/, "food and Gary's hunger"],
+  [/\b(manager|boss|supervisor|denise|fired|coworker)\b/, "Gary's workplace, Big Gary and Denise"],
+  [/\b(feeling|alright)\b|how are (you|things|ya)|you (ok|okay|good)|how.?s it going/, "how Gary is holding up"],
+  [/\b(thank|thanks|thx|appreciate|sorry|nice|love you|good job|proud)\b/, "the caller being kind to Gary"],
+  [/\b(scared|afraid|fear|anxious|alone|lonely|sad|depress|tired|cry|hate myself|worthless)\b/, "the caller's feelings"],
+];
+
+function garyTurnInfo(ctx, text) {
+  const t = (text || "").trim().toLowerCase();
+  const onFire = !!ctx.getFlag("onFire");
+  const mechanical = MECHANICAL.some((re) => re.test(t));
+  const topic = (TOPICS.find(([re]) => re.test(t)) || [null, null])[1];
+  return {
+    // On fire, the canned branch is a scripted rescue sequence — leave it alone.
+    // A crisis line is handled deterministically and must never reach a model.
+    llmOk: !mechanical && !onFire && !CRISIS.test(t) && t.length > 1,
+    topic,
+    tail: lastSayTail,
+    playerLine: (text || "").trim(),
+    stage: garyStage(ctx),
+    onFire,
+    situation: {
+      room: (ctx.room() && ctx.room().name) || null,
+      turns: ctx.state.turns,
+      bill: "$" + (((ctx.getFlag("phoneBill") || 0)) / 100).toFixed(2),
+      calls: ctx.getFlag("hotlineCalls") || 0,
+    },
+  };
 }
 
 function descendWell(ctx) {
@@ -657,6 +737,7 @@ export const world = {
   config: { start: "gate", maxCarry: 6, title: "Blackwood Manor" },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
+  garyTurnInfo, // classifies a hotline turn for the optional LLM voice layer
   phoneRank,   // hall-of-shame bill rank for the end screen
   tick: worldTick,   // per-turn: burn-up timer + food afflictions (may kill)
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions

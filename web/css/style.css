@@ -224,6 +224,8 @@ body { -webkit-text-size-adjust: 100%; }
   font-size: 0.95rem; min-height: 4rem;
 }
 #phone-transcript .gary { color: var(--green); margin-bottom: 0.45rem; }
+/* Gary is thinking on-device — dimmed placeholder, replaced in place. */
+#phone-transcript .gary.thinking { opacity: 0.45; font-style: italic; }
 #phone-transcript .you { color: var(--green-bright); opacity: 0.9; margin-bottom: 0.45rem; }
 #phone-transcript .sys { color: var(--dim); }
 

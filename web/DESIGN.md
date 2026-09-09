@@ -335,7 +335,72 @@ the mansion.
 - 🧀 **"Ate Well"** — ate the good cheese.
 
 ## 12.11 Testing
-`node tests/walkthrough.js` now covers **8 groups**: engine units, full winning walkthrough,
+`node tests/walkthrough.js` now covers **10 groups**: engine units, full winning walkthrough,
 death traps (attic/well/grue), Gary conversation + billing, hall-of-shame ranks, the hidden
 wing, the mailbox→burn→self-immolation→Gary fire call, and the burn-up timer + brazier + foods
-+ toilet + badges. Keep it green on every change.
++ toilet + badges, plus the Gary voice-layer gate and the crisis guard. Keep it green on every change.
+
+## 12.12 Command chaining (v2.1.0)
+`splitCommands()` in `parser.js` splits an input line on `.` `;` `,` and a standalone `then`,
+and `core.js` runs each fragment through `runOne()` in order. So
+`n. open mailbox. get letter. read letter` works.
+
+- **Aborts** the rest of the chain on: an unknown word, death, victory, or picking up the phone.
+- **Never splits while `onCall`** — Gary is a conversation and commas belong to him.
+- Capped at `MAX_CHAIN = 20`; `g`/`again` repeats the previous *chain*.
+- `game.send()` stays **synchronous** so the engine and tests are unaffected.
+
+## 12.13 The build stamp (v2.1.0)
+`js/version.js` is the single source of truth (`VERSION`, `BUILD_DATE`), shown in the banner and
+always-visible in the HUD. GitHub Pages serves `js/` with `cache-control: max-age=600` and module
+imports aren't cache-busted, so a tab can lag ~10 minutes behind a push. If the HUD version
+doesn't match what you deployed, hard-refresh. **Bump it in the same commit as any engine change.**
+
+## 12.14 Gary's on-device brain (v2.2.0)
+Gary can now *think*. He runs on **Apple Foundation Models** — the ~3B on-device model in
+iOS 26 / macOS 26. Free, private, offline, no API key, no token cost.
+
+**The one rule: the model is a VOICE, never a source of truth.**
+During prototyping the model was explicitly instructed to deliver a specific hint and it
+*silently dropped it*. In a hint line that is the unforgivable bug. So everything that matters
+stays deterministic in JS — the real hint text, the meter, the bill milestones, XP/stage, rude
+detection, hang-ups, score, and the fire rescue. The model only re-voices turns that are pure
+conversation.
+
+`world.garyTurnInfo(ctx, text)` is the gate. It returns `llmOk: false` for anything
+`MECHANICAL`, anything while `onFire`, and anything matching `CRISIS`. `tests/walkthrough.js`
+group 3b asserts this and will fail if a mechanical branch ever becomes model-voiced.
+
+**Providers** (`js/gary-brain.js`, tried in order, every failure path returns `""` = use canned):
+
+| Provider | Where | Transport |
+|---|---|---|
+| `native` | iOS/macOS app | `window.webkit.messageHandlers.gary` → `GaryBridge` |
+| `daemon` | Mac, local play | `POST http://127.0.0.1:8138/gary` (`mac/gary-daemon`) |
+| `null` | public web site | canned lines only |
+
+An **HTTPS page cannot call `http://127.0.0.1`** (mixed content), so the public GitHub Pages
+site is always canned Gary — by design, and indistinguishable from before. Smart Gary happens
+on local play (`Play Blackwood Manor.command` starts the daemon if it's been built) or in the app.
+
+**Personas** live as pure data in `js/gary-profile.js`. `HINTLINE_STAGES[0..3]` mirror
+`garyStage()` (grumpy → cracking → reluctant therapist → full therapist); `FIREFIGHTER` exists
+for the fire call. Swapping Gary's job is a data edit, not a code change.
+
+**Lessons from a 3B model** (all encoded in `SHARED_RULES` / `clean()`):
+- *Few-shot examples matter far more than description.* A prose persona produced a generic
+  helpful assistant; three tone examples produced Gary. But it then parrots them verbatim
+  unless told the examples are **tone only** and sampling is raised
+  (`.random(top: 40)`, `temperature 1.0`).
+- It leaks `Gary:` prefixes, wrapping/smart quotes, third-person narration
+  (`Gary sighs and says, "…`), extra paragraphs, and motivational filler. `clean()` strips or
+  rejects all of it; returning `""` falls back to the hand-written line, which is always safe.
+- It swears. Hand-written Gary never does, so profanity is **rejected**, not just discouraged.
+- Sessions are cached per instruction-string (max 8) to keep the KV cache warm: ~1.6s first
+  turn, ~0.5s after.
+
+**Crisis handling.** Late-stage Gary plays therapist as a joke. A real person typing real
+despair is not a joke, so it is handled **deterministically before the meter runs and before
+any model sees the text**: the bit drops, the call ends, nothing is billed, and it points at
+988. `CRISIS` is deliberately narrow — this game is full of "kill the wraith" and "I died
+again", so bare kill/die/dead must not match. Both directions are tested.

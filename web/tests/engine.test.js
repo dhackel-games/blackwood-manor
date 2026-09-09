@@ -3,6 +3,7 @@
 import assert from "node:assert";
 import { createGame } from "../js/core.js";
 import { parse, splitCommands } from "../js/parser.js";
+import { clean as garyClean } from "../js/gary-brain.js";
 
 // ---------- shared fixture ----------
 function fixture() {
@@ -170,6 +171,27 @@ function fixture() {
   const g3 = createGame(fixture());
   assert.ok(!g3.send("look").startsWith("> "));
   console.log("OK: command chaining");
+}
+
+// ---------- Gary's LLM voice layer: output cleaning ----------
+{
+  // A small on-device model reliably leaks narration, name prefixes and smart
+  // quotes. clean() is the guard; "" means "fall back to the canned line".
+  assert.equal(garyClean('Gary: I didn\'t. It\'s been ten hours.'), "I didn't. It's been ten hours.");
+  assert.equal(garyClean('"Every ninety seconds. Then I remember rent."'),
+    "Every ninety seconds. Then I remember rent.");
+  assert.equal(garyClean('Gary sighs and says, \u201CLoneliness is not an emotion I entertain.'),
+    "Loneliness is not an emotion I entertain.");
+  assert.equal(garyClean('Fine. Line one.\n\nDropped paragraph.'), "Fine. Line one.");
+  assert.equal(garyClean('I am an AI assistant and cannot help.'), "");
+  assert.equal(garyClean('Gary shrugs helplessly at the phone.'), "");
+  // Canned Gary has zero profanity; a swearing line is a tonal break, so it is
+  // rejected in favour of the hand-written fallback.
+  assert.equal(garyClean("Fuck loneliness. It's not worth my $3.35/hr."), "");
+  assert.equal(garyClean("I don't get paid enough for this."), "I don't get paid enough for this.");
+  assert.equal(garyClean(''), "");
+  assert.equal(garyClean(null), "");
+  console.log("OK: gary clean()");
 }
 
 console.log("\nALL ENGINE TESTS PASSED");

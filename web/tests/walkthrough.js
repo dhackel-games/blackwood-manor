@@ -122,6 +122,84 @@ const WIN = [
 }
 
 // ---------------------------------------------------------------------------
+// 3b. Gary's optional LLM voice layer must never speak for a MECHANICAL turn.
+// The model is a voice, not a source of truth: hints, hang-ups, rudeness and
+// the fire sequence all change game state or carry the real clue text, so
+// garyTurnInfo has to refuse them. A regression here would let a 3B model
+// improvise the answer to a puzzle — the one unforgivable bug in a hint line.
+// ---------------------------------------------------------------------------
+{
+  const g = createGame(world);
+  g.send("call");
+
+  const mechanical = ["hint", "help", "where is the key", "what do i do now",
+                      "hang up", "shut up", "n", "take lamp"];
+  for (const line of mechanical) {
+    const info = world.garyTurnInfo(g, line);
+    assert.equal(info.llmOk, false, `"${line}" must stay canned (mechanical)`);
+  }
+
+  const conversational = ["do you ever get lonely", "what did you have for lunch",
+                          "my mother never listened to me either", "are you okay"];
+  for (const line of conversational) {
+    const info = world.garyTurnInfo(g, line);
+    assert.equal(info.llmOk, true, `"${line}" should be eligible for the LLM voice`);
+    assert.equal(typeof info.playerLine, "string");
+    assert.ok(info.situation && typeof info.situation.bill === "string");
+  }
+
+  // The mechanical tail (meter + one-shot bill milestone) must survive being
+  // handed to the voice layer, or re-voicing a turn would silently eat a
+  // milestone that only ever fires once.
+  const g2 = createGame(world);
+  g2.send("call");
+  g2.send("do you ever get lonely");
+  const info = world.garyTurnInfo(g2, "do you ever get lonely");
+  assert.match(info.tail, /Meter's at \$/, "tail must carry the running meter");
+
+  // While the house is burning, Gary runs a scripted rescue — never improvised.
+  const g3 = createGame(world);
+  g3.setFlag("onFire", true);
+  assert.equal(world.garyTurnInfo(g3, "what do i do about my arm").llmOk, false,
+    "on fire => scripted, never LLM");
+
+  console.log("OK: Gary LLM voice layer — mechanical turns protected");
+}
+
+// ---------------------------------------------------------------------------
+// 3c. Real distress is intercepted deterministically. Gary's late stages are a
+// joke about a burnt-out man playing therapist; a real person typing real
+// despair is not. This must work with no LLM present, must not bill, and must
+// NOT fire on ordinary game violence ("kill the wraith", "I died again").
+// ---------------------------------------------------------------------------
+{
+  for (const line of ["i want to kill myself", "i've been thinking about suicide",
+                      "i want to die", "there's no reason to live",
+                      "i've been hurting myself", "everyone would be better off dead"]) {
+    const g = createGame(world);
+    g.send("call");
+    const before = g.getFlag("phoneBill") || 0;
+    const out = g.send(line);
+    assert.match(out, /988/, `crisis line must surface a real resource: "${line}"`);
+    assert.equal(g.getFlag("onCall"), false, "crisis ends the call");
+    assert.equal(g.getFlag("phoneBill") || 0, before, "crisis must never be billed");
+    assert.ok(!/meter|minute/i.test(out), "no billing snark in a crisis reply");
+    assert.equal(world.garyTurnInfo(g, line).llmOk, false, "crisis must never reach a model");
+  }
+
+  // Ordinary game talk must NOT trip the guard, or the joke dies on every death.
+  for (const line of ["how do i kill the wraith", "i died in the well again",
+                      "is the butler dead", "this game is killing me"]) {
+    const g = createGame(world);
+    g.send("call");
+    const out = g.send(line);
+    assert.ok(!/988/.test(out), `false positive on ordinary game talk: "${line}"`);
+    assert.equal(g.getFlag("onCall"), true, `"${line}" should not end the call`);
+  }
+  console.log("OK: Gary crisis guard — deterministic, unbilled, no false positives");
+}
+
+// ---------------------------------------------------------------------------
 // 4. Well is reachable via "down" / "climb down" (and lethal without a rope)
 // ---------------------------------------------------------------------------
 {

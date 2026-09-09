@@ -5,6 +5,7 @@ import { createGame } from "./core.js";
 import { world } from "./world.js";
 import { saveGame, loadGame, hasSave } from "./save.js";
 import { VERSION, BUILD_DATE } from "./version.js";
+import * as garyBrain from "./gary-brain.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -80,12 +81,13 @@ function fmtTime(s) {
   return String(m).padStart(2, "0") + ":" + String(r).padStart(2, "0");
 }
 function printToPhone(text, cls) {
-  if (text == null) return;
+  if (text == null) return null;
   const div = document.createElement("div");
   div.className = cls || "gary";
   div.textContent = (cls === "you" ? "You: " : "") + text;
   phoneT.appendChild(div);
   phoneT.scrollTop = phoneT.scrollHeight;
+  return div;
 }
 function garyLineLabel() {
   const xp = game.state.flags.garyXP || 0;
@@ -262,6 +264,22 @@ function handle(raw) {
 
   if (nowOnCall) {
     if (!onCall) showPhone();          // the call just connected → switch to the phone screen
+    // If an on-device model is available and this turn is pure conversation,
+    // let Gary actually think. The canned line is kept as the fallback and the
+    // mechanical tail (meter / bill milestone) is preserved either way.
+    const info = onCall ? world.garyTurnInfo(game, cmd) : null;
+    if (info && info.llmOk && garyBrain.isAvailable()) {
+      const el = printToPhone("...", "gary thinking");
+      updatePhoneStatus();
+      updateHud();
+      garyBrain.speak(info).then((line) => {
+        const spoken = line ? line + (info.tail || "") : out;
+        if (el) { el.className = "gary"; el.textContent = spoken; }
+        phoneT.scrollTop = phoneT.scrollHeight;
+        garySpeak(spoken);
+      });
+      return;
+    }
     printToPhone(out, "gary");
     garySpeak(out);                    // Gary complains out loud
     updatePhoneStatus();
@@ -383,6 +401,13 @@ if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to co
 print("\n" + game.describeRoom(true));
 updateHud();
 if (canType) input.focus();
+
+// Probe for an on-device model for Gary (native app bridge, or the local Mac
+// daemon). Fire-and-forget: if nothing answers, Gary stays canned and nobody
+// ever sees an error.
+garyBrain.detect().then((p) => {
+  if (p) console.log(`[gary] on-device voice active via "${p}" provider`);
+});
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.
 if (/[?&]call\b/.test(location.search)) setTimeout(() => handle("call"), 350);

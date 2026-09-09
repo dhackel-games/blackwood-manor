@@ -25,6 +25,7 @@ struct GameView: UIViewControllerRepresentable {
 final class GameViewController: UIViewController {
     private var webView: WKWebView!
     private var speechBridge: SpeechBridge?
+    private var garyBridge: AnyObject?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,11 +40,28 @@ final class GameViewController: UIViewController {
         let bridge = SpeechBridge()
         let ucc = WKUserContentController()
         ucc.add(bridge, name: "speech")
-        config.userContentController = ucc
         speechBridge = bridge
+
+        // Gary's on-device brain (Apple Foundation Models). Registered ONLY when the
+        // model is actually usable, because js/gary-brain.js decides whether to use
+        // the native provider purely by testing for the existence of this handler —
+        // registering it on an unsupported device would strand Gary on a dead bridge
+        // instead of falling back to his canned lines.
+        if #available(iOS 26.0, macOS 26.0, *) {
+            if GaryBridge.isModelAvailable() {
+                let gb = GaryBridge()
+                ucc.add(gb, name: "gary")
+                garyBridge = gb
+            }
+        }
+
+        config.userContentController = ucc
 
         webView = WKWebView(frame: .zero, configuration: config)
         bridge.webView = webView
+        if #available(iOS 26.0, macOS 26.0, *) {
+            (garyBridge as? GaryBridge)?.webView = webView
+        }
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.isOpaque = false
         webView.backgroundColor = bg
@@ -234,5 +252,75 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
         case "ico":         return "image/x-icon"
         default:            return "application/octet-stream"
         }
+    }
+}
+
+// MARK: - Gary's on-device brain (Apple Foundation Models -> JS)
+//
+// JS posts { id, instructions, prompt } to window.webkit.messageHandlers.gary and
+// we call back into window.__garyReply(id, text, error). Everything runs on-device;
+// nothing leaves the phone, which is the whole point of Gary being private enough
+// to say anything to.
+//
+// The model is a VOICE layer only — game facts (hints, the phone bill, Gary's arc)
+// are computed in JS and never asked of the model. See web/js/gary-brain.js.
+
+import FoundationModels
+
+@available(iOS 26.0, macOS 26.0, *)
+final class GaryBridge: NSObject, WKScriptMessageHandler {
+    weak var webView: WKWebView?
+
+    /// One session per instruction set keeps the KV cache warm across a call,
+    /// which noticeably speeds up later turns of the same conversation.
+    private var sessions: [String: LanguageModelSession] = [:]
+
+    static func isModelAvailable() -> Bool {
+        if case .available = SystemLanguageModel.default.availability { return true }
+        return false
+    }
+
+    func userContentController(_ uc: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard
+            let body = message.body as? [String: Any],
+            let id = body["id"] as? Int,
+            let instructions = body["instructions"] as? String,
+            let prompt = body["prompt"] as? String
+        else { return }
+
+        Task { [weak self] in
+            guard let self else { return }
+            do {
+                let text = try await self.reply(instructions: instructions, prompt: prompt)
+                self.callBack(id: id, text: text, error: nil)
+            } catch {
+                self.callBack(id: id, text: "", error: "\(error)")
+            }
+        }
+    }
+
+    @MainActor
+    private func session(for instructions: String) -> LanguageModelSession {
+        if let s = sessions[instructions] { return s }
+        let s = LanguageModelSession(instructions: instructions)
+        if sessions.count > 8 { sessions.removeAll() }
+        sessions[instructions] = s
+        return s
+    }
+
+    private func reply(instructions: String, prompt: String) async throws -> String {
+        let s = await session(for: instructions)
+        // At default temperature the small model parrots its own few-shot examples.
+        let options = GenerationOptions(sampling: .random(top: 40, seed: nil), temperature: 1.0)
+        return try await s.respond(to: prompt, options: options).content
+    }
+
+    private func callBack(id: Int, text: String, error: String?) {
+        // JSON-encode through an array so quotes/newlines can't break out of the JS.
+        let payload: [Any] = [text, error ?? NSNull()]
+        let json = (try? JSONSerialization.data(withJSONObject: payload))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "[\"\",null]"
+        let js = "window.__garyReply && window.__garyReply(\(id), \(json)[0], \(json)[1]);"
+        DispatchQueue.main.async { self.webView?.evaluateJavaScript(js, completionHandler: nil) }
     }
 }
