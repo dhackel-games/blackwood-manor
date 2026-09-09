@@ -301,11 +301,13 @@ final class GaryBridge: NSObject, WKScriptMessageHandler {
 
     @MainActor
     private func session(for instructions: String) -> LanguageModelSession {
-        if let s = sessions[instructions] { return s }
-        let s = LanguageModelSession(instructions: instructions)
-        if sessions.count > 8 { sessions.removeAll() }
-        sessions[instructions] = s
-        return s
+        // Deliberately stateless — a fresh session per turn. A reused session
+        // accumulates its transcript and this model drifts out of character as
+        // that grows (measured: Gary claiming his job paid well, then sliding
+        // into mystical free verse about a mansion he has never entered).
+        // instructions + prompt are rebuilt from game state every turn, so there
+        // is nothing to carry; this makes drift structurally impossible.
+        LanguageModelSession(instructions: instructions)
     }
 
     private func reply(instructions: String, prompt: String) async throws -> String {

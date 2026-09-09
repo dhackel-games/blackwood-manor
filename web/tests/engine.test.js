@@ -191,6 +191,17 @@ function fixture() {
   assert.equal(garyClean("I don't get paid enough for this."), "I don't get paid enough for this.");
   assert.equal(garyClean(''), "");
   assert.equal(garyClean(null), "");
+  // Gary talks, he does not write verse: the model answers in short mystical
+  // lines if left alone, and ignores "two sentences max" once it gets going.
+  assert.equal(garyClean("It is not a dream I dream of.\nIt is my reality."),
+    "It is not a dream I dream of. It is my reality.");
+  assert.equal(
+    garyClean("Been here a decade. They don't pay much. But it's stable. Now what do you want?"),
+    "Been here a decade. They don't pay much.");
+  assert.equal(garyClean("One sentence only"), "One sentence only");
+  assert.equal(garyClean("'Been here over a decade.'"), "Been here over a decade.");
+  assert.equal(garyClean("Yes. , I haven't eaten any food."), "Yes. I haven't eaten any food.");
+  assert.equal(garyClean("I don't get paid enough."), "I don't get paid enough.");
   console.log("OK: gary clean()");
 }
 

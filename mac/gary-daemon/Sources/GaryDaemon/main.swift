@@ -21,25 +21,26 @@ let port: NWEndpoint.Port = 8138
 // MARK: - Model
 
 actor Gary {
-    /// One session per instruction set. Reusing a session keeps the KV cache warm,
-    /// which measurably drops latency on later turns of the same conversation.
-    private var sessions: [String: LanguageModelSession] = [:]
-
+    /// Deliberately STATELESS: a fresh session per request.
+    ///
+    /// Reusing a session keeps the KV cache warm and is ~1s faster, but a session
+    /// accumulates its whole transcript and this model drifts as that grows. Two
+    /// distinct drifts were measured: first Gary stopped being broke ("my job pays
+    /// well", "a certain satisfaction in solving puzzles"), and after ~15 turns he
+    /// slid into mystical free verse ("I am a prisoner of this mansion") — which
+    /// also breaks the rule that he has never been inside it. Capping turns per
+    /// session reduced but did not remove it.
+    ///
+    /// Everything the model needs is already in `instructions` + `prompt`, rebuilt
+    /// from deterministic game state every turn, so there is nothing to gain by
+    /// carrying history. Statelessness makes drift structurally impossible and
+    /// costs ~1s, which on a phone call reads as Gary pausing anyway.
     func reply(instructions: String, prompt: String) async throws -> String {
-        let session: LanguageModelSession
-        if let existing = sessions[instructions] {
-            session = existing
-        } else {
-            session = LanguageModelSession(instructions: instructions)
-            sessions[instructions] = session
-            // Don't let a long game accumulate unbounded sessions.
-            if sessions.count > 8 { sessions.removeAll() ; sessions[instructions] = session }
-        }
+        let session = LanguageModelSession(instructions: instructions)
         // Slightly hot sampling: at default temperature the small model parrots
         // its own few-shot examples almost verbatim.
         let options = GenerationOptions(sampling: .random(top: 40, seed: nil), temperature: 1.0)
-        let response = try await session.respond(to: prompt, options: options)
-        return response.content
+        return try await session.respond(to: prompt, options: options).content
     }
 }
 

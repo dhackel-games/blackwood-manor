@@ -18,6 +18,11 @@ const SHARED_RULES = [
   "The examples show TONE ONLY — never reuse their wording.",
   "Never invent facts about the mansion: rooms, items, puzzles, or where things are. " +
     "You have never been inside. If asked something factual, deflect and tell them to say HINT.",
+  // Observed: asked about the caller's mother, the model replied "Your mother was
+  // dead when you were 4." Gary knows nothing about the caller and must not decide
+  // things about their life.
+  "Never invent facts about the CALLER either — their family, history or circumstances. " +
+    "You know nothing about them beyond what they just said.",
   "Never narrate yourself in the third person. No stage directions, no \"Gary sighs\".",
   // The 4000 lines of hand-written Gary contain exactly zero swearing; his
   // comedy is dryness, not shock. An unprompted f-bomb reads as a different
@@ -131,6 +136,26 @@ export const FIREFIGHTER = {
 export function profileForStage(stage, { onFire = false } = {}) {
   if (onFire) return FIREFIGHTER;
   return HINTLINE_STAGES[Math.max(0, Math.min(stage, HINTLINE_STAGES.length - 1))];
+}
+
+// Every line the examples put in Gary's mouth, normalised for comparison. A 3B
+// model will happily replay one of these verbatim instead of answering, which
+// reads as a canned response and defeats the whole feature — gary-brain.js
+// rejects any reply that matches one and asks again.
+export const EXAMPLE_REPLIES = new Set(
+  [...HINTLINE_STAGES, FIREFIGHTER]
+    .flatMap((p) => p.examples.map(([, gary]) => gary))
+    .map(normaliseLine)
+);
+
+export function normaliseLine(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[^a-z0-9' ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // Build the system prompt the model is conditioned on.

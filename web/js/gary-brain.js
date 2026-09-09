@@ -24,7 +24,7 @@
 // (Safari blocks the request outright regardless.) So the public site never
 // probes, and stays canned by choice rather than by accident.
 
-import { profileForStage, buildInstructions } from "./gary-profile.js";
+import { profileForStage, buildInstructions, EXAMPLE_REPLIES, normaliseLine } from "./gary-profile.js";
 
 const DAEMON_URL = "http://127.0.0.1:8138";
 const REPLY_TIMEOUT_MS = 8000;
@@ -123,7 +123,7 @@ export function isAvailable() { return provider !== null; }
 
 // --- prompt assembly --------------------------------------------------------
 // `turn` is the structured record world.js stashes for the turn (see garyTurn).
-function buildPrompt(turn) {
+function buildPrompt(turn, nudge) {
   const lines = [];
   const s = turn.situation || {};
   const facts = [
@@ -136,6 +136,7 @@ function buildPrompt(turn) {
   if (turn.topic) lines.push(`The caller is talking about: ${turn.topic}.`);
   lines.push(`Caller: "${turn.playerLine}"`);
   lines.push("Reply as Gary, in his voice, in two sentences at most.");
+  if (nudge) lines.push(nudge);
   return lines.join("\n\n");
 }
 
@@ -151,7 +152,12 @@ export function clean(text) {
 
   out = out.replace(/^\s*gary\s*[:\-—]\s*/i, "");   // "Gary: ..."
   out = out.split(/\n\s*\n/)[0].trim();              // first paragraph only
+  // Gary talks; he does not write verse. Single newlines get collapsed, because
+  // the model likes to answer in two mystical short lines when left alone.
+  out = out.replace(/\s*\n+\s*/g, " ").trim();
   out = out.replace(/^"+|"+$/g, "").trim();          // wrapping quotes
+  // ...and the single-quoted variant, without touching apostrophes inside.
+  if (/^'[\s\S]*'$/.test(out)) out = out.slice(1, -1).trim();
   // An unmatched trailing quote is left behind by the narration case above.
   if ((out.match(/"/g) || []).length === 1) out = out.replace(/"/g, "").trim();
 
@@ -161,6 +167,14 @@ export function clean(text) {
   // Hand-written Gary never swears. A prompt rule alone doesn't hold on a 3B
   // model, so reject rather than risk a tonal break; the canned line is in-voice.
   if (/\b(fuck\w*|shit\w*|bitch\w*|bastard|cunt|dick|piss)\b/i.test(out)) return "";
+
+  // "Two sentences maximum" is a rule the model ignores when it gets going, and
+  // a rambling five-sentence answer stops sounding like a man who resents the
+  // call. Enforce it here rather than hoping.
+  const sentences = out.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g);
+  if (sentences && sentences.length > 2) out = sentences.slice(0, 2).join("").trim();
+  // Tidy stray punctuation the model leaves behind ("Yes. , I haven't eaten").
+  out = out.replace(/([.!?])\s*[,;:]+\s*/g, "$1 ").replace(/\s+([,.!?;:])/g, "$1").trim();
   return out;
 }
 
@@ -169,16 +183,42 @@ export function clean(text) {
  * Returns the generated line, or "" to mean "use the canned line" — every
  * failure path returns "" so the caller never has to handle an error.
  */
+// A reply that just replays a tone example, or repeats what Gary said last
+// turn, is worse than the canned line: it looks like the model isn't running.
+// Observed in real play — two different questions both answered with the
+// granola-bar example word for word.
+let lastSpoken = "";
+
+export function isEcho(line) {
+  const n = normaliseLine(line);
+  if (!n) return true;
+  return EXAMPLE_REPLIES.has(n) || n === lastSpoken;
+}
+
 export async function speak(turn) {
   if (!isAvailable()) return "";
   try {
     const profile = profileForStage(turn.stage || 0, { onFire: !!turn.onFire });
     const instructions = buildInstructions(profile);
-    const prompt = buildPrompt(turn);
-    const raw = provider === "native"
-      ? await askNative(instructions, prompt)
-      : await askDaemon(instructions, prompt);
-    return clean(raw);
+    const ask = async (nudge) => {
+      const raw = provider === "native"
+        ? await askNative(instructions, buildPrompt(turn, nudge))
+        : await askDaemon(instructions, buildPrompt(turn, nudge));
+      return clean(raw);
+    };
+
+    let line = await ask("");
+    if (isEcho(line)) {
+      // One retry, told plainly what it just did wrong. If it echoes again the
+      // hand-written line is the better answer, so give up quietly.
+      line = await ask(
+        "Do NOT reuse any wording from the tone examples and do not repeat your last reply. " +
+        "Answer THIS caller with a fresh sentence."
+      );
+      if (isEcho(line)) return "";
+    }
+    lastSpoken = normaliseLine(line);
+    return line;
   } catch {
     return ""; // any failure => canned Gary, silently
   }
