@@ -332,14 +332,16 @@ if (!canType) {
   });
 }
 
-// Mute toggle for Gary's voice.
-const muteBtn = document.getElementById("phone-mute");
+// Voice toggle — tap the big GARY avatar (or the hint under it). Muted by default.
+const muteBtn = document.getElementById("phone-mute");     // the hint text under the name
+const phoneAvatar = document.getElementById("phone-avatar");
 function setMuteLabel() {
-  muteBtn.textContent = ttsMuted ? "🔊 Turn on Gary's voice" : "🔇 Mute Gary";
+  muteBtn.textContent = ttsMuted ? "🔊 Tap Gary to hear him" : "🔊 Voice on — tap to mute";
   muteBtn.classList.toggle("on", !ttsMuted);
+  if (phoneAvatar) phoneAvatar.classList.toggle("muted", ttsMuted);
 }
 setMuteLabel();   // reflect the default (muted)
-muteBtn.addEventListener("click", () => {
+function toggleVoice() {
   ttsMuted = !ttsMuted;
   setMuteLabel();
   if (ttsMuted) {
@@ -349,7 +351,9 @@ muteBtn.addEventListener("click", () => {
     // inside the user's tap (Chrome/Safari need a gesture to start speaking).
     garySpeak("Fine. The voice is on. Don't make it weird.");
   }
-});
+}
+muteBtn.addEventListener("click", toggleVoice);
+if (phoneAvatar) phoneAvatar.addEventListener("click", toggleVoice);
 
 // Mic buttons (speech-to-text).
 const micBtn = document.getElementById("mic");

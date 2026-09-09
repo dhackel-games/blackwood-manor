@@ -155,19 +155,21 @@ body { -webkit-text-size-adjust: 100%; }
 }
 .linkbtn:active { color: var(--green-bright); }
 
-/* Make the "turn on Gary's voice" toggle an obvious button (it's muted by default) */
-#phone-mute {
-  display: inline-block; margin: 6px auto 0; padding: 5px 12px;
-  border: 1px solid var(--green); border-radius: 8px;
-  background: rgba(67, 255, 122, 0.14); color: var(--green-bright);
-  font-size: 0.9rem; font-weight: 700; letter-spacing: 0.3px;
+/* Tap the big GARY avatar (or the hint under it) to toggle Gary's voice — muted by default. */
+.phone-avatar { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease; }
+.phone-avatar:active { transform: scale(0.95); }
+.phone-avatar:not(.muted) {   /* voice ON: solid glow, calm (stop the attention pulse) */
+  border-color: var(--green-bright);
+  box-shadow: 0 0 16px rgba(67, 255, 122, 0.6);
+  animation: none;
 }
-#phone-mute:active { background: rgba(67, 255, 122, 0.3); }
-#phone-mute.on {   /* voice is already on — quieter styling */
-  border-color: var(--dim); background: none; color: var(--dim); font-weight: 400;
+#phone-mute.voice-hint {
+  display: block; margin: 3px auto 2px; padding: 2px 8px;
+  text-align: center; font-size: 0.85rem; font-weight: 700;
+  color: var(--green-bright); background: none; border: none; cursor: pointer;
 }
-/* put the toggle on its own line under the timer/bill so it's unmissable */
-.phone-status { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+#phone-mute.voice-hint.on { color: var(--dim); font-weight: 400; }  /* voice on = quiet hint */
+.phone-status { text-align: center; }
 
 /* Collapse Gary's big header while typing on the call screen (touch), so the
    conversation window isn't squeezed to a few lines. */
