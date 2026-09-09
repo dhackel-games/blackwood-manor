@@ -195,6 +195,15 @@ const LEFT_JAG = [1, 0, 1, 2, 1, 1, 0, 1, 2, 2, 1, 0, 0, 1, 2, 1, 1, 0];
 const RIGHT_JAG = [0, 1, 2, 1, 1, 0, 1, 2, 2, 1, 0, 1, 1, 2, 0, 0, 1, 2];
 const PAD = 3;  // fixed gutter between the torn edge and the text
 
+// Gary faxed this to himself before tearing it out, and never trimmed the
+// perforated feed strip off either side. A fixed, unjagged column of punch
+// holes down each margin — deliberately NOT wandering like the torn edge, so
+// it reads as tractor-feed stock rather than more damage to the page.
+const HOLE_GAP = 3;              // rows between holes, like real fax paper
+const HOLE_MARGIN = "  o  ";     // sprocket hole + its fixed gutter
+const HOLE_BLANK = " ".repeat(HOLE_MARGIN.length);
+const hole = (i) => (i % HOLE_GAP === 0 ? HOLE_MARGIN : HOLE_BLANK);
+
 function tornPage(lines) {
   const inner = Math.max(44, ...lines.map((l) => l.length));
   const out = [];
@@ -217,7 +226,7 @@ function tornPage(lines) {
              " ".repeat(r + 1) + rch);
   });
   out.push("  " + ripple("`'~-._.~'`-._.-", width - 2));
-  return out.join("\n");
+  return out.map((row, i) => hole(i) + row + hole(i)).join("\n");
 }
 
 // Sentinel wrapping the ASCII block. The transcript is `white-space: pre-wrap`,
