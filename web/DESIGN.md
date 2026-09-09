@@ -1,8 +1,11 @@
 # Blackwood Manor — Design
 
-*A haunted-mansion text adventure in the classic Zork style. Personal project for David Hackel. Lives in HackelFamilyBrain (iCloud) — no git, ever.*
+*A haunted-mansion text adventure in the classic Zork style. Personal project for David Hackel (with Andy Coven).*
 
-Date: 2026-09-05
+Original design: 2026-09-05. **Sections 1–11 below are the original v1 spec, kept as history.
+Section 12 is the living record of everything built since — read it for current state.**
+
+> **Distribution:** now a git repo at **github.com/dhackel-games/blackwood-manor** (public), auto-published to **https://dhackel-games.github.io/blackwood-manor/** via GitHub Pages. Also a native iOS wrapper (`ios/`). It is no longer in HackelFamilyBrain/iCloud.
 
 ---
 
@@ -210,3 +213,115 @@ Everything player-facing lives in `js/world.js`:
 - **Add a puzzle:** attach an `on: { verb: handler }` to a room or item using the `ctx` API.
 - **Re-run** `node tests/walkthrough.js` to confirm nothing broke (update the walkthrough
   if the solution path changed).
+
+---
+
+# 12. Current state — everything built since v1 (living record)
+
+*Last updated: 2026-09-09. This section supersedes the v1 spec where they differ.*
+
+Everything is still **content-in-`world.js`, engine stays generic**. A few small, generic
+hooks were added to the engine to support new content — none of them know anything about
+the mansion.
+
+## 12.1 Distribution & how to play
+- **Web (canonical):** pure static files in `web/`. Play locally by double-clicking
+  `web/Play Blackwood Manor.command` (serves on a free port over http so Chrome's `file://`
+  module block doesn't bite). A LaunchAgent (`com.dhackel.blackwood-manor`) also serves it
+  on `127.0.0.1:8137` from `web/`.
+- **Live website:** pushing to `main` auto-deploys the `web/` folder to GitHub Pages via
+  `.github/workflows/pages.yml` → **https://dhackel-games.github.io/blackwood-manor/**
+  (`web/.nojekyll` keeps Pages from mangling the JS modules). Repo is public.
+- **Push flow:** the game repo is on David's personal `dhackel-games` GitHub, so pushes need
+  `gh auth switch --user dhackel-games` first, then switch back to `dhackel_adobe` (work repos
+  use SSH and are unaffected).
+- **iOS:** `ios/` is a SwiftUI + `WKWebView` wrapper bundling `web/` for offline play, with a
+  native `app://` scheme handler and a native speech-to-text bridge. Bundle
+  `com.dhackel.BlackwoodManor`, team `9W789FP4LG`.
+
+## 12.2 Generic engine hooks added since v1 (all optional, content-free)
+- **`world.tick(game)`** — called once per world turn from `core.tick()`. Returns an optional
+  message (appended to output) and may call `ctx.kill()` / `ctx.win()` to end the game
+  mid-tick. Drives the **burn-up timer** and **food afflictions**.
+- **`world.statusBanner(game)`** — returns a string appended to every room description
+  (`core.describeRoom`). Drives the **ASCII fire / sickness art**.
+- **`world.endBadges(game)`** — returns extra lines for the **win screen** (achievement badges).
+- **Room-handler injection** — at module load, `world.js` wraps every room's
+  `on.light/burn/extinguish/off` with a self-immolation interceptor, so "light self on fire"
+  works in **any** room without per-room code (falls through to the normal command otherwise).
+- **`game.getFlag` returns the raw value** (not coerced to boolean), so numeric flags
+  (`phoneBill`, `burnTurns`, `sick`, `high`, `fireTab`, `garyXP`) work.
+- **New parser verbs:** `burn`, `sit`, `use`, `flush` (plus the v1 set).
+
+## 12.3 Gary, the 1-900 hint line (the centerpiece)
+- `call`/`dial`/`hint` opens a **conversation** (`onCall` routes all input to
+  `world.hotlineTalk` until you `hang up`). Grumpy, starving, underpaid operator who gives
+  genuinely progress-aware hints (`nextHint`) but needles you.
+- **Billing:** 99¢/min meter (`phoneBill`), milestone jabs at $5/$10/$20/$35/$50, and a
+  **Hall-of-Shame rank** on the end screen (`phoneRank`): Frugal → Chatty → Best Customer →
+  Funding the Hint Line → Worst Caller of All Time.
+- **Hunger asides** spliced into ~45% of hints.
+- **Therapist arc** driven by `garyXP` (bumps every dial-in + exchange), 4 stages:
+  grumpy → cracking/oversharing → reluctant therapist → full "Wellness Line." The hint is
+  ALWAYS still delivered (`frameHint` wraps `nextHint`); the call-screen subtitle changes with
+  the stage. Hotline-only.
+
+## 12.4 Voice
+- **Gary speaks** via Web `speechSynthesis` (low, gruff), muted by default for work safety.
+  **Toggle by tapping the pulsing "GARY" avatar** on the call screen (or the hint under it);
+  avatar glows solid when voice is on.
+- **Speech-to-text:** browsers use `webkitSpeechRecognition`; the iOS app uses a native
+  `SFSpeechRecognizer` bridge exposed as `window.webkit.messageHandlers.speech`.
+
+## 12.5 Hidden wing / true ending
+- Ringing the bell (once all heirlooms are deposited) no longer ends the game — it lifts the
+  curse, drops a **BONE KEY**, and opens a **secret door** in the Grand Hall → Hollow Passage
+  → Hollow Sanctum, where a **SILVER MIRROR** and the matriarch's spirit wait. Take the mirror
+  and step into the dawn for the true ending (+30). **Full win score 155** (125 heirlooms + 30
+  mirror).
+
+## 12.6 The fire subsystem (Andy's idea, expanded)
+- **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` → `onFire`.
+- **Burn-up timer:** 5 escalating warning turns, then you burn to **ash** on the 6th
+  (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
+  the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT
+  taking turns — and it even advances **on the phone** (see §12.8), so you can burn up on hold.
+- **ASCII fire art** is stamped onto every room description while ablaze (`statusBanner`).
+- **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
+
+## 12.7 The brazier fire-puzzle (garden)
+- A cold iron **brazier** whose grave-damp moss a match cannot light — the only way to light
+  it is to be **on fire yourself** and `light brazier`. Your fire leaps into it: you're put
+  out, the bowl blazes, and it yields an **EMBER STONE (+10)**. Optional, self-contained.
+
+## 12.8 Gary while you're on fire
+- Dialing in ablaze: Gary smells smoke, quotes a **$1.99** premium (`fireTab`, tracked
+  separately from the main meter so the numbers land cleanly).
+- **"Call the fire department!"** → he dials slowly, quotes **$2.98**, and demands **pizza money**.
+- **Glass of water gag:** Gary periodically offers a glass of water; there is no water; biting
+  wastes a turn and burns you more (a lone "yes" is water, but "yes, pizza money" is not).
+- **Pizza:** when Gary finally eats a pizza there's a **50% chance** of a "biblical, two-ended
+  gastrointestinal reckoning" (he abandons you to the brigade mid-catastrophe); otherwise he's,
+  for one shining moment, happy. Either way the fire brigade hoses you out.
+- Every line you speak while ablaze feeds the fire; dawdle long enough and you **burn up on hold**.
+
+## 12.9 Food & afflictions (kitchen) + the privy
+- **Strange mushrooms** → `high` (trippy per-turn flavor, harmless).
+- **Rancid meat** → `sick` = violent vomiting & diarrhea; **lethal in ~20 turns if uncured**,
+  with an **ASCII sick banner** on every room description and escalating dehydration warnings.
+- **Good cheese** → real food: cures affliction, +5, "fortified" (and the "Ate Well" badge).
+- **The privy** (ivy-choked outhouse east of the garden) has a **toilet**: `sit`/`use`/`flush`
+  cures the sickness ("private, thorough, deeply cathartic").
+
+## 12.10 End-screen badges (`endBadges`)
+- 🔥 **"Out Of The Frying Pan"** — escaped *while still on fire* (the escape banner also gets a
+  🔥 after "alive").
+- 🕯️ **"The Old Ways"** — lit the brazier with your own body.
+- 🥵 **"Slow Burn"** — stayed ablaze 4+ turns and lived.
+- 🧀 **"Ate Well"** — ate the good cheese.
+
+## 12.11 Testing
+`node tests/walkthrough.js` now covers **8 groups**: engine units, full winning walkthrough,
+death traps (attic/well/grue), Gary conversation + billing, hall-of-shame ranks, the hidden
+wing, the mailbox→burn→self-immolation→Gary fire call, and the burn-up timer + brazier + foods
++ toilet + badges. Keep it green on every change.
