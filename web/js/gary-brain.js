@@ -29,11 +29,35 @@ import { profileForStage, buildInstructions, EXAMPLE_REPLIES, normaliseLine } fr
 const DAEMON_URL = "http://127.0.0.1:8138";
 const REPLY_TIMEOUT_MS = 8000;
 const PROBE_TIMEOUT_MS = 700;
+const OPT_IN_KEY = "blackwood-llm-optin";
 
 let provider = null;     // "native" | "daemon" | null
 let probed = false;
+let reason = "not probed yet";  // human-readable why-not, for the AI command
 let nextId = 1;
 const pending = new Map();
+
+// Opt-in escape hatch for the public site.
+//
+// The site never probes loopback by default (see the header) because it would
+// make every stranger who opens a text adventure approve local network access.
+// But a *known* tester on the public URL is exactly who needs the model, and
+// telling them to clone the repo to try it is absurd. So: `?llm` on the URL
+// opts in explicitly and is remembered, `?llm=0` opts back out. The scary
+// permission prompt then belongs to someone who deliberately asked for it.
+export function optedIn() {
+  try {
+    const m = typeof location !== "undefined" && /[?&]llm(?:=([^&]*))?/.exec(location.search);
+    if (m) {
+      const on = m[1] !== "0" && m[1] !== "off" && m[1] !== "false";
+      localStorage.setItem(OPT_IN_KEY, on ? "1" : "0");
+      return on;
+    }
+    return localStorage.getItem(OPT_IN_KEY) === "1";
+  } catch {
+    return false;   // Safari in private mode throws on localStorage
+  }
+}
 
 // --- native bridge (iOS/macOS app) -----------------------------------------
 function hasNativeBridge() {
@@ -83,14 +107,22 @@ async function askDaemon(instructions, prompt) {
   }
 }
 
-async function daemonAlive() {
+async function daemonHealth() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PROBE_TIMEOUT_MS);
   try {
     const res = await fetch(`${DAEMON_URL}/health`, { signal: ctl.signal });
-    return res.ok;
+    if (!res.ok) return { ok: false, why: `daemon returned ${res.status}` };
+    const data = await res.json().catch(() => ({}));
+    // The daemon refuses to boot at all when the model is unavailable, so a
+    // reachable daemon reporting model:"unavailable" is close to impossible —
+    // but report it honestly rather than claiming a working model.
+    if (data && data.ok === false) {
+      return { ok: false, why: "daemon is up but the on-device model is unavailable" };
+    }
+    return { ok: true };
   } catch {
-    return false;
+    return { ok: false, why: "no daemon answered on 127.0.0.1:8138" };
   } finally {
     clearTimeout(t);
   }
@@ -110,12 +142,41 @@ export async function detect() {
   if (probed) return provider;
   probed = true;
   try {
-    if (hasNativeBridge()) provider = "native";
-    else if (typeof fetch === "function" && isLocalPage() && await daemonAlive()) provider = "daemon";
+    if (hasNativeBridge()) { provider = "native"; reason = "Apple on-device model via the app"; return provider; }
+    if (typeof fetch !== "function") { reason = "this browser has no fetch"; return null; }
+    if (!isLocalPage() && !optedIn()) {
+      reason = "public site — the model is off by default. Add ?llm to the URL to switch it on.";
+      return null;
+    }
+    const h = await daemonHealth();
+    if (h.ok) { provider = "daemon"; reason = "Apple on-device model via the local Mac daemon"; }
+    else reason = h.why;
   } catch {
     provider = null;
+    reason = "the model probe failed";
   }
   return provider;
+}
+
+/** Probe again from scratch — used after the player opts in mid-game. */
+export async function redetect() {
+  probed = false;
+  provider = null;
+  return detect();
+}
+
+/** Everything the AI command needs to explain itself to a confused tester. */
+export function status() {
+  return {
+    provider,                       // "native" | "daemon" | null
+    reason,
+    available: provider !== null,
+    optedIn: optedIn(),
+    localPage: isLocalPage(),
+    label: provider === "native" ? "on-device (app)"
+         : provider === "daemon" ? "on-device (daemon)"
+         : "scripted",
+  };
 }
 
 export function currentProvider() { return provider; }

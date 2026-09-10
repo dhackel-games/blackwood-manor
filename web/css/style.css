@@ -238,7 +238,30 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #phone-transcript .gary { color: var(--green); margin-bottom: 0.45rem; }
 /* Gary is thinking on-device — dimmed placeholder, replaced in place. */
-#phone-transcript .gary.thinking { opacity: 0.45; font-style: italic; }
+#phone-transcript .gary.thinking { opacity: 0.55; font-style: italic; }
+#phone-transcript .gary.thinking::after {
+  content: "▍";
+  animation: gary-blink 1s steps(1) infinite;
+}
+@keyframes gary-blink { 50% { opacity: 0; } }
+/* A line the model actually wrote, so you can tell it apart from the script. */
+#phone-transcript .gary.llm { border-left: 2px solid var(--green); padding-left: 0.5rem; }
+#phone-transcript .gary.llm::after {
+  content: " ◆";
+  color: var(--dim);
+  font-size: 0.7em;
+  vertical-align: super;
+}
+@media (prefers-reduced-motion: reduce) {
+  #phone-transcript .gary.thinking::after { animation: none; }
+}
+
+/* Model status badge in the phone header. Tap for the full story. */
+.phone-ai {
+  font-size: 0.7rem; letter-spacing: 0.04em; margin-top: 0.15rem;
+  color: var(--dim); cursor: pointer; user-select: none;
+}
+.phone-ai.on { color: var(--green); }
 #phone-transcript .you { color: var(--green-bright); opacity: 0.9; margin-bottom: 0.45rem; }
 #phone-transcript .sys { color: var(--dim); }
 

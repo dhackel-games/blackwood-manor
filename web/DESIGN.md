@@ -451,3 +451,35 @@ on a phone, and the TTS voice would cheerfully read the torn edge out loud. `ren
 wraps its output in a `MAP_MARK` (U+001F) sentinel; `ui.js` splits on it to emit the block in
 its own non-wrapping `.map` element and to strip it from anything sent to `garySpeak()`.
 The `.map` font-size is a `clamp()` on viewport width so the widest panel fits an iPhone.
+
+
+## 12.16 Telling the model apart from the script (v2.4.0)
+
+The whole point of 12.14 is that a failed model call is *invisible* — `speak()` returns `""`
+and the hand-written line runs instead. That is correct for players and terrible for whoever is
+testing it: the first real playtest produced seven canned replies in a row and looked exactly
+like a working model having a boring night. (It wasn't. The provider was `null`.)
+
+So the state is now on screen, and it is stated **per line**, not just globally:
+
+- **Header badge** — `◆ AI VOICE · on-device (daemon)` when a provider answered,
+  `○ scripted Gary · tap` when not. Tapping it prints the reason into the transcript, so a
+  remote tester can read it back instead of being asked to open devtools.
+- **`Gary is thinking`** with a blinking cursor replaces the old bare `...` placeholder.
+- **A `◆` and a left rule on every line the model actually wrote.** This is the important one.
+  The badge only says a provider *exists*; the marker says *this specific sentence came from
+  the model*. When `speak()` falls back mid-call the line is deliberately left unmarked —
+  a badge that lies is worse than no badge.
+
+**`?llm` opt-in.** The public site still never probes loopback by default, for the reason in
+12.14 (Chrome's Local Network Access prompt). But "clone the repo and run a Swift daemon" is
+not a thing you can ask a playtester to do just to see the feature, and the alternative was
+shipping people a URL where the AI is silently absent. `?llm` opts in explicitly and is
+remembered in `localStorage`; `?llm=0` opts out. The permission prompt then belongs to someone
+who deliberately asked for it, which was always the real objection — not the prompt itself, but
+showing it to strangers who never asked.
+
+**Don't try to detect macOS from the browser.** The user-agent has been frozen at `10.15` for
+years and will lie to you. The daemon is the detector: it refuses to boot when the model is
+unavailable and prints why, and `/health` reports availability. The launcher surfaces that text
+directly instead of guessing.

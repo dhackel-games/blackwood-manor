@@ -281,12 +281,15 @@ function handle(raw) {
     // mechanical tail (meter / bill milestone) is preserved either way.
     const info = onCall ? world.garyTurnInfo(game, cmd) : null;
     if (info && info.llmOk && garyBrain.isAvailable()) {
-      const el = printToPhone("...", "gary thinking");
+      const el = printToPhone("Gary is thinking", "gary thinking");
       updatePhoneStatus();
       updateHud();
       garyBrain.speak(info).then((line) => {
         const spoken = line ? line + (info.tail || "") : out;
-        if (el) { el.className = "gary"; el.textContent = spoken; }
+        // `llm` marks a line the model actually wrote. When speak() returns ""
+        // we fell back to the scripted line, and it must NOT claim otherwise —
+        // a badge that lies is worse than no badge.
+        if (el) { el.className = line ? "gary llm" : "gary"; el.textContent = spoken; }
         phoneT.scrollTop = phoneT.scrollHeight;
         garySpeak(spoken);
       });
@@ -417,8 +420,33 @@ if (canType) input.focus();
 // Probe for an on-device model for Gary (native app bridge, or the local Mac
 // daemon). Fire-and-forget: if nothing answers, Gary stays canned and nobody
 // ever sees an error.
+const aiBadge = document.getElementById("phone-ai");
+export function refreshAiBadge() {
+  if (!aiBadge) return;
+  const s = garyBrain.status();
+  aiBadge.textContent = s.available ? `◆ AI VOICE · ${s.label}` : "○ scripted Gary · tap";
+  aiBadge.classList.toggle("on", s.available);
+  aiBadge.title = s.reason;
+}
+if (aiBadge) {
+  const explain = () => {
+    const s = garyBrain.status();
+    printToPhone(s.available
+      ? `[Gary's replies are being written live by the ${s.label} model. Lines marked ◆ came from it; unmarked lines are the script.]`
+      : `[Gary is running from the script. ${s.reason}]`, "sys");
+    phoneT.scrollTop = phoneT.scrollHeight;
+  };
+  aiBadge.addEventListener("click", explain);
+  aiBadge.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); explain(); }
+  });
+}
+
 garyBrain.detect().then((p) => {
-  if (p) console.log(`[gary] on-device voice active via "${p}" provider`);
+  refreshAiBadge();
+  console.log(p
+    ? `[gary] on-device voice active via "${p}" provider`
+    : `[gary] scripted — ${garyBrain.status().reason}`);
 });
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.

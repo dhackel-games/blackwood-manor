@@ -5,10 +5,43 @@ Gives Gary a real, on-device LLM voice when you play Blackwood Manor locally on 
 Uses Apple's **Foundation Models** framework — the ~3B model built into macOS 26. Free,
 private, offline. Nothing leaves the machine and there is no API key.
 
+## Quick start (you have the repo)
+
+Double-click **`web/Play Blackwood Manor.command`**.
+
+That's it. On first run it builds this daemon (a minute or two, once), starts it, serves the
+game on a free local port and opens your browser. Gary will think. The phone screen shows
+**`◆ AI VOICE · on-device (daemon)`** when the model is live, and every line the model actually
+wrote is marked with a **◆**.
+
+If anything is missing it tells you exactly what — wrong macOS, Intel Mac, no Xcode — and the
+game still plays with canned Gary.
+
+> Clone with `git clone`, don't download the ZIP: files extracted from a downloaded ZIP are
+> quarantined by Gatekeeper and macOS will refuse to run the `.command`.
+
+## Using the model on the public site
+
+The public site (`dhackel-games.github.io/blackwood-manor`) ships **canned Gary only**. Add
+`?llm` to opt in:
+
+```
+https://dhackel-games.github.io/blackwood-manor/?llm
+```
+
+With the daemon running, that page will use it. The choice is remembered; `?llm=0` turns it
+back off. Chrome will ask once for Local Network Access — that prompt is the whole reason this
+is opt-in rather than automatic (see "Why a daemon?" below).
+
 ## Requirements
 
 - macOS 26 (Tahoe) or later, Apple Silicon
 - Apple Intelligence enabled in System Settings
+- Xcode (for the one-time build)
+
+There is no way to check the macOS version from the browser — the user-agent has been frozen at
+`10.15` for years — so don't try. The daemon is the detector: it refuses to start and prints the
+reason, and `/health` reports model availability.
 
 ## Build
 
@@ -43,7 +76,7 @@ allow "access to devices on your local network". Safari blocks it outright anywa
 
 - **Local play** (`http://127.0.0.1/…`) → the page reaches this daemon.
 - **The iOS/macOS app** → uses the in-process `GaryBridge` instead; no daemon needed.
-- **The public GitHub Pages site** → always the hand-written canned Gary.
+- **The public GitHub Pages site** → canned Gary, unless you add `?llm` to opt in.
 
 If the daemon isn't running, the game silently falls back to canned Gary. Nothing breaks.
 
