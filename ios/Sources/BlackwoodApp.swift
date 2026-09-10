@@ -271,10 +271,6 @@ import FoundationModels
 final class GaryBridge: NSObject, WKScriptMessageHandler {
     weak var webView: WKWebView?
 
-    /// One session per instruction set keeps the KV cache warm across a call,
-    /// which noticeably speeds up later turns of the same conversation.
-    private var sessions: [String: LanguageModelSession] = [:]
-
     static func isModelAvailable() -> Bool {
         if case .available = SystemLanguageModel.default.availability { return true }
         return false
