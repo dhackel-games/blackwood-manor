@@ -150,6 +150,17 @@ export async function detect() {
     }
     const h = await daemonHealth();
     if (h.ok) { provider = "daemon"; reason = "Apple on-device model via the local Mac daemon"; }
+    else if (!isLocalPage()) {
+      // From the public site the probe can fail for two very different reasons
+      // and the distinction is invisible to fetch() — it reports a bare
+      // "Failed to fetch" for both. Chrome's actual console error is
+      // "Permission was denied for this request to access the loopback address
+      // space", i.e. the Local Network Access prompt was dismissed or blocked.
+      // Naming only the daemon here sends people off debugging a daemon that is
+      // running perfectly, so say both, shortest fix first.
+      reason = "couldn't reach the daemon — either it isn't running, or the browser " +
+               "blocked local network access. Playing from the local launcher avoids the prompt.";
+    }
     else reason = h.why;
   } catch {
     provider = null;
