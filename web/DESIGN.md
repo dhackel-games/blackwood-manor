@@ -452,6 +452,15 @@ wraps its output in a `MAP_MARK` (U+001F) sentinel; `ui.js` splits on it to emit
 its own non-wrapping `.map` element and to strip it from anything sent to `garySpeak()`.
 The `.map` font-size is a `clamp()` on viewport width so the widest panel fits an iPhone.
 
+**Discoverability (v2.5.0).** `MAP` also has a button in the touch bar, between `Inv` and
+`Call`. A feature you only reach by typing a word nobody told you about is, for most players,
+not a feature — Gary's offer only fires once you're measurably stuck, which is late, and the
+`HELP` listing is a wall of text. The button costs one wrapped row (`#controls .verbs` is
+`flex-wrap: wrap`) and no new wiring: `ui.js` binds every `#controls [data-cmd]` generically,
+so `data-cmd="map"` routes through the same `handle()` path as typing it. It sits with the
+orientation verbs rather than the phone cluster (`Call`/`Hint`) because `MAP` is ungated — it
+is a game command, not a hint-line service, even though Gary is the one who hands it to you.
+
 
 ## 12.16 Telling the model apart from the script (v2.4.0)
 
