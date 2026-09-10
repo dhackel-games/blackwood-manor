@@ -202,6 +202,17 @@ function fixture() {
   assert.equal(garyClean("'Been here over a decade.'"), "Been here over a decade.");
   assert.equal(garyClean("Yes. , I haven't eaten any food."), "Yes. I haven't eaten any food.");
   assert.equal(garyClean("I don't get paid enough."), "I don't get paid enough.");
+  // Meta-preamble leak, seen live: the model announces the line before saying
+  // it. Both shapes — inline, and as its own paragraph before the real reply.
+  assert.equal(garyClean("Here's a possible response from Gary: Meter's at $1.98."),
+    "Meter's at $1.98.");
+  assert.equal(garyClean("Gary thinks for a second or two before answering:\n\nI'm wearing an old sweater."),
+    "I'm wearing an old sweater.");
+  assert.equal(garyClean("Sure, here you go: I haven't eaten since yesterday."),
+    "I haven't eaten since yesterday.");
+  // ...but an ordinary line that merely contains a colon must survive intact.
+  assert.equal(garyClean("Look: I don't care."), "Look: I don't care.");
+  assert.equal(garyClean("Rule one: don't die in the dark."), "Rule one: don't die in the dark.");
   console.log("OK: gary clean()");
 }
 

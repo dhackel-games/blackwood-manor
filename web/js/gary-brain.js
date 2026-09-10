@@ -223,7 +223,23 @@ export function clean(text) {
   if (narrated) out = narrated[1];
 
   out = out.replace(/^\s*gary\s*[:\-—]\s*/i, "");   // "Gary: ..."
-  out = out.split(/\n\s*\n/)[0].trim();              // first paragraph only
+
+  // The model often prefaces the performance with a sentence *about* the
+  // performance — "Here's a possible response from Gary:", "Gary thinks for a
+  // moment before answering:" — with the real dialogue after a blank line.
+  // Taking paragraph [0] blindly kept the preamble and threw the actual line
+  // away; observed live as Gary saying "Here's a possible response from Gary:".
+  // Drop leading paragraphs that are clearly framing rather than speech.
+  const META_PARA = /^(?:here'?s|sure|okay|certainly|of course|as gary|gary\b)[^:]{0,80}:$/i;
+  const paras = out.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  while (paras.length > 1 && META_PARA.test(paras[0])) paras.shift();
+  out = paras[0] || "";
+  // Same leak, but inline on one line: "Here's what Gary says: ..." — only
+  // strip when the clause actually announces a reply, so an ordinary Gary line
+  // that happens to contain a colon ("Look: I don't care.") survives untouched.
+  out = out.replace(/^(?:here'?s|sure|okay|certainly|of course)\b[^:"]{0,80}:\s*/i, "");
+  out = out.replace(/^(?:as )?gary(?:'s)?\b[^:"]{0,60}?\b(?:response|reply|answer|says?|thinks?|would say)\b[^:"]{0,30}:\s*/i, "");
+  out = out.trim();
   // Gary talks; he does not write verse. Single newlines get collapsed, because
   // the model likes to answer in two mystical short lines when left alone.
   out = out.replace(/\s*\n+\s*/g, " ").trim();
