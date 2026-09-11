@@ -665,12 +665,14 @@ to the TROLL GATE. A male cave TROLL blocks the inner VAULT DOOR there.
 He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including MORE,
 DOOR, FLOOR, CORE, ROAR, LORE, SHORE, STORE, and BEFORE. A valid rhyme makes him move
 and opens DREADMAW'S VAULT. The intended environmental clue is optional:
-`EXAMINE DOUBLOON` reveals LORE etched around its edge, while GORE and other rhymes can
-still solve the poem independently. `SAY <anything> TO TROLL` starts the conversation
+`EXAMINE DOUBLOON` reveals LORE etched around its edge. Several alternate rhymes solve
+the poem, while GORE is accurately acknowledged as a rhyme but rejected as the intended
+word. `SAY <anything> TO TROLL` starts the conversation
 without spending a guess; anticipating a valid rhyme before he asks delights him and
 opens the VAULT immediately. After three wrong answers, the TROLL folds the
 tunnel around the player and sends them back to the FRONT GATE; the three-guess attempt
-then resets. The vault contains a GOLD BAR and WINGED SHOES.
+then resets. Once the VAULT is open, the TROLL no longer repeats the challenge. The vault
+contains a GOLD BAR and WINGED SHOES.
 
 ## 12.27 Equipment, hall bedroom, and roofline
 

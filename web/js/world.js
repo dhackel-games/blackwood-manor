@@ -1328,6 +1328,11 @@ function openSafe(ctx, cmd) {
 }
 
 const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
+const TROLL_REJECTED_RHYMES = new Set([
+  "adore", "boar", "bore", "chore", "explore", "fore", "four", "gore",
+  "ignore", "oar", "or", "pore", "poor", "pour", "score", "snore",
+  "sore", "therefore", "tore", "war", "wore", "yore",
+]);
 const TROLL_RIDDLE =
   "\"Past this door lie gold and ore,\n" +
   "Old crowns, old bones, and something more.\n" +
@@ -1410,6 +1415,9 @@ function giveDragon(ctx, cmd) {
     "The troll inside decides who reaches the hoard.\" (+10)";
 }
 function talkToTroll(ctx) {
+  if (ctx.getFlag("dragonVaultOpen")) {
+    return "The TROLL stands aside from the open VAULT DOOR. \"You solved it. Go admire the loot.\"";
+  }
   ctx.setFlag("trollAskedRiddle");
   return "The TROLL scratches one stone-hard ear. \"No coin, no combat. Finish the missing word and I move.\"\n\n" +
     TROLL_RIDDLE;
@@ -1428,6 +1436,7 @@ function openTrollVault(ctx, answer, anticipated = false) {
     "Deep locks answer one another inside the mountain, and the vault door rolls open.";
 }
 function answerTrollRiddle(ctx, cmd) {
+  if (ctx.getFlag("dragonVaultOpen")) return talkToTroll(ctx);
   const addressed = cmd.iobj ? ctx.find(cmd.iobj) : null;
   const spoken = addressed?.id === "caveTroll"
     ? (cmd.dobj || "")
@@ -1442,17 +1451,20 @@ function answerTrollRiddle(ctx, cmd) {
     return "The TROLL folds his arms across the VAULT DOOR. Perhaps TALK TO TROLL before shouting answers.";
   }
   if (!TROLL_RHYMES.has(answer)) {
+    const rejection = TROLL_REJECTED_RHYMES.has(answer)
+      ? "It does rhyme, but it is not the word the TROLL is looking for."
+      : "It does not rhyme with the TROLL's verse.";
     const wrongGuesses = (ctx.getFlag("trollWrongGuesses") || 0) + 1;
     if (wrongGuesses >= 3) {
       ctx.setFlag("trollWrongGuesses", 0);
       ctx.setFlag("trollAskedRiddle", false);
       ctx.state.room = "gate";
-      return `You offer "${answer || "..."}." The TROLL holds up three stony fingers. "Three wrong rhymes." ` +
+      return `You offer "${answer || "..."}." ${rejection} The TROLL holds up three stony fingers. "Three wrong answers." ` +
         "He stamps one enormous foot, the tunnel folds inside out, and you tumble onto the gravel at the FRONT GATE.";
     }
     ctx.setFlag("trollWrongGuesses", wrongGuesses);
     const remaining = 3 - wrongGuesses;
-    return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move. ` +
+    return `You offer "${answer || "..."}." ${rejection} He does not move. ` +
       `${remaining === 1 ? "One guess remains." : `${remaining} guesses remain.`}`;
   }
   return openTrollVault(ctx, answer);
