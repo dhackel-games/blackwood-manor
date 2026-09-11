@@ -170,6 +170,18 @@ function garySpeak(text) {
 }
 function stopSpeaking() { if ("speechSynthesis" in window) try { speechSynthesis.cancel(); } catch {} }
 
+// Ambient reactions — Gary editorializes on gross/dangerous turns, in the same
+// garbled voice, even when you're not on a call with him. Simple substring/flag
+// checks against the turn's output; no sound effects, just Gary being Gary.
+function garyReacts(out, prevFlags, flags) {
+  if (flags.onFire && !prevFlags.onFire) return "Whoa! You're on fire!";
+  if (out.includes("H U U U R K")) return "Oh, that is repulsive.";
+  if (out.includes("F O O M P") || out.includes("S P L U R T")) return "Good god, that stinks.";
+  if (out.includes("B U R P")) return "Classy.";
+  if ((flags.high || 0) > 0 && !(prevFlags.high || 0)) return "You're tripping, aren't you.";
+  return null;
+}
+
 // ---- Speech-to-text: talk to it (native bridge in the app, web API in browsers) ----
 const nativeSpeech = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.speech;
 const WebSR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -263,6 +275,14 @@ function handle(raw) {
   // where the engine refuses every command. Tear down the phone overlay first.
   if (low === "restart") { if (onCall) endCallUI(); print("Restarting..."); newGame(); return; }
   if (low === "quit") { if (onCall) endCallUI(); print("Thanks for playing. Refresh to return to Blackwood Manor."); input.disabled = true; return; }
+  // AI status is a meta-verb too, and must work mid-call — "is Gary actually
+  // using the model?" is precisely the question you ask while talking to him.
+  if (low === "ai" || low === "ai status" || low === "model") {
+    const text = modelStatusText();
+    onCall ? printToPhone(text, "sys") : print(text, garyBrain.isAvailable() ? "sys ok" : "sys");
+    if (onCall) phoneT.scrollTop = phoneT.scrollHeight;
+    return;
+  }
   // save/restore stay terminal-only.
   if (!onCall) {
     if (low === "save") { print(saveGame(game) ? "Game saved to this browser." : "Save failed."); return; }
@@ -274,6 +294,7 @@ function handle(raw) {
   }
 
   lastCmd = cmd;
+  const prevFlags = { ...game.state.flags };
   const out = game.send(cmd);
   const nowOnCall = !!game.state.flags.onCall;
 
@@ -284,15 +305,17 @@ function handle(raw) {
     // mechanical tail (meter / bill milestone) is preserved either way.
     const info = onCall ? world.garyTurnInfo(game, cmd) : null;
     if (info && info.llmOk && garyBrain.isAvailable()) {
-      const el = printToPhone("Gary is thinking", "gary thinking");
+      const el = printToPhone("◆ AI · Gary is thinking on-device", "gary thinking");
       updatePhoneStatus();
       updateHud();
       garyBrain.speak(info).then((line) => {
         const spoken = line ? line + (info.tail || "") : out;
         // `llm` marks a line the model actually wrote. When speak() returns ""
         // we fell back to the scripted line, and it must NOT claim otherwise —
-        // a badge that lies is worse than no badge.
-        if (el) { el.className = line ? "gary llm" : "gary"; el.textContent = spoken; }
+        // a badge that lies is worse than no badge. Mark that case explicitly
+        // too: an unlabelled line was exactly what made testers conclude the
+        // model "isn't working" when it was simply a fallback on that turn.
+        if (el) { el.className = line ? "gary llm" : "gary scripted"; el.textContent = spoken; }
         phoneT.scrollTop = phoneT.scrollHeight;
         garySpeak(spoken);
       });
@@ -319,6 +342,8 @@ function handle(raw) {
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
+  const reaction = garyReacts(out, prevFlags, game.state.flags);
+  if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
   if (game.state.won) print("\nType RESTART to play again.", "over");
   else if (!game.state.dead) saveGame(game);
 }
@@ -434,10 +459,7 @@ export function refreshAiBadge() {
 }
 if (aiBadge) {
   const explain = () => {
-    const s = garyBrain.status();
-    printToPhone(s.available
-      ? `[Gary's replies are being written live by the ${s.label} model. Lines marked ◆ came from it; unmarked lines are the script.]`
-      : `[Gary is running from the script. ${s.reason}]`, "sys");
+    printToPhone(modelStatusText(), "sys");
     phoneT.scrollTop = phoneT.scrollHeight;
   };
   aiBadge.addEventListener("click", explain);
@@ -448,10 +470,36 @@ if (aiBadge) {
 
 garyBrain.detect().then((p) => {
   refreshAiBadge();
+  announceModelCheck();
   console.log(p
     ? `[gary] on-device voice active via "${p}" provider`
     : `[gary] scripted — ${garyBrain.status().reason}`);
 });
+
+// Launch-time model check.
+//
+// Testers kept reporting "Gary isn't using the LLM" with no way to tell whether
+// the model was missing, switched off, or simply not being reached — the badge
+// alone was too quiet and only lives on the call screen. So on the app, say it
+// out loud once at launch, in the main transcript, before anyone calls Gary.
+function announceModelCheck() {
+  const s = garyBrain.status();
+  if (!s.nativeApp) return;          // browser: the badge is enough, no launch noise
+  print(modelStatusText(), garyBrain.isAvailable() ? "sys ok" : "sys");
+}
+
+/** One honest answer about the model, shared by the launch check, the badge and AI. */
+export function modelStatusText() {
+  const s = garyBrain.status();
+  if (s.available) {
+    return "[AI check] On-device model READY — Gary's phone replies are written live on this device.\n" +
+           "  Lines he actually generates are marked ◆ AI; anything marked '· scripted' came from the script.";
+  }
+  const why = s.native ? s.native.detail : s.reason;
+  const fix = s.fix || (s.native ? "" : "");
+  return "[AI check] On-device model NOT ACTIVE — Gary is using his scripted lines.\n" +
+         `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
+}
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.
 if (/[?&]call\b/.test(location.search)) setTimeout(() => handle("call"), 350);

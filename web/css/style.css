@@ -81,6 +81,16 @@ body { -webkit-text-size-adjust: 100%; }
 }
 
 #transcript .banner { color: var(--green-bright); }
+/* Diagnostic lines (the launch AI check, the AI command). Deliberately set
+   apart from game prose so nobody mistakes a model report for story text. */
+#transcript .sys {
+  color: var(--dim);
+  border-left: 2px solid var(--dim);
+  padding-left: 0.5rem;
+  margin: 0.4rem 0;
+  white-space: pre-wrap;
+}
+#transcript .sys.ok { color: var(--green); border-left-color: var(--green); }
 #transcript .echo { color: var(--green-bright); opacity: 0.85; }
 #transcript .over { color: var(--green-bright); font-weight: bold; }
 #transcript div { margin: 0 0 0.15rem; }
@@ -242,19 +252,32 @@ body { -webkit-text-size-adjust: 100%; }
   font-size: 0.95rem; min-height: 4rem;
 }
 #phone-transcript .gary { color: var(--green); margin-bottom: 0.45rem; }
-/* Gary is thinking on-device — dimmed placeholder, replaced in place. */
-#phone-transcript .gary.thinking { opacity: 0.55; font-style: italic; }
+/* Gary is thinking on-device — dimmed placeholder, replaced in place. The label
+   names the model explicitly; a bare "thinking" read as ordinary game flavour
+   and testers couldn't tell the model from the script. */
+#phone-transcript .gary.thinking { opacity: 0.7; font-style: italic; color: var(--green); }
 #phone-transcript .gary.thinking::after {
-  content: "▍";
-  animation: gary-blink 1s steps(1) infinite;
+  content: "…";
+  animation: gary-think 1.2s steps(4) infinite;
 }
-@keyframes gary-blink { 50% { opacity: 0; } }
+@keyframes gary-think { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
 /* A line the model actually wrote, so you can tell it apart from the script. */
 #phone-transcript .gary.llm { border-left: 2px solid var(--green); padding-left: 0.5rem; }
 #phone-transcript .gary.llm::after {
-  content: " ◆";
+  content: " ◆ AI";
+  color: var(--green);
+  font-size: 0.65em;
+  letter-spacing: 0.08em;
+  vertical-align: super;
+  opacity: 0.85;
+}
+/* ...and its opposite: the model was available but fell back this turn. Saying
+   so beats an unmarked line, which reads as "the AI isn't working at all". */
+#phone-transcript .gary.scripted::after {
+  content: " · scripted";
   color: var(--dim);
-  font-size: 0.7em;
+  font-size: 0.65em;
+  letter-spacing: 0.08em;
   vertical-align: super;
 }
 @media (prefers-reduced-motion: reduce) {

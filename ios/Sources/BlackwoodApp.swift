@@ -47,13 +47,30 @@ final class GameViewController: UIViewController {
         // the native provider purely by testing for the existence of this handler —
         // registering it on an unsupported device would strand Gary on a dead bridge
         // instead of falling back to his canned lines.
+        let report: ModelReport
         if #available(iOS 26.0, macOS 26.0, *) {
-            if GaryBridge.isModelAvailable() {
+            report = GaryBridge.availabilityReport()
+            if report.supported {
                 let gb = GaryBridge()
                 ucc.add(gb, name: "gary")
                 garyBridge = gb
             }
+        } else {
+            report = ModelReport(
+                supported: false, code: "osTooOld",
+                detail: "This device is on an older OS. Gary's on-device voice needs iOS 26 or later.",
+                fix: "Update to iOS 26 or later in Settings → General → Software Update.")
         }
+
+        // Tell the web layer what the native side found, ALWAYS — including (in fact
+        // especially) when the bridge was not registered. Without this the page can
+        // only observe "no gary handler" and then falls through to its browser-oriented
+        // reasoning, which on a phone produced the actively misleading advice to "add
+        // ?llm to the URL" — there is no URL bar in an app. Injected at documentStart
+        // so it is present before any module runs.
+        ucc.addUserScript(WKUserScript(source: report.js,
+                                       injectionTime: .atDocumentStart,
+                                       forMainFrameOnly: true))
 
         config.userContentController = ucc
 
@@ -267,13 +284,61 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
 
 import FoundationModels
 
+/// What the native side found out about the on-device model, in a form the web
+/// layer can display verbatim. `fix` is the actionable half — the difference
+/// between "not supported" (dead end) and "not switched on yet" (one tap away)
+/// is the whole question a tester is asking, so never collapse them into a bool.
+struct ModelReport {
+    let supported: Bool
+    let code: String
+    let detail: String
+    let fix: String
+
+    var js: String {
+        let payload: [String: Any] = [
+            "supported": supported, "code": code, "detail": detail, "fix": fix,
+        ]
+        let json = (try? JSONSerialization.data(withJSONObject: payload))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "{\"supported\":false}"
+        return "window.__garyNative = \(json);"
+    }
+}
+
 @available(iOS 26.0, macOS 26.0, *)
 final class GaryBridge: NSObject, WKScriptMessageHandler {
     weak var webView: WKWebView?
 
-    static func isModelAvailable() -> Bool {
-        if case .available = SystemLanguageModel.default.availability { return true }
-        return false
+    static func isModelAvailable() -> Bool { availabilityReport().supported }
+
+    /// Map Apple's availability enum to something a human can act on.
+    static func availabilityReport() -> ModelReport {
+        switch SystemLanguageModel.default.availability {
+        case .available:
+            return ModelReport(
+                supported: true, code: "available",
+                detail: "Apple's on-device model is available. Gary's replies are written live on this device.",
+                fix: "")
+        case .unavailable(.deviceNotEligible):
+            return ModelReport(
+                supported: false, code: "deviceNotEligible",
+                detail: "This iPhone doesn't support Apple Intelligence, so Gary can't think on-device. He'll use his scripted lines.",
+                fix: "Nothing to fix — the on-device model needs a newer iPhone. The game plays fine scripted.")
+        case .unavailable(.appleIntelligenceNotEnabled):
+            return ModelReport(
+                supported: false, code: "appleIntelligenceNotEnabled",
+                detail: "This iPhone supports Apple Intelligence, but it isn't switched on — so Gary is scripted.",
+                fix: "Turn it on in Settings → Apple Intelligence & Siri, then relaunch the game.")
+        case .unavailable(.modelNotReady):
+            return ModelReport(
+                supported: false, code: "modelNotReady",
+                detail: "Apple Intelligence is on, but the model is still downloading or preparing.",
+                fix: "Wait for the download to finish (Settings → Apple Intelligence & Siri), then relaunch.")
+        case .unavailable(let other):
+            return ModelReport(
+                supported: false, code: "unavailable",
+                detail: "Apple's on-device model is unavailable on this device (\(other)).",
+                fix: "Check Settings → Apple Intelligence & Siri, then relaunch.")
+        }
     }
 
     func userContentController(_ uc: WKUserContentController, didReceive message: WKScriptMessage) {

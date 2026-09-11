@@ -255,6 +255,20 @@ const SIGNOFF_STAGE = [
    "Go. The only way out is through. Also, north. *click*"],
 ];
 
+// Gary comments on your condition the moment he picks up, before anything
+// else — he can hear it. Fire has its own full greeting override (below);
+// sick/high just get a one-line aside stitched onto the normal intro.
+function conditionAside(ctx) {
+  if (ctx.getFlag("onFire")) return ""; // fireGreeting takes over entirely
+  if ((ctx.getFlag("sick") || 0) > 0)
+    return "Oh my GOD — is that BARF I smell? You reek like a dumpster that ate a burrito and " +
+      "regretted it, deeply. Please, for both our sakes, find a TOILET.\n\n";
+  if ((ctx.getFlag("high") || 0) > 0)
+    return "...you're tripping balls right now, aren't you. I can hear it in your voice. Please " +
+      "don't pet anything that isn't there.\n\n";
+  return "";
+}
+
 // First contact when you CALL / DIAL / HINT — greets, gives one real hint, and
 // leaves the line OPEN so you can actually talk to him (see hotlineTalk).
 function hotline(ctx) {
@@ -264,12 +278,13 @@ function hotline(ctx) {
   bumpBill(ctx);
   ctx.addScore(-2); // dialing in isn't free, pal
   if (ctx.getFlag("onFire")) return fireGreeting(ctx);
+  const aside = conditionAside(ctx);
   const pool = STAGE_INTROS[garyStage(ctx)];
   const intro = pool[(n - 1) % pool.length];
   const tail = garyStage(ctx) >= 2
     ? `(You're in session. Say HINT for a clue, ask Gary anything, or HANG UP. ${meter(ctx)})`
     : `(You're on the line. Ask him things, say HINT for another clue, or HANG UP when you're done. ${meter(ctx)})`;
-  return `${intro}\n\n${frameHint(ctx, nextHint(ctx))}\n\n${tail}`;
+  return `${aside}${intro}\n\n${frameHint(ctx, nextHint(ctx))}\n\n${tail}`;
 }
 
 // While you're on the line, everything you type is routed here (core.send).

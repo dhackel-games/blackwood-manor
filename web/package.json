@@ -9,6 +9,6 @@
     "test:walkthrough": "npm test -- --tags @walkthrough"
   },
   "devDependencies": {
-    "@cucumber/cucumber": "^13.2.1"
+    "@cucumber/cucumber": "12.9.0"
   }
 }

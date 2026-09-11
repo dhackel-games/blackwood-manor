@@ -65,6 +65,18 @@ function hasNativeBridge() {
     !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.gary);
 }
 
+// The native app injects window.__garyNative at document start — present even
+// (especially) when the gary handler was NOT registered, which is how we learn
+// *why* the model is missing instead of guessing. Absent in a plain browser.
+export function nativeReport() {
+  if (typeof window === "undefined") return null;
+  const r = window.__garyNative;
+  return r && typeof r === "object" ? r : null;
+}
+
+/** True when we're inside the iOS/macOS app shell, model or no model. */
+export function isNativeApp() { return nativeReport() !== null; }
+
 // Swift calls window.__garyReply(id, text, error).
 if (typeof window !== "undefined") {
   window.__garyReply = (id, text, error) => {
@@ -143,6 +155,12 @@ export async function detect() {
   probed = true;
   try {
     if (hasNativeBridge()) { provider = "native"; reason = "Apple on-device model via the app"; return provider; }
+    // Inside the app with no bridge, the native side already told us exactly why.
+    // Stop here: every remaining branch is browser reasoning, and applying it on a
+    // phone is how this used to advise adding "?llm to the URL" in an app that has
+    // no URL bar — the single most confusing thing a tester could be told.
+    const nat = nativeReport();
+    if (nat) { reason = nat.detail + (nat.fix ? " " + nat.fix : ""); return null; }
     if (typeof fetch !== "function") { reason = "this browser has no fetch"; return null; }
     if (!isLocalPage() && !optedIn()) {
       reason = "public site — the model is off by default. Add ?llm to the URL to switch it on.";
@@ -178,12 +196,16 @@ export async function redetect() {
 
 /** Everything the AI command needs to explain itself to a confused tester. */
 export function status() {
+  const nat = nativeReport();
   return {
     provider,                       // "native" | "daemon" | null
     reason,
     available: provider !== null,
     optedIn: optedIn(),
     localPage: isLocalPage(),
+    native: nat,                    // full native report, or null in a browser
+    nativeApp: nat !== null,
+    fix: nat && !nat.supported ? nat.fix : "",
     label: provider === "native" ? "on-device (app)"
          : provider === "daemon" ? "on-device (daemon)"
          : "scripted",
