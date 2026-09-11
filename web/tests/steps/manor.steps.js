@@ -208,6 +208,13 @@ Then("digestive status has {int} turns and phase {string}", function (remaining,
   assert.equal(status.name, phase);
 });
 
+Then("the inline bowel status matches the current digestive state", function () {
+  const status = world.digestiveStatus(this.game);
+  assert.ok(status, "digestive status must be active");
+  assert.match(this.output, new RegExp(`${status.percent}%`));
+  assert.match(this.output, new RegExp(`~${status.remaining} turns to blast`));
+});
+
 Then("every sickness event drawing is marked as non-wrapping output", function () {
   const artBlocks = this.accumulatedOutput.split(MAP_MARK).filter((_, index) => index % 2 === 1);
   for (const marker of ["B U R P", "B L E A R G H", "F O O M P", "S P L U R T"]) {

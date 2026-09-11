@@ -50,6 +50,8 @@ export function createGame(world) {
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
   let darkWarningRendered = false;
+  let deferStatusBanner = false;
+  let describedRoomThisTurn = false;
 
   // --- lookups ---------------------------------------------------------------
   game.room = () => world.rooms[state.room];
@@ -189,8 +191,12 @@ export function createGame(world) {
       }
     }
     if (typeof world.statusBanner === "function") {
-      const sb = world.statusBanner(game);
-      if (sb) out += "\n" + sb + "\n";
+      if (deferStatusBanner) {
+        describedRoomThisTurn = true;
+      } else {
+        const sb = world.statusBanner(game);
+        if (sb) out += "\n" + sb + "\n";
+      }
     }
     return out.trimEnd();
   };
@@ -254,6 +260,8 @@ export function createGame(world) {
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
 
+    deferStatusBanner = true;
+    describedRoomThisTurn = false;
     const override = runHandlers(cmd);
     let text;
     if (override != null) {
@@ -264,8 +272,14 @@ export function createGame(world) {
       text = r == null ? "You can't do that." : r;
     }
     if (!state.dead && !state.won) tick();
+    deferStatusBanner = false;
+    let result = text + suffix();
+    if (describedRoomThisTurn && typeof world.statusBanner === "function") {
+      const sb = world.statusBanner(game);
+      if (sb) result += "\n\n" + sb;
+    }
     return {
-      text: text + suffix(),
+      text: result,
       stop: state.dead || state.won || !!state.flags.onCall,
     };
   }

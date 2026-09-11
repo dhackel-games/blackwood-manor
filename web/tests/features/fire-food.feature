@@ -180,6 +180,12 @@ Feature: Fire and food consequences
     And item "matches" is in "inventory"
     And the output contains "flaming fart"
 
+  Scenario: Inline and HUD bowel status use the same turn snapshot
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "look"
+    Then the inline bowel status matches the current digestive state
+
   Scenario: Dropping the foil cancels queued fart ignition
     Given the player is in room "kitchen"
     When I send "eat burrito"
