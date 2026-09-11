@@ -26,12 +26,12 @@ Feature: The mushroom trip's third eye
     When I send "eat mushrooms"
     And the player moves directly to room "masterBedroom"
     When I send "look"
-    Then the output contains "MUSHROOM VISION"
+    Then the output contains "THIRD EYE (👁️ 11 turns left)"
     And the output contains "RUBY RING"
     And vision status has 11 turns
     And flight status has 11 turns
     When I send "look"
-    Then the output contains "MUSHROOM VISION"
+    Then the output contains "THIRD EYE"
 
   Scenario: Mushroom flight and the library lever do not end the third eye
     Given the player is in room "kitchen"

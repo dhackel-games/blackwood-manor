@@ -208,6 +208,7 @@ Feature: Dreadmaw's hedge maze and hoard
     When I send "talk"
     Then the output contains "(talk to TROLL)"
     And the output contains "Past this door lie gold and ore"
+    And the troll riddle uses real line breaks
     And flag "trollAskedRiddle" is set
 
   Scenario: Mushroom flight can reach named rooms beyond the dragon and troll

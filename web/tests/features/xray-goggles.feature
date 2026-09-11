@@ -30,7 +30,7 @@ Feature: X-ray goggles in the hall bedroom
     And I send "wear goggles"
     Given the player is in room "garden"
     When I send "look"
-    Then the output contains "XRAY VISION"
+    Then the output contains "THIRD EYE (👁️ ∞)"
     And the output contains "IRON KEY"
 
   Scenario: Taking the goggles off returns the room to pitch black

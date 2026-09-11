@@ -78,7 +78,7 @@ Feature: Mushroom vision and flight
   Scenario: First glance reveals hidden objects
     When the player moves directly to room "gate"
     And I send "east"
-    Then the output contains "MUSHROOM VISION"
+    Then the output contains "THIRD EYE"
     And the output contains "IRON KEY"
     And the output contains "ANCIENT COIN"
     And the output contains "BRAZIER"
@@ -118,7 +118,7 @@ Feature: Mushroom vision and flight
   Scenario: The mushroom trip's third eye lights up dark rooms, no grue warning needed
     When I send "fly to wine cellar"
     Then the game is alive
-    And the output contains "MUSHROOM VISION"
+    And the output contains "THIRD EYE"
     And the output does not contain "pitch black"
 
   Scenario: The crypt wraith still kills an unprotected high player

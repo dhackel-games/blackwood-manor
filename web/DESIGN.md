@@ -599,8 +599,9 @@ validates and uploads when App Store Connect credentials are available.
 Eating the strange mushrooms explicitly hints that the player feels light enough to
 `FLY TO` a named room. While `high` remains positive:
 
-- Room descriptions append `MUSHROOM VISION` with `highDesc` clues for hidden objects.
-  Worn XRAY GOGGLES provide the same clue visibility and label it `XRAY VISION`.
+- Room descriptions append one `THIRD EYE (👁️ N turns left)` heading followed by
+  `highDesc` clues for hidden objects. Worn XRAY GOGGLES provide the same clue
+  visibility and show `THIRD EYE (👁️ ∞)`.
 - `GO TO <room>`, `FLOAT TO <room>`, and `FLY TO <room>` resolve room IDs or names and
   move there directly. Worn WINGED SHOES provide the same named-room flight without
   a countdown.

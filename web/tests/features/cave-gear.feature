@@ -82,7 +82,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And vision status is permanent
     When the player moves directly to room "garden"
     And I send "look"
-    Then the output contains "XRAY VISION"
+    Then the output contains "THIRD EYE (👁️ ∞)"
     And the output contains "IRON KEY"
 
   Scenario: WINGED SHOES open the physical roof and belfry route
