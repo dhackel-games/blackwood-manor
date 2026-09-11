@@ -131,6 +131,27 @@ Feature: Dreadmaw's hedge maze and hoard
       | store  |
       | before |
 
+  Scenario: ENTER VAULT works the same as EAST once the door is open
+    Given item "apple" is carried
+    And the player is in room "dragonCaveMouth"
+    When I send "offer apple to dragon"
+    And I play this command sequence:
+      """
+      east
+      east
+      down
+      east
+      """
+    Then the current room is "trollGate"
+    When I send "enter vault"
+    Then the current room is "trollGate"
+    And the output contains "sealed behind the TROLL"
+    When I send "talk to troll"
+    And I send "say more"
+    Then flag "dragonVaultOpen" is true
+    When I send "enter vault"
+    Then the current room is "dreadmawVault"
+
   Scenario: A non-rhyming answer leaves the vault locked
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"

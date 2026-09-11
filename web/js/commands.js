@@ -338,6 +338,25 @@ export const commands = {
     if (!cmd.dobj) return "Enter what?";
     const target = ctx.find(cmd.dobj);
     if (target && target.enterTo) return commands.go(ctx, { ...cmd, dobj: target.enterTo });
+    // "ENTER VAULT" / "ENTER KITCHEN" etc: if a compass exit from here leads to a
+    // room matching that name, redirect to that direction so GO's locked-exit
+    // handling (and its lockedMsg) still applies instead of a generic failure.
+    // Matched only against exits actually adjacent to the player, so two
+    // unrelated rooms that happen to share a suffix (e.g. two "vault"s) can't
+    // collide the way a global room-name lookup would.
+    const wanted = normalizeRoomName(cmd.dobj);
+    const exits = ctx.room().exits || {};
+    const matchesRoom = (roomId) => {
+      const room = ctx.world.rooms[roomId];
+      if (!room) return false;
+      const names = [roomId, room.name, ...(room.aliases || [])].map(normalizeRoomName);
+      return names.some((name) => name === wanted || name.endsWith(wanted));
+    };
+    const dir = Object.keys(exits).find((d) => {
+      const exit = exits[d];
+      return matchesRoom(typeof exit === "object" ? exit.to : exit);
+    });
+    if (dir) return commands.go(ctx, { ...cmd, dobj: dir });
     return commands.go(ctx, { ...cmd, dobj: "in" });
   },
   give(ctx) { return "There's no one here to give it to."; },
