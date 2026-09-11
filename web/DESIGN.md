@@ -616,6 +616,11 @@ The SAFE does not require the `knowsCombo` flag when the player already knows th
 After `OPEN SAFE` prompts for its dial, bare `7 3 9` opens it; `OPEN SAFE WITH 7 3 9` works
 directly. Reading the DIARY remains the in-world route to learning that code.
 
+Every room also has an explicit entry in `world.implicitNavigation`. Typed or touch-button
+`IN` and `OUT` resolve through that table; `LEAVE` and `EXIT` are aliases for `OUT`.
+Entering a closed door derives OPEN, and a carried matching key additionally derives UNLOCK.
+`OPEN DOOR WITH KEY` runs and displays `(unlock door with key, open door)` as one turn.
+
 ## 12.26 Dreadmaw's maze and vault
 
 The FRONT GATE is the grounds fork: east leads to the original garden, OUTHOUSE, and
@@ -623,6 +628,9 @@ WELL; west enters a three-room HEDGE MAZE whose short route is west, west, south
 The maze reaches DREADMAW THE DRAGON, an ancient female dragon sleeping across the
 cave entrance. TALK, WAKE, MOVE, PUSH, PULL, TOUCH, ATTACK, CLIMB, SHAKE, or NUDGE
 makes her breathe fire over the player and settle back without moving.
+SAY/YELL/SHOUT near sleeping DREADMAW first echoes the utterance, then triggers
+the same immobile dragonfire response. Elsewhere, speech echoes and does nothing;
+inside the cave, SAY/ANSWER/RECITE supplies the TROLL's rhyme answer.
 
 Only offering the kitchen APPLE wakes DREADMAW pleasantly and moves her aside.
 `OFFER`/`GIVE`/`FEED`/`PUT APPLE TO`/`WITH`/`ON DRAGON` all use the same handler.

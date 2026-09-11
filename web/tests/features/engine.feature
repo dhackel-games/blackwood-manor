@@ -189,4 +189,14 @@ Feature: Generic text-adventure engine
     When I send "look"
     Then the output does not start with "> "
 
+  Scenario Outline: Saying or yelling repeats the words without an effect
+    When I send "<command>"
+    Then the output contains "\"Foo\""
+    And the output contains "Nothing happens."
+
+    Examples:
+      | command   |
+      | say "foo" |
+      | yell foo  |
+
 # end engine.feature

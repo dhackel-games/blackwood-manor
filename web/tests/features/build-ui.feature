@@ -20,6 +20,9 @@ Feature: Build metadata and touch-control contract
   Scenario: HUD statuses use declarative slots
     Then every HUD status is a HudSlot with an emoji and calculation
 
+  Scenario: Say is available as a shortcut prefill
+    Then the page has a "say " prefill control
+
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command
 
@@ -31,6 +34,8 @@ Feature: Build metadata and touch-control contract
       | west      |
       | up        |
       | down      |
+      | in        |
+      | out       |
 
   Scenario: TestFlight packages the canonical web game
     Then the TestFlight release refreshes the web bundle before generating the Xcode project
