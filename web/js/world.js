@@ -600,6 +600,12 @@ function putOutSelf(ctx) {
 function selfLightInterceptor(ctx, cmd) {
   const d = (cmd.dobj || "").toLowerCase();
   const i = (cmd.iobj || "").toLowerCase();
+  const FART_WORDS = ["fart", "farts", "gas", "wrapper", "foil", "tinfoil", "burrito"];
+  if (FART_WORDS.includes(d)) {
+    if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+    ctx.setFlag("selfFirePrompt", false);
+    return queueFartIgnition(ctx);
+  }
   const targetsSelf = ["self", "myself", "me", "yourself"].includes(d) ||
     (["fire", "flame", "flames"].includes(d) && !ctx.find(d)) ||
     (!d && i === "fire");
@@ -750,6 +756,29 @@ const SICK_LINES = [
   "A FLAMING FART cracks behind you — blue at the core, orange at the edges, and deeply judgmental.",
   "A spicy, sparking diarrhea disaster fills your pants. Tiny embers spit from the cuffs. This is now a repeating problem.",
 ];
+// Per-event ASCII blasts, indexed to match SICK_LINES phases (0=burp, 1=barf,
+// 2=flaming fart, 3=sparking diarrhea). Stamped in right after the event line.
+const BURP_ART = [
+  "        ( -.-)  ~ B U R P ~   ))) hot enough to tarnish silver (((",
+].join("\n");
+const BARF_ART = [
+  "          O",
+  "         /|\\     H U U U R K —",
+  "         / \\   o vVv ( * : ~ : * : ~ )   B L E A R G H !",
+  "               ~ : * ~ chunks & regret ~ * : ~",
+].join("\n");
+const FART_ART = [
+  "          O",
+  "         /|          ((( F O O M P )))",
+  "        _/ \\_ >>>~~~( * )~~~>>>>>  🔥",
+  "               blue core · orange edge · deeply judgmental",
+].join("\n");
+const DIARRHEA_ART = [
+  "          O     *spark*        *spark*",
+  "         /|\\    >>>  S P L U R T  <<<",
+  "         _||_   ( pants )  . ° tiny embers ° .",
+].join("\n");
+const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
 function eatMushrooms(ctx) {
   ctx.destroy("mushrooms");
   ctx.setFlag("high", 6);
@@ -813,6 +842,7 @@ function afflictionTick(ctx) {
     const left = sick - 1;
     ctx.setFlag("sick", left);
     out.push(SICK_LINES[phase]);
+    if (SICK_EVENT_ART[phase]) out.push(SICK_EVENT_ART[phase]);
 
     if (ctx.getFlag("fartIgnitionQueued")) {
       if (!ctx.has("burritoWrapper")) {

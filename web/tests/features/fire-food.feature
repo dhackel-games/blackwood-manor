@@ -173,6 +173,18 @@ Feature: Fire and food consequences
     Then the output contains "plan is cancelled"
     And flag "fartIgnitionQueued" is false
 
+  Scenario: Bare "light fart" ignites via the burrito foil
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "light fart"
+    Then the output contains "next flaming fart or sparking diarrhea"
+    And flag "fartIgnitionQueued" is true
+    And flag "onFire" is unset
+    When I send "wait"
+    And I send "wait"
+    Then the output contains "comprehensively ablaze"
+    And flag "onFire" is true
+
   Scenario: Untreated burrito sickness completes ten cycles and kills
     Given the player is in room "kitchen"
     When I send "eat burrito"
@@ -181,6 +193,9 @@ Feature: Fire and food consequences
     And the accumulated output contains "BARF with" 10 times
     And the accumulated output contains "FLAMING FART cracks" 10 times
     And the accumulated output contains "spicy, sparking diarrhea" 10 times
+    And the accumulated output contains "B L E A R G H" 10 times
+    And the accumulated output contains "F O O M P" 10 times
+    And the accumulated output contains "S P L U R T" 10 times
     And the game is dead
 
   Scenario Outline: Using or entering the toilet cures burrito sickness
