@@ -47,6 +47,14 @@ Feature: Mushroom vision and flight
     Then the output contains "so light you could FLY TO any room you can name"
     And flag "high" equals 6
 
+  Scenario: Eating dried and fresh mushrooms adds both durations
+    Given a fresh manor game
+    And the player is in room "kitchen"
+    And item "outhouseMushrooms" is carried
+    When I send "eat dried mushrooms"
+    And I send "eat fresh mushrooms"
+    Then flag "high" equals 18
+
   Scenario: First glance reveals hidden objects
     When the player moves directly to room "gate"
     And I send "east"

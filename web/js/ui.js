@@ -26,6 +26,7 @@ const hudTurns = document.getElementById("hud-turns");
 const hudBill = document.getElementById("hud-bill");
 const hudBm = document.getElementById("hud-bm");
 const hudSick = document.getElementById("hud-sick");
+const hudHigh = document.getElementById("hud-high");
 const hudEye = document.getElementById("hud-eye");
 const hudVersion = document.getElementById("hud-version");
 if (hudVersion) hudVersion.textContent = VERSION;
@@ -149,9 +150,13 @@ function updateHud() {
     hudSick.textContent = "";
   }
 
+  const high = game.state.flags.high || 0;
+  hudHigh.hidden = high <= 0;
+  hudHigh.textContent = high > 0 ? `🍄 ${high} turns` : "";
+
   const eye = game.state.flags.thirdEye || 0;
   hudEye.hidden = eye <= 0;
-  hudEye.textContent = eye > 0 ? `👁 ${eye} turns` : "";
+  hudEye.textContent = eye > 0 ? `🍅 ${eye} turns` : "";
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----

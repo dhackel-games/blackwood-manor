@@ -588,3 +588,6 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
   trap-door without lowering its ladder or shedding inventory.
 - Darkness still starts the normal one-turn grue warning, and an unprotected arrival in
   the crypt still triggers the wraith.
+- Mushroom durations stack additively: dried kitchen mushrooms add 6 turns and fresh
+  TOILET-HOLE mushrooms add 12. The always-visible HUD shows `🍄 <turns>`; the TOMATO's
+  independent third-eye countdown shows `🍅 <turns>`.

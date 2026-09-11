@@ -25,7 +25,9 @@ auto-saves to your browser.
   brief revisits show their abbreviations on a separate line.
 - **While high:** hidden clues appear on first entry, vertical movement needs no
   rope or ladder, and `go to <room>`, `float to <room>`, or `fly to <room>`
-  carries you directly there. Darkness and supernatural hazards still apply.
+  carries you directly there. Eating another mushroom cluster adds its full
+  duration to the remaining high. The HUD shows the countdown as `🍄`; TOMATO
+  third-eye time appears as `🍅`. Darkness and supernatural hazards still apply.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.

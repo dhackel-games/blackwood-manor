@@ -14,8 +14,8 @@ Feature: Build metadata and touch-control contract
     And the transcript shrinks and scrolls inside the viewport
     And the controls remain pinned inside the viewport
 
-  Scenario: The HUD exposes digestive and astral countdowns
-    Then the HUD has bowel pressure, sickness phase, and third-eye indicators
+  Scenario: The HUD exposes digestive, mushroom, and tomato countdowns
+    Then the HUD has bowel pressure, sickness phase, mushroom, and tomato indicators
 
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command

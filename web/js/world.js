@@ -826,7 +826,7 @@ const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
 function eatMushrooms(ctx, cmd) {
   const mushrooms = ctx.find(cmd.dobj);
   if (mushrooms) ctx.destroy(mushrooms.id);
-  ctx.setFlag("high", mushrooms?.highTurns || 6);
+  ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 6));
   ctx.setFlag("highGrace", true);
   const origin = mushrooms?.fresh
     ? "You eat the fresh mushrooms. They are slick with literal shit and piss from the TOILET HOLE — " +
