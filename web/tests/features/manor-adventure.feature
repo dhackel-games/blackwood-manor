@@ -248,7 +248,7 @@ Feature: Blackwood Manor adventure
     And the output contains "statue"
     And the output contains "movable"
     And the output contains "THINGS YOU CAN ACT ON"
-    And the output contains "STATUE: MOVE, PUSH, EXAMINE"
+    And the output contains "STATUE: MOVE, PUSH, PULL, EXAMINE"
     When I send "look at statue"
     Then the output contains "key"
     And item "frontKey" is in "garden"
