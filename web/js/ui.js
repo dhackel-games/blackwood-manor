@@ -8,9 +8,11 @@ import { VERSION } from "./version.js";
 import { createHud } from "./hud.js";
 import * as garyBrain from "./gary-brain.js";
 import { MAP_MARK } from "./map.js";
+import { bugReportUrl } from "./issue-report.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
+const bugReport = document.getElementById("bug-report");
 
 // phone-call screen elements
 const phone = document.getElementById("phone");
@@ -126,6 +128,7 @@ function endCallUI() {
 
 function updateHud() {
   hud.update({ game, world });
+  if (bugReport) bugReport.href = bugReportUrl(game.room().name);
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----
