@@ -536,6 +536,15 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
   ctx.setFlag("burnGrace", grantTickGrace);
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.addScore(-1);
+  if (source === "coldFart") {
+    return (
+      "No active affliction — but the burrito left a permanent pilot light down there, and the wrapper is still in " +
+      "your grip. You bear down, summon a deliberate, sulfurous residual fart on command, and snap the crumpled tin " +
+      "foil into the blue-orange jet. Your clothes catch; the rest of you follows.\n\n" +
+      "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, so " +
+      "this appalling party trick works anywhere in the house, for as long as you carry it."
+    );
+  }
   if (source === "fart") {
     if (digestivePhase === 3) {
       return (
@@ -570,6 +579,9 @@ function queueFartIgnition(ctx) {
   }
   const sick = ctx.getFlag("sick") || 0;
   if (sick <= 0) {
+    // Andy's rule: once you've eaten the burrito, the wrapper lets you self-immolate on
+    // demand anywhere — no active sickness required. Fire immediately rather than queueing.
+    if (ctx.getFlag("ateBurrito")) return igniteSelf(ctx, "coldFart");
     return "You ready the foil, but your digestive pilot light is out. No flaming fart is currently scheduled.";
   }
   ctx.setFlag("fartIgnitionQueued", true);
@@ -627,7 +639,7 @@ function selfLightInterceptor(ctx, cmd) {
     ctx.setFlag("selfFirePrompt", "match");
     return "(with match?)";
   }
-  if (hasWrapper && (ctx.getFlag("sick") || 0) > 0) return queueFartIgnition(ctx);
+  if (hasWrapper) return queueFartIgnition(ctx); // sick -> queue; cured but ate burrito -> ignite on demand
   return SELF_FIRE_NO_SOURCE;
 }
 function selfExtinguishInterceptor(ctx, cmd) {
@@ -791,6 +803,7 @@ function eatBurrito(ctx) {
   ctx.setFlag("sick", SICK_DURATION);
   ctx.setFlag("sickGrace", true);
   ctx.setFlag("fartIgnitionQueued", false);
+  ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
   return "You eat Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
     "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
     "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or eat the good cheese before " +

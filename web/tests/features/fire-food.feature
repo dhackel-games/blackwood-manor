@@ -185,6 +185,22 @@ Feature: Fire and food consequences
     Then the output contains "comprehensively ablaze"
     And flag "onFire" is true
 
+  Scenario: The wrapper self-immolates on demand long after the sickness is cured
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "eat cheese"
+    Then flag "sick" equals 0
+    And item "burritoWrapper" is in "inventory"
+    When I send "light self on fire"
+    Then the output contains "permanent pilot light"
+    And the output contains "comprehensively ablaze"
+    And flag "onFire" is true
+    And item "burritoWrapper" is in "inventory"
+    When I send "extinguish self"
+    And the player moves directly to room "garden"
+    And I send "light fart"
+    Then flag "onFire" is true
+
   Scenario: Untreated burrito sickness completes ten cycles and kills
     Given the player is in room "kitchen"
     When I send "eat burrito"
