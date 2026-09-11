@@ -132,6 +132,7 @@ Feature: Generic text-adventure engine
   Scenario: Acting twice in darkness causes a grue death
     When I send "down"
     Then the output matches "pitch black|grue"
+    And the output contains regex "It is pitch black[.] You are likely to be eaten by a grue[.]" exactly 1 time
     When I send "look"
     Then the output contains "grue"
     And the game is dead

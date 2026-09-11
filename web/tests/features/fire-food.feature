@@ -167,6 +167,19 @@ Feature: Fire and food consequences
     And flag "onFire" is true
     And item "burritoWrapper" is in "inventory"
 
+  Scenario: A carried match does not block ignition during the displayed fart phase
+    Given the player is in room "kitchen"
+    When I send "take matches"
+    And I send "eat burrito"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    Then digestive status has 37 turns and phase "FART"
+    When I send "light self on fire"
+    Then flag "onFire" is true
+    And item "matches" is in "inventory"
+    And the output contains "flaming fart"
+
   Scenario: Dropping the foil cancels queued fart ignition
     Given the player is in room "kitchen"
     When I send "eat burrito"

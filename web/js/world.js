@@ -597,6 +597,10 @@ function queueFartIgnition(ctx) {
     return "That plan needs something foil-lined to catch and redirect the flame. You do not currently have it.";
   }
   const sick = ctx.getFlag("sick") || 0;
+  const currentPhase = ctx.getFlag("digestivePhase");
+  if (sick > 0 && [2, 3].includes(currentPhase)) {
+    return igniteSelf(ctx, "fart", true, currentPhase);
+  }
   if (sick <= 0) {
     // Andy's rule: once you've eaten the burrito, the wrapper lets you self-immolate on
     // demand anywhere — no active sickness required. Fire immediately rather than queueing.
@@ -650,6 +654,9 @@ function selfLightInterceptor(ctx, cmd) {
 
   const hasMatch = !!carriedMatch(ctx);
   const hasWrapper = ctx.has("burritoWrapper");
+  if (hasWrapper && [2, 3].includes(ctx.getFlag("digestivePhase"))) {
+    return queueFartIgnition(ctx);
+  }
   if (hasMatch && hasWrapper) {
     ctx.setFlag("selfFirePrompt", "source");
     return "(with match or fart flames?)";
@@ -787,6 +794,12 @@ const SICK_LINES = [
   "A FLAMING FART cracks behind you — blue at the core, orange at the edges, and deeply judgmental.",
   "A spicy, sparking diarrhea disaster fills your pants. Tiny embers spit from the cuffs. This is now a repeating problem.",
 ];
+const DIGESTIVE_PHASES = [
+  { name: "GURGLE", emoji: "🫧" },
+  { name: "BARF", emoji: "🤮" },
+  { name: "FART", emoji: "💨" },
+  { name: "SHIT", emoji: "💩" },
+];
 // Per-event ASCII blasts, indexed to match SICK_LINES phases (0=burp, 1=barf,
 // 2=flaming fart, 3=sparking diarrhea). Stamped in right after the event line.
 const BURP_ART = [
@@ -843,6 +856,7 @@ function eatBurrito(ctx) {
   ctx.moveItem("burritoWrapper", "inventory");
   ctx.setFlag("sick", SICK_DURATION);
   ctx.setFlag("sickGrace", true);
+  ctx.setFlag("digestivePhase", 0);
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
   return "You eat Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
@@ -855,6 +869,7 @@ function drinkMilk(ctx) {
   const wasAfflicted = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
   ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
   ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
+  ctx.setFlag("digestivePhase", null);
   ctx.setFlag("drankMilk", true);
   ctx.addScore(5);
   return "You drink the milk. Cold, fresh, and impossibly wholesome.\n\n" +
@@ -947,6 +962,7 @@ function afflictionTick(ctx) {
     const phase = (SICK_DURATION - sick) % SICK_LINES.length;
     const left = sick - 1;
     ctx.setFlag("sick", left);
+    ctx.setFlag("digestivePhase", phase);
     out.push(SICK_LINES[phase]);
     if (SICK_EVENT_ART[phase]) out.push(MAP_MARK + SICK_EVENT_ART[phase] + MAP_MARK);
 
@@ -993,10 +1009,9 @@ const SICK_ART = [
 // already built up. Rendered under the sick art every turn you're afflicted.
 const GAUGE_WIDTH = 18;
 function digestiveGauge(ctx) {
-  const sick = ctx.getFlag("sick") || 0;
-  if (sick <= 0) return "";
-  const pressure = SICK_DURATION - sick;                 // 0 (just ate) .. 40 (boom)
-  const pct = Math.min(100, Math.round((pressure / SICK_DURATION) * 100));
+  const status = digestiveStatus(ctx);
+  if (!status) return "";
+  const { remaining, pressure, percent: pct } = status;
   const filled = Math.min(GAUGE_WIDTH, Math.round((pressure / SICK_DURATION) * GAUGE_WIDTH));
   const bar = "█".repeat(filled) + "░".repeat(GAUGE_WIDTH - filled);
   let label;
@@ -1006,7 +1021,20 @@ function digestiveGauge(ctx) {
   else if (pct < 80) label = "CLENCHED — do NOT sneeze";
   else if (pct < 95) label = "🚨 EVACUATE — detonation imminent";
   else label = "🚨🚨 T-MINUS SPLASHDOWN 🚨🚨";
-  return `💩 BOWEL PRESSURE ▐${bar}▌ ${pct}%  (~${sick} turns to blast)\n   ≈ ${label} ≈`;
+  return `💩 BOWEL PRESSURE ▐${bar}▌ ${pct}%  (~${remaining} turns to blast)\n   ≈ ${label} ≈`;
+}
+function digestiveStatus(ctx) {
+  const remaining = ctx.getFlag("sick") || 0;
+  if (remaining <= 0) return null;
+  const pressure = SICK_DURATION - remaining;
+  const phaseIndex = ctx.getFlag("digestivePhase") ?? (pressure % DIGESTIVE_PHASES.length);
+  return {
+    remaining,
+    pressure,
+    percent: Math.min(100, Math.round((pressure / SICK_DURATION) * 100)),
+    phaseIndex,
+    ...DIGESTIVE_PHASES[phaseIndex],
+  };
 }
 function statusBanner(ctx) {
   const parts = [];
@@ -1023,6 +1051,7 @@ function useToilet(ctx) {
     ctx.setFlag("sick", 0);
     ctx.setFlag("sickGrace", false);
     ctx.setFlag("fartIgnitionQueued", false);
+    ctx.setFlag("digestivePhase", null);
     return "You reach the TOILET HOLE not one moment too soon. What follows is private, thorough, and — eventually — " +
       "deeply cathartic. You emerge hollow and trembling, but CURED. The burrito's four-stage assault has passed.";
   }
@@ -1225,6 +1254,7 @@ export const world = {
   phoneRank,   // hall-of-shame bill rank for the end screen
   tick: worldTick,   // per-turn: burn-up timer + food afflictions (may kill)
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
+  digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
 

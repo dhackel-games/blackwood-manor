@@ -342,6 +342,8 @@ the mansion.
   `sick`: stomach-acid burp → barf → flaming fart → spicy, sparking diarrhea. That four-turn
   cycle repeats ten times and is lethal after its 40th uncured beat. Each event carries its
   own non-wrapping ASCII drawing rendered through the same mobile-safe block path as MAP MODE.
+- The always-visible HUD shows a compact `💩 BM` pressure bar and a `🤮` countdown with the
+  current four-beat phase: `🫧 GURGLE`, `🤮 BARF`, `💨 FART`, or `💩 SHIT`.
 - **Cold milk** → a drinkable cure for the affliction, +5, "fortified" (and the "Got Milk?" badge).
 - **The privy** (ivy-choked outhouse east of the garden) has a wooden seat over a raw
   **TOILET HOLE**. `SIT`/`USE` cures the sickness and cancels queued fart-flame ignition;

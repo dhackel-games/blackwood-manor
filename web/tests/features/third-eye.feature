@@ -31,6 +31,18 @@ Feature: The nightshade third eye
     And the output contains "RUBY RING"
     And the output matches "[0-9]+ turns of astral sight left"
 
+  Scenario: Mushroom flight and the library lever do not end tomato sight
+    Given the player is in room "kitchen"
+    When I send "eat mushrooms"
+    And I send "eat tomato"
+    And I send "fly to library"
+    And I send "pull lever"
+    Then flag "thirdEye" is positive
+    When I send "down"
+    Then the current room is "secretChamber"
+    And the output does not contain "pitch black"
+    And flag "thirdEye" is positive
+
   Scenario: The attic vault door opens only after the third eye has shown it
     Given the player is in room "attic"
     When I send "north"

@@ -285,6 +285,18 @@ Then("the controls remain pinned inside the viewport", function () {
   assert.match(css, /#controls\s*\{[^}]*flex:\s*0 0 auto/s);
 });
 
+Then("the HUD has bowel pressure, sickness phase, and third-eye indicators", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  for (const id of ["hud-bm", "hud-sick", "hud-eye"]) {
+    assert.match(html, new RegExp(`id=["']${id}["']`));
+  }
+  assert.match(ui, /💩 BM/);
+  assert.match(ui, /🤮/);
+  assert.match(ui, /phaseIndex \+ 1/);
+  assert.match(ui, /👁/);
+});
+
 Then("the page has a {string} touch command", function (direction) {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, new RegExp(`data-cmd=["']${direction}["']`));

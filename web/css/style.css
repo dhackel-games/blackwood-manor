@@ -49,6 +49,11 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #hud .sep { opacity: 0.6; }
 #hud #hud-bill { color: var(--green); }
+#hud .hud-effect {
+  color: var(--green-bright);
+  flex: 0 1 auto;
+}
+#hud .hud-effect[hidden] { display: none; }
 /* The copyright-version gets its own wrapping row above the compact counters. */
 #hud #hud-version {
   flex: 1 0 100%;

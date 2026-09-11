@@ -10,6 +10,8 @@
 import { parse, splitCommands } from "./parser.js";
 import { commands } from "./commands.js";
 
+const DARK_WARNING = "It is pitch black. You are likely to be eaten by a grue.";
+
 const DIRECTION_ORDER = [
   "north", "northeast", "east", "southeast",
   "south", "southwest", "west", "northwest",
@@ -47,6 +49,7 @@ export function createGame(world) {
   const game = { world, state };
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
+  let darkWarningRendered = false;
 
   // --- lookups ---------------------------------------------------------------
   game.room = () => world.rooms[state.room];
@@ -148,7 +151,10 @@ export function createGame(world) {
 
   // --- room description ------------------------------------------------------
   game.describeRoom = (force) => {
-    if (!game.isLit()) return "It is pitch black. You are likely to be eaten by a grue.";
+    if (!game.isLit()) {
+      darkWarningRendered = true;
+      return DARK_WARNING;
+    }
     const r = world.rooms[state.room];
     const first = !state.flags["seen:" + state.room];
     state.flags["seen:" + state.room] = true;
@@ -203,10 +209,11 @@ export function createGame(world) {
       state.flags.__darkWarned = false;
     } else if (!state.flags.__darkWarned) {
       state.flags.__darkWarned = true;
-      pending = "It is pitch black. You are likely to be eaten by a grue.";
+      if (!darkWarningRendered) pending = DARK_WARNING;
     } else {
       grueKill = true;
     }
+    darkWarningRendered = false;
     // Generic per-turn content hook (e.g. the burn-up timer). Returns an optional
     // message; may call ctx.kill()/ctx.win() to end the game mid-tick.
     if (typeof world.tick === "function") {
@@ -242,6 +249,7 @@ export function createGame(world) {
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
   function runOne(input) {
+    darkWarningRendered = false;
     const cmd = parse(input);
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };

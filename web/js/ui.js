@@ -24,6 +24,9 @@ let callSeconds = 0;
 const hudScore = document.getElementById("hud-score");
 const hudTurns = document.getElementById("hud-turns");
 const hudBill = document.getElementById("hud-bill");
+const hudBm = document.getElementById("hud-bm");
+const hudSick = document.getElementById("hud-sick");
+const hudEye = document.getElementById("hud-eye");
 const hudVersion = document.getElementById("hud-version");
 if (hudVersion) hudVersion.textContent = VERSION;
 
@@ -129,6 +132,26 @@ function updateHud() {
   hudScore.textContent = "Score " + game.state.score;
   hudTurns.textContent = game.state.turns + (game.state.turns === 1 ? " turn" : " turns");
   hudBill.textContent = "☎ " + billText();
+
+  const digestion = typeof world.digestiveStatus === "function" ? world.digestiveStatus(game) : null;
+  if (digestion) {
+    const width = 8;
+    const filled = Math.min(width, Math.round((digestion.percent / 100) * width));
+    hudBm.hidden = false;
+    hudBm.textContent = `💩 BM ▐${"█".repeat(filled)}${"░".repeat(width - filled)}▌ ${digestion.percent}%`;
+    hudSick.hidden = false;
+    hudSick.textContent =
+      `🤮 ${digestion.remaining} turns · ${digestion.emoji} ${digestion.name} (${digestion.phaseIndex + 1}/4)`;
+  } else {
+    hudBm.hidden = true;
+    hudBm.textContent = "";
+    hudSick.hidden = true;
+    hudSick.textContent = "";
+  }
+
+  const eye = game.state.flags.thirdEye || 0;
+  hudEye.hidden = eye <= 0;
+  hudEye.textContent = eye > 0 ? `👁 ${eye} turns` : "";
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----

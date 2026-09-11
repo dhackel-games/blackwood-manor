@@ -201,6 +201,13 @@ Then("the accumulated output contains {string} {int} times", function (text, cou
   assert.equal((this.accumulatedOutput.match(new RegExp(escaped, "gi")) || []).length, count);
 });
 
+Then("digestive status has {int} turns and phase {string}", function (remaining, phase) {
+  const status = world.digestiveStatus(this.game);
+  assert.ok(status, "digestive status must be active");
+  assert.equal(status.remaining, remaining);
+  assert.equal(status.name, phase);
+});
+
 Then("every sickness event drawing is marked as non-wrapping output", function () {
   const artBlocks = this.accumulatedOutput.split(MAP_MARK).filter((_, index) => index % 2 === 1);
   for (const marker of ["B U R P", "B L E A R G H", "F O O M P", "S P L U R T"]) {
