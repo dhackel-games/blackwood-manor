@@ -167,6 +167,25 @@ Feature: Dreadmaw's hedge maze and hoard
     And I send "answer banana"
     Then flag "dragonVaultOpen" is unset
     And the output contains "does not rhyme"
+    And the output contains "2 guesses remain"
+
+  Scenario: Three wrong rhymes send the player back to the front gate
+    Given flag "trollAskedRiddle" is set
+    And the player is in room "trollGate"
+    When I send "answer banana"
+    Then the current room is "trollGate"
+    And flag "trollWrongGuesses" equals 1
+    And the output contains "2 guesses remain"
+    When I send "answer orange"
+    Then the current room is "trollGate"
+    And flag "trollWrongGuesses" equals 2
+    And the output contains "One guess remains"
+    When I send "answer purple"
+    Then the current room is "gate"
+    And flag "trollWrongGuesses" equals 0
+    And flag "trollAskedRiddle" is false
+    And the output contains "Three wrong rhymes"
+    And the output contains "FRONT GATE"
 
   Scenario: The troll ignores answers until he has asked the riddle
     Given item "apple" is carried
