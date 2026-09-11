@@ -50,6 +50,15 @@ Given("the random number generator returns {float} then {float}", function (firs
   Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
 });
 
+Given("the mystery package teleport selects room {string}", function (room) {
+  const destinations = Object.keys(this.game.world.rooms).filter((id) => id !== this.game.state.room);
+  const index = destinations.indexOf(room);
+  assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
+  const seq = [0.3, (index + 0.5) / destinations.length];
+  let i = 0;
+  Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
+});
+
 Given("the player is in room {string}", function (room) {
   this.game.state.room = room;
 });
@@ -60,6 +69,10 @@ Given("the player is on fire", function () {
 
 Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
+});
+
+Given("item {string} uses wear slot {string}", function (item, slot) {
+  this.game.item(item).wearSlot = slot;
 });
 
 Given("flag {string} is set", function (flag) {
@@ -85,6 +98,13 @@ When("the player moves directly to room {string}", function (room) {
 When("I wait at most {int} turns until death", function (limit) {
   for (let i = 0; i < limit && !this.game.state.dead; i++) {
     this.output = this.game.send("wait");
+  }
+});
+
+When("I wait {int} turns", function (turns) {
+  for (let i = 0; i < turns; i++) {
+    this.output = this.game.send("wait");
+    assert.equal(this.game.state.dead, false, `Player died on wait ${i + 1}`);
   }
 });
 
@@ -140,6 +160,25 @@ Then("item {string} is destroyed", function (item) {
 
 Then("item {string} is open", function (item) {
   assert.equal(this.game.item(item).open, true);
+});
+
+Then("item {string} is worn in slot {string}", function (item, slot) {
+  const worn = this.game.item(item);
+  assert.equal(worn.worn, true);
+  assert.equal(worn.wearSlot, slot);
+  assert.equal(this.game.equipped(slot)?.id, item);
+});
+
+Then("item {string} is not worn", function (item) {
+  assert.notEqual(this.game.item(item).worn, true);
+});
+
+Then("item {string} is unlit", function (item) {
+  assert.equal(this.game.item(item).lit, false);
+});
+
+Then("the inventory load is {int}", function (load) {
+  assert.equal(this.game.inventoryLoad(), load);
 });
 
 Then("flag {string} is false", function (flag) {
@@ -243,6 +282,14 @@ Then("the accumulated output contains {string} {int} times", function (text, cou
   assert.equal((this.accumulatedOutput.match(new RegExp(escaped, "gi")) || []).length, count);
 });
 
+Then("Dreadmaw's rebuke burns the player or launches them to the front gate", function () {
+  const burned = this.game.getFlag("onFire") === true && this.game.state.room === "dragonCaveMouth";
+  const launched = this.game.state.room === "gate"
+    && (this.game.getFlag("dragonInjuries") || 0) > 0
+    && /crash|crater/i.test(this.output);
+  assert.ok(burned || launched, this.output);
+});
+
 Then("digestive status has {int} turns and phase {string}", function (remaining, phase) {
   const status = world.digestiveStatus(this.game);
   assert.ok(status, "digestive status must be active");
@@ -253,6 +300,12 @@ Then("digestive status has {int} turns and phase {string}", function (remaining,
 Then("fire status has {int} turns", function (remaining) {
   const status = world.fireStatus(this.game);
   assert.ok(status, "fire status must be active");
+  assert.equal(status.remaining, remaining);
+});
+
+Then("headlamp status has {int} turn(s)", function (remaining) {
+  const status = world.headlampStatus(this.game);
+  assert.ok(status, "headlamp status must be active");
   assert.equal(status.remaining, remaining);
 });
 

@@ -71,7 +71,7 @@ Feature: Blackwood Manor adventure
       put ring in reliquary
       put miniature in reliquary
       east
-      move portrait
+      move painting
       open safe
       take talisman
       wear talisman
@@ -257,10 +257,10 @@ Feature: Blackwood Manor adventure
   Scenario: Handler-driven directions appear when available
     Given the player is in room "landing"
     When I send "look"
-    Then the output does not contain line "Directions you can go: east, south, west, up, down"
+    Then the output does not contain line "Directions you can go: north, east, south, west, up, down"
     When I send "pull cord"
     And I send "look"
-    Then the output contains line "Directions you can go: east, south, west, up, down"
+    Then the output contains line "Directions you can go: north, east, south, west, up, down"
     Given a fresh manor game
     And the player is in room "hollowSanctum"
     When I send "look"
@@ -283,7 +283,7 @@ Feature: Blackwood Manor adventure
 
   Scenario: A known safe code can be typed without reading the diary
     Given the player is in room "parlor"
-    When I send "move portrait"
+    When I send "move painting"
     And I send "open safe"
     Then the output contains "type it now"
     And flag "knowsCombo" is unset
@@ -293,7 +293,7 @@ Feature: Blackwood Manor adventure
 
   Scenario: A safe code can be supplied inline
     Given the player is in room "parlor"
-    When I send "move portrait"
+    When I send "move painting"
     And I send "open safe with 7 3 9"
     Then the output contains "safe clicks open"
     And item "safe" is open
@@ -315,7 +315,7 @@ Feature: Blackwood Manor adventure
     And item "frontKey" is in "garden"
     Given a fresh manor game
     And the player is in room "parlor"
-    When I send "ex portrait"
+    When I send "ex painting"
     Then the output contains "SAFE"
     And item "safe" is in "parlor"
 
@@ -332,7 +332,7 @@ Feature: Blackwood Manor adventure
       | privy         | TOILET                           |
       | porch         | MAILBOX,FRONT DOOR               |
       | grandHall     | RELIQUARY,BELL                   |
-      | parlor        | PORTRAIT                         |
+      | parlor        | PROFILE PAINTING                 |
       | library       | LEVER                            |
       | diningRoom    | CANDLESTICK                      |
       | kitchen       | ROPE,MATCHES,CELLAR DOOR         |

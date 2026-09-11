@@ -74,7 +74,7 @@ function takeAll(ctx, cmd) {
   const leftBehind = [];
   const limit = ctx.world.config.maxCarry ?? 99;
   for (const item of candidates) {
-    if (ctx.inventory().length >= limit) {
+    if (ctx.inventoryLoad() >= limit) {
       leftBehind.push(item.names[0]);
       continue;
     }
@@ -98,7 +98,9 @@ export const commands = {
     const dir = cmd.dobj;
     const room = ctx.room();
     let exit = room.exits && room.exits[dir];
-    if (!exit && (ctx.getFlag("high") || 0) > 0) {
+    const canFly = (ctx.getFlag("high") || 0) > 0
+      || (typeof ctx.world.canFly === "function" && ctx.world.canFly(ctx));
+    if (!exit && canFly) {
       const destination = resolveRoom(ctx, dir);
       if (destination) {
         const [roomId, roomDef] = destination;
@@ -147,7 +149,7 @@ export const commands = {
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (ctx.has(it.id)) return "You already have that.";
     if (it.fixed || !it.takeable) return "That's hardly portable.";
-    if (ctx.inventory().length >= (ctx.world.config.maxCarry ?? 99))
+    if (ctx.inventoryLoad() >= (ctx.world.config.maxCarry ?? 99))
       return "Your hands are full. You'll have to drop something first.";
     ctx.moveItem(it.id, "inventory");
     return "Taken.";
@@ -157,6 +159,7 @@ export const commands = {
     if (!cmd.dobj) return "Drop what?";
     const it = ctx.find(cmd.dobj, ctx.inventory());
     if (!it) return "You aren't carrying that.";
+    if (it.worn) return `Remove the ${it.names[0]} before dropping it.`;
     ctx.moveItem(it.id, ctx.state.room);
     return "Dropped.";
   },
@@ -165,7 +168,11 @@ export const commands = {
     const inv = ctx.inventory();
     if (!inv.length) return "You are empty-handed.";
     return "You are carrying:\n" +
-      inv.map((i) => "  " + [...(i.adjectives || []).slice(0, 1), i.names[0]].join(" ").toUpperCase()).join("\n");
+      inv.map((i) => {
+        const name = [...(i.adjectives || []).slice(0, 1), i.names[0]].join(" ").toUpperCase();
+        const worn = i.worn ? ` (WORN${i.wearSlot ? `: ${i.wearSlot.toUpperCase()}` : ""})` : "";
+        return `  ${name}${worn}`;
+      }).join("\n");
   },
 
   open(ctx, cmd) {
@@ -220,6 +227,7 @@ export const commands = {
     if (!cmd.dobj) return "Put what?";
     const it = ctx.find(cmd.dobj, ctx.inventory());
     if (!it) return "You aren't carrying that.";
+    if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
     if (!cmd.iobj) return "Put it where?";
     const dest = ctx.find(cmd.iobj);
     if (!dest) return `You can't see any ${cmd.iobj} here.`;
@@ -250,9 +258,11 @@ export const commands = {
     if (!it || !it.lightSource) return "You can't light that.";
     if (it.lit) return "It's already lit.";
     if (typeof it.fuel === "number" && it.fuel <= 0) return "It's burned out; it won't catch.";
-    const hasMatch = ctx.inventory().some((i) =>
-      (i.names || []).some((n) => n === "match" || n === "matches"));
-    if (!hasMatch) return "You have nothing to light it with.";
+    if (!it.selfPowered) {
+      const hasMatch = ctx.inventory().some((i) =>
+        (i.names || []).some((n) => n === "match" || n === "matches"));
+      if (!hasMatch) return "You have nothing to light it with.";
+    }
     it.lit = true;
     return `The ${it.names[0]} flickers to life, throwing shadows against the walls.`;
   },
@@ -271,13 +281,24 @@ export const commands = {
     if (!it) return "You aren't carrying that.";
     if (!it.wearable) return "You can't wear that.";
     if (it.worn) return "You're already wearing it.";
+    if (it.wearSlot) {
+      const occupied = ctx.equipped(it.wearSlot);
+      if (occupied) return `Your ${it.wearSlot} slot is already occupied by the ${occupied.names[0]}.`;
+    }
     it.worn = true;
-    return `You put on the ${it.names[0]}.`;
+    if (it.activatesOnWear && (it.fuel == null || it.fuel > 0)) {
+      it.lit = true;
+      it.lightGrace = true;
+    }
+    return it.wearSlot
+      ? `You put the ${it.names[0]} on your ${it.wearSlot}.`
+      : `You put on the ${it.names[0]}.`;
   },
   remove(ctx, cmd) {
     const it = ctx.find(cmd.dobj, ctx.inventory());
     if (!it || !it.worn) return "You aren't wearing that.";
     it.worn = false;
+    if (it.activatesOnWear) it.lit = false;
     return `You take off the ${it.names[0]}.`;
   },
 
