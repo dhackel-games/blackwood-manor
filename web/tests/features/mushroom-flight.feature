@@ -38,10 +38,10 @@ Feature: Mushroom vision and flight
       | get mushrooms from toilet       |
       | reach into toilet for mushrooms |
 
-  Scenario: Dried kitchen mushrooms are half-strength and hint that flight is possible
+  Scenario: Dried kitchen mushrooms hint that flight is possible
     Then the output contains "dried kitchen mushrooms"
     Then the output contains "so light you could FLY TO any room you can name"
-    And flag "high" equals 6
+    And flag "high" equals 12
 
   Scenario: Eating dried and fresh mushrooms adds both durations
     Given a fresh manor game
@@ -49,7 +49,7 @@ Feature: Mushroom vision and flight
     And item "outhouseMushrooms" is carried
     When I send "eat dried mushrooms"
     And I send "eat fresh mushrooms"
-    Then flag "high" equals 18
+    Then flag "high" equals 24
 
   Scenario: First glance reveals hidden objects
     When the player moves directly to room "gate"

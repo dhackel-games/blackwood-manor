@@ -830,13 +830,13 @@ const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
 function eatMushrooms(ctx, cmd) {
   const mushrooms = ctx.find(cmd.dobj);
   if (mushrooms) ctx.destroy(mushrooms.id);
-  ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 6));
+  ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 12));
   ctx.setFlag("highGrace", true);
   ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
   const origin = mushrooms?.fresh
     ? "You eat the fresh mushrooms. They are slick with literal shit and piss from the TOILET HOLE — " +
-      "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway. They are alarmingly potent."
-    : "You chew through the dried kitchen mushrooms. They are dusty, bitter, and only half-strength.";
+      "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway."
+    : "You chew through the dried kitchen mushrooms. They are dusty and bitter, but the trip hits just the same.";
   return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
     "Your body feels so light you could FLY TO any room you can name.\n\n" +
@@ -2186,9 +2186,9 @@ export const world = {
     // --- kitchen edibles: high / sick / help ---
     mushrooms: {
       names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
-      loc: "kitchen", takeable: true, edible: true, highTurns: 6,
+      loc: "kitchen", takeable: true, edible: true, highTurns: 12,
       roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
-      desc: "Dried purple mushrooms, faintly luminous and half as potent as a fresh cluster.",
+      desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
       on: { eat: eatMushrooms },
     },
     outhouseMushrooms: {
