@@ -2,6 +2,7 @@ import SwiftUI
 import WebKit
 import Speech
 import AVFoundation
+import UIKit
 
 @main
 struct BlackwoodApp: App {
@@ -22,7 +23,7 @@ struct GameView: UIViewControllerRepresentable {
     func updateUIViewController(_ vc: GameViewController, context: Context) {}
 }
 
-final class GameViewController: UIViewController {
+final class GameViewController: UIViewController, WKUIDelegate {
     private var webView: WKWebView!
     private var speechBridge: SpeechBridge?
     private var garyBridge: AnyObject?
@@ -75,6 +76,7 @@ final class GameViewController: UIViewController {
         config.userContentController = ucc
 
         webView = WKWebView(frame: .zero, configuration: config)
+        webView.uiDelegate = self
         bridge.webView = webView
         if #available(iOS 26.0, macOS 26.0, *) {
             (garyBridge as? GaryBridge)?.webView = webView
@@ -102,6 +104,21 @@ final class GameViewController: UIViewController {
         if let url = URL(string: "app://local/index.html") {
             webView.load(URLRequest(url: url))
         }
+    }
+
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        guard navigationAction.targetFrame == nil,
+              let url = navigationAction.request.url,
+              ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
+            return nil
+        }
+        UIApplication.shared.open(url)
+        return nil
     }
 }
 

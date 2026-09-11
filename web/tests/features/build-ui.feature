@@ -23,6 +23,10 @@ Feature: Build metadata and touch-control contract
   Scenario: Say is available as a shortcut prefill
     Then the page has a "say " prefill control
 
+  Scenario: Bug reports open the repository issue form outside the game
+    Then the page links the Bug control to "https://github.com/dhackel-games/blackwood-manor/issues/new"
+    And the iOS wrapper opens new-window web links externally
+
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command
 
