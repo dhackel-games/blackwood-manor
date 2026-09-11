@@ -13,6 +13,11 @@ import {
   bugReportUrl,
   DEFAULT_ISSUE_DESCRIPTION,
 } from "./issue-report.js";
+import {
+  DEFAULT_GARY_VOICE_PRESET,
+  garyVoiceProfile,
+  pickGaryVoice,
+} from "./gary-voice.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -24,6 +29,7 @@ const phoneT = document.getElementById("phone-transcript");
 const phoneCmd = document.getElementById("phone-cmd");
 const phoneTimer = document.getElementById("phone-timer");
 const phoneBillEl = document.getElementById("phone-bill");
+const garyVoiceSelect = document.getElementById("gary-voice");
 let callTimer = null;
 let callSeconds = 0;
 
@@ -145,18 +151,30 @@ function openBugReport(description = "") {
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----
 // Default MUTED so audio never plays unexpectedly (e.g. at work) — tap 🔇 Gary
 // on the call screen to turn his voice on.
+const GARY_VOICE_PRESET_KEY = "blackwood-gary-voice";
 let ttsMuted = true;
 let garyVoice = null;
-function pickGaryVoice() {
-  if (!("speechSynthesis" in window)) return null;
-  const vs = speechSynthesis.getVoices();
-  const prefs = ["Fred", "Ralph", "Albert", "Aaron", "Arthur", "Reed", "Rocko", "Eddy", "Daniel"];
-  for (const p of prefs) { const v = vs.find((v) => v.name && v.name.includes(p)); if (v) return v; }
-  return vs.find((v) => /^en/i.test(v.lang)) || vs[0] || null;
+let garyVoicePreset = DEFAULT_GARY_VOICE_PRESET;
+try {
+  garyVoicePreset = garyVoiceProfile(localStorage.getItem(GARY_VOICE_PRESET_KEY)).id;
+} catch (error) {
+  console.warn("[gary] could not read saved voice preset", error);
+}
+if (garyVoiceSelect) garyVoiceSelect.value = garyVoicePreset;
+function refreshGaryVoice() {
+  if (!("speechSynthesis" in window)) return;
+  garyVoice = pickGaryVoice(speechSynthesis.getVoices(), garyVoicePreset);
+  if (garyVoiceSelect) {
+    garyVoiceSelect.title = garyVoice
+      ? `System voice: ${garyVoice.name}`
+      : "No matching system voice is installed";
+  }
 }
 if ("speechSynthesis" in window) {
-  garyVoice = pickGaryVoice();
-  speechSynthesis.addEventListener("voiceschanged", () => { garyVoice = pickGaryVoice(); });
+  refreshGaryVoice();
+  speechSynthesis.addEventListener("voiceschanged", refreshGaryVoice);
+} else if (garyVoiceSelect) {
+  garyVoiceSelect.disabled = true;
 }
 function garySpeak(text) {
   if (ttsMuted || !text || !("speechSynthesis" in window)) return;
@@ -168,7 +186,9 @@ function garySpeak(text) {
   try {
     const u = new SpeechSynthesisUtterance(spoken);
     if (garyVoice) u.voice = garyVoice;
-    u.pitch = 0.7; u.rate = 1.02;
+    const profile = garyVoiceProfile(garyVoicePreset);
+    u.pitch = profile.pitch;
+    u.rate = profile.rate;
     // Chrome DROPS an utterance if cancel() and speak() run back-to-back.
     // Only cancel when something's already playing, and defer the new speak.
     if (speechSynthesis.speaking || speechSynthesis.pending) {
@@ -516,6 +536,18 @@ function toggleVoice() {
 }
 muteBtn.addEventListener("click", toggleVoice);
 if (phoneAvatar) phoneAvatar.addEventListener("click", toggleVoice);
+if (garyVoiceSelect) {
+  garyVoiceSelect.addEventListener("change", () => {
+    garyVoicePreset = garyVoiceProfile(garyVoiceSelect.value).id;
+    try {
+      localStorage.setItem(GARY_VOICE_PRESET_KEY, garyVoicePreset);
+    } catch (error) {
+      console.warn("[gary] could not save voice preset", error);
+    }
+    refreshGaryVoice();
+    if (!ttsMuted) garySpeak("Fine. New voice. Still Gary.");
+  });
+}
 
 // Mic buttons (speech-to-text).
 const micBtn = document.getElementById("mic");

@@ -46,6 +46,9 @@ auto-saves to your browser.
   title with the current room and its body with `Describe issue here`. Typing
   `bug <description>` instead puts that text into the issue body without
   advancing the game turn.
+- **Gary's voice:** tap Gary or the voice-status line to unmute him. The selector
+  beside that line offers computer male/female and Australian male/female
+  presets and remembers your choice.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived

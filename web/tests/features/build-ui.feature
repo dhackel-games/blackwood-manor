@@ -33,6 +33,10 @@ Feature: Build metadata and touch-control contract
   Scenario: Gary uses an icon-only send control
     Then Gary's send control contains only an up arrow
 
+  Scenario: Gary offers persistent computer and Australian voice presets
+    Then Gary offers male and female computer and Australian voices
+    And Gary remembers the selected voice preset
+
   Scenario: In and Out controls use title case
     Then the movement controls are labeled In and Out
 
