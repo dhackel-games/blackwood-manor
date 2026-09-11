@@ -24,6 +24,7 @@ const VERBS = {
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
   map: ["map", "m", "chart", "floorplan"],
+  code: ["code", "combination"],
   yes: ["yes", "y", "yeah", "yep"], no: ["no", "nope", "nah"],
   score: ["score"], save: ["save"], restore: ["restore", "load"], restart: ["restart"],
   verbose: ["verbose"], brief: ["brief"], help: ["help", "?", "commands"], quit: ["quit", "q"],
@@ -51,6 +52,9 @@ export function splitCommands(input) {
 export function parse(input) {
   const raw = (input || "").trim().toLowerCase();
   if (!raw) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
+  if (/^[\d\s-]+$/.test(raw) && /\d/.test(raw)) {
+    return { verb: "code", dobj: raw, prep: null, iobj: null };
+  }
 
   let words = raw.split(/\s+/).filter((w) => w && !ARTICLES.has(w));
   if (!words.length) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };

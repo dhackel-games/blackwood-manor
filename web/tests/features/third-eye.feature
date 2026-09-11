@@ -14,6 +14,7 @@ Feature: The nightshade third eye
     When I send "examine tomato"
     Then the output matches "nightshade|belladonna"
     When I send "eat tomato"
+    Then the output contains "(get tomato, eat tomato)"
     Then flag "thirdEye" is positive
     And flag "vaultFound" is set
     And the output matches "NIGHTSHADE|third eye"

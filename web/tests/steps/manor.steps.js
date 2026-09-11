@@ -111,6 +111,10 @@ Then("item {string} is destroyed", function (item) {
   assert.equal(this.game.roomOf(item), null);
 });
 
+Then("item {string} is open", function (item) {
+  assert.equal(this.game.item(item).open, true);
+});
+
 Then("flag {string} is false", function (flag) {
   assert.equal(this.game.getFlag(flag), false);
 });

@@ -602,3 +602,16 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
 updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
 pressure, digestive phase, mushroom high, TOMATO sight, and fire countdown are data entries
 in one registry rather than separate DOM mutations in `ui.js`.
+
+## 12.25 Derived actions and player-known codes
+
+`core.runOne()` derives safe convenience actions before dispatch. `READ`, `EAT`, `DRINK`,
+and `WEAR` automatically GET a visible portable target and print the complete parenthetical
+sequence, such as `(get diary, read diary)`. The world-level `deriveCommand` hook supplies
+content-specific prerequisites; TOILET mushroom commands become
+`(look in toilet, get mushrooms, eat mushrooms)` without making the player repeat obvious
+steps. Derived actions still respect carrying capacity.
+
+The SAFE does not require the `knowsCombo` flag when the player already knows the answer.
+After `OPEN SAFE` prompts for its dial, bare `7 3 9` opens it; `OPEN SAFE WITH 7 3 9` works
+directly. Reading the DIARY remains the in-world route to learning that code.

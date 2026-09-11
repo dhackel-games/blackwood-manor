@@ -1098,6 +1098,46 @@ function reachIntoToilet(ctx, cmd) {
   if (!/\b(toilet|hole|mushroom|fungus)\b/.test(target)) return null;
   return takeToiletMushrooms(ctx);
 }
+function deriveCommand(ctx, cmd) {
+  if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
+  if (!["take", "eat", "reach"].includes(cmd.verb)) return [];
+  const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
+  if (!/\b(mushroom|mushrooms|fungus|toilet|hole)\b/.test(target)) return [];
+  inspectToilet(ctx);
+  return ["look in toilet"];
+}
+const SAFE_CODE = "739";
+function safeCode(cmd) {
+  return `${cmd.dobj || ""} ${cmd.iobj || ""}`.replace(/\D/g, "");
+}
+function finishOpeningSafe(ctx, source) {
+  const safe = ctx.item("safe");
+  safe.locked = false;
+  safe.open = true;
+  ctx.setFlag("safeCodePrompt", false);
+  const inside = ctx.itemsIn("safe");
+  return `${source} The safe clicks open` +
+    (inside.length ? ", revealing " + inside.map((item) => item.names[0].toUpperCase()).join(", ") + "." : ".");
+}
+function enterSafeCode(ctx, cmd) {
+  if (ctx.roomOf("safe") !== "parlor") return null;
+  if (safeCode(cmd) !== SAFE_CODE) return "You dial that combination. The safe remains locked.";
+  return finishOpeningSafe(ctx, "You dial seven left, three right, nine left.");
+}
+function openSafe(ctx, cmd) {
+  const safe = ctx.item("safe");
+  if (safe.open) return "The safe already stands open.";
+  const suppliedCode = safeCode({ dobj: null, iobj: cmd.iobj });
+  if (safe.locked && suppliedCode) {
+    if (suppliedCode !== SAFE_CODE) return "You dial that combination. The safe remains locked.";
+    return finishOpeningSafe(ctx, "You dial seven left, three right, nine left.");
+  }
+  if (safe.locked && !ctx.getFlag("knowsCombo")) {
+    ctx.setFlag("safeCodePrompt", true);
+    return "The safe has a combination dial. If you know the code, type it now.";
+  }
+  return finishOpeningSafe(ctx, "You dial the combination from the DIARY — seven left, three right, nine left.");
+}
 
 // --- End-screen achievement badges -------------------------------------------
 function endBadges(ctx) {
@@ -1261,6 +1301,7 @@ export const world = {
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
+  deriveCommand,     // content-specific missing steps the parser may safely infer
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
 
@@ -1426,6 +1467,7 @@ export const world = {
           : "The PORTRAIT frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
       },
       exits: { west: "grandHall", south: "library" },
+      on: { code: enterSafeCode },
     },
 
     library: {
@@ -1895,20 +1937,7 @@ export const world = {
       open: false, locked: true, capacity: 3,
       desc: "A squat iron safe set into the wall, fitted with a combination dial.",
       on: {
-        open(ctx) {
-          const s = ctx.item("safe");
-          if (s.open) return "The safe already stands open.";
-          if (s.locked) {
-            if (!ctx.getFlag("knowsCombo"))
-              return "The safe has a combination dial. You try a few turns at random; it does not yield.";
-            s.locked = false;
-          }
-          s.open = true;
-          const inside = ctx.itemsIn("safe");
-          return "You dial the combination from the diary — seven left, three right, nine left — and " +
-            "the safe clicks open" +
-            (inside.length ? ", revealing " + inside.map((x) => "a " + x.names[0]).join(", ") + "." : ".");
-        },
+        open: openSafe,
       },
     },
     talisman: {

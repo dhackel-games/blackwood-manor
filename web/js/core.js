@@ -252,6 +252,20 @@ export function createGame(world) {
     return null;
   }
 
+  function implicitlyAcquire(cmd) {
+    if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
+    const item = game.find(cmd.dobj);
+    if (!item || !item.takeable || game.has(item.id)) return null;
+    if (game.inventory().length >= (world.config.maxCarry ?? 99)) {
+      return {
+        blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
+        step: `get ${item.names[0]}`,
+      };
+    }
+    game.moveItem(item.id, "inventory");
+    return { step: `get ${item.names[0]}` };
+  }
+
   // --- main loop -------------------------------------------------------------
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
@@ -261,9 +275,15 @@ export function createGame(world) {
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
 
+    const derivedSteps = typeof world.deriveCommand === "function"
+      ? (world.deriveCommand(game, cmd) || [])
+      : [];
+    const acquisition = implicitlyAcquire(cmd);
+    if (acquisition) derivedSteps.push(acquisition.step);
+
     deferStatusBanner = true;
     describedRoomThisTurn = false;
-    const override = runHandlers(cmd);
+    const override = acquisition?.blocked ? acquisition.blocked : runHandlers(cmd);
     let text;
     if (override != null) {
       text = override;
@@ -274,6 +294,10 @@ export function createGame(world) {
     }
     if (!state.dead && !state.won) tick();
     deferStatusBanner = false;
+    if (derivedSteps.length) {
+      const sequence = acquisition?.blocked ? derivedSteps : [...derivedSteps, input.trim().toLowerCase()];
+      text = `(${sequence.join(", ")})\n\n${text}`;
+    }
     let result = text + suffix();
     if (describedRoomThisTurn && typeof world.statusBanner === "function") {
       const sb = world.statusBanner(game);

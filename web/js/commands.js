@@ -312,6 +312,7 @@ export const commands = {
   smell() { return "Dust, rot, and cold ash."; },
   climb(ctx, cmd) { return `You can't climb the ${cmd.dobj || "that"}.`; },
   reach() { return "You reach into the darkness and find nothing useful."; },
+  code() { return "There is no combination lock waiting for that code."; },
   enter(ctx, cmd) {
     if (!cmd.dobj) return "Enter what?";
     const target = ctx.find(cmd.dobj);

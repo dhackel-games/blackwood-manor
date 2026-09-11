@@ -36,10 +36,15 @@ auto-saves to your browser.
 - **Touch controls:** direction and action buttons remain visible and usable at all
   times, including while the software keyboard is open.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
+- **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
+  `drink`, or `wear` it, the game automatically gets it and prints the derived
+  sequence. TOILET mushrooms also derive the missing `look in toilet` step.
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
   `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,
   cellar, well, and toilet)
+  A revealed SAFE accepts `open safe with 7 3 9`, or `open safe` followed by
+  typing `7 3 9`.
 - **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 

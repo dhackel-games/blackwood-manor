@@ -20,6 +20,7 @@ Feature: Player command parsing
       | turn on lamp                        | on      | lamp      | [none]      | [none]    |
       | yes                                 | yes     | [none]    | [none]      | [none]    |
       | no                                  | no      | [none]    | [none]      | [none]    |
+      | 7 3 9                               | code    | 7 3 9     | [none]      | [none]    |
 
   Scenario: Invalid commands report parser errors
     Then parsing "[empty]" fails with "empty"

@@ -237,6 +237,30 @@ Feature: Blackwood Manor adventure
     And the game is not won
     And item "boneKey" is in "grandHall"
 
+  Scenario: Reading a nearby diary implicitly gets it first
+    Given the player is in room "study"
+    When I send "read diary"
+    Then the output contains "(get diary, read diary)"
+    And item "diary" is in "inventory"
+    And flag "knowsCombo" is true
+
+  Scenario: A known safe code can be typed without reading the diary
+    Given the player is in room "parlor"
+    When I send "move portrait"
+    And I send "open safe"
+    Then the output contains "type it now"
+    And flag "knowsCombo" is unset
+    When I send "7 3 9"
+    Then the output contains "safe clicks open"
+    And item "safe" is open
+
+  Scenario: A safe code can be supplied inline
+    Given the player is in room "parlor"
+    When I send "move portrait"
+    And I send "open safe with 7 3 9"
+    Then the output contains "safe clicks open"
+    And item "safe" is open
+
   Scenario: Every room has compact art and a closer-inspection tidbit
     Then every manor room has searchable detail and narrow ASCII art
 
