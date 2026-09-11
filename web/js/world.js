@@ -1410,8 +1410,20 @@ function answerTrollRiddle(ctx, cmd) {
   const words = `${cmd.dobj || ""} ${cmd.iobj || ""}`.trim().toLowerCase().match(/[a-z]+/g) || [];
   const answer = words.at(-1) || "";
   if (!TROLL_RHYMES.has(answer)) {
-    return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move.`;
+    const wrongGuesses = (ctx.getFlag("trollWrongGuesses") || 0) + 1;
+    if (wrongGuesses >= 3) {
+      ctx.setFlag("trollWrongGuesses", 0);
+      ctx.setFlag("trollAskedRiddle", false);
+      ctx.state.room = "gate";
+      return `You offer "${answer || "..."}." The TROLL holds up three stony fingers. "Three wrong rhymes." ` +
+        "He stamps one enormous foot, the tunnel folds inside out, and you tumble onto the gravel at the FRONT GATE.";
+    }
+    ctx.setFlag("trollWrongGuesses", wrongGuesses);
+    const remaining = 3 - wrongGuesses;
+    return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move. ` +
+      `${remaining === 1 ? "One guess remains." : `${remaining} guesses remain.`}`;
   }
+  ctx.setFlag("trollWrongGuesses", 0);
   ctx.setFlag("dragonVaultOpen");
   return `You answer ${answer.toUpperCase()}. The TROLL grins, pleased by the rhyme, and lumbers aside. ` +
     "Deep locks answer one another inside the mountain, and the vault door rolls open.";

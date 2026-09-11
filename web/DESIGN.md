@@ -650,7 +650,9 @@ He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including 
 DOOR, FLOOR, CORE, ROAR, LORE, SHORE, STORE, and BEFORE. A valid rhyme makes him move
 and opens DREADMAW'S VAULT. The intended environmental clue is optional:
 `EXAMINE DOUBLOON` reveals LORE etched around its edge, while GORE and other rhymes can
-still solve the poem independently. The vault contains a GOLD BAR and WINGED SHOES.
+still solve the poem independently. After three wrong answers, the TROLL folds the
+tunnel around the player and sends them back to the FRONT GATE; the three-guess attempt
+then resets. The vault contains a GOLD BAR and WINGED SHOES.
 
 ## 12.27 Equipment, hall bedroom, and roofline
 
