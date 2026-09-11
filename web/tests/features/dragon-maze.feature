@@ -71,6 +71,13 @@ Feature: Dreadmaw's hedge maze and hoard
     And the output contains "apple-bringer"
     And the output contains "troll inside"
 
+  Scenario: The doubloon carries the intended rhyme without making it mandatory
+    Given item "apple" is carried
+    And the player is in room "dragonCaveMouth"
+    When I send "offer apple to dragon"
+    And I send "examine doubloon"
+    Then the output contains "etched by hand: LORE"
+
   Scenario Outline: A valid rhyming word opens Dreadmaw's inner vault
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"
@@ -78,8 +85,8 @@ Feature: Dreadmaw's hedge maze and hoard
     And I send "east"
     Then the current room is "dragonAntechamber"
     When I send "talk to troll"
-    Then the output contains "Name a rhyme to pass this door"
-    And the output contains "guard no ____"
+    Then the output contains "Past this door lie gold and ore"
+    And the output contains "Treasure, terror, blood, and ____"
     When I send "say <rhyme>"
     Then flag "dragonVaultOpen" is true
     And the output contains "vault door rolls open"

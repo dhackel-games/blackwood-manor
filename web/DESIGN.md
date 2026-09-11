@@ -630,5 +630,7 @@ She awards a GOLD DOUBLOON and allows passage. Inside, a male cave TROLL blocks 
 inner VAULT DOOR. `TALK TO TROLL` makes him recite a poem whose final word is missing.
 He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including MORE,
 DOOR, FLOOR, CORE, ROAR, LORE, SHORE, STORE, and BEFORE. A valid rhyme makes him move
-and opens DREADMAW'S VAULT. Mushroom flight cannot bypass either the sleeping dragon
-or sealed inner door.
+and opens DREADMAW'S VAULT. The intended environmental clue is optional:
+`EXAMINE DOUBLOON` reveals LORE etched around its edge, while GORE and other rhymes can
+still solve the poem independently. Mushroom flight cannot bypass either the sleeping
+dragon or sealed inner door.

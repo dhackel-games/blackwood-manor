@@ -1304,10 +1304,10 @@ function openSafe(ctx, cmd) {
 
 const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
 const TROLL_RIDDLE =
-  "\"Apple wakes the wyrm once more;\\n" +
-  "Doubloon buys what lies in store;\\n" +
-  "Name a rhyme to pass this door:\\n" +
-  "Open now, and guard no ____.\"";
+  "\"Past this door lie gold and ore,\\n" +
+  "Old crowns, old bones, and something more.\\n" +
+  "What fills a dragon's hidden store?\\n" +
+  "Treasure, terror, blood, and ____.\"";
 function dragonFire(ctx) {
   ctx.setFlag("onFire", true);
   ctx.setFlag("burnTurns", 0);
@@ -2241,7 +2241,8 @@ export const world = {
     goldDoubloon: {
       names: ["doubloon", "coin"], adjectives: ["gold", "dragon", "dreadmaw"],
       loc: null, takeable: true,
-      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed.",
+      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed. " +
+        "Around its edge, one word has been etched by hand: LORE.",
     },
     dragonVaultDoor: {
       names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
