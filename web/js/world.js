@@ -1153,24 +1153,61 @@ function openMysteryPackage(ctx) {
 
 // --- Lightning Jumps: the manor's own random teleport, no wrapping paper -----
 // Once you're inside (front door open), every turn has a small chance of a
-// bolt hurling you to a random room — the same doorless BETWEEN THE WALLS
-// included, the same crypt-wraith risk included. While you're high on the
-// mushrooms, you're already loose enough from your body that the lightning
-// can't grab hold of you at all — you keep your own steering (FLY TO / FLOAT
-// TO any room by name) instead of being yanked somewhere at random.
-const LIGHTNING_CHANCE = 0.06;
+// bolt of lightning spearing into the floor of whatever room you're standing
+// in. It does NOT grab you — it just sits there, crackling, same as the
+// mystery package sits in the grand hall: you have to choose to TOUCH it. If
+// you do, it teleports you to a random room, the same doorless BETWEEN THE
+// WALLS included, the same crypt-wraith risk included. Left alone, it
+// fizzles out on its own after a few turns. While you're high on the
+// mushrooms, it still can't grab hold of you at all — touching it does
+// nothing, since you keep your own steering (FLY TO / FLOAT TO any room by
+// name) instead.
+const LIGHTNING_CHANCE = 0.15;
+const LIGHTNING_FUSE = 4; // turns the bolt lingers, untouched, before it fizzles out
 const LIGHTNING_FLAVOR =
   "LIGHTNING CRACKS somewhere far too close, and the air suddenly tastes like a dropped fork on a battery.";
+const LIGHTNING_ART = [
+  "            ⚡",
+  "           ╱",
+  "          ╱___",
+  "              ╲",
+  "           ___╲",
+  "          ╱",
+  "         ╱",
+  "        ⚡",
+].join("\n");
 function lightningTick(ctx) {
   if (ctx.getFlag("__noChaos")) return null; // deterministic test harness kill-switch
   if (!ctx.getFlag("frontDoorOpen")) return null; // the manor's lightning only hunts you once you're inside
-  if (Math.random() >= LIGHTNING_CHANCE) return null;
-  if ((ctx.getFlag("high") || 0) > 0) {
-    return `${LIGHTNING_FLAVOR}\n\nIt should have grabbed you. It doesn't — you're already halfway out of your ` +
-      "body, and the bolt just drifts through the space where you used to be. (You're high enough to FLY TO or " +
-      "FLOAT TO any room you like, any time you like — nothing forces your hand while you're this loose.)";
+  const boltRoom = ctx.getFlag("lightningBoltRoom");
+  if (boltRoom) {
+    const fuse = (ctx.getFlag("lightningBoltFuse") || 1) - 1;
+    if (fuse > 0) { ctx.setFlag("lightningBoltFuse", fuse); return null; } // still crackling, nothing new to say
+    ctx.destroy("lightningBolt");
+    ctx.setFlag("lightningBoltRoom", null);
+    ctx.setFlag("lightningBoltFuse", null);
+    return boltRoom === ctx.state.room
+      ? "The scorched bolt in the floor finally sputters out, leaving nothing but a smoking black scar."
+      : null; // fizzled out somewhere you aren't standing; no need to announce it
   }
-  return teleportRandom(ctx, LIGHTNING_FLAVOR);
+  if (Math.random() >= LIGHTNING_CHANCE) return null;
+  ctx.moveItem("lightningBolt", ctx.state.room);
+  ctx.setFlag("lightningBoltRoom", ctx.state.room);
+  ctx.setFlag("lightningBoltFuse", LIGHTNING_FUSE);
+  return `${LIGHTNING_FLAVOR}\n\n${MAP_MARK}${LIGHTNING_ART}${MAP_MARK}\n\n` +
+    "A jagged bolt of LIGHTNING has speared into the floor right where you're standing, hissing and " +
+    "crackling. You could TOUCH it, if you dare.";
+}
+function touchLightningBolt(ctx) {
+  ctx.destroy("lightningBolt");
+  ctx.setFlag("lightningBoltRoom", null);
+  ctx.setFlag("lightningBoltFuse", null);
+  if ((ctx.getFlag("high") || 0) > 0) {
+    return "You reach for it, but you're already loose enough from your body that your fingers just drift " +
+      "through the crackling light. It sputters out a moment later. (You're high enough to FLY TO or FLOAT " +
+      "TO any room you like, any time you like — you don't need the bolt's help.)";
+  }
+  return teleportRandom(ctx, "You touch the bolt. The world WHITES OUT.");
 }
 
 // --- The privy: use the outhouse hole to end the vomiting & diarrhea ----------
@@ -1888,6 +1925,17 @@ export const world = {
       text:
         "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
       on: { open: openMysteryPackage },
+    },
+
+    // --- a bolt of lightning that speared into the floor and is, somehow, still here ---
+    lightningBolt: {
+      names: ["bolt", "lightning"], adjectives: ["lightning", "crackling", "jagged"],
+      loc: null, fixed: true,
+      roomDesc: "A jagged bolt of LIGHTNING is speared into the floor here, hissing and crackling, scorch " +
+        "marks spreading outward.",
+      desc: "Still crackling, blue-white and hair-raising, driven into the floorboards like it's daring you " +
+        "to get closer.",
+      on: { touch: touchLightningBolt },
     },
 
     // --- getting inside ---

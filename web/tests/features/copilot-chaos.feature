@@ -52,6 +52,7 @@ Feature: Copilot's mystery package and lightning jumps
     And flag "seen:betweenWalls" is set
     And the random number generator returns 0.0 then 0.99
     When I send "wait"
+    And I send "touch bolt"
     Then the current room is "betweenWalls"
     And the game score is 0
 
@@ -86,22 +87,50 @@ Feature: Copilot's mystery package and lightning jumps
     Then the current room is "grandHall"
     And the output does not contain "LIGHTNING"
 
-  Scenario: Lightning strikes once you're inside and hurls you to a random room
+  Scenario: Lightning strikes once you're inside and spears into the floor, not you
     Given chaos events (lightning jumps) are enabled
     And flag "frontDoorOpen" is set
     And the random number generator always returns 0.0
     When I send "wait"
     Then the output contains "LIGHTNING"
-    And the current room is not "grandHall"
+    And the output contains "TOUCH it, if you dare"
+    And the current room is "grandHall"
+    And item "lightningBolt" is in "grandHall"
 
-  Scenario: A player high on mushrooms is immune to lightning and keeps free flight
+  Scenario: Touching the lightning bolt teleports you to a random room
+    Given chaos events (lightning jumps) are enabled
+    And flag "frontDoorOpen" is set
+    And the random number generator returns 0.0 then 0.99
+    When I send "wait"
+    Then item "lightningBolt" is in "grandHall"
+    When I send "touch bolt"
+    Then the output contains "WHITES OUT"
+    And the current room is not "grandHall"
+    And item "lightningBolt" is destroyed
+
+  Scenario: A player high on mushrooms is immune to the lightning bolt's touch
     Given chaos events (lightning jumps) are enabled
     And flag "frontDoorOpen" is set
     And flag "high" is 10
+    And the random number generator returns 0.0 then 0.99
+    When I send "wait"
+    Then item "lightningBolt" is in "grandHall"
+    When I send "touch bolt"
+    Then the output contains "FLY TO or FLOAT TO"
+    And the current room is "grandHall"
+    And item "lightningBolt" is destroyed
+
+  Scenario: An untouched lightning bolt fizzles out on its own after a few turns
+    Given chaos events (lightning jumps) are enabled
+    And flag "frontDoorOpen" is set
     And the random number generator always returns 0.0
     When I send "wait"
-    Then the output contains "LIGHTNING"
-    And the output contains "FLY TO or FLOAT TO"
-    And the current room is "grandHall"
+    Then item "lightningBolt" is in "grandHall"
+    When I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    Then the output contains "sputters out"
+    And item "lightningBolt" is destroyed
 
 # end copilot-chaos.feature
