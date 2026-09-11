@@ -128,7 +128,6 @@ function endCallUI() {
 
 function updateHud() {
   hud.update({ game, world });
-  if (bugReport) bugReport.href = bugReportUrl(game.room().name);
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----
@@ -501,6 +500,11 @@ const micBtn = document.getElementById("mic");
 const phoneMicBtn = document.getElementById("phone-mic");
 micBtn.addEventListener("click", () => { listening ? stopListening() : startListening(input, micBtn); });
 phoneMicBtn.addEventListener("click", () => { listening ? stopListening() : startListening(phoneCmd, phoneMicBtn); });
+if (bugReport) {
+  bugReport.addEventListener("click", () => {
+    window.open(bugReportUrl(game.room().name), "_blank", "noopener,noreferrer");
+  });
+}
 
 // --- touch controls ---
 // Action buttons run WITHOUT grabbing the keyboard (only refocus on desktop).
