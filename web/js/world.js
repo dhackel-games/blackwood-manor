@@ -1159,7 +1159,7 @@ function openMysteryPackage(ctx) {
 // mushrooms, it still can't grab hold of you at all — touching it does
 // nothing, since you keep your own steering (FLY TO / FLOAT TO any room by
 // name) instead.
-const LIGHTNING_CHANCE = 0.15;
+const LIGHTNING_CHANCE = 1 / 11; // ~1 in 11 turns (was 0.15, ~1 in 6.7 — too frequent)
 const LIGHTNING_FUSE = 4; // turns the bolt lingers, untouched, before it fizzles out
 const LIGHTNING_FLAVOR =
   "LIGHTNING CRACKS somewhere far too close, and the air suddenly tastes like a dropped fork on a battery.";
