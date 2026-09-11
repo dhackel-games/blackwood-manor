@@ -241,9 +241,11 @@ export function createGame(world) {
 
   // Content override hook: item-targeted handler first, then room handler.
   function runHandlers(cmd) {
-    const it = cmd.dobj ? game.find(cmd.dobj) : null;
+    const direct = cmd.dobj ? game.find(cmd.dobj) : null;
+    const indirect = cmd.iobj ? game.find(cmd.iobj) : null;
     const targets = [];
-    if (it) targets.push(world.items[it.id]);
+    if (direct) targets.push(world.items[direct.id]);
+    if (indirect && indirect.id !== direct?.id) targets.push(world.items[indirect.id]);
     targets.push(world.rooms[state.room]);
     for (const t of targets) {
       const h = t && t.on && t.on[cmd.verb];

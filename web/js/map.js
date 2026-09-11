@@ -18,6 +18,7 @@ const ROWH = 3; // lines between one row of rooms and the next
 
 // Short names, because a sketch has no room for "Master Bedroom".
 const LABELS = {
+  hedgeMazeGate: "Hedge Maze", dragonCaveMouth: "Dragon Cave",
   gate: "Front Gate", garden: "Garden", privy: "Privy", porch: "Porch",
   grandHall: "Grand Hall", parlor: "Parlor", library: "Library",
   diningRoom: "Dining Rm", kitchen: "Kitchen", landing: "Landing",
@@ -77,18 +78,24 @@ const FLOORS = [
   {
     title: "THE GROUNDS",
     rooms: [
-      { id: "porch", col: 0, row: 0, anchor: true },
-      { id: "gate", col: 0, row: 1 },
-      { id: "garden", col: 1, row: 1 },
-      { id: "privy", col: 2, row: 1 },
+      { id: "porch", col: 1, row: 0, anchor: true },
+      { id: "hedgeMazeGate", col: 0, row: 1 },
+      { id: "gate", col: 1, row: 1 },
+      { id: "garden", col: 2, row: 1 },
+      { id: "privy", col: 3, row: 1 },
+      { id: "dragonCaveMouth", col: 0, row: 2 },
     ],
     links: [
       { a: "porch", b: "gate" },
+      { a: "hedgeMazeGate", b: "gate" },
+      { a: "hedgeMazeGate", b: "dragonCaveMouth", note: "maze" },
       { a: "gate", b: "garden" },
       { a: "garden", b: "privy" },
     ],
-    foot: "A well drops into the dark below the Garden.",
-    footIf: "garden",  // don't mention the well before you've seen the garden
+    foot: (ctx, seen) => seen("garden")
+      ? "Gate: WEST to Hedge Maze; EAST to Garden. Garden well goes DOWN."
+      : "Front Gate: WEST to Hedge Maze; EAST to Garden.",
+    footIf: "gate",
   },
   {
     title: "BELOW",
@@ -180,7 +187,8 @@ function drawFloor(floor, ctx) {
   }
 
   const lines = canvas.map((row) => row.join("").replace(/\s+$/, ""));
-  const foot = floor.footIf && !seen(floor.footIf) ? null : floor.foot;
+  const rawFoot = typeof floor.foot === "function" ? floor.foot(ctx, seen) : floor.foot;
+  const foot = floor.footIf && !seen(floor.footIf) ? null : rawFoot;
   return { title: floor.title, foot, lines };
 }
 
@@ -254,6 +262,15 @@ export function renderMap(ctx) {
     body.push("");
   }
   if (!drew) body.push("  You haven't been anywhere yet.");
+
+  const visited = Object.entries(ctx.world.rooms)
+    .filter(([id]) => id === ctx.state.room || !!ctx.getFlag("seen:" + id))
+    .map(([, room]) => room.name)
+    .sort((a, b) => a.localeCompare(b));
+  body.push("  VISITED LOCATIONS (FLY TO ...)");
+  body.push("  ==============================");
+  for (const name of visited) body.push("  * " + name);
+  body.push("");
 
   body.push("  X = you are here.   ????? = not yet explored.");
   return MAP_MARK + tornPage(body) + MAP_MARK;

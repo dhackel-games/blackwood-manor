@@ -21,6 +21,10 @@ Feature: Player command parsing
       | yes                                 | yes     | [none]    | [none]      | [none]    |
       | no                                  | no      | [none]    | [none]      | [none]    |
       | 7 3 9                               | code    | 7 3 9     | [none]      | [none]    |
+      | talk to dragon                      | talk    | dragon    | [none]      | [none]    |
+      | wake up dragon                      | wake    | dragon    | [none]      | [none]    |
+      | offer apple to dragon               | give    | apple     | to          | dragon    |
+      | put apple on dragon                 | put     | apple     | on          | dragon    |
 
   Scenario: Invalid commands report parser errors
     Then parsing "[empty]" fails with "empty"

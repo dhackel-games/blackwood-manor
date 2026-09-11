@@ -12,14 +12,16 @@ const VERBS = {
   go: ["go", "walk", "run", "float", "fly"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
-  read: ["read"], search: ["search"], move: ["move", "shift"], push: ["push", "press"],
+  read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
   pull: ["pull", "lift", "yank"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
   extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
-  smell: ["smell", "sniff"], give: ["give"], pray: ["pray", "perform"],
+  smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
+  talk: ["talk", "speak", "chat", "say", "answer", "recite"], wake: ["wake", "awaken", "rouse"],
+  pray: ["pray", "perform"],
   sit: ["sit"], use: ["use"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
@@ -92,6 +94,7 @@ export function parse(input) {
   }
   // "pick up X" / "take up X" => drop the stray "up"
   if (verb === "take" && rest[0] === "up") rest = rest.slice(1);
+  if (verb === "wake" && rest[0] === "up") rest = rest.slice(1);
 
   // Split remaining words on the first preposition.
   let prep = null, dobjWords = [], iobjWords = [], seenPrep = false;
@@ -100,5 +103,12 @@ export function parse(input) {
     (seenPrep ? iobjWords : dobjWords).push(w);
   }
   const join = (arr) => (arr.length ? arr.join(" ") : null);
-  return { verb, dobj: join(dobjWords), prep, iobj: join(iobjWords) };
+  let dobj = join(dobjWords);
+  let iobj = join(iobjWords);
+  if (verb === "talk" && !dobj && iobj) {
+    dobj = iobj;
+    iobj = null;
+    prep = null;
+  }
+  return { verb, dobj, prep, iobj };
 }
