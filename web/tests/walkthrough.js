@@ -305,6 +305,33 @@ const WIN = [
 }
 
 // ---------------------------------------------------------------------------
+// 7b. Deep room inspection + item discovery
+// ---------------------------------------------------------------------------
+{
+  for (const [id, room] of Object.entries(world.rooms)) {
+    assert.ok(typeof room.searchDesc === "string" || typeof room.searchDesc === "function",
+      `${id} must define a closer-inspection tidbit`);
+  }
+
+  const garden = createGame(world);
+  garden.state.room = "garden";
+  const searched = garden.send("look");
+  assert.match(searched, /CLOSER INSPECTION[\s\S]*statue[\s\S]*movable/i,
+    "nounless look gives the room's diegetic puzzle hint");
+  assert.match(searched, /THINGS YOU CAN ACT ON[\s\S]*STATUE: MOVE, PUSH, EXAMINE/i,
+    "room inspection lists manipulable scenery and concrete verbs");
+  assert.match(garden.send("look at statue"), /key/i,
+    "looking at a hidden-object anchor performs the same deep inspection as search");
+  assert.equal(garden.roomOf("frontKey"), "garden", "deep statue inspection reveals the hidden key");
+
+  const parlor = createGame(world);
+  parlor.state.room = "parlor";
+  assert.match(parlor.send("ex portrait"), /SAFE/i, "EX reveals the portrait's hidden safe");
+  assert.equal(parlor.roomOf("safe"), "parlor");
+  console.log("OK: deep room inspection + hidden-object discovery");
+}
+
+// ---------------------------------------------------------------------------
 // 8. Burn-up timer, brazier challenge, kitchen foods, toilet, badges
 // ---------------------------------------------------------------------------
 {

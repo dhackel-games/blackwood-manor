@@ -5,6 +5,54 @@
 
 import { renderMap } from "./map.js";
 
+function suggestedActions(ctx, item) {
+  const actions = [];
+  if (item.takeable && !ctx.has(item.id)) actions.push("TAKE");
+  if (item.openable) {
+    if (item.locked) actions.push("UNLOCK");
+    actions.push(item.open ? "CLOSE" : "OPEN");
+  }
+  if (item.container) actions.push("PUT ITEMS IN");
+  if (item.readable || item.text) actions.push("READ");
+  if (item.edible) actions.push("EAT");
+  if (item.drinkable) actions.push("DRINK");
+  if (item.wearable && !item.worn) actions.push("WEAR");
+  if (item.lightSource && !item.lit) actions.push("LIGHT");
+
+  const definition = ctx.world.items[item.id];
+  for (const verb of Object.keys((definition && definition.on) || {})) {
+    if (verb !== "search") actions.push(verb.toUpperCase());
+  }
+  for (const verb of item.searchActions || []) actions.push(verb.toUpperCase());
+  if (!actions.length && (item.fixed || item.scenery)) actions.push("EXAMINE");
+  return [...new Set(actions)];
+}
+
+function notableItems(ctx) {
+  const direct = ctx.itemsIn(ctx.state.room);
+  const visible = [...direct];
+  for (const item of direct) {
+    if (item.container && item.open) visible.push(...ctx.itemsIn(item.id));
+  }
+  const lines = visible
+    .map((item) => ({ item, actions: suggestedActions(ctx, item) }))
+    .filter(({ actions }) => actions.length)
+    .map(({ item, actions }) => `* ${(item.names[0] || item.id).toUpperCase()}: ${actions.join(", ")}`);
+  return lines.length ? "\n\nTHINGS YOU CAN ACT ON\n" + lines.join("\n") : "";
+}
+
+function inspectRoom(ctx) {
+  const base = ctx.describeRoom(true);
+  if (!ctx.isLit()) return base;
+  const room = ctx.room();
+  const detail = typeof room.searchDesc === "function"
+    ? room.searchDesc(ctx)
+    : room.searchDesc;
+  return base + "\n\nCLOSER INSPECTION\n" +
+    (detail || "You make a careful circuit of the room but find no further clue demanding attention.") +
+    notableItems(ctx);
+}
+
 export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
@@ -21,13 +69,14 @@ export const commands = {
   },
 
   look(ctx, cmd) {
-    // "look" alone describes the room; "look <thing>" examines it.
+    // The parser normally canonicalizes item forms to EXAMINE. Keep this
+    // fallback so callers constructing command objects directly behave too.
     if (cmd.dobj) return commands.examine(ctx, cmd);
-    return ctx.describeRoom(true);
+    return inspectRoom(ctx);
   },
 
   examine(ctx, cmd) {
-    if (!cmd.dobj) return "Examine what?";
+    if (!cmd.dobj) return inspectRoom(ctx);
     if (!ctx.isLit()) return "It's too dark to see anything.";
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
@@ -141,10 +190,8 @@ export const commands = {
   },
 
   search(ctx, cmd) {
-    if (!cmd.dobj) return "Search what?";
-    const it = ctx.find(cmd.dobj);
-    if (!it) return `You can't see any ${cmd.dobj} here.`;
-    return "You find nothing of interest.";
+    if (!cmd.dobj) return inspectRoom(ctx);
+    return commands.examine(ctx, cmd);
   },
 
   light(ctx, cmd) {
@@ -258,7 +305,8 @@ export const commands = {
       "COMMANDS",
       "Move: n s e w  ne nw se sw  up down",
       "  in out   (or: go <dir>)",
-      "look (l), examine <x>, search <x>",
+      "look (l), examine (ex/x), search — inspect the room more closely",
+      "look at <x>, examine <x>, search <x> — inspect an item",
       "map — Gary's floor plan of the manor (MAP MODE)",
       "take <x>, drop <x>, inventory (i)",
       "open / close / unlock <x> with <y>",

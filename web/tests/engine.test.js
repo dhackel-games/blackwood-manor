@@ -10,7 +10,9 @@ function fixture() {
   return {
     config: { start: "hall", maxCarry: 5 },
     rooms: {
-      hall: { name: "Hall", desc: "A dusty hall.", exits: { north: "study", down: "cellar" } },
+      hall: { name: "Hall", desc: "A dusty hall.",
+        searchDesc: "Scratches on the floor suggest the locked box has been moved recently.",
+        exits: { north: "study", down: "cellar" } },
       study: { name: "Study", desc: "A small study.", exits: { south: "hall" } },
       cellar: { name: "Cellar", desc: "A damp cellar.", dark: true, exits: { up: "hall" } },
     },
@@ -49,6 +51,15 @@ function fixture() {
   assert.deepEqual(p("unlock the oak door with the brass key"),
     { verb: "unlock", dobj: "oak door", prep: "with", iobj: "brass key" });
   assert.deepEqual(p("look"), { verb: "look", dobj: null, prep: null, iobj: null });
+  assert.deepEqual(p("look at brass key"),
+    { verb: "examine", dobj: "brass key", prep: null, iobj: null });
+  assert.deepEqual(p("look brass key"),
+    { verb: "examine", dobj: "brass key", prep: null, iobj: null });
+  assert.deepEqual(p("search brass key"),
+    { verb: "examine", dobj: "brass key", prep: null, iobj: null });
+  assert.deepEqual(p("ex brass key"),
+    { verb: "examine", dobj: "brass key", prep: null, iobj: null });
+  assert.deepEqual(p("look at"), { verb: "look", dobj: null, prep: null, iobj: null });
   assert.deepEqual(p("turn on lamp"), { verb: "on", dobj: "lamp", prep: null, iobj: null });
   assert.deepEqual(p("yes"), { verb: "yes", dobj: null, prep: null, iobj: null });
   assert.deepEqual(p("no"), { verb: "no", dobj: null, prep: null, iobj: null });
@@ -71,6 +82,33 @@ function fixture() {
   assert.equal(g.roomOf("key"), "study");
   assert.match(g.send("south"), /HALL/);
   console.log("OK: movement + inventory");
+}
+
+// ---------- unified item and room inspection ----------
+{
+  const itemForms = [
+    "search brass key",
+    "ex brass key",
+    "examine brass key",
+    "look brass key",
+    "look at brass key",
+  ];
+  for (const command of itemForms) {
+    const g = createGame(fixture());
+    assert.match(g.send(command), /brass key/i, `${command} should inspect the item`);
+  }
+
+  const roomForms = ["search", "ex", "examine", "look", "look at"];
+  for (const command of roomForms) {
+    const g = createGame(fixture());
+    const output = g.send(command);
+    assert.ok(output.indexOf("A dusty hall.") < output.indexOf("CLOSER INSPECTION"),
+      `${command} should show the base room before deeper detail`);
+    assert.match(output, /Scratches on the floor/, `${command} should show the room-specific tidbit`);
+    assert.match(output, /KEY: TAKE/, `${command} should list takeable items`);
+    assert.match(output, /BOX: UNLOCK, OPEN, PUT ITEMS IN/, `${command} should list manipulation verbs`);
+  }
+  console.log("OK: unified room + item inspection");
 }
 
 // ---------- Task 5: containers ----------

@@ -9,7 +9,7 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "walk", "run"], look: ["look", "l"], examine: ["examine", "x", "inspect", "look"],
+  go: ["go", "walk", "run"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift"], push: ["push", "press"],
@@ -70,6 +70,14 @@ export function parse(input) {
     return { verb: null, dobj: null, prep: null, iobj: null, error: "unknown-verb", word: words[0] };
   }
   let rest = words.slice(1);
+
+  // All item-inspection phrasings converge on EXAMINE. With no noun they
+  // remain room-inspection commands ("look", "look at", "search", "examine").
+  if ((verb === "look" || verb === "search") &&
+      (rest[0] === "at" || rest[0] === "in" || rest[0] === "inside")) {
+    rest = rest.slice(1);
+  }
+  if ((verb === "look" || verb === "search") && rest.length) verb = "examine";
 
   // "go north" / "go n" / "climb up"
   if ((verb === "go" || verb === "climb") && rest.length && DIRECTIONS[rest[0]]) {

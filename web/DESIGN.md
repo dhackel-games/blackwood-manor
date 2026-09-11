@@ -503,3 +503,18 @@ showing it to strangers who never asked.
 years and will lie to you. The daemon is the detector: it refuses to boot when the model is
 unavailable and prints why, and `/health` reports availability. The launcher surfaces that text
 directly instead of guessing.
+
+## 12.17 Deep inspection (v2.7.0)
+
+The inspection vocabulary is deliberately forgiving. `SEARCH`, `EX`, `EXAMINE`, `LOOK`, and
+`LOOK AT` all converge on the same item-detail path when given a noun. With no noun, each one
+reprints the room's base description first, then adds:
+
+- **`searchDesc`** — an authored string or state-aware function on every room. It gives a
+  diegetic nudge toward hidden objects or non-obvious puzzle actions without calling Gary.
+- **`THINGS YOU CAN ACT ON`** — generated from the live visible item data. It names portable
+  and manipulable objects with valid verbs such as `TAKE`, `OPEN`, `READ`, `MOVE`, or `PULL`.
+
+Hidden-object anchors use the same canonical item inspection handler, so `SEARCH STATUE`,
+`EX STATUE`, and `LOOK AT STATUE` all discover the garden key rather than arbitrarily requiring
+one preferred synonym. The same rule applies to the hinged parlor portrait and its safe.
