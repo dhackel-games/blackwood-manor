@@ -252,12 +252,11 @@ body { -webkit-text-size-adjust: 100%; }
   font-size: 0.95rem; min-height: 4rem;
 }
 #phone-transcript .gary { color: var(--green); margin-bottom: 0.45rem; }
-/* Gary is thinking on-device — dimmed placeholder, replaced in place. The label
-   names the model explicitly; a bare "thinking" read as ordinary game flavour
-   and testers couldn't tell the model from the script. */
-#phone-transcript .gary.thinking { opacity: 0.7; font-style: italic; color: var(--green); }
-#phone-transcript .gary.thinking::after {
-  content: "…";
+/* Gary is thinking — dimmed animated ellipsis, replaced in place by the reply.
+   The reply itself carries the ◆ AI / · scripted tag and the header badge is
+   always visible, so this stays wordless rather than repeating the claim. */
+#phone-transcript .gary.thinking {
+  opacity: 0.7; font-style: italic; color: var(--green);
   animation: gary-think 1.2s steps(4) infinite;
 }
 @keyframes gary-think { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
@@ -281,7 +280,7 @@ body { -webkit-text-size-adjust: 100%; }
   vertical-align: super;
 }
 @media (prefers-reduced-motion: reduce) {
-  #phone-transcript .gary.thinking::after { animation: none; }
+  #phone-transcript .gary.thinking { animation: none; }
 }
 
 /* Model status badge in the phone header. Tap for the full story. */

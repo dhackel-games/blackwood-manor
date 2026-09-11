@@ -305,7 +305,12 @@ function handle(raw) {
     // mechanical tail (meter / bill milestone) is preserved either way.
     const info = onCall ? world.garyTurnInfo(game, cmd) : null;
     if (info && info.llmOk && garyBrain.isAvailable()) {
-      const el = printToPhone("◆ AI · Gary is thinking on-device", "gary thinking");
+      // Just an animated ellipsis. The finished line carries the ◆ AI tag and
+      // the header badge is always on screen, so spelling out "thinking
+      // on-device" here said the same thing a third time. Must be non-empty:
+      // emit() drops whitespace-only text and would return no element to
+      // replace, losing the reply.
+      const el = printToPhone("…", "gary thinking");
       updatePhoneStatus();
       updateHud();
       garyBrain.speak(info).then((line) => {
@@ -376,8 +381,22 @@ if (!canType) {
 phoneCmd.addEventListener("keydown", (e) => {
   if (e.key === "Enter") { handle(phoneCmd.value); phoneCmd.value = ""; }
 });
-document.getElementById("phone-go").addEventListener("click", () => { handle(phoneCmd.value); phoneCmd.value = ""; if (canType) phoneCmd.focus(); });
-document.getElementById("phone-end").addEventListener("click", () => { handle("hang up"); });
+// iOS: tapping a control while the keyboard is up blurs the field first, and the
+// blur handler below drops the "compact" class — which un-hides the avatar, the
+// sub-label and the name, shoving the button down out from under your finger
+// before the click lands. The tap is swallowed and you have to press Say twice.
+// Suppressing the default focus shift keeps the field focused, so nothing
+// reflows and the first tap counts (and the keyboard stays up between lines).
+function keepFocus(el) {
+  if (el) el.addEventListener("mousedown", (e) => e.preventDefault());
+}
+
+const phoneGo = document.getElementById("phone-go");
+const phoneEnd = document.getElementById("phone-end");
+phoneGo.addEventListener("click", () => { handle(phoneCmd.value); phoneCmd.value = ""; if (canType) phoneCmd.focus(); });
+phoneEnd.addEventListener("click", () => { phoneCmd.blur(); handle("hang up"); });
+[phoneGo, phoneEnd, document.getElementById("phone-mic"), document.getElementById("phone-ai"),
+ document.getElementById("phone-avatar"), document.getElementById("phone-mute")].forEach(keepFocus);
 
 const scrollPhoneBottom = () => { phoneT.scrollTop = phoneT.scrollHeight; };
 // While typing on the call screen (touch), collapse Gary's big header so the
