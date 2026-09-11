@@ -82,6 +82,15 @@ Feature: Fire and food consequences
     When I wait at most 12 turns until death
     Then the game is dead
 
+  Scenario: The player's flames illuminate a dark room
+    Given the player is on fire
+    And the player is in room "library"
+    And flag "leverPulled" is set
+    When I send "down"
+    Then the current room is "secretChamber"
+    And the output does not contain "pitch black"
+    And the output contains "HIDDEN CHAMBER"
+
   Scenario: The garden brazier requires the player's whole fire
     Given the player is in room "garden"
     When I send "light brazier"

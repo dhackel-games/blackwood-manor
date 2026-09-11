@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
+import { HUD_SLOT_DEFINITIONS, HudSlot } from "../../js/hud.js";
 import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
 
@@ -286,17 +287,21 @@ Then("the controls remain pinned inside the viewport", function () {
 });
 
 Then("the HUD has bowel pressure, sickness phase, mushroom, tomato, and fire indicators", function () {
-  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  for (const id of ["hud-bm", "hud-sick", "hud-high", "hud-eye", "hud-fire"]) {
-    assert.match(html, new RegExp(`id=["']${id}["']`));
+  const slots = new Map(HUD_SLOT_DEFINITIONS.map((slot) => [slot.id, slot]));
+  assert.equal(slots.get("bm").emoji, "💩");
+  assert.equal(slots.get("sick").emoji, "🤮");
+  assert.equal(slots.get("high").emoji, "🍄");
+  assert.equal(slots.get("eye").emoji, "🍅");
+  assert.equal(slots.get("fire").emoji, "🔥");
+});
+
+Then("every HUD status is a HudSlot with an emoji and calculation", function () {
+  for (const definition of HUD_SLOT_DEFINITIONS) {
+    const slot = new HudSlot(definition);
+    assert.equal(slot.id, definition.id);
+    assert.equal(slot.emoji, definition.emoji || "");
+    assert.equal(typeof slot.calculate, "function");
   }
-  assert.match(ui, /💩 BM/);
-  assert.match(ui, /🤮/);
-  assert.match(ui, /phaseIndex \+ 1/);
-  assert.match(ui, /🍄/);
-  assert.match(ui, /🍅/);
-  assert.match(ui, /🔥/);
 });
 
 Then("the page has a {string} touch command", function (direction) {

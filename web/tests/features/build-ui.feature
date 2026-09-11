@@ -17,6 +17,9 @@ Feature: Build metadata and touch-control contract
   Scenario: The HUD exposes digestive, mushroom, tomato, and fire countdowns
     Then the HUD has bowel pressure, sickness phase, mushroom, tomato, and fire indicators
 
+  Scenario: HUD statuses use declarative slots
+    Then every HUD status is a HudSlot with an emoji and calculation
+
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command
 

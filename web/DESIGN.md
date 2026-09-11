@@ -314,6 +314,7 @@ the mansion.
 - The always-visible HUD shows `🔥 6 turns` immediately on ignition and counts down until
   the fire is extinguished or becomes fatal.
 - **ASCII fire art** is stamped onto every room description while ablaze (`statusBanner`).
+- The player's own flames count as a light source in dark rooms.
 - **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
 
 ## 12.7 The brazier fire-puzzle (garden)
@@ -593,3 +594,11 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
 - Mushroom durations stack additively: dried kitchen mushrooms add 6 turns and fresh
   TOILET-HOLE mushrooms add 12. The always-visible HUD shows `🍄 <turns>`; the TOMATO's
   independent third-eye countdown shows `🍅 <turns>`.
+
+## 12.24 Declarative HUD slots
+
+`js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
+`emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
+updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
+pressure, digestive phase, mushroom high, TOMATO sight, and fire countdown are data entries
+in one registry rather than separate DOM mutations in `ui.js`.

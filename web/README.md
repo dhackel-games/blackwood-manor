@@ -60,6 +60,7 @@ js/core.js            game state + rules (DOM-free, testable in Node)
 js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
 js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
+js/hud.js             declarative HudSlot definitions and renderer
 js/ui.js              browser terminal adapter
 js/save.js                 localStorage save/restore
 tests/features/*.feature   all executable Gherkin specifications

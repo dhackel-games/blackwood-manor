@@ -47,19 +47,27 @@ body { -webkit-text-size-adjust: 100%; }
   padding-bottom: 0.35rem; margin-bottom: 0.35rem;
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
-#hud .sep { opacity: 0.6; }
-#hud #hud-bill { color: var(--green); }
-#hud #hud-phone {
-  display: inline-block;
+#hud-slots {
+  display: flex;
+  flex: 1 1 100%;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.hud-slot { color: var(--green-bright); }
+.hud-slot[hidden] { display: none; }
+.hud-slot + .hud-slot::before {
+  content: "·";
+  color: var(--dim);
+  margin-right: 0.5rem;
+}
+.hud-slot-emoji { display: inline-block; }
+.hud-slot--bill .hud-slot-emoji {
   font-size: 1.5em;
   line-height: 0;
   vertical-align: -0.08em;
 }
-#hud .hud-effect {
-  color: var(--green-bright);
-  flex: 0 1 auto;
-}
-#hud .hud-effect[hidden] { display: none; }
 /* The copyright-version gets its own wrapping row above the compact counters. */
 #hud #hud-version {
   flex: 1 0 100%;

@@ -132,6 +132,7 @@ export function createGame(world) {
     // A carried flame, the temporary nightshade third eye, or the permanent
     // Obsidian Eye all let you see in otherwise pitch-black rooms.
     return game.activeLights().length > 0
+      || !!state.flags.onFire
       || (state.flags.thirdEye || 0) > 0
       || !!state.flags.darkSight;
   };
