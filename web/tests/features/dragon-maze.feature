@@ -202,6 +202,13 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is unset
     And the output contains "TALK TO TROLL"
 
+  Scenario: TALK infers the troll when he is the only conversational target
+    Given the player is in room "trollGate"
+    When I send "talk"
+    Then the output contains "(talk to TROLL)"
+    And the output contains "Past this door lie gold and ore"
+    And flag "trollAskedRiddle" is set
+
   Scenario: Mushroom flight can reach named rooms beyond the dragon and troll
     Given flag "high" is 4
     When I send "fly to dragon cave antechamber"

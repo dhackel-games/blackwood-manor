@@ -628,7 +628,8 @@ and `WEAR` automatically GET a visible portable target and print the complete pa
 sequence, such as `(get diary, read diary)`. The world-level `deriveCommand` hook supplies
 content-specific prerequisites; TOILET mushroom commands become
 `(look in toilet, get mushrooms, eat mushrooms)` without making the player repeat obvious
-steps. Derived actions still respect carrying capacity.
+steps. A nounless `TALK` becomes `(talk to NAME)` when exactly one visible room object has
+a TALK handler; ambiguous rooms are never guessed. Derived actions still respect carrying capacity.
 
 The SAFE does not require the `knowsCombo` flag when the player already knows the answer.
 After `OPEN SAFE` prompts for its dial, bare `7 3 9` opens it; `OPEN SAFE WITH 7 3 9` works
