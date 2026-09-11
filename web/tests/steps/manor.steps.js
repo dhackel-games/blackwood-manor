@@ -290,6 +290,12 @@ Then("Dreadmaw's rebuke burns the player or launches them to the front gate", fu
   assert.ok(burned || launched, this.output);
 });
 
+Then("the troll riddle uses real line breaks", function () {
+  assert.doesNotMatch(this.output, /\\n/);
+  assert.ok(this.output.split("\n").includes("Old crowns, old bones, and something more."));
+  assert.ok(this.output.split("\n").includes("What fills a dragon's hidden store?"));
+});
+
 Then("digestive status has {int} turns and phase {string}", function (remaining, phase) {
   const status = world.digestiveStatus(this.game);
   assert.ok(status, "digestive status must be active");

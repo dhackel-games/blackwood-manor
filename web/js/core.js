@@ -183,9 +183,12 @@ export function createGame(world) {
       const status = typeof world.visionStatus === "function"
         ? world.visionStatus(game)
         : { permanent: false, remaining: state.flags.high || 0 };
+      const displayTurns = status?.permanent
+        ? null
+        : Math.max(0, (status?.remaining || 0) - (deferStatusBanner && !state.flags.highGrace ? 1 : 0));
       const remaining = status?.permanent
         ? "∞"
-        : `${status?.remaining || 0} turn${status?.remaining === 1 ? "" : "s"} left`;
+        : `${displayTurns} turn${displayTurns === 1 ? "" : "s"} left`;
       if (vision) out += `THIRD EYE (👁️ ${remaining})\n${vision}\n`;
     }
     const directions = game.availableDirections();
