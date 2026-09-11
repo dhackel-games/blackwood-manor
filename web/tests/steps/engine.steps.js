@@ -5,10 +5,8 @@ import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
 import { parse, splitCommands } from "../../js/parser.js";
-import { VERSION } from "../../js/version.js";
+import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
 
-const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-11.0a13:acoven";
 const NONE = "[none]";
 const EMPTY = "[empty]";
 
@@ -258,7 +256,11 @@ Then("the following command lines split as:", function (table) {
 });
 
 Then("the copyright-version is exact", function () {
-  assert.equal(VERSION, COPYRIGHT_VERSION);
+  const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+  // The clean number we monitor stays locked to the App Store marketing version.
+  assert.equal(APP_VERSION, packageJson.version);
+  // Apple-style "version (build)" so the on-screen badge mirrors App Store Connect exactly.
+  assert.equal(VERSION, `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`);
 });
 
 Then("the package version is the release date", function () {

@@ -23,21 +23,29 @@ EXPORT_DIR="build/export"
 UPLOAD=1
 [[ "${1:-}" == "--no-upload" ]] && UPLOAD=0
 
-echo "==> Refreshing bundled web game"
-./copy-web.sh
-
+# Derive the marketing version and next build number FIRST, so we can stamp the
+# same values into the on-screen badge, the bundled web game, and project.yml.
 MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
 if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Invalid YYYY.M.D package version: $MARKETING_VERSION" >&2
   exit 1
 fi
-echo "==> Setting app version to ${MARKETING_VERSION}"
-sed -i '' -E "s/MARKETING_VERSION: \"[^\"]+\"/MARKETING_VERSION: \"${MARKETING_VERSION}\"/g" project.yml
-
-# Auto-bump CURRENT_PROJECT_VERSION so each TestFlight upload has a unique build number.
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
 NEXT=$((CUR + 1))
-echo "==> Bumping build number ${CUR} -> ${NEXT}"
+echo "==> Releasing version ${MARKETING_VERSION} build ${NEXT}"
+
+# Stamp the on-screen build badge (web/js/version.js) so the browser and the app
+# always report the same version + build number. Done BEFORE copy-web.sh so the
+# stamped file is the copy that lands in the app bundle.
+echo "==> Stamping build badge (v${MARKETING_VERSION} build ${NEXT})"
+sed -i '' -E "s/(export const APP_VERSION = \")[^\"]*(\";)/\1${MARKETING_VERSION}\2/" ../web/js/version.js
+sed -i '' -E "s/(export const BUILD = \")[^\"]*(\";)/\1${NEXT}\2/" ../web/js/version.js
+
+echo "==> Refreshing bundled web game"
+./copy-web.sh
+
+echo "==> Setting app version ${MARKETING_VERSION} + build ${NEXT} in project.yml"
+sed -i '' -E "s/MARKETING_VERSION: \"[^\"]+\"/MARKETING_VERSION: \"${MARKETING_VERSION}\"/g" project.yml
 sed -i '' "s/CURRENT_PROJECT_VERSION: \"${CUR}\"/CURRENT_PROJECT_VERSION: \"${NEXT}\"/g" project.yml
 
 echo "==> Regenerating project (xcodegen)"
