@@ -11,20 +11,22 @@ Feature: Mushroom vision and flight
     And the player is in room "kitchen"
     When I send "eat mushrooms"
 
-  Scenario: Another mushroom cluster grows behind the outhouse
+  Scenario: Fresh mushrooms grow inside the outhouse toilet hole
     Given a fresh manor game
-    And the player is in room "garden"
+    And the player is in room "privy"
     When I send "look"
-    Then the output contains "Behind the OUTHOUSE"
+    Then the output contains "TOILET HOLE"
     And the output contains "MUSHROOMS"
     When I send "eat mushrooms"
-    Then flag "high" is positive
+    Then the output contains "shit-fueled"
+    And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
 
-  Scenario: Eating mushrooms hints that named flight is possible
+  Scenario: Dried kitchen mushrooms are half-strength and hint that flight is possible
+    Then the output contains "dried kitchen mushrooms"
     Then the output contains "so light you could FLY TO any room you can name"
-    And flag "high" is positive
+    And flag "high" equals 6
 
   Scenario: First glance reveals hidden objects
     When the player moves directly to room "gate"

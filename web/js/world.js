@@ -798,8 +798,12 @@ const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
 function eatMushrooms(ctx, cmd) {
   const mushrooms = ctx.find(cmd.dobj);
   if (mushrooms) ctx.destroy(mushrooms.id);
-  ctx.setFlag("high", 6);
-  return "You eat the strange mushrooms.\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
+  ctx.setFlag("high", mushrooms?.highTurns || 6);
+  ctx.setFlag("highGrace", true);
+  const origin = mushrooms?.fresh
+    ? "You pluck the fresh, shit-fueled mushrooms from inside the TOILET HOLE and eat them. They are alarmingly potent."
+    : "You chew through the dried kitchen mushrooms. They are dusty, bitter, and only half-strength.";
+  return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
     "Your body feels so light you could FLY TO any room you can name.";
 }
@@ -865,7 +869,14 @@ const SICK_DEATH =
 function afflictionTick(ctx) {
   const out = [];
   const hi = ctx.getFlag("high") || 0;
-  if (hi > 0) { ctx.setFlag("high", hi - 1); out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]); }
+  if (hi > 0) {
+    if (ctx.getFlag("highGrace")) {
+      ctx.setFlag("highGrace", false);
+    } else {
+      ctx.setFlag("high", hi - 1);
+      out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
+    }
+  }
   const sick = ctx.getFlag("sick") || 0;
   if (sick > 0) {
     if (ctx.getFlag("sickGrace")) {
@@ -922,18 +933,21 @@ function statusBanner(ctx) {
   return parts.length ? parts.join("\n") : "";
 }
 
-// --- The privy: sit / use / flush to end the vomiting & diarrhea -------------
+// --- The privy: use the outhouse hole to end the vomiting & diarrhea ----------
 function useToilet(ctx) {
   if ((ctx.getFlag("sick") || 0) > 0) {
     ctx.setFlag("sick", 0);
     ctx.setFlag("sickGrace", false);
     ctx.setFlag("fartIgnitionQueued", false);
-    return "You reach the privy not one moment too soon. What follows is private, thorough, and — eventually — " +
+    return "You reach the TOILET HOLE not one moment too soon. What follows is private, thorough, and — eventually — " +
       "deeply cathartic. You emerge hollow and trembling, but CURED. The burrito's four-stage assault has passed.";
   }
   if ((ctx.getFlag("high") || 0) > 0)
-    return "You sit and contemplate the porcelain for what may be an hour, or an epoch. It is profound. It is also unhelpful.";
-  return "You don't especially need it right now — but you're glad it's here. The old plumbing groans a ghostly groan.";
+    return "You squat over the hole and contemplate the mushrooms' birthplace for what may be an hour, or an epoch.";
+  return "You don't especially need the TOILET HOLE right now, but you're glad the outhouse has one.";
+}
+function flushToilet() {
+  return "It is a hole in the ground. There is no plumbing and nothing to flush.";
 }
 
 // --- End-screen achievement badges -------------------------------------------
@@ -967,10 +981,10 @@ const ROOM_ART = {
   ].join("\n"),
   privy: [
     "      _______",
-    "     / _____ \\",
-    "    | |  _  | |",
-    "    | | (_) | |",
-    "    |_|_____|_|",
+    "     /       \\",
+    "    |  _____  |",
+    "    | /  O  \\ |",
+    "    |/_______\\|",
   ].join("\n"),
   porch: [
     "   ______________",
@@ -1151,11 +1165,11 @@ export const world = {
       name: "Ivy-Choked Privy",
       art: ROOM_ART.privy,
       desc:
-        "A cramped brick outhouse strangled in ivy, containing one heroically old TOILET. Against all " +
-        "odds and several laws of hygiene, it still flushes. The garden lies back to the west.",
+        "A cramped brick OUTHOUSE strangled in ivy. Its only fixture is a rough wooden seat over a dark " +
+        "TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The garden lies west.",
       searchDesc:
-        "The ancient plumbing is genuinely connected and the seat is load-bearing. If your stomach ever declares " +
-        "war, using this TOILET may be the closest thing in the manor to medicine.",
+        "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. The fresh " +
+        "MUSHROOMS inside look much more potent than the dried kitchen cluster.",
       exits: { west: "garden" },
     },
 
@@ -1548,18 +1562,17 @@ export const world = {
 
     // --- kitchen edibles: high / sick / help ---
     mushrooms: {
-      names: ["mushrooms", "mushroom", "fungus"], adjectives: ["strange", "speckled", "purple"],
-      loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A cluster of speckled purple MUSHROOMS sprouts from the damp windowsill.",
-      desc: "Speckled purple mushrooms, faintly luminous. Eating these is self-evidently a terrible idea.",
+      names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
+      loc: "kitchen", takeable: true, edible: true, highTurns: 6,
+      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
+      desc: "Dried purple mushrooms, faintly luminous and half as potent as a fresh cluster.",
       on: { eat: eatMushrooms },
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
-      adjectives: ["outhouse", "damp", "purple"],
-      loc: "garden", takeable: true, edible: true,
-      roomDesc: "Behind the OUTHOUSE, a damp cluster of purple MUSHROOMS pushes through the weeds.",
-      desc: "Purple mushrooms thriving behind the outhouse. Their location raises questions their glow does not answer.",
+      adjectives: ["fresh", "shit-fueled", "purple", "toilet"],
+      loc: "toilet", takeable: true, edible: true, fresh: true, highTurns: 12,
+      desc: "Fresh, shit-fueled purple mushrooms growing inside the TOILET HOLE. Their glow is twice as intense.",
       on: { eat: eatMushrooms },
     },
     burrito: {
@@ -1589,12 +1602,11 @@ export const world = {
       on: { drink: drinkMilk },
     },
     toilet: {
-      names: ["toilet", "commode", "throne", "loo"], adjectives: ["old", "porcelain", "cracked"],
-      loc: "privy", fixed: true,
-      roomDesc: "The TOILET waits, lid up, weirdly inviting.",
-      desc: "A cracked porcelain toilet of tremendous age, miraculously plumbed. In a haunted house it is the least " +
-        "frightening thing by a mile — unless you badly need it, in which case it is salvation itself.",
-      on: { sit: useToilet, use: useToilet, flush: useToilet, enter: useToilet },
+      names: ["toilet", "hole", "latrine", "loo"], adjectives: ["outhouse", "dark", "earthen"],
+      loc: "privy", fixed: true, container: true, open: true, capacity: 8,
+      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat, with fresh MUSHROOMS growing inside.",
+      desc: "A wooden seat over a raw hole in the earth. It has no plumbing and cannot flush.",
+      on: { sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet },
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],

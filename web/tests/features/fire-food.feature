@@ -230,6 +230,13 @@ Feature: Fire and food consequences
       | use toilet   |
       | enter toilet |
 
+  @toilet
+  Scenario: The outhouse toilet is only a hole and cannot flush
+    Given the player is in room "privy"
+    When I send "flush toilet"
+    Then the output contains "hole in the ground"
+    And the output contains "nothing to flush"
+
   Scenario: Escaping while burning awards the fire badge
     Given the player is on fire
     When I win with "You step into the dawn."

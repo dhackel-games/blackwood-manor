@@ -331,8 +331,9 @@ the mansion.
 - Every line you speak while ablaze feeds the fire; dawdle long enough and you **burn up on hold**.
 
 ## 12.9 Food & afflictions (kitchen) + the privy
-- **Strange mushrooms** → `high` (trippy per-turn flavor, harmless). One cluster grows
-  in the kitchen and another behind the garden OUTHOUSE; eating consumes only that cluster.
+- **Strange mushrooms** → `high` (trippy per-turn flavor, harmless). The dried kitchen
+  cluster lasts 6 turns. Fresh, shit-fueled mushrooms grow inside the OUTHOUSE's TOILET HOLE
+  and last 12 turns. Eating consumes only that cluster.
 - **Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito** contains two kinds of beans,
   three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
   destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts
@@ -340,8 +341,9 @@ the mansion.
   cycle repeats ten times and is lethal after its 40th uncured beat. Each event carries its
   own non-wrapping ASCII drawing rendered through the same mobile-safe block path as MAP MODE.
 - **Cold milk** → a drinkable cure for the affliction, +5, "fortified" (and the "Got Milk?" badge).
-- **The privy** (ivy-choked outhouse east of the garden) has a **toilet**: `sit`/`use`/`flush`
-  cures the sickness and cancels any queued fart-flame ignition.
+- **The privy** (ivy-choked outhouse east of the garden) has a wooden seat over a raw
+  **TOILET HOLE**. `SIT`/`USE` cures the sickness and cancels queued fart-flame ignition;
+  `FLUSH` cannot work because there is no plumbing.
 
 ## 12.10 End-screen badges (`endBadges`)
 - 🔥 **"Out Of The Frying Pan"** — escaped *while still on fire* (the escape banner also gets a
