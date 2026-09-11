@@ -12,6 +12,7 @@ import {
 } from "../../js/issue-report.js";
 import {
   GARY_VOICE_PRESETS,
+  estimatedSpeechDurationMs,
   garyVoiceProfile,
   pickGaryVoice,
 } from "../../js/gary-voice.js";
@@ -359,17 +360,24 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
 });
 
-Then("Gary's send control contains only an up arrow", function () {
+Then("Gary's send arrow is visually doubled without resizing its button", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*↑\s*<\/button>/);
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
+  assert.match(css, /#phone-go span\s*\{[^}]*transform:\s*scale\(2\)/s);
 });
 
-Then("Gary offers male and female computer and Australian voices", function () {
+Then("Gary's circular voice toggle contains a speaker icon", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /<div[^>]+id=["']phone-avatar["'][^>]*>\s*🔊\s*<\/div>/);
+});
+
+Then("Gary offers robot and human voice icons", function () {
   const expected = [
-    ["computer-male", "Computer male", "Fred"],
-    ["computer-female", "Computer female", "Kathy"],
-    ["australian-male", "Australian male", "Lee"],
-    ["australian-female", "Australian female", "Karen"],
+    ["computer-male", "Computer male", "Fred", "🤖♂️"],
+    ["computer-female", "Computer female", "Kathy", "🤖♀️"],
+    ["australian-male", "Australian male", "Lee", "👨"],
+    ["australian-female", "Australian female", "Karen", "👩"],
   ];
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const voices = expected.map(([, , name], index) => ({
@@ -378,8 +386,8 @@ Then("Gary offers male and female computer and Australian voices", function () {
   }));
   assert.deepEqual(GARY_VOICE_PRESETS.map(({ id, label }) => [id, label]),
     expected.map(([id, label]) => [id, label]));
-  for (const [id, label, voiceName] of expected) {
-    assert.match(html, new RegExp(`<option value=["']${id}["']>${label}</option>`));
+  for (const [id, label, voiceName, icon] of expected) {
+    assert.match(html, new RegExp(`<option value=["']${id}["'] title=["']${label}["']>${icon}</option>`));
     assert.equal(garyVoiceProfile(id).label, label);
     assert.equal(pickGaryVoice(voices, id).name, voiceName);
   }
@@ -389,6 +397,38 @@ Then("Gary remembers the selected voice preset", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /localStorage\.getItem\(GARY_VOICE_PRESET_KEY\)/);
   assert.match(ui, /localStorage\.setItem\(GARY_VOICE_PRESET_KEY, garyVoicePreset\)/);
+});
+
+Then("Australian presets remain distinct when only the female accent is installed", function () {
+  const voices = [
+    { name: "Karen", lang: "en-AU" },
+    { name: "Daniel", lang: "en-GB" },
+  ];
+  assert.equal(pickGaryVoice(voices, "australian-male").name, "Daniel");
+  assert.equal(pickGaryVoice(voices, "australian-female").name, "Karen");
+  assert.equal(pickGaryVoice([voices[0]], "australian-male"), null);
+});
+
+Then("browser speech accumulates finalized phrases until explicit submission", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /recognition\.continuous = true/);
+  assert.match(ui, /webTranscript \+= text\.trim\(\) \+ " "/);
+  assert.match(ui, /webTranscript \+= webPartial\.trim\(\) \+ " "/);
+  assert.match(ui, /if \(listening\) webRestartTimer = setTimeout\(beginWebRecognition, 100\)/);
+  assert.match(ui, /const text = \(webTranscript \+ webPartial\)\.trim\(\)/);
+});
+
+Then("END CALL disables and shows progress until Gary finishes speaking", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+id=["']phone-end["'][^>]*><span>END CALL<\/span><\/button>/);
+  assert.match(css, /#phone-end\.closing::before\s*\{[^}]*animation:\s*end-call-progress/s);
+  assert.match(ui, /phoneEnd\.disabled = true/);
+  assert.match(ui, /Promise\.all\(\[speechDone, wait\(duration\)\]\)/);
+  assert.match(ui, /Promise\.all\(\[speechDone, wait\(duration\)\]\)\.then\(\(\) => \{\s*endCallUI\(\)/s);
+  assert.match(ui, /if \(onCall\)[\s\S]*finishPhoneCall\(out\)/);
+  assert.ok(estimatedSpeechDurationMs("One two three.", 1) >= 1400);
 });
 
 Then("the movement controls are labeled In and Out", function () {

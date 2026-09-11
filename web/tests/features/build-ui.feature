@@ -30,12 +30,20 @@ Feature: Build metadata and touch-control contract
     And a Bug command uses its phrase as the issue description
     And the iOS wrapper opens new-window web links externally
 
-  Scenario: Gary uses an icon-only send control
-    Then Gary's send control contains only an up arrow
+  Scenario: Gary uses large icon-only voice controls
+    Then Gary's send arrow is visually doubled without resizing its button
+    And Gary's circular voice toggle contains a speaker icon
 
-  Scenario: Gary offers persistent computer and Australian voice presets
-    Then Gary offers male and female computer and Australian voices
+  Scenario: Gary offers persistent icon-only computer and Australian voice presets
+    Then Gary offers robot and human voice icons
+    And Australian presets remain distinct when only the female accent is installed
     And Gary remembers the selected voice preset
+
+  Scenario: Browser speech stays active until the microphone is tapped again
+    Then browser speech accumulates finalized phrases until explicit submission
+
+  Scenario: Ending Gary's call waits for his final spoken line
+    Then END CALL disables and shows progress until Gary finishes speaking
 
   Scenario: In and Out controls use title case
     Then the movement controls are labeled In and Out

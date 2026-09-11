@@ -286,14 +286,20 @@ the mansion.
 
 ## 12.4 Voice
 - **Gary speaks** via Web `speechSynthesis` (low, gruff), muted by default for work safety.
-  **Toggle by tapping the pulsing "GARY" avatar** on the call screen (or the hint under it);
+  **Toggle by tapping the pulsing speaker avatar** on the call screen (or the hint under it);
   avatar glows solid when voice is on.
 - A compact selector beside the mute hint provides four remembered presets: COMPUTER MALE
   (the original Fred-style novelty voice), COMPUTER FEMALE, AUSTRALIAN MALE, and AUSTRALIAN
   FEMALE. Each preset prefers known system voices, falls back by locale, and supplies its
-  own pitch and rate.
+  own pitch and rate. Gendered fallback lists prevent the Australian presets from collapsing
+  onto the same voice when only one Australian system voice is installed.
 - **Speech-to-text:** browsers use `webkitSpeechRecognition`; the iOS app uses a native
   `SFSpeechRecognizer` bridge exposed as `window.webkit.messageHandlers.speech`.
+  Both stay active across natural pauses and submit the accumulated phrase only
+  when the MIC is tapped again.
+- Ending a call keeps Gary's final line on screen, disables END CALL, fills that
+  button as a speech-progress indicator, and dismisses the phone only after
+  speech completion (or a bounded safety timeout).
 
 ## 12.5 Hidden wing / true ending
 - Ringing the bell (once all heirlooms are deposited) no longer ends the game — it lifts the

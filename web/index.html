@@ -68,15 +68,15 @@
         <div class="phone-ai" id="phone-ai" role="button" tabindex="0"
              aria-label="how Gary is being generated">&#9675; checking&hellip;</div>
       </div>
-      <div id="phone-avatar" class="phone-avatar" role="button" tabindex="0" aria-label="tap to turn Gary's voice on or off">GARY</div>
+      <div id="phone-avatar" class="phone-avatar" role="button" tabindex="0" aria-label="tap to turn Gary's voice on or off">🔊</div>
       <div class="phone-name">Gary</div>
       <div class="voice-controls">
         <div id="phone-mute" class="voice-hint" role="button" tabindex="0" aria-label="toggle Gary's voice"></div>
         <select id="gary-voice" aria-label="Gary voice">
-          <option value="computer-male">Computer male</option>
-          <option value="computer-female">Computer female</option>
-          <option value="australian-male">Australian male</option>
-          <option value="australian-female">Australian female</option>
+          <option value="computer-male" title="Computer male">🤖♂️</option>
+          <option value="computer-female" title="Computer female">🤖♀️</option>
+          <option value="australian-male" title="Australian male">👨</option>
+          <option value="australian-female" title="Australian female">👩</option>
         </select>
       </div>
       <div class="phone-status">
@@ -87,9 +87,9 @@
         <button id="phone-mic" class="iconbtn" aria-label="speak to Gary" hidden>&#127908;</button>
         <input id="phone-cmd" autocomplete="off" autocapitalize="off" autocorrect="off"
                spellcheck="false" enterkeyhint="send" placeholder="say something to Gary…" aria-label="say to Gary" />
-        <button id="phone-go" aria-label="send to Gary">↑</button>
+        <button id="phone-go" aria-label="send to Gary"><span aria-hidden="true">↑</span></button>
       </div>
-      <button id="phone-end">END CALL</button>
+      <button id="phone-end"><span>END CALL</span></button>
     </div>
   </div>
 
