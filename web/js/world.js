@@ -845,7 +845,7 @@ function eatBurrito(ctx) {
   ctx.setFlag("sickGrace", true);
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
-  return "You eat Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
+  return "You eat Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
     "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
     "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or drink the MILK before " +
     "this completes ten full digestive laps.)";
@@ -1721,8 +1721,8 @@ export const world = {
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TACO STAND DEATH WISH SPICY BURRITO sweats on the table.",
-      desc: "Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
+      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",
+      desc: "Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
         "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
         "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
         "available evidence, it may be edible if you're feeling adventurous.",

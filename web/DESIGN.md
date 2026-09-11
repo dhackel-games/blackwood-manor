@@ -336,7 +336,7 @@ the mansion.
   only then are the fresh, shit-and-piss-covered mushrooms revealed inside the OUTHOUSE's
   TOILET HOLE. They last 12 turns. `GET MUSHROOMS FROM TOILET` or
   `REACH INTO TOILET FOR MUSHROOMS` retrieves them after inspection.
-- **Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito** contains two kinds of beans,
+- **Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito** contains two kinds of beans,
   three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
   destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts
   `sick`: stomach-acid burp → barf → flaming fart → spicy, sparking diarrhea. That four-turn
