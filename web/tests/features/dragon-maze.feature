@@ -187,20 +187,21 @@ Feature: Dreadmaw's hedge maze and hoard
     And the output contains "Three wrong rhymes"
     And the output contains "FRONT GATE"
 
-  Scenario: The troll ignores answers until he has asked the riddle
-    Given item "apple" is carried
-    And the player is in room "dragonCaveMouth"
-    When I send "offer apple to dragon"
-    And I play this command sequence:
-      """
-      east
-      east
-      down
-      east
-      """
-    And I send "answer more"
+  Scenario: Speech directed to the troll starts his conversation
+    Given the player is in room "trollGate"
+    When I send "say hello to troll"
     Then flag "dragonVaultOpen" is unset
-    And the output contains "TALK TO TROLL"
+    And flag "trollAskedRiddle" is set
+    And flag "trollWrongGuesses" is unset
+    And the output contains "(talk to TROLL)"
+    And the output contains "Past this door lie gold and ore"
+
+  Scenario: Anticipating the troll's rhyme opens the vault immediately
+    Given the player is in room "trollGate"
+    When I send "say lore to troll"
+    Then flag "dragonVaultOpen" is true
+    And the output contains "answered before I even asked"
+    And the output contains "vault door rolls open"
 
   Scenario: TALK infers the troll when he is the only conversational target
     Given the player is in room "trollGate"
