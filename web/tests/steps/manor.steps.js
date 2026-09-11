@@ -181,6 +181,17 @@ Then("every manor room has searchable detail and narrow ASCII art", function () 
   }
 });
 
+Then("every manor room declares implicit IN and OUT routing", function () {
+  assert.deepEqual(
+    Object.keys(world.implicitNavigation).sort(),
+    Object.keys(world.rooms).sort(),
+  );
+  for (const [id, route] of Object.entries(world.implicitNavigation)) {
+    assert.ok(Object.hasOwn(route, "in"), `${id} must declare IN routing`);
+    assert.ok(Object.hasOwn(route, "out"), `${id} must declare OUT routing`);
+  }
+});
+
 Then("these room descriptions contain uppercase interactables:", function (table) {
   for (const row of table.hashes()) {
     const description = world.rooms[row.room].desc;

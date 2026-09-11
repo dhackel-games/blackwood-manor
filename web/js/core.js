@@ -254,6 +254,51 @@ export function createGame(world) {
     return null;
   }
 
+  function dispatchWithoutTick(cmd) {
+    const override = runHandlers(cmd);
+    if (override != null) return override;
+    const handler = commands[cmd.verb];
+    const result = handler ? handler(game, cmd) : "You can't do that.";
+    return result == null ? "You can't do that." : result;
+  }
+
+  function prepareEntry(cmd, derivedSteps) {
+    if (cmd.verb !== "enter" || !cmd.dobj) return null;
+    const target = game.find(cmd.dobj);
+    if (!target || !target.enterTo) return null;
+    const definition = world.items[target.id];
+    const canOpen = target.openable || !!definition?.on?.open;
+    if (!canOpen || target.open) return null;
+
+    if (target.locked) {
+      const suppliedKey = cmd.iobj ? game.find(cmd.iobj, game.inventory()) : null;
+      const knownKey = target.keyId ? game.item(target.keyId) : null;
+      const key = suppliedKey || (knownKey?.loc === "inventory" ? knownKey : null);
+      if (key) {
+        const keyName = key.names[0];
+        const unlock = { verb: "unlock", dobj: target.names[0], prep: "with", iobj: keyName };
+        const result = dispatchWithoutTick(unlock);
+        derivedSteps.push(`unlock ${target.names[0]} with ${keyName}`);
+        if (target.locked) return result;
+      }
+    }
+
+    const open = { verb: "open", dobj: target.names[0], prep: null, iobj: null };
+    const result = dispatchWithoutTick(open);
+    derivedSteps.push(`open ${target.names[0]}`);
+    return target.open ? null : result;
+  }
+
+  function prepareOpenWithKey(cmd, derivedSteps) {
+    if (cmd.verb !== "open" || !cmd.dobj || !cmd.iobj) return null;
+    const target = game.find(cmd.dobj);
+    if (!target?.locked || !target.keyId) return null;
+    const unlock = { verb: "unlock", dobj: cmd.dobj, prep: "with", iobj: cmd.iobj };
+    const result = dispatchWithoutTick(unlock);
+    derivedSteps.push(`unlock ${cmd.dobj} with ${cmd.iobj}`);
+    return target.locked ? result : null;
+  }
+
   function implicitlyAcquire(cmd) {
     if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
     const item = game.find(cmd.dobj);
@@ -273,19 +318,29 @@ export function createGame(world) {
   // a chained line (parse error, game over, or we just picked up the phone).
   function runOne(input) {
     darkWarningRendered = false;
-    const cmd = parse(input);
+    let cmd = parse(input);
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
+
+    const roomNavigation = world.implicitNavigation?.[state.room];
+    const implicitNavigation = cmd.verb === "go" && cmd.dobj === "in" ? roomNavigation?.in
+      : cmd.verb === "go" && cmd.dobj === "out" ? roomNavigation?.out
+      : null;
+    if (implicitNavigation) cmd = parse(implicitNavigation);
+    const executionLabel = implicitNavigation || input.trim().toLowerCase();
 
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || [])
       : [];
     const acquisition = implicitlyAcquire(cmd);
     if (acquisition) derivedSteps.push(acquisition.step);
+    const preparationBlocked = acquisition?.blocked
+      || prepareOpenWithKey(cmd, derivedSteps)
+      || prepareEntry(cmd, derivedSteps);
 
     deferStatusBanner = true;
     describedRoomThisTurn = false;
-    const override = acquisition?.blocked ? acquisition.blocked : runHandlers(cmd);
+    const override = preparationBlocked || runHandlers(cmd);
     let text;
     if (override != null) {
       text = override;
@@ -297,8 +352,14 @@ export function createGame(world) {
     if (!state.dead && !state.won) tick();
     deferStatusBanner = false;
     if (derivedSteps.length) {
-      const sequence = acquisition?.blocked ? derivedSteps : [...derivedSteps, input.trim().toLowerCase()];
+      let finalStep = executionLabel;
+      if (cmd.verb === "open" && derivedSteps.some((step) => step.startsWith("unlock "))) {
+        finalStep = `open ${cmd.dobj}`;
+      }
+      const sequence = preparationBlocked ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join(", ")})\n\n${text}`;
+    } else if (implicitNavigation) {
+      text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();
     if (describedRoomThisTurn && typeof world.statusBanner === "function") {

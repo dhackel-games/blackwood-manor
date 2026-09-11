@@ -321,6 +321,12 @@ export const commands = {
   },
   give(ctx) { return "There's no one here to give it to."; },
   talk() { return "No one answers."; },
+  say(ctx, cmd) {
+    const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "");
+    if (!raw) return "Say what?";
+    const spoken = raw.charAt(0).toUpperCase() + raw.slice(1);
+    return `"${spoken}"\nNothing happens.`;
+  },
   wake() { return "Nothing here seems inclined to wake up."; },
   pray(ctx) { return "Nothing happens. Perhaps something is missing."; },
   sit(ctx, cmd) { return `You sit. ${cmd.dobj ? "The " + cmd.dobj + " is unmoved by the gesture." : "The floor is cold and unhelpful."}`; },

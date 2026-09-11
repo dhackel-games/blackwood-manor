@@ -9,7 +9,7 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "walk", "run", "float", "fly"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
+  go: ["go", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
@@ -17,10 +17,11 @@ const VERBS = {
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
   extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],
-  throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter"],
+  throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
-  talk: ["talk", "speak", "chat", "say", "answer", "recite"], wake: ["wake", "awaken", "rouse"],
+  talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],
+  wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],
   sit: ["sit"], use: ["use"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
@@ -76,6 +77,12 @@ export function parse(input) {
     return { verb: null, dobj: null, prep: null, iobj: null, error: "unknown-verb", word: words[0] };
   }
   let rest = words.slice(1);
+  if ((words[0] === "leave" || words[0] === "exit") && !rest.length) {
+    return { verb: "go", dobj: "out", prep: null, iobj: null };
+  }
+  if (verb === "enter" && !rest.length) {
+    return { verb: "go", dobj: "in", prep: null, iobj: null };
+  }
 
   // All item-inspection phrasings converge on EXAMINE. With no noun they
   // remain room-inspection commands ("look", "look at", "search", "examine").

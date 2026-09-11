@@ -135,6 +135,10 @@ When("I send {string}", function (command) {
   this.output = this.game.send(command);
 });
 
+When('I send "say {string}"', function (words) {
+  this.output = this.game.send(`say "${words}"`);
+});
+
 When("I repeatedly send {string} at most {int} times until death", function (command, limit) {
   for (let i = 0; i < limit && !this.game.state.dead; i++) {
     this.output = this.game.send(command);
@@ -307,6 +311,11 @@ Then("every HUD status is a HudSlot with an emoji and calculation", function () 
 Then("the page has a {string} touch command", function (direction) {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, new RegExp(`data-cmd=["']${direction}["']`));
+});
+
+Then("the page has a {string} prefill control", function (value) {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, new RegExp(`data-prefill=["']${value}["']`));
 });
 
 Then("the TestFlight release refreshes the web bundle before generating the Xcode project", function () {
