@@ -452,7 +452,8 @@ function garyTurnInfo(ctx, text) {
 }
 
 function descendWell(ctx) {
-  if (!ctx.has("rope")) {
+  const floating = (ctx.getFlag("high") || 0) > 0;
+  if (!ctx.has("rope") && !floating) {
     return ctx.kill(
       "You clamber over the mossy lip of the well and lower yourself into the dark — " +
       "but there is nothing to hold to. You plunge, and strike the dry stone bottom " +
@@ -462,8 +463,11 @@ function descendWell(ctx) {
   if (ctx.getFlag("wellLooted")) return "You climb down again, but the well is empty now.";
   ctx.setFlag("wellLooted");
   ctx.moveItem("ancientCoin", "garden");
-  return "Bracing against the rope, you descend into the well. At the muddy bottom your " +
-    "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.";
+  return floating
+    ? "You drift down the WELL like a dandelion seed, pluck the ANCIENT COIN from the muddy bottom, " +
+      "and float back into the garden without touching the walls."
+    : "Bracing against the rope, you descend into the well. At the muddy bottom your " +
+      "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.";
 }
 
 // ---------------------- Andy's "light self on fire" gag ----------------------
@@ -795,7 +799,23 @@ function eatMushrooms(ctx) {
   ctx.destroy("mushrooms");
   ctx.setFlag("high", 6);
   return "You eat the strange mushrooms.\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
-    "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here.";
+    "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
+    "Your body feels so light you could FLY TO any room you can name.";
+}
+
+function floatToRoom(ctx, roomId) {
+  const destination = ctx.world.rooms[roomId];
+  ctx.state.room = roomId;
+  if (roomId === "crypt") {
+    const talisman = ctx.item("talisman");
+    if (!(talisman && talisman.loc === "inventory" && talisman.worn)) {
+      return ctx.kill(
+        "You float straight into the CRYPT. Weightlessness does nothing against the WRAITH; " +
+        "it sweeps through you, and your heart simply stops."
+      );
+    }
+  }
+  return `You rise weightless and drift through the manor to ${destination.name}.\n\n${ctx.describeRoom()}`;
 }
 function eatBurrito(ctx) {
   ctx.destroy("burrito");
@@ -1076,6 +1096,7 @@ export const world = {
   tick: worldTick,   // per-turn: burn-up timer + food afflictions (may kill)
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
   endBadges,         // win-screen achievement badges
+  floatTo: floatToRoom,
 
   rooms: {
     gate: {
@@ -1111,6 +1132,9 @@ export const world = {
         }
         return "The STATUE and WELL have yielded what they hid. Only the grave-damp BRAZIER still looks expectant.";
       },
+      highDesc:
+        "Stone and soil turn translucent. An IRON KEY glints beneath the STATUE, an ANCIENT COIN waits at the " +
+        "bottom of the WELL, and old fire sleeps inside the BRAZIER.",
       extraDirections: ["down"],
       exits: { west: "gate", east: "privy" },
       on: {
@@ -1146,6 +1170,7 @@ export const world = {
           ? "The open MAILBOX has no false back. The FRONT DOOR's iron lock is old but functional; it needs a real KEY."
           : "The MAILBOX lid has a finger-worn edge and no lock. The FRONT DOOR's iron keyhole is too large for subtle tools.";
       },
+      highDesc: "The wall behind the PORTRAIT shimmers around the hard rectangular outline of an IRON SAFE.",
       exits: {
         south: "gate",
         north: { to: "grandHall", via: "frontDoorOpen", lockedMsg: "The front door is shut fast." },
@@ -1171,6 +1196,7 @@ export const world = {
         return "The RELIQUARY contains seven heirloom-shaped recesses. The BELL rope hangs directly above them, " +
           "waiting for a collection not yet complete.";
       },
+      highDesc: "The shelves become transparent enough to reveal a hidden stair folding down behind the brass LEVER.",
       exits: {
         south: "porch", east: "parlor", west: "diningRoom", up: "landing",
         north: { to: "hollowPassage", via: "secretWingOpen",
@@ -1349,12 +1375,16 @@ export const world = {
           ? "The lowered attic ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
           : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
       },
-      extraDirections: (ctx) => ctx.getFlag("ladderDown") ? ["up"] : [],
+      extraDirections: (ctx) => (ctx.getFlag("high") || 0) > 0 || ctx.getFlag("ladderDown") ? ["up"] : [],
       exits: { down: "grandHall", west: "nursery", east: "masterBedroom", south: "study" },
       on: {
         // The attic ladder is flimsy: climb it laden and it — and you — come down hard.
         go(ctx, cmd) {
           if (cmd.dobj !== "up") return null;
+          if ((ctx.getFlag("high") || 0) > 0) {
+            ctx.state.room = "attic";
+            return "You float through the closed trap-door as if wood were only a suggestion.\n\n" + ctx.describeRoom();
+          }
           if (!ctx.getFlag("ladderDown")) return "There is no way up; the trap-door is shut.";
           if (ctx.inventory().length > 2) {
             return ctx.kill(
@@ -1377,6 +1407,7 @@ export const world = {
         "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The landing lies east.",
       searchDesc:
         "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted.",
+      highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
       exits: { east: "landing" },
     },
 
@@ -1388,6 +1419,7 @@ export const world = {
         "JEWELRY BOX of dark walnut. The landing lies west.",
       searchDesc:
         "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
+      highDesc: "The dark wood becomes glassy, revealing a RUBY RING inside the locked JEWELRY BOX.",
       exits: { west: "landing" },
     },
 

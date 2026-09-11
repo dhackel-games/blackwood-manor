@@ -568,3 +568,16 @@ TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
 `web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
 integer build number. The script archives and exports locally with `--no-upload`, or also
 validates and uploads when App Store Connect credentials are available.
+
+## 12.23 Mushroom vision and flight
+
+Eating the strange mushrooms explicitly hints that the player feels light enough to
+`FLY TO` a named room. While `high` remains positive:
+
+- First entry appends `MUSHROOM VISION` with `highDesc` clues for hidden objects.
+- `GO TO <room>`, `FLOAT TO <room>`, and `FLY TO <room>` resolve room IDs or names and
+  move there directly.
+- The player can descend the garden well without a rope and float through the attic
+  trap-door without lowering its ladder or shedding inventory.
+- Darkness still starts the normal one-turn grue warning, and an unprotected arrival in
+  the crypt still triggers the wraith.

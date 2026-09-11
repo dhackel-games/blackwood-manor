@@ -9,7 +9,7 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "walk", "run"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
+  go: ["go", "walk", "run", "float", "fly"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift"], push: ["push", "press"],
@@ -78,6 +78,9 @@ export function parse(input) {
     rest = rest.slice(1);
   }
   if ((verb === "look" || verb === "search") && rest.length) verb = "examine";
+
+  // Named travel: "go to kitchen", "float to attic", "fly to the garden".
+  if (verb === "go" && rest[0] === "to") rest = rest.slice(1);
 
   // "go north" / "go n" / "climb up"
   if ((verb === "go" || verb === "climb") && rest.length && DIRECTIONS[rest[0]]) {

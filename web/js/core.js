@@ -132,7 +132,7 @@ export function createGame(world) {
     const directions = Object.entries(room.exits || {})
       .filter(([, exit]) => {
         if (typeof exit === "string") return true;
-        return !exit.revealedBy || !!state.flags[exit.revealedBy];
+        return (state.flags.high || 0) > 0 || !exit.revealedBy || !!state.flags[exit.revealedBy];
       })
       .map(([direction]) => direction);
     const extra = typeof room.extraDirections === "function"
@@ -153,6 +153,11 @@ export function createGame(world) {
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
     if (extended) out += r.desc + "\n";
+    if (first && !force && (state.flags.high || 0) > 0) {
+      const visionSource = r.highDesc || r.searchDesc;
+      const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
+      if (vision) out += `MUSHROOM VISION\n${vision}\n`;
+    }
     const directions = game.availableDirections();
     out += extended
       ? `Directions you can go: ${directions.join(", ") || "nowhere"}\n`

@@ -5,6 +5,19 @@
 
 import { renderMap } from "./map.js";
 
+const normalizeRoomName = (name) => String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function resolveRoom(ctx, phrase) {
+  const wanted = normalizeRoomName(phrase);
+  if (!wanted) return null;
+  const exact = Object.entries(ctx.world.rooms).find(([id, room]) =>
+    [id, room.name, ...(room.aliases || [])].some((name) => normalizeRoomName(name) === wanted));
+  if (exact) return exact;
+  const suffixMatches = Object.entries(ctx.world.rooms).filter(([id, room]) =>
+    [id, room.name, ...(room.aliases || [])].some((name) => normalizeRoomName(name).endsWith(wanted)));
+  return suffixMatches.length === 1 ? suffixMatches[0] : null;
+}
+
 function suggestedActions(ctx, item) {
   const actions = [];
   if (item.takeable && !ctx.has(item.id)) actions.push("TAKE");
@@ -85,6 +98,15 @@ export const commands = {
     const dir = cmd.dobj;
     const room = ctx.room();
     let exit = room.exits && room.exits[dir];
+    if (!exit && (ctx.getFlag("high") || 0) > 0) {
+      const destination = resolveRoom(ctx, dir);
+      if (destination) {
+        const [roomId, roomDef] = destination;
+        if (typeof ctx.world.floatTo === "function") return ctx.world.floatTo(ctx, roomId);
+        ctx.state.room = roomId;
+        return `You float weightlessly to ${roomDef.name}.\n\n${ctx.describeRoom()}`;
+      }
+    }
     if (!exit) return "You can't go that way.";
     if (typeof exit === "object") {
       if (exit.locked) return exit.lockedMsg || "That way is locked.";
