@@ -172,7 +172,7 @@ export function createGame(world) {
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
     if (extended) out += r.desc + "\n";
-    // Mushroom and XRAY vision reveal hidden detail on entry and every LOOK.
+    // Mushroom and XRAY vision share one status heading and hidden-detail view.
     const highOn = (state.flags.high || 0) > 0;
     const enhancedVision = typeof world.hasMushroomVision === "function"
       ? world.hasMushroomVision(game)
@@ -180,8 +180,13 @@ export function createGame(world) {
     if (enhancedVision) {
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
-      const label = highOn ? "MUSHROOM VISION" : "XRAY VISION";
-      if (vision) out += `${label}\n${vision}\n`;
+      const status = typeof world.visionStatus === "function"
+        ? world.visionStatus(game)
+        : { permanent: false, remaining: state.flags.high || 0 };
+      const remaining = status?.permanent
+        ? "∞"
+        : `${status?.remaining || 0} turn${status?.remaining === 1 ? "" : "s"} left`;
+      if (vision) out += `THIRD EYE (👁️ ${remaining})\n${vision}\n`;
     }
     const directions = game.availableDirections();
     out += extended
@@ -324,6 +329,15 @@ export function createGame(world) {
     return { step: `get ${item.names[0]}` };
   }
 
+  function inferSoleTalkTarget(cmd) {
+    if (cmd.verb !== "talk" || cmd.dobj) return null;
+    const talkable = game.itemsIn(state.room).filter((item) =>
+      typeof world.items[item.id]?.on?.talk === "function");
+    if (talkable.length !== 1) return null;
+    cmd.dobj = talkable[0].names[0];
+    return `talk to ${talkable[0].names[0].toUpperCase()}`;
+  }
+
   // --- main loop -------------------------------------------------------------
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
@@ -338,7 +352,8 @@ export function createGame(world) {
       : cmd.verb === "go" && cmd.dobj === "out" ? roomNavigation?.out
       : null;
     if (implicitNavigation) cmd = parse(implicitNavigation);
-    const executionLabel = implicitNavigation || input.trim().toLowerCase();
+    const implicitTalk = inferSoleTalkTarget(cmd);
+    const executionLabel = implicitNavigation || implicitTalk || input.trim().toLowerCase();
 
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || [])
@@ -369,7 +384,7 @@ export function createGame(world) {
       }
       const sequence = preparationBlocked ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join(", ")})\n\n${text}`;
-    } else if (implicitNavigation) {
+    } else if (implicitNavigation || implicitTalk) {
       text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();

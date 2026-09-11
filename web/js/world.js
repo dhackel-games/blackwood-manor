@@ -1326,9 +1326,9 @@ function openSafe(ctx, cmd) {
 
 const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
 const TROLL_RIDDLE =
-  "\"Past this door lie gold and ore,\\n" +
-  "Old crowns, old bones, and something more.\\n" +
-  "What fills a dragon's hidden store?\\n" +
+  "\"Past this door lie gold and ore,\n" +
+  "Old crowns, old bones, and something more.\n" +
+  "What fills a dragon's hidden store?\n" +
   "Treasure, terror, blood, and ____.\"";
 const DRAGON_REBUKES = [
   {
