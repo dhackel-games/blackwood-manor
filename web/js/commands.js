@@ -320,6 +320,8 @@ export const commands = {
     return commands.go(ctx, { ...cmd, dobj: "in" });
   },
   give(ctx) { return "There's no one here to give it to."; },
+  talk() { return "No one answers."; },
+  wake() { return "Nothing here seems inclined to wake up."; },
   pray(ctx) { return "Nothing happens. Perhaps something is missing."; },
   sit(ctx, cmd) { return `You sit. ${cmd.dobj ? "The " + cmd.dobj + " is unmoved by the gesture." : "The floor is cold and unhelpful."}`; },
   use(ctx, cmd) { return cmd.dobj ? `You can't see a way to use the ${cmd.dobj}.` : "Use what?"; },
@@ -367,7 +369,7 @@ export const commands = {
       "put <x> in <y>, read <x>",
       "light <x>, turn on/off <x>",
       "wear / remove, eat / drink",
-      "push / pull / move, reach into <x>, ring <x>",
+      "push / pull / move, reach into <x>, talk to / wake <x>, give <x> to <y>, ring <x>",
       "score save restore restart quit",
       "ai — is Gary's on-device model running, or is he scripted?",
       "",

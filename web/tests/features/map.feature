@@ -14,6 +14,7 @@ Feature: Spoiler-safe map mode
     And the output contains "?????"
     And the output does not match "UPSTAIRS|GROUND FLOOR|BELOW"
     And the output contains regex "X [A-Z]" exactly 1 time
+    And the output contains "Front Gate: WEST to Hedge Maze; EAST to Garden."
     And the output contains none of:
       | Grand Hall |
       | Landing    |
@@ -56,5 +57,27 @@ Feature: Spoiler-safe map mode
     And I add 10 points
     And I send "hint"
     Then the output does not contain "Type MAP"
+
+  Scenario: Map lists canonical names for every visited location
+    When I send "look"
+    And I send "east"
+    And I send "east"
+    And I send "map"
+    Then the output contains "VISITED LOCATIONS (FLY TO ...)"
+    And the output contains "Front Gate"
+    And the output contains "Overgrown Garden"
+    And the output contains "Ivy-Choked Privy"
+    And the output does not contain "Grand Hall"
+
+  Scenario: The grounds map places the maze west and garden east of the gate
+    When I send "look"
+    And I send "west"
+    And I send "map"
+    Then the output contains "X Hedge Maze"
+    And the output contains "Front Gate"
+    When I send "east"
+    And I send "east"
+    And I send "map"
+    Then the output contains "X Garden"
 
 # end map.feature

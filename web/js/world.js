@@ -844,6 +844,9 @@ function eatMushrooms(ctx, cmd) {
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
   const destinationName = destination.name.replace(/^The\s+/i, "");
+  if (destination.flightRequires && !ctx.getFlag(destination.flightRequires)) {
+    return `You drift toward the ${destinationName}, but a sealed barrier turns even mushroom flight aside.`;
+  }
   ctx.state.room = roomId;
   if (roomId === "crypt") {
     const talisman = ctx.item("talisman");
@@ -1299,6 +1302,63 @@ function openSafe(ctx, cmd) {
   return finishOpeningSafe(ctx, "You dial the combination from the DIARY — seven left, three right, nine left.");
 }
 
+const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
+const TROLL_RIDDLE =
+  "\"Apple wakes the wyrm once more;\\n" +
+  "Doubloon buys what lies in store;\\n" +
+  "Name a rhyme to pass this door:\\n" +
+  "Open now, and guard no ____.\"";
+function dragonFire(ctx) {
+  ctx.setFlag("onFire", true);
+  ctx.setFlag("burnTurns", 0);
+  ctx.setFlag("burnGrace", true);
+  return "DREADMAW THE DRAGON cracks one eye and breathes a sheet of dragonfire over you. You are ON FIRE. " +
+    "Then she lowers her head across the cave mouth again without moving an inch.";
+}
+function talkToDragon(ctx) {
+  if (ctx.getFlag("dragonFriendly")) {
+    return "DREADMAW lowers her vast head companionably. \"The centuries are long, little apple-bringer. " +
+      "Do try not to spend the doubloon somewhere vulgar. The troll inside handles visitors now.\"";
+  }
+  return dragonFire(ctx);
+}
+function wakeDragon(ctx) {
+  if (ctx.getFlag("dragonFriendly")) return talkToDragon(ctx);
+  return dragonFire(ctx);
+}
+function giveDragon(ctx, cmd) {
+  const offered = ctx.find(cmd.dobj, ctx.inventory());
+  if (!offered || offered.id !== "apple") return "DREADMAW does not stir. Perhaps offer her something worth waking for.";
+  ctx.destroy("apple");
+  ctx.setFlag("dragonAwake");
+  ctx.setFlag("dragonMoved");
+  ctx.setFlag("dragonFriendly");
+  ctx.moveItem("goldDoubloon", "inventory");
+  ctx.addScore(10);
+  return "You offer the APPLE. One immense golden eye opens. DREADMAW THE DRAGON eats it with exquisite care, " +
+    "then rises and coils beside the cave instead of across it.\n\n" +
+    "\"At last, a visitor with manners,\" she says. \"Take this GOLD DOUBLOON. You may enter. " +
+    "The troll inside decides who reaches the hoard.\" (+10)";
+}
+function talkToTroll(ctx) {
+  ctx.setFlag("trollAskedRiddle");
+  return "The TROLL scratches one stone-hard ear. \"No coin, no combat. Finish the missing word and I move.\"\n\n" +
+    TROLL_RIDDLE;
+}
+function answerTrollRiddle(ctx, cmd) {
+  if (!ctx.getFlag("trollAskedRiddle")) {
+    return "The TROLL folds his arms across the VAULT DOOR. Perhaps TALK TO TROLL before shouting answers.";
+  }
+  const words = `${cmd.dobj || ""} ${cmd.iobj || ""}`.trim().toLowerCase().match(/[a-z]+/g) || [];
+  const answer = words.at(-1) || "";
+  if (!TROLL_RHYMES.has(answer)) {
+    return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move.`;
+  }
+  ctx.setFlag("dragonVaultOpen");
+  return `You answer ${answer.toUpperCase()}. The TROLL grins, pleased by the rhyme, and lumbers aside. ` +
+    "Deep locks answer one another inside the mountain, and the vault door rolls open.";
+}
+
 // --- End-screen achievement badges -------------------------------------------
 function endBadges(ctx) {
   const b = [];
@@ -1478,12 +1538,11 @@ export const world = {
       desc:
         "You stand at the rusted iron gate of Blackwood Manor as the last light drains " +
         "from the sky. The house looms beyond a dead lawn, its windows like sockets. A " +
-        "gravel path leads north to the porch, and a low wall gives way east to an " +
-        "overgrown garden.",
+        "gravel path leads north to the porch. A low wall gives way east to the overgrown " +
+        "garden, while a black yew opening enters the HEDGE MAZE to the west.",
       searchDesc:
-        "Fresh scuffs disturb the gravel toward the garden. Whatever admits you to the house is unlikely to be " +
-        "lying helpfully at the locked front door.",
-      exits: { north: "porch", east: "garden" },
+        "Fresh scuffs disturb the gravel toward the eastern garden. West, scorched leaves disappear into the HEDGE MAZE.",
+      exits: { north: "porch", east: "garden", west: "hedgeMazeGate" },
     },
 
     garden: {
@@ -1518,6 +1577,115 @@ export const world = {
         },
       },
     },
+
+    hedgeMazeGate: {
+        name: "Hedge Maze: Yew Gate",
+        art: [
+          "  ||||||     ||||||",
+          "  ||  \\       /  ||",
+          "  ||   \\_____/   ||",
+          "  ||             ||",
+        ].join("\n"),
+        desc:
+          "Black yew walls swallow the sky. The front gate is east; passages run west and south, both " +
+          "already looking suspiciously familiar.",
+        searchDesc:
+          "Freshly snapped twigs and one enormous scale lie toward the western passage.",
+        exits: { east: "gate", west: "hedgeMazeKnot", south: "hedgeMazeLoop" },
+      },
+
+    hedgeMazeKnot: {
+        name: "Hedge Maze: Thorn Knot",
+        art: [
+          "  >>>>\\     /<<<<",
+          "  >>>> \\___/ <<<<",
+          "       /   \\",
+          "  <<<< /     \\ >>>>",
+        ].join("\n"),
+        desc:
+          "Three thorn corridors knot together beneath clawed branches. The air to the south smells faintly of apples and smoke.",
+        searchDesc:
+          "A trail of scorched leaves continues south. The western corridor circles toward your own footprints.",
+        exits: { east: "hedgeMazeGate", west: "hedgeMazeLoop", south: "dragonCaveMouth" },
+      },
+
+    hedgeMazeLoop: {
+        name: "Hedge Maze: Crooked Loop",
+        art: [
+          "  /\\/\\/\\/\\/\\/\\",
+          "  \\          /",
+          "   \\  LOOP  /",
+          "    \\/\\/\\/\\/",
+        ].join("\n"),
+        desc:
+          "The hedge bends back on itself with malicious precision. Every opening resembles the one you just used.",
+        searchDesc:
+          "Your overlapping footprints prove the northern opening is a loop; broken thorns point east toward the warmer air.",
+        exits: { north: "hedgeMazeLoop", east: "hedgeMazeKnot", west: "hedgeMazeGate" },
+      },
+
+    dragonCaveMouth: {
+        name: "Dreadmaw's Cave Mouth",
+        art: [
+          "       /\\___/\\",
+          "   ___/  -.-  \\___",
+          "  /____ DREADMAW ___\\",
+          "      \\________/",
+        ].join("\n"),
+        desc:
+          "A cave yawns in a basalt hill, but DREADMAW THE DRAGON sleeps across its entrance — an ancient female dragon " +
+          "vast enough to serve as the door. The maze lies north. The cave is east, entirely blocked by dragon.",
+        searchDesc(ctx) {
+          return ctx.getFlag("dragonMoved")
+            ? "DREADMAW now rests beside the entrance, leaving the passage east open."
+            : "Her nostrils smoke in her sleep. She will have to move before anything enters the cave.";
+        },
+        exits: {
+          north: "hedgeMazeKnot",
+          east: { to: "dragonAntechamber", via: "dragonMoved",
+            lockedMsg: "DREADMAW is sleeping across the entire cave mouth. She has to move first." },
+        },
+      },
+
+    dragonAntechamber: {
+        name: "Dragon Cave Antechamber",
+        flightRequires: "dragonMoved",
+        art: [
+          "  |\\            /|",
+          "  | \\  [####]  / |",
+          "  |  \\  DOOR  /  |",
+          "  |___\\______/___|",
+        ].join("\n"),
+        desc:
+            "The outer cave narrows at a seamless black VAULT DOOR. A broad, warty TROLL sits directly " +
+            "in front of it. DREADMAW's cave mouth is west; the hoard lies east.",
+        searchDesc:
+            "No keyhole interrupts the VAULT DOOR. The TROLL watches you expectantly, as if waiting to ask something.",
+        exits: {
+          west: "dragonCaveMouth",
+            east: { to: "dreadmawVault", via: "dragonVaultOpen",
+            lockedMsg: "The inner VAULT DOOR remains sealed. It seems to be listening for a word." },
+        },
+          on: { talk: answerTrollRiddle },
+      },
+
+    dreadmawVault: {
+        name: "Dreadmaw's Vault",
+        aliases: ["dreadmaw vault", "dragon hoard", "cave of riches", "hoard"],
+        flightRequires: "dragonVaultOpen",
+        art: [
+          "   $  *  $  *  $",
+          "  /_____________\\",
+          " /_$$_GEMS_$$_*__\\",
+          " \\_______________/",
+        ].join("\n"),
+        desc:
+          "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
+          "large gemstones fill DREADMAW'S VAULT. The antechamber is west.",
+        searchDesc:
+          "This is generational dragon wealth, not loose change. DREADMAW's gifted DOUBLOON is the one piece explicitly yours.",
+        exits: { west: "dragonAntechamber" },
+      },
 
     privy: {
       name: "Ivy-Choked Privy",
@@ -2043,6 +2211,12 @@ export const world = {
       desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
       on: { drink: drinkMilk },
     },
+    apple: {
+      names: ["apple"], adjectives: ["red", "crisp", "kitchen"],
+      loc: "kitchen", takeable: true, edible: true,
+      roomDesc: "A single crisp red APPLE sits in a shallow pantry basket.",
+      desc: "A flawless red apple. In this kitchen, its lack of mould is almost supernatural.",
+    },
     toilet: {
       names: ["toilet", "hole", "latrine", "loo"], adjectives: ["outhouse", "dark", "earthen"],
       loc: "privy", fixed: true, container: true, open: true, capacity: 8,
@@ -2052,6 +2226,39 @@ export const world = {
         sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet,
         examine: inspectToilet,
       },
+    },
+    dreadmaw: {
+      names: ["dragon", "dreadmaw", "wyrm"], adjectives: ["sleeping", "female", "vast", "ashen"],
+      loc: "dragonCaveMouth", fixed: true, scenery: true,
+      desc: "DREADMAW THE DRAGON: an ancient female dragon armoured in plates like burnt cathedral stone. " +
+        "She is sleeping directly across the cave entrance.",
+      on: {
+        talk: talkToDragon, wake: wakeDragon, give: giveDragon, put: giveDragon,
+        move: dragonFire, push: dragonFire, pull: dragonFire, touch: dragonFire,
+        attack: dragonFire, climb: dragonFire,
+      },
+    },
+    goldDoubloon: {
+      names: ["doubloon", "coin"], adjectives: ["gold", "dragon", "dreadmaw"],
+      loc: null, takeable: true,
+      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed.",
+    },
+    dragonVaultDoor: {
+      names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
+      loc: "dragonAntechamber", fixed: true, scenery: true,
+      desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
+      on: { talk: answerTrollRiddle },
+    },
+    caveTroll: {
+      names: ["troll", "guard"], adjectives: ["cave", "warty", "broad", "male"],
+      loc: "dragonAntechamber", fixed: true, scenery: true,
+      desc: "A broad male TROLL with granite-coloured warts sits before the VAULT DOOR. He looks more literary than hungry.",
+      on: { talk: talkToTroll, wake: talkToTroll },
+    },
+    dragonHoard: {
+      names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
+      loc: "dreadmawVault", fixed: true, scenery: true,
+      desc: "A mountainous dragon hoard: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],

@@ -45,6 +45,9 @@ auto-saves to your browser.
   cellar, well, and toilet)
   A revealed SAFE accepts `open safe with 7 3 9`, or `open safe` followed by
   typing `7 3 9`.
+- **DREADMAW:** the FRONT GATE leads west into a small HEDGE MAZE. Jostling the
+  sleeping dragon gets you burned; bring the kitchen APPLE and use variants such
+  as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
 - **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 
