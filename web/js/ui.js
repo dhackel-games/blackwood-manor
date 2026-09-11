@@ -15,6 +15,7 @@ import {
 } from "./issue-report.js";
 import {
   DEFAULT_GARY_VOICE_PRESET,
+  estimatedSpeechDurationMs,
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js";
@@ -32,6 +33,7 @@ const phoneBillEl = document.getElementById("phone-bill");
 const garyVoiceSelect = document.getElementById("gary-voice");
 let callTimer = null;
 let callSeconds = 0;
+let endingCall = false;
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
 const hud = createHud(document);
@@ -117,6 +119,12 @@ function garyLineLabel() {
   return "Hint Line · 99¢/min";
 }
 function showPhone() {
+  endingCall = false;
+  phone.removeAttribute("aria-busy");
+  const endButton = document.getElementById("phone-end");
+  endButton.disabled = false;
+  endButton.classList.remove("closing");
+  endButton.style.removeProperty("--end-call-duration");
   phoneT.innerHTML = "";
   callSeconds = 0;
   phoneTimer.textContent = "00:00";
@@ -133,7 +141,16 @@ function endCallUI() {
   clearInterval(callTimer);
   callTimer = null;
   phone.classList.remove("show");
-  setTimeout(() => { phone.hidden = true; if (canType) input.focus(); }, 450);
+  setTimeout(() => {
+    phone.hidden = true;
+    phone.removeAttribute("aria-busy");
+    const endButton = document.getElementById("phone-end");
+    endButton.disabled = false;
+    endButton.classList.remove("closing");
+    endButton.style.removeProperty("--end-call-duration");
+    endingCall = false;
+    if (canType) input.focus();
+  }, 450);
 }
 
 function updateHud() {
@@ -163,11 +180,13 @@ try {
 if (garyVoiceSelect) garyVoiceSelect.value = garyVoicePreset;
 function refreshGaryVoice() {
   if (!("speechSynthesis" in window)) return;
+  const profile = garyVoiceProfile(garyVoicePreset);
   garyVoice = pickGaryVoice(speechSynthesis.getVoices(), garyVoicePreset);
   if (garyVoiceSelect) {
+    garyVoiceSelect.setAttribute("aria-label", `Gary voice: ${profile.label}`);
     garyVoiceSelect.title = garyVoice
-      ? `System voice: ${garyVoice.name}`
-      : "No matching system voice is installed";
+      ? `${profile.label} — system voice: ${garyVoice.name}`
+      : `${profile.label} — no matching system voice is installed`;
   }
 }
 if ("speechSynthesis" in window) {
@@ -177,27 +196,43 @@ if ("speechSynthesis" in window) {
   garyVoiceSelect.disabled = true;
 }
 function garySpeak(text) {
-  if (ttsMuted || !text || !("speechSynthesis" in window)) return;
+  if (ttsMuted || !text || !("speechSynthesis" in window)) return Promise.resolve();
   // strip stage directions like *click* / *chewing* so he doesn't read them aloud
   // Drop MAP_MARK blocks entirely — nobody wants the torn edge read aloud.
   const spoken = text.split(MAP_MARK).filter((_, i) => i % 2 === 0).join(" ")
     .replace(/\*[^*]*\*/g, " ").replace(/\s+/g, " ").trim();
-  if (!spoken) return;
-  try {
-    const u = new SpeechSynthesisUtterance(spoken);
-    if (garyVoice) u.voice = garyVoice;
-    const profile = garyVoiceProfile(garyVoicePreset);
-    u.pitch = profile.pitch;
-    u.rate = profile.rate;
-    // Chrome DROPS an utterance if cancel() and speak() run back-to-back.
-    // Only cancel when something's already playing, and defer the new speak.
-    if (speechSynthesis.speaking || speechSynthesis.pending) {
-      speechSynthesis.cancel();
-      setTimeout(() => { try { speechSynthesis.speak(u); } catch { /* ignore */ } }, 130);
-    } else {
-      speechSynthesis.speak(u);
+  if (!spoken) return Promise.resolve();
+  return new Promise((resolve) => {
+    try {
+      const u = new SpeechSynthesisUtterance(spoken);
+      if (garyVoice) u.voice = garyVoice;
+      const profile = garyVoiceProfile(garyVoicePreset);
+      u.pitch = profile.pitch;
+      u.rate = profile.rate;
+      let finished = false;
+      const finish = () => {
+        if (finished) return;
+        finished = true;
+        resolve();
+      };
+      u.onend = finish;
+      u.onerror = finish;
+      const speak = () => {
+        if (ttsMuted) { finish(); return; }
+        try { speechSynthesis.speak(u); } catch { finish(); }
+      };
+      // Chrome DROPS an utterance if cancel() and speak() run back-to-back.
+      // Only cancel when something's already playing, and defer the new speak.
+      if (speechSynthesis.speaking || speechSynthesis.pending) {
+        speechSynthesis.cancel();
+        setTimeout(speak, 130);
+      } else {
+        speak();
+      }
+    } catch {
+      resolve();
     }
-  } catch { /* ignore */ }
+  });
 }
 function stopSpeaking() { if ("speechSynthesis" in window) try { speechSynthesis.cancel(); } catch {} }
 
@@ -305,6 +340,9 @@ const speechAvailable = !!(nativeSpeech || WebSR);
 let listening = false;
 let speechTarget = input;
 let webRec = null;
+let webTranscript = "";
+let webPartial = "";
+let webRestartTimer = null;
 
 let activeMic = null;
 function setListening(on) {
@@ -315,10 +353,57 @@ function setListening(on) {
   }
 }
 
+function speechRecognitionFailed(error) {
+  setListening(false);
+  const detail = error ? ` (${error})` : "";
+  const message = `Speech recognition stopped${detail}. Tap the microphone to try again.`;
+  speechTarget === phoneCmd ? printToPhone(message, "sys") : print(message, "sys");
+}
+
+function beginWebRecognition() {
+  if (!listening || !WebSR) return;
+  const recognition = new WebSR();
+  webRec = recognition;
+  recognition.lang = "en-US";
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.onresult = (event) => {
+    if (!listening) return;
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const text = event.results[i][0].transcript;
+      if (event.results[i].isFinal) webTranscript += text.trim() + " ";
+      else interim += text;
+    }
+    webPartial = interim;
+    speechTarget.value = (webTranscript + webPartial).trim();
+  };
+  recognition.onerror = (event) => {
+    if (!listening || event.error === "no-speech" || event.error === "aborted") return;
+    speechRecognitionFailed(event.error);
+  };
+  recognition.onend = () => {
+    if (webRec === recognition) webRec = null;
+    if (listening && webPartial.trim()) {
+      webTranscript += webPartial.trim() + " ";
+      webPartial = "";
+      speechTarget.value = webTranscript.trim();
+    }
+    if (listening) webRestartTimer = setTimeout(beginWebRecognition, 100);
+  };
+  try {
+    recognition.start();
+  } catch (error) {
+    speechRecognitionFailed(error?.message || "unavailable");
+  }
+}
+
 function startListening(targetInput, micBtn) {
   if (!speechAvailable || listening) return;
   speechTarget = targetInput;
   activeMic = micBtn;
+  webTranscript = "";
+  webPartial = "";
   stopSpeaking();                 // don't record Gary's own voice
   targetInput.dataset.ph = targetInput.getAttribute("placeholder") || "";
   targetInput.value = "";         // start clean so nothing stale is appended
@@ -327,24 +412,23 @@ function startListening(targetInput, micBtn) {
   if (nativeSpeech) {
     nativeSpeech.postMessage({ action: "start" });
   } else if (WebSR) {
-    webRec = new WebSR();
-    webRec.lang = "en-US";
-    webRec.interimResults = true;
-    webRec.continuous = false;
-    webRec.onresult = (e) => {
-      const t = Array.from(e.results).map((r) => r[0].transcript).join("");
-      speechTarget.value = t;
-      if (e.results[e.results.length - 1].isFinal) finishListening(t);
-    };
-    webRec.onerror = () => setListening(false);
-    webRec.onend = () => { if (listening) setListening(false); };
-    try { webRec.start(); } catch { setListening(false); }
+    beginWebRecognition();
   }
 }
 function stopListening() {
-  if (nativeSpeech) nativeSpeech.postMessage({ action: "stop" });
-  if (webRec) try { webRec.stop(); } catch {}
+  if (nativeSpeech) {
+    nativeSpeech.postMessage({ action: "stop" });
+    setListening(false);
+    return;
+  }
+  const text = (webTranscript + webPartial).trim();
   setListening(false);
+  if (webRestartTimer) clearTimeout(webRestartTimer);
+  webRestartTimer = null;
+  const recognition = webRec;
+  webRec = null;
+  if (recognition) try { recognition.stop(); } catch {}
+  finishListening(text);
 }
 function finishListening(text) {
   setListening(false);
@@ -368,9 +452,33 @@ function newGame() {
   updateHud();
 }
 
+function finishPhoneCall(message) {
+  printToPhone(message, "gary");
+  phoneT.scrollTop = phoneT.scrollHeight;
+  updatePhoneStatus();
+  endingCall = true;
+  phone.setAttribute("aria-busy", "true");
+  const profile = garyVoiceProfile(garyVoicePreset);
+  const canSpeak = !ttsMuted && "speechSynthesis" in window;
+  const duration = canSpeak ? estimatedSpeechDurationMs(message, profile.rate) : 1400;
+  phoneEnd.disabled = true;
+  phoneEnd.style.setProperty("--end-call-duration", `${duration}ms`);
+  phoneEnd.classList.add("closing");
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const speechDone = canSpeak
+    ? Promise.race([garySpeak(message), wait(duration + 5000)])
+    : Promise.resolve();
+  Promise.all([speechDone, wait(duration)]).then(() => {
+    endCallUI();
+    print("(You hang up. Phone bill so far: " + billText() + ".)", "echo");
+    updateHud();
+  });
+}
+
 function handle(raw) {
   let cmd = raw.trim();
-  if (!cmd) return;
+  if (!cmd || endingCall) return;
   const onCall = !!game.state.flags.onCall;
 
   // Echo to whichever screen is active.
@@ -460,12 +568,7 @@ function handle(raw) {
   }
 
   if (onCall) {                        // the call just ended → switch back to the game
-    printToPhone(out, "gary");
-    garySpeak(out);
-    updatePhoneStatus();
-    endCallUI();
-    print("(You hang up. Phone bill so far: " + billText() + ".)", "echo");
-    updateHud();
+    finishPhoneCall(out);
     return;
   }
 
@@ -541,7 +644,7 @@ if (!canType) {
   });
 }
 
-// Voice toggle — tap the big GARY avatar (or the hint under it). Muted by default.
+// Voice toggle — tap the speaker avatar (or the hint under it). Muted by default.
 const muteBtn = document.getElementById("phone-mute");     // the hint text under the name
 const phoneAvatar = document.getElementById("phone-avatar");
 function setMuteLabel() {

@@ -210,7 +210,7 @@ body { -webkit-text-size-adjust: 100%; }
 }
 .linkbtn:active { color: var(--green-bright); }
 
-/* Tap the big GARY avatar (or the hint under it) to toggle Gary's voice — muted by default. */
+/* Tap the speaker avatar (or the hint under it) to toggle Gary's voice — muted by default. */
 .phone-avatar { cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 0.1s ease; }
 .phone-avatar:active { transform: scale(0.95); }
 .phone-avatar:not(.muted) {   /* voice ON: solid glow, calm (stop the attention pulse) */
@@ -229,7 +229,7 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #phone-mute.voice-hint.on { color: var(--dim); font-weight: 400; }  /* voice on = quiet hint */
 #gary-voice {
-  max-width: 10.5rem; min-height: 1.8rem; padding: 0.15rem 0.25rem;
+  width: 3.75rem; min-height: 1.8rem; padding: 0.15rem 0.25rem;
   color: var(--green-bright); background: rgba(67, 255, 122, 0.06);
   border: 1px solid var(--dim); border-radius: 5px;
   font: inherit; font-size: 0.8rem; cursor: pointer;
@@ -272,7 +272,7 @@ body { -webkit-text-size-adjust: 100%; }
   width: 82px; height: 82px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   border: 2px solid var(--dim); background: rgba(67, 255, 122, 0.06);
-  color: var(--green-bright); font-size: 1.2rem; letter-spacing: 2px;
+  color: var(--green-bright); font-size: 2rem; letter-spacing: 2px;
   animation: ring 1.6s ease-in-out infinite;
 }
 @keyframes ring { 0%,100%{ box-shadow: 0 0 0 0 rgba(67,255,122,0.25);} 50%{ box-shadow: 0 0 0 8px rgba(67,255,122,0);} }
@@ -345,11 +345,27 @@ body { -webkit-text-size-adjust: 100%; }
   border-radius: 6px; color: var(--green-bright); font: inherit; font-size: 0.95rem;
   text-shadow: inherit; cursor: pointer; touch-action: manipulation;
 }
+#phone-go span {
+  display: inline-block;
+  line-height: 1;
+  transform: scale(2);
+}
 #phone-go:active { background: rgba(67, 255, 122, 0.25); }
 #phone-end {
+  position: relative; overflow: hidden;
   min-height: 3rem; border: none; border-radius: 12px;
   background: #b0322a; color: #fff; font: inherit; font-size: 1.05rem;
   font-weight: bold; letter-spacing: 1px; cursor: pointer; touch-action: manipulation;
   text-shadow: none;
 }
+#phone-end::before {
+  content: ""; position: absolute; inset: 0; z-index: 0;
+  background: #e0483c; transform: scaleX(0); transform-origin: left;
+}
+#phone-end.closing::before {
+  animation: end-call-progress var(--end-call-duration, 1400ms) linear forwards;
+}
+#phone-end span { position: relative; z-index: 1; }
+#phone-end:disabled { color: #fff; opacity: 1; cursor: wait; }
+@keyframes end-call-progress { to { transform: scaleX(1); } }
 #phone-end:active { background: #e0483c; }
