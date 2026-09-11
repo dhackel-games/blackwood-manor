@@ -999,7 +999,7 @@ const FIRE_ART = [
   "      _(___)_(___)_",
 ].join("\n");
 const SICK_ART = [
-  "     \\o/   ~ B L E A R G H ~     🤢  BURP · BARF · FART · POOP  🔥",
+  "     \\o/   ~ B L E A R G H ~     BURP 🫧 · BARF 🤮 · FART 💨 · POOP 💩",
   "      |    ~ ~ ~",
   "     / \\   . : . : .",
 ].join("\n");

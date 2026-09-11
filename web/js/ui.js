@@ -142,7 +142,7 @@ function updateHud() {
     hudBm.textContent = `💩 BM ▐${"█".repeat(filled)}${"░".repeat(width - filled)}▌ ${digestion.percent}%`;
     hudSick.hidden = false;
     hudSick.textContent =
-      `🤮 ${digestion.remaining} turns · ${digestion.emoji} ${digestion.name} (${digestion.phaseIndex + 1}/4)`;
+      `🤮 ${digestion.remaining} turns · ${digestion.name} ${digestion.emoji} (${digestion.phaseIndex + 1}/4)`;
   } else {
     hudBm.hidden = true;
     hudBm.textContent = "";
