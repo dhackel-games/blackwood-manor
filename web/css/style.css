@@ -212,12 +212,23 @@ body { -webkit-text-size-adjust: 100%; }
   box-shadow: 0 0 16px rgba(67, 255, 122, 0.6);
   animation: none;
 }
+.voice-controls {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.25rem;
+  margin: 3px auto 2px;
+}
 #phone-mute.voice-hint {
-  display: block; margin: 3px auto 2px; padding: 2px 8px;
+  display: inline-block; margin: 0; padding: 2px 4px;
   text-align: center; font-size: 0.85rem; font-weight: 700;
   color: var(--green-bright); background: none; border: none; cursor: pointer;
 }
 #phone-mute.voice-hint.on { color: var(--dim); font-weight: 400; }  /* voice on = quiet hint */
+#gary-voice {
+  max-width: 10.5rem; min-height: 1.8rem; padding: 0.15rem 0.25rem;
+  color: var(--green-bright); background: rgba(67, 255, 122, 0.06);
+  border: 1px solid var(--dim); border-radius: 5px;
+  font: inherit; font-size: 0.8rem; cursor: pointer;
+}
+#gary-voice:disabled { opacity: 0.45; cursor: default; }
 .phone-status { text-align: center; }
 
 /* Collapse Gary's big header while typing on the call screen (touch), so the

@@ -288,6 +288,10 @@ the mansion.
 - **Gary speaks** via Web `speechSynthesis` (low, gruff), muted by default for work safety.
   **Toggle by tapping the pulsing "GARY" avatar** on the call screen (or the hint under it);
   avatar glows solid when voice is on.
+- A compact selector beside the mute hint provides four remembered presets: COMPUTER MALE
+  (the original Fred-style novelty voice), COMPUTER FEMALE, AUSTRALIAN MALE, and AUSTRALIAN
+  FEMALE. Each preset prefers known system voices, falls back by locale, and supplies its
+  own pitch and rate.
 - **Speech-to-text:** browsers use `webkitSpeechRecognition`; the iOS app uses a native
   `SFSpeechRecognizer` bridge exposed as `window.webkit.messageHandlers.speech`.
 

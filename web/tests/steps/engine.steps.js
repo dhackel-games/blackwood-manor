@@ -10,6 +10,11 @@ import {
   bugReportUrl,
   DEFAULT_ISSUE_DESCRIPTION,
 } from "../../js/issue-report.js";
+import {
+  GARY_VOICE_PRESETS,
+  garyVoiceProfile,
+  pickGaryVoice,
+} from "../../js/gary-voice.js";
 import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
 
@@ -357,6 +362,33 @@ Then("a Bug command uses its phrase as the issue description", function () {
 Then("Gary's send control contains only an up arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*↑\s*<\/button>/);
+});
+
+Then("Gary offers male and female computer and Australian voices", function () {
+  const expected = [
+    ["computer-male", "Computer male", "Fred"],
+    ["computer-female", "Computer female", "Kathy"],
+    ["australian-male", "Australian male", "Lee"],
+    ["australian-female", "Australian female", "Karen"],
+  ];
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const voices = expected.map(([, , name], index) => ({
+    name,
+    lang: index < 2 ? "en-US" : "en-AU",
+  }));
+  assert.deepEqual(GARY_VOICE_PRESETS.map(({ id, label }) => [id, label]),
+    expected.map(([id, label]) => [id, label]));
+  for (const [id, label, voiceName] of expected) {
+    assert.match(html, new RegExp(`<option value=["']${id}["']>${label}</option>`));
+    assert.equal(garyVoiceProfile(id).label, label);
+    assert.equal(pickGaryVoice(voices, id).name, voiceName);
+  }
+});
+
+Then("Gary remembers the selected voice preset", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /localStorage\.getItem\(GARY_VOICE_PRESET_KEY\)/);
+  assert.match(ui, /localStorage\.setItem\(GARY_VOICE_PRESET_KEY, garyVoicePreset\)/);
 });
 
 Then("the movement controls are labeled In and Out", function () {
