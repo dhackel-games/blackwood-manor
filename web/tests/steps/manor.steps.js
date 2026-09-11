@@ -309,6 +309,22 @@ Then("headlamp status has {int} turn(s)", function (remaining) {
   assert.equal(status.remaining, remaining);
 });
 
+Then("vision status has {int} turn(s)", function (remaining) {
+  assert.deepEqual(world.visionStatus(this.game), { permanent: false, remaining });
+});
+
+Then("flight status has {int} turn(s)", function (remaining) {
+  assert.deepEqual(world.flightStatus(this.game), { permanent: false, remaining });
+});
+
+Then("vision status is permanent", function () {
+  assert.deepEqual(world.visionStatus(this.game), { permanent: true });
+});
+
+Then("flight status is permanent", function () {
+  assert.deepEqual(world.flightStatus(this.game), { permanent: true });
+});
+
 Then("the inline bowel status matches the current digestive state", function () {
   const status = world.digestiveStatus(this.game);
   assert.ok(status, "digestive status must be active");
@@ -321,6 +337,18 @@ Then("every sickness event drawing is marked as non-wrapping output", function (
   for (const marker of ["B U R P", "B L E A R G H", "F O O M P", "S P L U R T"]) {
     assert.ok(artBlocks.some((block) => block.includes(marker)), `${marker} must be in an art block`);
   }
+});
+
+Then("the map sprocket holes are column-aligned", function () {
+  const map = this.output.split(MAP_MARK)[1];
+  assert.ok(map, "Expected MAP output");
+  const rows = map.split("\n");
+  const sprocketRows = rows.filter((row) => row.startsWith("  o  "));
+  assert.ok(sprocketRows.length > 2, "Expected multiple sprocket-hole rows");
+  assert.deepEqual([...new Set(rows.map((row) => row.length))], [rows[0].length]);
+  assert.deepEqual([...new Set(sprocketRows.map((row) => row.indexOf("o")))], [2]);
+  assert.deepEqual([...new Set(sprocketRows.map((row) => row.lastIndexOf("o")))],
+    [sprocketRows[0].lastIndexOf("o")]);
 });
 
 Then("the output contains regex {string} exactly {int} time", function (pattern, count) {

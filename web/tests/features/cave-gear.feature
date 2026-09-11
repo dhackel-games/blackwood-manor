@@ -79,6 +79,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "wear goggles"
     Then the output contains "(get goggles, wear goggles)"
     And item "xrayGoggles" is worn in slot "eyes"
+    And vision status is permanent
     When the player moves directly to room "garden"
     And I send "look"
     Then the output contains "XRAY VISION"
@@ -95,6 +96,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       down
       """
     Then the current room is "hiddenVault"
+    And flight status is permanent
 
   Scenario: WINGED SHOES protect against open vertical hazards
     Given item "wingedShoes" is carried
