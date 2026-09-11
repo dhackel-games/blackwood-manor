@@ -150,6 +150,15 @@ Then("every manor room has searchable detail and narrow ASCII art", function () 
   }
 });
 
+Then("these room descriptions contain uppercase interactables:", function (table) {
+  for (const row of table.hashes()) {
+    const description = world.rooms[row.room].desc;
+    for (const label of row.labels.split(",")) {
+      assert.ok(description.includes(label), `${row.room} must emphasize ${label}`);
+    }
+  }
+});
+
 Then("these Gary lines are mechanical:", function (table) {
   for (const [line] of table.raw()) {
     assert.equal(world.garyTurnInfo(this.game, line).llmOk, false, line);

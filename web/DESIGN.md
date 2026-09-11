@@ -338,7 +338,7 @@ the mansion.
   `sick`: stomach-acid burp → barf → flaming fart → spicy, sparking diarrhea. That four-turn
   cycle repeats ten times and is lethal after its 40th uncured beat. Each event carries its
   own non-wrapping ASCII drawing rendered through the same mobile-safe block path as MAP MODE.
-- **Good cheese** → real food: cures affliction, +5, "fortified" (and the "Ate Well" badge).
+- **Cold milk** → a drinkable cure for the affliction, +5, "fortified" (and the "Got Milk?" badge).
 - **The privy** (ivy-choked outhouse east of the garden) has a **toilet**: `sit`/`use`/`flush`
   cures the sickness and cancels any queued fart-flame ignition.
 
@@ -347,7 +347,7 @@ the mansion.
   🔥 after "alive").
 - 🕯️ **"The Old Ways"** — lit the brazier with your own body.
 - 🥵 **"Slow Burn"** — stayed ablaze 4+ turns and lived.
-- 🧀 **"Ate Well"** — ate the good cheese.
+- 🥛 **"Got Milk?"** — drank the curative milk.
 
 ## 12.11 Testing
 `npm test` runs all executable Gherkin. `npm run test:unit` selects engine state, parsing,

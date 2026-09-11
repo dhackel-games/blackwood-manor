@@ -806,17 +806,17 @@ function eatBurrito(ctx) {
   ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
   return "You eat Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
     "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
-    "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or eat the good cheese before " +
+    "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or drink the MILK before " +
     "this completes ten full digestive laps.)";
 }
-function eatProvisions(ctx) {
-  ctx.destroy("provisions");
+function drinkMilk(ctx) {
+  ctx.destroy("milk");
   const wasAfflicted = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
   ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
   ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
-  ctx.setFlag("ateGood", true);
+  ctx.setFlag("drankMilk", true);
   ctx.addScore(5);
-  return "You eat the good cheese. Real food, at last.\n\n" +
+  return "You drink the milk. Cold, fresh, and impossibly wholesome.\n\n" +
     (wasAfflicted ? "Your stomach settles and your head clears — whatever was wrong with you passes. " : "") +
     "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)";
 }
@@ -867,7 +867,7 @@ function afflictionTick(ctx) {
     }
 
     if (left <= 4 && left > 0)
-      out.push("You are dangerously dehydrated. Find a TOILET or the good cheese NOW.");
+      out.push("You are dangerously dehydrated. Find a TOILET or drink the MILK NOW.");
     if (left === 0) out.push(ctx.kill(SICK_DEATH));        // ten complete four-beat cycles
   }
   return out.length ? out.join("\n") : null;
@@ -924,8 +924,8 @@ function endBadges(ctx) {
     b.push("🕯️ BADGE: \"The Old Ways\" — you lit the ceremonial brazier with your own burning body.");
   if ((ctx.getFlag("maxBurnTurns") || 0) >= 4)
     b.push("🥵 BADGE: \"Slow Burn\" — you stayed ablaze for " + ctx.getFlag("maxBurnTurns") + " turns and lived to tell it.");
-  if (ctx.getFlag("ateGood"))
-    b.push("🧀 BADGE: \"Ate Well\" — you found the one thing in that kitchen worth eating.");
+  if (ctx.getFlag("drankMilk"))
+    b.push("🥛 BADGE: \"Got Milk?\" — you found the one thing in that kitchen worth drinking.");
   return b.length ? "\n\n" + b.join("\n") : "";
 }
 
@@ -1096,20 +1096,20 @@ export const world = {
       name: "Overgrown Garden",
       art: ROOM_ART.garden,
       desc:
-        "Brambles have swallowed what was once a formal garden. A weathered stone statue " +
-        "of a robed woman leans amid the weeds, and a crumbling well shaft plunges into " +
-        "blackness. A cold iron brazier stands nearby. An ivy-choked brick privy squats to " +
+        "Brambles have swallowed what was once a formal garden. A weathered stone STATUE " +
+        "of a robed woman leans amid the weeds, and a crumbling WELL shaft plunges into " +
+        "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick privy squats to " +
         "the east; the gate lies back to the west.",
       searchDesc(ctx) {
         if (!ctx.getFlag("statueMoved")) {
-          return "The weeds around the leaning statue are crushed, and its base has scraped a shallow arc through " +
-            "the soil. It looks heavy, but not immovable. The well would require a sound rope.";
+          return "The weeds around the leaning STATUE are crushed, and its base has scraped a shallow arc through " +
+            "the soil. It looks heavy, but not immovable. The WELL would require a sound ROPE.";
         }
         if (!ctx.getFlag("wellLooted")) {
-          return "The disturbed statue base has surrendered its secret. Wear on the well's lip suggests a rope could " +
-            "make the descent survivable; old scorch marks around the brazier suggest a much larger flame.";
+          return "The disturbed STATUE base has surrendered its secret. Wear on the WELL's lip suggests a ROPE could " +
+            "make the descent survivable; old scorch marks around the BRAZIER suggest a much larger flame.";
         }
-        return "The statue and well have yielded what they hid. Only the grave-damp brazier still looks expectant.";
+        return "The STATUE and WELL have yielded what they hid. Only the grave-damp BRAZIER still looks expectant.";
       },
       extraDirections: ["down"],
       exits: { west: "gate", east: "privy" },
@@ -1130,7 +1130,7 @@ export const world = {
         "odds and several laws of hygiene, it still flushes. The garden lies back to the west.",
       searchDesc:
         "The ancient plumbing is genuinely connected and the seat is load-bearing. If your stomach ever declares " +
-        "war, using this toilet may be the closest thing in the manor to medicine.",
+        "war, using this TOILET may be the closest thing in the manor to medicine.",
       exits: { west: "garden" },
     },
 
@@ -1138,13 +1138,13 @@ export const world = {
       name: "Front Porch",
       art: ROOM_ART.porch,
       desc:
-        "The porch boards sag underfoot. A brass mailbox is bolted beside a great oak " +
-        "front door, its wood black with age. The path returns south to the gate.",
+        "The porch boards sag underfoot. A brass MAILBOX is bolted beside a great oak " +
+        "FRONT DOOR, its wood black with age. The path returns south to the gate.",
       searchDesc(ctx) {
         const mailbox = ctx.item("mailbox");
         return mailbox && mailbox.open
-          ? "The open mailbox has no false back. The front door's iron lock is old but functional; it needs a real key."
-          : "The mailbox lid has a finger-worn edge and no lock. The front door's iron keyhole is too large for subtle tools.";
+          ? "The open MAILBOX has no false back. The FRONT DOOR's iron lock is old but functional; it needs a real KEY."
+          : "The MAILBOX lid has a finger-worn edge and no lock. The FRONT DOOR's iron keyhole is too large for subtle tools.";
       },
       exits: {
         south: "gate",
@@ -1158,17 +1158,17 @@ export const world = {
       desc:
         "A vast, cobwebbed hall rises two storeys to a shattered chandelier. A grand " +
         "staircase climbs up into shadow. Set into the far wall is a stone RELIQUARY, and " +
-        "above it hangs a great brass bell on a frayed rope. Doorways lead east to the " +
+        "above it hangs a great brass BELL on a frayed rope. Doorways lead east to the " +
         "parlor and west to the dining room; the porch lies south.",
       searchDesc(ctx) {
         if (ctx.getFlag("bellRung")) {
-          return "The bell is spent. Fresh stone dust outlines the impossible door in the north wall, and the bone " +
-            "key's tooth-shaped profile matches its lock.";
+          return "The BELL is spent. Fresh stone dust outlines the impossible SECRET DOOR in the north wall, and the BONE " +
+            "KEY's tooth-shaped profile matches its lock.";
         }
         if (ctx.getFlag("curseLiftable")) {
-          return "Every filled recess in the reliquary glows faintly. Above it, the bell rope trembles though the air is still.";
+          return "Every filled recess in the RELIQUARY glows faintly. Above it, the BELL rope trembles though the air is still.";
         }
-        return "The reliquary contains seven heirloom-shaped recesses. The bell rope hangs directly above them, " +
+        return "The RELIQUARY contains seven heirloom-shaped recesses. The BELL rope hangs directly above them, " +
           "waiting for a collection not yet complete.";
       },
       exits: {
@@ -1229,8 +1229,8 @@ export const world = {
         "returns west to the hall; a low door leads south to the library.",
       searchDesc(ctx) {
         return ctx.getFlag("safeRevealed")
-          ? "Behind the swung-aside portrait, the iron safe's combination dial shows recent fingerprints."
-          : "The portrait frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
+          ? "Behind the swung-aside PORTRAIT, the iron SAFE's combination dial shows recent fingerprints."
+          : "The PORTRAIT frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
       },
       exits: { west: "grandHall", south: "library" },
     },
@@ -1244,7 +1244,7 @@ export const world = {
       searchDesc(ctx) {
         return ctx.getFlag("leverPulled")
           ? "Scrape marks confirm the open bookcase is a counterweighted door. The concealed stair descends into darkness."
-          : "The brass lever is polished by hands while every nearby book is thick with dust. It was meant to be pulled.";
+          : "The brass LEVER is polished by hands while every nearby book is thick with dust. It was meant to be pulled.";
       },
       exits: {
         north: "parlor",
@@ -1260,7 +1260,7 @@ export const world = {
         "A cramped stone chamber that has not seen daylight in a century. A single lectern " +
         "stands at its centre. The only way out is the stair up.",
       searchDesc:
-        "The lectern's silver clasp-marks fit the grimoire exactly. Nothing else here has survived except the warning chill.",
+        "The lectern's silver clasp-marks fit the GRIMOIRE exactly. Nothing else here has survived except the warning chill.",
       dark: true,
       exits: { up: "library" },
     },
@@ -1273,8 +1273,8 @@ export const world = {
         "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The hall " +
         "is east; a swinging door leads south to the kitchen.",
       searchDesc:
-        "Everything is dust-choked except the candlestick's wick. It is dry and usable, but it will need the manor's " +
-        "single precious match.",
+        "Everything is dust-choked except the CANDLESTICK's wick. It is dry and usable, but it will need the manor's " +
+        "single precious MATCH.",
       exits: { east: "grandHall", south: "kitchen" },
     },
 
@@ -1283,11 +1283,11 @@ export const world = {
       art: ROOM_ART.kitchen,
       desc:
         "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
-        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR door is set in " +
+        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR DOOR is set in " +
         "the floor. The dining room lies north.",
       searchDesc:
-        "The matchbox contains exactly one match. The rope remains sound, the cellar door has a lift-ring, and the " +
-        "sweating super burrito appears to violate several eras of food-safety law.",
+        "The MATCHBOX contains exactly one MATCH. The ROPE remains sound, the CELLAR DOOR has a lift-ring, and the " +
+        "sweating super BURRITO appears to violate several eras of food-safety law.",
       exits: {
         north: "diningRoom",
         down: { to: "wineCellar", via: "cellarOpen", lockedMsg: "The cellar door is shut." },
@@ -1302,8 +1302,8 @@ export const world = {
         "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb up " +
         "to the kitchen; an arch leads south, deeper, into a cold that raises the hairs on your neck.",
       searchDesc:
-        "The decanter is the only intact valuable. Frost rims the southern arch in the shape of grasping fingers; " +
-        "crossing it unprotected feels terminal.",
+        "The DECANTER is the only intact valuable. Frost rims the southern arch in the shape of grasping fingers; " +
+        "crossing it without the TALISMAN feels terminal.",
       dark: true,
       exits: { up: "kitchen", south: "crypt" },
       on: {
@@ -1328,11 +1328,11 @@ export const world = {
       name: "Crypt",
       art: ROOM_ART.crypt,
       desc:
-        "A low crypt of Blackwood dead. The wraith that guards it cowers from the talisman " +
+        "A low crypt of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
         "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
         "LOCKET. The only way out is north.",
       searchDesc:
-        "The talisman's warmth pushes the wraith back whenever you approach the sarcophagus. The gold locket is now within reach.",
+        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
       dark: true,
       exits: { north: "wineCellar" },
     },
@@ -1347,7 +1347,7 @@ export const world = {
       searchDesc(ctx) {
         return ctx.getFlag("ladderDown")
           ? "The lowered attic ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
-          : "The cord is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
+          : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
       },
       extraDirections: (ctx) => ctx.getFlag("ladderDown") ? ["up"] : [],
       exits: { down: "grandHall", west: "nursery", east: "masterBedroom", south: "study" },
@@ -1376,7 +1376,7 @@ export const world = {
         "A child's nursery, its wallpaper peeling in long tongues. A rocking horse stares " +
         "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The landing lies east.",
       searchDesc:
-        "The music box lid has a tiny spring catch. Something metallic rattles inside when the box is tilted.",
+        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted.",
       exits: { east: "landing" },
     },
 
@@ -1387,7 +1387,7 @@ export const world = {
         "A great canopied bed rots beneath a collapsed tester. On the vanity stands a locked " +
         "JEWELRY BOX of dark walnut. The landing lies west.",
       searchDesc:
-        "The jewelry box's keyhole is absurdly small. A normal door key could never fit it; a miniature key might.",
+        "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
       exits: { west: "landing" },
     },
 
@@ -1398,7 +1398,7 @@ export const world = {
         "A book-lined study with a great oak DESK. A leather-bound DIARY lies open upon it, " +
         "as though its writer had just stepped away. The landing lies north.",
       searchDesc:
-        "The diary is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
+        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
       exits: { north: "landing" },
     },
 
@@ -1409,7 +1409,7 @@ export const world = {
         "A vast, raftered attic, silver with moonlight through a broken skylight. Amid the " +
         "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads down.",
       searchDesc:
-        "The ancestral portrait is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
+        "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
       exits: { down: "landing" },
     },
 
@@ -1433,7 +1433,7 @@ export const world = {
         "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
         "Beyond her, an archway opens NORTH onto a growing dawn.",
       searchDesc:
-        "The spirit guards nothing now. The silver mirror lifts freely from its pedestal, and the northern dawn feels like an ending.",
+        "The SPIRIT guards nothing now. The SILVER MIRROR lifts freely from its pedestal, and the northern dawn feels like an ending.",
       extraDirections: ["north"],
       exits: { south: "hollowPassage" },
       on: {
@@ -1470,7 +1470,7 @@ export const world = {
     statue: {
       names: ["statue", "woman"], adjectives: ["stone", "robed"], loc: "garden", fixed: true, scenery: true,
       desc: "A robed stone woman, features worn smooth. She leans oddly, as if something props her up.",
-      on: { move: revealKey, push: revealKey, examine: revealKey },
+      on: { move: revealKey, push: revealKey, pull: revealKey, examine: revealKey },
     },
     well: {
       names: ["well", "shaft"], loc: "garden", fixed: true, scenery: true,
@@ -1540,12 +1540,12 @@ export const world = {
       desc: "The used burrito wrapper is laminated with a stubborn sheet of tin foil. It smells dangerous, but " +
         "its shiny inner surface looks capable of redirecting a brief digestive flame.",
     },
-    provisions: {
-      names: ["cheese", "wheel", "provisions", "rations"], adjectives: ["wax", "hard", "good"],
-      loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A wax-sealed WHEEL OF CHEESE sits untouched in the pantry nook.",
-      desc: "A wax-sealed wheel of hard cheese, somehow still perfectly good. Actual, genuine, edible food.",
-      on: { eat: eatProvisions },
+    milk: {
+      names: ["milk", "bottle"], adjectives: ["cold", "fresh", "glass"],
+      loc: "kitchen", takeable: true, drinkable: true,
+      roomDesc: "A cold BOTTLE OF MILK sits untouched in the pantry nook.",
+      desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
+      on: { drink: drinkMilk },
     },
     toilet: {
       names: ["toilet", "commode", "throne", "loo"], adjectives: ["old", "porcelain", "cracked"],

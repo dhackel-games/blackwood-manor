@@ -159,12 +159,12 @@ export function createGame(world) {
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery);
     for (const it of here) {
-      out += (it.roomDesc || `There is a ${it.names[0]} here.`) + "\n";
+      out += (it.roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {
         const inside = game.itemsIn(it.id);
         if (inside.length) {
           out += `The ${it.names[0]} contains:\n` +
-            inside.map((x) => "  a " + x.names[0]).join("\n") + "\n";
+            inside.map((x) => "  a " + x.names[0].toUpperCase()).join("\n") + "\n";
         }
       }
     }

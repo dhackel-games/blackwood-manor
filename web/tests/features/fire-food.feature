@@ -109,9 +109,11 @@ Feature: Fire and food consequences
     And item "burritoWrapper" is in "inventory"
     When I send "look"
     Then the output matches "FART-FIRE|🤢"
-    When I send "eat cheese"
+    When I send "drink milk"
     Then flag "sick" equals 0
-    And flag "ateGood" is true
+    And flag "drankMilk" is true
+    When I win with "You step into the dawn."
+    Then the output contains "Got Milk?"
 
   Scenario: Carrying match and foil requires an explicit source choice
     Given the player is in room "kitchen"
@@ -188,7 +190,7 @@ Feature: Fire and food consequences
   Scenario: The wrapper self-immolates on demand long after the sickness is cured
     Given the player is in room "kitchen"
     When I send "eat burrito"
-    And I send "eat cheese"
+    And I send "drink milk"
     Then flag "sick" equals 0
     And item "burritoWrapper" is in "inventory"
     When I send "light self on fire"

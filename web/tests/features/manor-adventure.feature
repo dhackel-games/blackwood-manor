@@ -258,4 +258,30 @@ Feature: Blackwood Manor adventure
     Then the output contains "SAFE"
     And item "safe" is in "parlor"
 
+  Scenario: Lifting the statue reveals the hidden key
+    Given the player is in room "garden"
+    When I send "lift statue"
+    Then the output contains "key"
+    And item "frontKey" is in "garden"
+
+  Scenario: Room descriptions emphasize interactable objects
+    Then these room descriptions contain uppercase interactables:
+      | room          | labels                           |
+      | garden        | STATUE,WELL,BRAZIER              |
+      | privy         | TOILET                           |
+      | porch         | MAILBOX,FRONT DOOR               |
+      | grandHall     | RELIQUARY,BELL                   |
+      | parlor        | PORTRAIT                         |
+      | library       | LEVER                            |
+      | diningRoom    | CANDLESTICK                      |
+      | kitchen       | ROPE,MATCHES,CELLAR DOOR         |
+      | wineCellar    | CRYSTAL DECANTER                 |
+      | crypt         | WRAITH,GOLD LOCKET               |
+      | landing       | CORD                             |
+      | nursery       | JEWELED MUSIC BOX                |
+      | masterBedroom | JEWELRY BOX                      |
+      | study         | DESK,DIARY                       |
+      | attic         | ANCESTRAL PORTRAIT               |
+      | hollowSanctum | SPIRIT,SILVER MIRROR             |
+
 # end manor-adventure.feature

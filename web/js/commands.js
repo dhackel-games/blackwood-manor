@@ -72,7 +72,7 @@ function takeAll(ctx, cmd) {
       continue;
     }
     ctx.moveItem(item.id, "inventory");
-    results.push(`${item.names[0]}: Taken.`);
+    results.push(`${item.names[0].toUpperCase()}: Taken.`);
   }
   if (leftBehind.length) {
     results.push(`Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
@@ -143,7 +143,7 @@ export const commands = {
     const inv = ctx.inventory();
     if (!inv.length) return "You are empty-handed.";
     return "You are carrying:\n" +
-      inv.map((i) => "  a " + [...(i.adjectives || []).slice(0, 1), i.names[0]].join(" ")).join("\n");
+      inv.map((i) => "  " + [...(i.adjectives || []).slice(0, 1), i.names[0]].join(" ").toUpperCase()).join("\n");
   },
 
   open(ctx, cmd) {
@@ -157,7 +157,7 @@ export const commands = {
     const inside = it.container ? ctx.itemsIn(it.id) : [];
     if (inside.length)
       return `You open the ${it.names[0]}, revealing ` +
-        inside.map((x) => "a " + x.names[0]).join(", ") + ".";
+        inside.map((x) => x.names[0].toUpperCase()).join(", ") + ".";
     return `You open the ${it.names[0]}.`;
   },
 
