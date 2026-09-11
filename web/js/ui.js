@@ -8,7 +8,7 @@ import { VERSION } from "./version.js";
 import { createHud } from "./hud.js";
 import * as garyBrain from "./gary-brain.js";
 import { MAP_MARK } from "./map.js";
-import { bugReportUrl } from "./issue-report.js";
+import { bugReportDescription, bugReportUrl } from "./issue-report.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -128,6 +128,14 @@ function endCallUI() {
 
 function updateHud() {
   hud.update({ game, world });
+}
+
+function openBugReport(description = "") {
+  window.open(
+    bugReportUrl(game.room().name, description),
+    "_blank",
+    "noopener,noreferrer",
+  );
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----
@@ -327,6 +335,16 @@ function handle(raw) {
   }
   const low = cmd.toLowerCase();
 
+  const bugDescription = bugReportDescription(cmd);
+  if (bugDescription !== null) {
+    openBugReport(bugDescription);
+    const message = bugDescription
+      ? "Opening a GitHub issue with your description."
+      : "Opening a GitHub issue.";
+    onCall ? printToPhone(message, "sys") : print(message, "sys");
+    return;
+  }
+
   // restart/quit are UI meta-verbs and must work from ANYWHERE — including the
   // call screen. Otherwise a game that ends mid-call strands you on the phone,
   // where the engine refuses every command. Tear down the phone overlay first.
@@ -501,9 +519,7 @@ const phoneMicBtn = document.getElementById("phone-mic");
 micBtn.addEventListener("click", () => { listening ? stopListening() : startListening(input, micBtn); });
 phoneMicBtn.addEventListener("click", () => { listening ? stopListening() : startListening(phoneCmd, phoneMicBtn); });
 if (bugReport) {
-  bugReport.addEventListener("click", () => {
-    window.open(bugReportUrl(game.room().name), "_blank", "noopener,noreferrer");
-  });
+  bugReport.addEventListener("click", () => openBugReport());
 }
 
 // --- touch controls ---

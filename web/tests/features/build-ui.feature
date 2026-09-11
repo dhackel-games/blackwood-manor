@@ -26,6 +26,7 @@ Feature: Build metadata and touch-control contract
   Scenario: Bug reports open the repository issue form outside the game
     Then the page has an icon-only Bug button
     And bug reports include the current room in the issue title
+    And a Bug command uses its phrase as the issue description
     And the iOS wrapper opens new-window web links externally
 
   Scenario: Gary uses an icon-only send control
