@@ -857,7 +857,12 @@ function capabilityStatus(ctx, equipmentFlag) {
   return remaining > 0 ? { permanent: false, remaining } : null;
 }
 function visionStatus(ctx) {
-  return capabilityStatus(ctx, "grantsMushroomVision");
+  if (ctx.inventory().some((item) =>
+    item.worn && (item.grantsMushroomVision || item.grantsDarkSight))) {
+    return { permanent: true };
+  }
+  const remaining = ctx.getFlag("high") || 0;
+  return remaining > 0 ? { permanent: false, remaining } : null;
 }
 function flightStatus(ctx) {
   return capabilityStatus(ctx, "grantsFlight");
@@ -866,11 +871,18 @@ function canFly(ctx) {
   return !!flightStatus(ctx);
 }
 function hasMushroomVision(ctx) {
-  return !!visionStatus(ctx);
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) => item.worn && item.grantsMushroomVision);
+}
+function hasDarkVision(ctx) {
+  return ctx.inventory().some((item) => item.worn && item.grantsDarkSight);
 }
 function headlampStatus(ctx) {
   const lamp = ctx.item("headlamp");
   return lamp?.worn && lamp.lit && lamp.fuel > 0 ? { remaining: lamp.fuel } : null;
+}
+function lightStatus(ctx) {
+  return hasDarkVision(ctx) ? { permanent: true } : headlampStatus(ctx);
 }
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
@@ -920,12 +932,13 @@ function drinkMilk(ctx) {
 // too, so the trip no longer needs to be running for it to work.
 function takeObsidianEye(ctx) {
   if (ctx.has("obsidianEye")) return "You already carry the OBSIDIAN EYE.";
+  const firstClaim = !ctx.getFlag("obsidianEyeClaimed");
   ctx.moveItem("obsidianEye", "inventory");
-  ctx.setFlag("darkSight", true); // permanent astral sight — no candle ever again
+  if (!firstClaim) return "You retrieve the OBSIDIAN EYE. It clings coldly to your palm, waiting to be worn.";
+  ctx.setFlag("obsidianEyeClaimed");
   ctx.addScore(15);
-  return "You lift the OBSIDIAN EYE off its plinth. It fuses cold to the space between your brows for one " +
-    "heartbeat, then settles into your palm — and the black of the vault becomes plain grey sight. You will " +
-    "never again need a candle to see in the dark places of Blackwood Manor. (+15)";
+  return "You lift the OBSIDIAN EYE off its plinth. It clings coldly to your palm, eager to adhere somewhere " +
+    "more useful. WEAR EYE on your FOREHEAD if you want its sight. (+15)";
 }
 
 // --- The ceremonial brazier: only YOUR fire is big enough to light it --------
@@ -958,7 +971,7 @@ function afflictionTick(ctx) {
       const left = hi - 1;
       ctx.setFlag("high", left);
       if (left <= 0) {
-        out.push(ctx.getFlag("darkSight")
+        out.push(hasDarkVision(ctx)
           ? "The trip loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
           : "The trip loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
       } else {
@@ -1669,7 +1682,7 @@ export const world = {
     start: "gate",
     maxCarry: 6,
     title: "Blackwood Manor",
-    equipmentSlots: ["head", "eyes", "feet", "finger", "wrist", "neck"],
+    equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck"],
   },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
@@ -1680,10 +1693,12 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
-  visionStatus,      // temporary mushroom sight or permanent worn XRAY GOGGLES
+  lightStatus,       // HEADLAMP duration or permanent worn OBSIDIAN EYE
+  visionStatus,      // temporary mushroom sight or permanent worn eye equipment
   flightStatus,      // temporary mushroom flight or permanent worn WINGED SHOES
   canFly,            // temporary mushroom flight or worn WINGED SHOES
   hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
+  hasDarkVision,     // permanent darkness sight from the worn OBSIDIAN EYE
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
@@ -2474,10 +2489,11 @@ export const world = {
     },
     obsidianEye: {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
-      loc: "hiddenVault", takeable: true,
+      loc: "hiddenVault", takeable: true, wearable: true, worn: false,
+      wearSlot: "forehead", grantsDarkSight: true,
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
-      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Held to the brow, it " +
-        "makes the dark stop being an enemy.",
+      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
+        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to make the dark stop being an enemy.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {

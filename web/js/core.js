@@ -133,12 +133,14 @@ export function createGame(world) {
     if (!r || !r.dark) return true;
     const enhancedVision = typeof world.hasMushroomVision === "function"
       && world.hasMushroomVision(game);
+    const darkVision = typeof world.hasDarkVision === "function"
+      && world.hasDarkVision(game);
     // A carried flame, mushroom/XRAY vision, or the permanent Obsidian Eye
     // lets you see in otherwise pitch-black rooms.
     return game.activeLights().length > 0
       || !!state.flags.onFire
       || enhancedVision
-      || !!state.flags.darkSight;
+      || darkVision;
   };
 
   game.availableDirections = () => {

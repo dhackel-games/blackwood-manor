@@ -676,8 +676,8 @@ contains a GOLD BAR and WINGED SHOES.
 
 ## 12.27 Equipment, hall bedroom, and roofline
 
-Wearable items declare one of six exclusive body slots: `head`, `eyes`, `feet`,
-`finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
+Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `eyes`,
+`feet`, `finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
 The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
@@ -687,6 +687,8 @@ and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH 
 the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
 that provide permanent mushroom-style clue vision and darkness sight while worn,
 shown as `👁️ ∞`. WINGED SHOES similarly show permanent flight as `🪽 ∞`.
+The OBSIDIAN EYE must be worn on the FOREHEAD, where it can coexist with EYES-slot
+goggles; its permanent dark-sight displays as `💡 ∞`.
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,

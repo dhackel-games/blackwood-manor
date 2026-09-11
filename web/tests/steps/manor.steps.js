@@ -315,6 +315,10 @@ Then("headlamp status has {int} turn(s)", function (remaining) {
   assert.equal(status.remaining, remaining);
 });
 
+Then("light status is permanent", function () {
+  assert.deepEqual(world.lightStatus(this.game), { permanent: true });
+});
+
 Then("vision status has {int} turn(s)", function (remaining) {
   assert.deepEqual(world.visionStatus(this.game), { permanent: false, remaining });
 });
