@@ -58,7 +58,7 @@ function nextHint(ctx) {
     return "Crystal decanter's in the WINE CELLAR. OPEN the CELLAR trap-door in the KITCHEN, go DOWN. Pitch dark — candle had better be lit or you're a grue's dinner. Unlike me, who has eaten NOTHING.";
   }
   if (!dep("ancestralPortrait")) {
-    return "There's a portrait in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first.";
+    return "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first.";
   }
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the wine cellar — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PORTRAIT in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the crypt. In that order. Write it down.";
@@ -2495,9 +2495,10 @@ export const world = {
       desc: "A cut-crystal decanter, still full, throwing splinters of colour even in the gloom.",
     },
     ancestralPortrait: {
-      names: ["miniature", "portrait"], adjectives: ["ancestral", "small", "gilt"], loc: "attic",
-      takeable: true, treasure: true, points: 20,
-      desc: "A small ancestral portrait in a gilt frame — a woman who looks unsettlingly like the STATUE in the GARDEN.",
+      names: ["portrait", "miniature"], adjectives: ["ancestral", "small", "gilt"], loc: "attic",
+      takeable: true, treasure: true, points: 20, scenery: true,
+      desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
+        "unsettlingly like the STATUE in the GARDEN.",
     },
 
     // --- Post-game (appear only after the bell is rung) ---

@@ -345,4 +345,14 @@ Feature: Blackwood Manor adventure
       | attic         | ANCESTRAL PORTRAIT               |
       | hollowSanctum | SPIRIT,SILVER MIRROR             |
 
+  Scenario: Portrait and miniature refer to one attic object
+    Given the player is in room "attic"
+    When I send "look"
+    Then the output does not contain "There is a MINIATURE here"
+    And the output does not contain "There is a PORTRAIT here"
+    When I send "examine portrait"
+    Then the output contains "painted in miniature"
+    When I send "examine miniature"
+    Then the output contains "ANCESTRAL PORTRAIT"
+
 # end manor-adventure.feature
