@@ -13,7 +13,7 @@ const VERBS = {
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
-  pull: ["pull", "lift", "yank"], on: ["on"], off: ["off"], light: ["light", "ignite"],
+  pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
   extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],

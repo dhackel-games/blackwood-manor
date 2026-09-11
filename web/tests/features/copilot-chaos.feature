@@ -73,6 +73,19 @@ Feature: Copilot's mystery package and lightning jumps
     Then the game is dead
     And the output contains "WRAITH"
 
+  Scenario: Peeling the nursery wallpaper opens a deliberate way between the walls
+    Given the player is in room "nursery"
+    When I send "pull wallpaper"
+    And I send "go in"
+    Then the current room is "betweenWalls"
+    And the output contains "BACKWARDS WATCH"
+
+  Scenario: The wallpaper gap stays shut until it has been peeled
+    Given the player is in room "nursery"
+    When I send "go in"
+    Then the output contains "just wallpaper"
+    And the current room is "nursery"
+
   Scenario: Lightning never strikes while chaos is off, no matter the manor state
     Given the random number generator always returns 0.0
     And flag "frontDoorOpen" is set

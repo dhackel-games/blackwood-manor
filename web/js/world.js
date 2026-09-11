@@ -1946,12 +1946,19 @@ export const world = {
       name: "Nursery",
       art: ROOM_ART.nursery,
       desc:
-        "A child's NURSERY, its wallpaper peeling in long tongues. A rocking horse stares " +
+        "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
         "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
       searchDesc:
-        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted.",
+        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
+        "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
       highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
-      exits: { east: "landing" },
+      exits: {
+        east: "landing",
+        // A crawl-gap into the space between the walls — the one deliberate,
+        // repeatable way in, versus the mystery package/lightning bolt's luck.
+        in: { to: "betweenWalls", via: "wallGapFound", revealedBy: "wallGapFound",
+          lockedMsg: "The wallpaper is just wallpaper, near as you can tell." },
+      },
     },
 
     masterBedroom: {
@@ -2379,6 +2386,15 @@ export const world = {
       },
     },
 
+    // --- nursery wallpaper -> crawl-gap into the space between the walls ---
+    wallpaper: {
+      names: ["wallpaper", "wall", "lath"], adjectives: ["peeling", "loose", "curling"],
+      loc: "nursery", fixed: true, scenery: true,
+      desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
+        "pulled almost all the way free, and the lath behind it sounds hollow when you rap on it.",
+      on: { pull: revealWallGap, push: revealWallGap, search: revealWallGap },
+    },
+
     // --- nursery music box -> tiny key ---
     musicBox: {
       names: ["music box", "musicbox", "box"], adjectives: ["jeweled", "jewelled", "music"], loc: "nursery",
@@ -2510,6 +2526,13 @@ function revealSafe(ctx) {
   ctx.setFlag("safeRevealed");
   ctx.moveItem("safe", "parlor");
   return "You swing the heavy portrait aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE.";
+}
+function revealWallGap(ctx) {
+  if (ctx.getFlag("wallGapFound"))
+    return "The gap in the wall stands open, dust-dark and waiting, right where you left it.";
+  ctx.setFlag("wallGapFound", true);
+  return "You peel back a curling tongue of WALLPAPER — and keep peeling, because a whole panel of rotten " +
+    "lath comes away in your hands, baring a gap just wide enough to squeeze IN, into the dark between the walls.";
 }
 
 // --- Self-immolation & stop-drop-roll in ANY room (Andy's idea) --------------
