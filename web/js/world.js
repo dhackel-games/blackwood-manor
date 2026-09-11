@@ -846,14 +846,24 @@ function eatMushrooms(ctx, cmd) {
     "detail keeps revealing itself while the trip lasts.)";
 }
 
+function capabilityStatus(ctx, equipmentFlag) {
+  if (ctx.inventory().some((item) => item.worn && item[equipmentFlag])) {
+    return { permanent: true };
+  }
+  const remaining = ctx.getFlag("high") || 0;
+  return remaining > 0 ? { permanent: false, remaining } : null;
+}
+function visionStatus(ctx) {
+  return capabilityStatus(ctx, "grantsMushroomVision");
+}
+function flightStatus(ctx) {
+  return capabilityStatus(ctx, "grantsFlight");
+}
 function canFly(ctx) {
-  return (ctx.getFlag("high") || 0) > 0
-    || ctx.inventory().some((item) => item.worn && item.grantsFlight);
+  return !!flightStatus(ctx);
 }
 function hasMushroomVision(ctx) {
-  return (ctx.getFlag("high") || 0) > 0
-    || ctx.inventory().some((item) =>
-      item.worn && (item.grantsMushroomVision || item.id === "xrayGoggles"));
+  return !!visionStatus(ctx);
 }
 function headlampStatus(ctx) {
   const lamp = ctx.item("headlamp");
@@ -1045,8 +1055,6 @@ function statusBanner(ctx) {
   const parts = [];
   if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
   if ((ctx.getFlag("sick") || 0) > 0) { parts.push(SICK_ART); parts.push(digestiveGauge(ctx)); }
-  const eye = ctx.getFlag("high") || 0;
-  if (eye > 0) parts.push(`👁  T H I R D   E Y E   O P E N  —  ${eye} turn${eye === 1 ? "" : "s"} of astral sight left`);
   return parts.length ? parts.join("\n") : "";
 }
 
@@ -1639,6 +1647,8 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
+  visionStatus,      // temporary mushroom sight or permanent worn XRAY GOGGLES
+  flightStatus,      // temporary mushroom flight or permanent worn WINGED SHOES
   canFly,            // temporary mushroom flight or worn WINGED SHOES
   hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
   deriveCommand,     // content-specific missing steps the parser may safely infer

@@ -462,6 +462,8 @@ again", so bare kill/die/dead must not match. Both directions are tested.
 `web/js/map.js` draws the manor as a hand-sketched floor plan on a torn-out page — Gary's
 placemat. `MAP` (also `M`, `CHART`, `FLOORPLAN`) works in the game *and* on the phone, because
 Gary tells you to type it and a hint line that lies to you is worse than no hint line.
+Its final section is titled `Visited Locations`; fixed-width row padding keeps both columns
+of tractor-feed sprocket holes aligned even though the page border itself is jagged.
 
 **It orients you; it never solves anything.** That distinction drives every rule:
 
@@ -608,14 +610,15 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
   still triggers the wraith.
 - Mushroom durations stack additively: both dried kitchen mushrooms and fresh
   TOILET-HOLE mushrooms add 12 turns. Eaten TOILET mushrooms can eventually regrow.
-  The always-visible HUD shows `🍄 <turns>`.
+  The always-visible HUD splits that duration into `👁️ <turns>` for vision and
+  `🪽 <turns>` for flight so future effects can vary independently.
 
 ## 12.24 Declarative HUD slots
 
 `js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
 `emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
 updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
-pressure, digestive phase, mushroom high, fire countdown, and HEADLAMP
+pressure, digestive phase, vision, flight, fire countdown, and HEADLAMP
 battery are data entries in one registry rather than separate DOM mutations in `ui.js`.
 
 ## 12.25 Derived actions and player-known codes
@@ -675,7 +678,8 @@ XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 The HEADLAMP activates when worn, has 40 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
 the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
-that provide permanent mushroom-style clue vision and darkness sight while worn.
+that provide permanent mushroom-style clue vision and darkness sight while worn,
+shown as `👁️ ∞`. WINGED SHOES similarly show permanent flight as `🪽 ∞`.
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,

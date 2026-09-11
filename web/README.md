@@ -27,14 +27,15 @@ auto-saves to your browser.
 - **Mushroom powers:** while high, hidden clues appear on first entry, vertical
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
   `fly to <room>` carries you directly there. Eating another mushroom cluster
-  adds its full duration to the remaining high. The HUD shows the countdown as
-  `🍄`; the trip's third eye also reveals hidden clues and lets you see in dark
-  rooms. Supernatural hazards still apply.
+  adds its full duration to the remaining high. The trip's third eye reveals
+  hidden clues and lets you see in dark rooms. The HUD tracks vision as `👁️`
+  and flight as `🪽`, allowing their durations to differ. Supernatural hazards
+  still apply.
 - **Equipment:** wearable items occupy HEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
   HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES
-  reveal the same clues as mushroom vision; WINGED SHOES provide permanent
-  named-room flight while worn.
+  show `👁️ ∞` and reveal the same clues as mushroom vision; WINGED SHOES show
+  `🪽 ∞` and provide permanent named-room flight while worn.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.

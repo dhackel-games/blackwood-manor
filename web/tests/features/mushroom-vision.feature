@@ -28,7 +28,8 @@ Feature: The mushroom trip's third eye
     When I send "look"
     Then the output contains "MUSHROOM VISION"
     And the output contains "RUBY RING"
-    And the output matches "[0-9]+ turns of astral sight left"
+    And vision status has 11 turns
+    And flight status has 11 turns
     When I send "look"
     Then the output contains "MUSHROOM VISION"
 

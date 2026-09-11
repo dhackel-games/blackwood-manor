@@ -271,7 +271,8 @@ function tornPage(lines) {
              " ".repeat(r + 1) + rch);
   });
   out.push("  " + ripple("`'~-._.~'`-._.-", width - 2));
-  return out.map((row, i) => hole(i) + row + hole(i)).join("\n");
+  const pageWidth = Math.max(...out.map((row) => row.length));
+  return out.map((row, i) => hole(i) + row.padEnd(pageWidth) + hole(i)).join("\n");
 }
 
 // Sentinel wrapping the ASCII block. The transcript is `white-space: pre-wrap`,
@@ -304,8 +305,8 @@ export function renderMap(ctx) {
     .filter(([id]) => id === ctx.state.room || !!ctx.getFlag("seen:" + id))
     .map(([, room]) => room.name)
     .sort((a, b) => a.localeCompare(b));
-  body.push("  VISITED LOCATIONS (FLY TO ...)");
-  body.push("  ==============================");
+  body.push("  Visited Locations");
+  body.push("  =================");
   for (const name of visited) body.push("  * " + name);
   body.push("");
 

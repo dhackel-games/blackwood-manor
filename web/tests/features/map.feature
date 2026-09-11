@@ -63,11 +63,16 @@ Feature: Spoiler-safe map mode
     And I send "east"
     And I send "east"
     And I send "map"
-    Then the output contains "VISITED LOCATIONS (FLY TO ...)"
+    Then the output contains "Visited Locations"
+    And the output does not contain "(FLY TO ...)"
     And the output contains "Front Gate"
     And the output contains "Overgrown Garden"
     And the output contains "Ivy-Choked Privy"
     And the output does not contain "Grand Hall"
+
+  Scenario: The map's ticker-tape holes stay in straight columns
+    When I send "map"
+    Then the map sprocket holes are column-aligned
 
   Scenario: The grounds map places the maze west and garden east of the gate
     When I send "look"
