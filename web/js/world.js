@@ -927,10 +927,31 @@ const SICK_ART = [
   "      |    ~ ~ ~",
   "     / \\   . : . : .",
 ].join("\n");
+// The digestive doomsday clock: a nasty bowel-pressure gauge that FILLS as the
+// burrito marches you toward fatal explosive diarrhea. `sick` counts down from
+// SICK_DURATION (freshly eaten) to 0 (detonation), so pressure = how much has
+// already built up. Rendered under the sick art every turn you're afflicted.
+const GAUGE_WIDTH = 18;
+function digestiveGauge(ctx) {
+  const sick = ctx.getFlag("sick") || 0;
+  if (sick <= 0) return "";
+  const pressure = SICK_DURATION - sick;                 // 0 (just ate) .. 40 (boom)
+  const pct = Math.min(100, Math.round((pressure / SICK_DURATION) * 100));
+  const filled = Math.min(GAUGE_WIDTH, Math.round((pressure / SICK_DURATION) * GAUGE_WIDTH));
+  const bar = "█".repeat(filled) + "░".repeat(GAUGE_WIDTH - filled);
+  let label;
+  if (pct < 20) label = "ominous gurgling";
+  else if (pct < 40) label = "churning, wet and low";
+  else if (pct < 60) label = "roiling — the sphincter is on notice";
+  else if (pct < 80) label = "CLENCHED — do NOT sneeze";
+  else if (pct < 95) label = "🚨 EVACUATE — detonation imminent";
+  else label = "🚨🚨 T-MINUS SPLASHDOWN 🚨🚨";
+  return `💩 BOWEL PRESSURE ▐${bar}▌ ${pct}%  (~${sick} turns to blast)\n   ≈ ${label} ≈`;
+}
 function statusBanner(ctx) {
   const parts = [];
   if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
-  if ((ctx.getFlag("sick") || 0) > 0) parts.push(SICK_ART);
+  if ((ctx.getFlag("sick") || 0) > 0) { parts.push(SICK_ART); parts.push(digestiveGauge(ctx)); }
   return parts.length ? parts.join("\n") : "";
 }
 

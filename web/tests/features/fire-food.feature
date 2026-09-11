@@ -203,6 +203,25 @@ Feature: Fire and food consequences
     And I send "light fart"
     Then flag "onFire" is true
 
+  Scenario: The bowel-pressure gauge tracks the march toward detonation
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "look"
+    Then the output contains "BOWEL PRESSURE"
+    And the output contains "turns to blast"
+    And the output contains "0%"
+    When I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "look"
+    Then the output matches "BOWEL PRESSURE.*[1-9][0-9]?%"
+    And the output contains "turns to blast"
+
   Scenario: Untreated burrito sickness completes ten cycles and kills
     Given the player is in room "kitchen"
     When I send "eat burrito"
