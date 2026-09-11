@@ -549,3 +549,10 @@ remain listed while closed or locked, while secret routes carry a `revealedBy` f
 join the list only after discovery. Handler-driven routes are data-declared through
 `extraDirections`, including the garden well, the attic after its ladder drops, and the
 sanctum's northern exit.
+
+## 12.21 Bulk pickup
+
+`TAKE ALL` and `GET ALL` collect every currently visible portable object, including
+objects exposed inside open containers. The operation respects `maxCarry`, reports each
+pickup, and names anything left behind when the player's hands fill. If no portable object
+is reachable, it says so explicitly.

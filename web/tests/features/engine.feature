@@ -34,6 +34,39 @@ Feature: Generic text-adventure engine
     When I send "south"
     Then the output contains "HALL"
 
+  Scenario Outline: Take every reachable portable object
+    When I send "<command>"
+    Then inventory contains exactly "candle,key,match"
+    And the output contains "key: Taken."
+    And the output contains "candle: Taken."
+    And the output contains "match: Taken."
+
+    Examples:
+      | command |
+      | take all |
+      | get all  |
+
+  Scenario: Take all includes objects inside open containers
+    When I send "take key"
+    And I send "unlock box with key"
+    And I send "open box"
+    And I send "drop key"
+    And I send "take all"
+    Then inventory contains exactly "candle,key,match,note"
+
+  Scenario: Take all respects carrying capacity and reports leftovers
+    Given a fresh fixture game with carry limit 2
+    When I send "take all"
+    Then inventory contains exactly "candle,key"
+    And item "match" is in "hall"
+    And the output contains "Your hands are full"
+    And the output contains "Left behind: match"
+
+  Scenario: Take all reports when no portable object is available
+    Given the player is in fixture room "study"
+    When I send "take all"
+    Then the output equals "There is nothing here you can take."
+
   Scenario Outline: Every item-inspection phrase shows item detail
     When I send "<command>"
     Then the output contains "brass key"

@@ -53,6 +53,33 @@ function inspectRoom(ctx) {
     notableItems(ctx);
 }
 
+function takeAll(ctx, cmd) {
+  const candidates = ctx.visibleItems().filter((item) => item.takeable && !ctx.has(item.id));
+  if (!candidates.length) return "There is nothing here you can take.";
+
+  const results = [];
+  const leftBehind = [];
+  const limit = ctx.world.config.maxCarry ?? 99;
+  for (const item of candidates) {
+    if (ctx.inventory().length >= limit) {
+      leftBehind.push(item.names[0]);
+      continue;
+    }
+    const handler = ctx.world.items[item.id]?.on?.take;
+    const handled = handler ? handler(ctx, { ...cmd, dobj: item.names[0] }) : null;
+    if (handled != null) {
+      results.push(`${item.names[0]}: ${handled}`);
+      continue;
+    }
+    ctx.moveItem(item.id, "inventory");
+    results.push(`${item.names[0]}: Taken.`);
+  }
+  if (leftBehind.length) {
+    results.push(`Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
+  }
+  return results.join("\n");
+}
+
 export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
@@ -93,6 +120,7 @@ export const commands = {
 
   take(ctx, cmd) {
     if (!cmd.dobj) return "Take what?";
+    if (cmd.dobj === "all" || cmd.dobj === "everything") return takeAll(ctx, cmd);
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (ctx.has(it.id)) return "You already have that.";
@@ -310,7 +338,7 @@ export const commands = {
       "look (l), examine (ex/x), search — inspect the room more closely",
       "look at <x>, examine <x>, search <x> — inspect an item",
       "map — Gary's floor plan of the manor (MAP MODE)",
-      "take <x>, drop <x>, inventory (i)",
+      "take <x>, take all, drop <x>, inventory (i)",
       "open / close / unlock <x> with <y>",
       "put <x> in <y>, read <x>",
       "light <x>, turn on/off <x>",

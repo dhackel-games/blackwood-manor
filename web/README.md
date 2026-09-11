@@ -30,7 +30,7 @@ auto-saves to your browser.
   and `look at <thing>` all show its deeper details.
 - **Touch controls:** direction and action buttons remain visible and usable at all
   times, including while the software keyboard is open.
-- **Things:** `take <x>`, `drop <x>`, `inventory` (`i`)
+- **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
   `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,

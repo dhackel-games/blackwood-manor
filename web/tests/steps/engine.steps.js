@@ -8,7 +8,7 @@ import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION } from "../../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a06:acoven";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a07:acoven";
 const NONE = "[none]";
 const EMPTY = "[empty]";
 
@@ -120,6 +120,16 @@ Given("a fresh fixture game with a working lever", function () {
     },
   };
   this.game = createGame(world);
+});
+
+Given("a fresh fixture game with carry limit {int}", function (limit) {
+  const world = fixture();
+  world.config.maxCarry = limit;
+  this.game = createGame(world);
+});
+
+Given("the player is in fixture room {string}", function (room) {
+  this.game.state.room = room;
 });
 
 When("I send {string}", function (command) {
