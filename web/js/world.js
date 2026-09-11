@@ -832,13 +832,18 @@ function eatMushrooms(ctx, cmd) {
   if (mushrooms) ctx.destroy(mushrooms.id);
   ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 6));
   ctx.setFlag("highGrace", true);
+  ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
   const origin = mushrooms?.fresh
     ? "You eat the fresh mushrooms. They are slick with literal shit and piss from the TOILET HOLE — " +
       "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway. They are alarmingly potent."
     : "You chew through the dried kitchen mushrooms. They are dusty, bitter, and only half-strength.";
   return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
-    "Your body feels so light you could FLY TO any room you can name.";
+    "Your body feels so light you could FLY TO any room you can name.\n\n" +
+    "Something else opens too: between your brows, an astral eye blinks awake. The dark of the house turns " +
+    "to legible grey, and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, behind it " +
+    "something that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark, and hidden " +
+    "detail keeps revealing itself while the trip lasts.)";
 }
 
 function floatToRoom(ctx, roomId) {
@@ -885,29 +890,11 @@ function drinkMilk(ctx) {
     "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)";
 }
 
-// --- The nightshade third eye: astral sight from a rotten tomato -------------
-// A tomato is a NIGHTSHADE (Solanaceae), kin to belladonna — the witches'
-// visionary flying-herb. Rotten enough, it reverts to type: violent nausea, but
-// the pineal "third eye" cracks open. You see in the dark, and a vision reveals
-// the hidden attic vault. Survivable (no death); the sight fades on its own.
-const THIRD_EYE_DURATION = 16;
-const THIRD_EYE_LINES = [
-  "The nightshade churns in your gut — and the dark turns to legible grey.",
-  "A greasy, visionary nausea. The unseen keeps insisting on being seen.",
-  "Your stomach knots; your third eye does not blink. Shadow is just another colour.",
-  "The veil thins. Above you, that impossible attic door is still there, waiting.",
-];
-function eatRottenTomato(ctx) {
-  ctx.destroy("rottenTomato");
-  ctx.setFlag("thirdEye", THIRD_EYE_DURATION);
-  ctx.setFlag("vaultFound", true); // the vision SHOWS you the hidden door — permanently
-  ctx.addScore(1);
-  return "You bite into the weeping, furred tomato. It is a NIGHTSHADE — kin to belladonna, the witches' " +
-    "flying-herb — and rotten enough to remember it.\n\nYour gut heaves, cold sweat springs up, and then, " +
-    "between your brows, something OPENS. The dark of the house turns to legible grey. The astral layer bleeds " +
-    "through — and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, and behind it something " +
-    "that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark. It won't last — get UP to the attic.)";
-}
+// --- The obsidian eye: the mushroom trip's astral sight, made permanent -----
+// The mushroom trip already cracks the pineal "third eye" open (see
+// eatMushrooms): you see in the dark and a vision reveals the hidden attic
+// vault, permanently. The OBSIDIAN EYE inside makes the dark-sight permanent
+// too, so the trip no longer needs to be running for it to work.
 function takeObsidianEye(ctx) {
   if (ctx.has("obsidianEye")) return "You already carry the OBSIDIAN EYE.";
   ctx.moveItem("obsidianEye", "inventory");
@@ -945,20 +932,15 @@ function afflictionTick(ctx) {
     if (ctx.getFlag("highGrace")) {
       ctx.setFlag("highGrace", false);
     } else {
-      ctx.setFlag("high", hi - 1);
-      out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
-    }
-  }
-  const eye = ctx.getFlag("thirdEye") || 0;
-  if (eye > 0) {
-    const left = eye - 1;
-    ctx.setFlag("thirdEye", left);
-    if (left <= 0) {
-      out.push(ctx.getFlag("darkSight")
-        ? "The nightshade loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
-        : "The nightshade loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
-    } else {
-      out.push(THIRD_EYE_LINES[(THIRD_EYE_DURATION - left) % THIRD_EYE_LINES.length]);
+      const left = hi - 1;
+      ctx.setFlag("high", left);
+      if (left <= 0) {
+        out.push(ctx.getFlag("darkSight")
+          ? "The trip loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
+          : "The trip loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
+      } else {
+        out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
+      }
     }
   }
   const sick = ctx.getFlag("sick") || 0;
@@ -1051,7 +1033,7 @@ function statusBanner(ctx) {
   const parts = [];
   if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
   if ((ctx.getFlag("sick") || 0) > 0) { parts.push(SICK_ART); parts.push(digestiveGauge(ctx)); }
-  const eye = ctx.getFlag("thirdEye") || 0;
+  const eye = ctx.getFlag("high") || 0;
   if (eye > 0) parts.push(`👁  T H I R D   E Y E   O P E N  —  ${eye} turn${eye === 1 ? "" : "s"} of astral sight left`);
   return parts.length ? parts.join("\n") : "";
 }
@@ -2036,13 +2018,13 @@ export const world = {
       exits: {
         down: "landing",
         // The astral door in the north gable — hidden and impassable until the
-        // nightshade third eye has shown it to you (sets vaultFound).
+        // mushroom trip's third eye has shown it to you (sets vaultFound).
         north: { to: "hiddenVault", via: "vaultFound", revealedBy: "vaultFound",
           lockedMsg: "The NORTH gable is blank plaster and close shadow. Your ordinary eyes find no seam." },
       },
     },
 
-    // --- The astral treasure vault, seen only through the nightshade third eye --
+    // --- The astral treasure vault, seen only through the mushroom trip's third eye --
     hiddenVault: {
       name: "Hidden Vault",
       art: [
@@ -2228,14 +2210,6 @@ export const world = {
       on: {
         eat: eatBurrito,
       },
-    },
-    rottenTomato: {
-      names: ["tomato", "rotten tomato"], adjectives: ["rotten", "furred", "weeping", "nightshade", "mouldy", "moldy"],
-      loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A furred, weeping ROTTEN TOMATO sags in a cracked dish on the table.",
-      desc: "A tomato so far gone it has climbed back up its own family tree to deadly nightshade — kin to " +
-        "belladonna, the witches' visionary flying-herb. It promises violent nausea, an opened third eye, or both.",
-      on: { eat: eatRottenTomato },
     },
     obsidianEye: {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],

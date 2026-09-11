@@ -129,11 +129,11 @@ export function createGame(world) {
   game.isLit = () => {
     const r = world.rooms[state.room];
     if (!r || !r.dark) return true;
-    // A carried flame, the temporary nightshade third eye, or the permanent
+    // A carried flame, the temporary mushroom-trip third eye, or the permanent
     // Obsidian Eye all let you see in otherwise pitch-black rooms.
     return game.activeLights().length > 0
       || !!state.flags.onFire
-      || (state.flags.thirdEye || 0) > 0
+      || (state.flags.high || 0) > 0
       || !!state.flags.darkSight;
   };
 
@@ -167,14 +167,12 @@ export function createGame(world) {
     if ((force || first) && r.art) out += r.art + "\n";
     if (extended) out += r.desc + "\n";
     // Altered sight overlays the room's hidden 'astral' detail. The mushroom
-    // high reveals it on first entry; the nightshade third eye is an astral
-    // X-ray that also reveals it every time you LOOK.
+    // trip is an astral X-ray that keeps revealing it every time you LOOK.
     const highOn = (state.flags.high || 0) > 0;
-    const eyeOn = (state.flags.thirdEye || 0) > 0;
-    if ((highOn || eyeOn) && (first || (eyeOn && force))) {
+    if (highOn) {
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
-      if (vision) out += `${eyeOn ? "THIRD-EYE SIGHT" : "MUSHROOM VISION"}\n${vision}\n`;
+      if (vision) out += `MUSHROOM VISION\n${vision}\n`;
     }
     const directions = game.availableDirections();
     out += extended

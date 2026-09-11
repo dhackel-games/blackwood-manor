@@ -83,14 +83,6 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     },
   },
   {
-    id: "eye",
-    emoji: "🍅",
-    calculate: ({ game }) => {
-      const turns = game.state.flags.thirdEye || 0;
-      return turns > 0 ? `${turns} turns` : null;
-    },
-  },
-  {
     id: "fire",
     emoji: "🔥",
     calculate: ({ game, world }) => {

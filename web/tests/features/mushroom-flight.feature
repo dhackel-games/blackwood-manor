@@ -2,9 +2,9 @@
 
 @walkthrough @mushroom
 Feature: Mushroom vision and flight
-  While the mushroom high lasts, the player sees hidden clues immediately and
-  can float to named rooms or across vertical obstacles, without immunity from
-  darkness or supernatural hazards.
+  While the mushroom trip lasts, the player sees hidden clues immediately,
+  sees in the dark, and can float to named rooms or across vertical
+  obstacles — but gets no immunity from supernatural hazards.
 
   Background:
     Given a fresh manor game
@@ -91,13 +91,11 @@ Feature: Mushroom vision and flight
     And the current room is "attic"
     And the output contains "float through the closed trap-door"
 
-  Scenario: Darkness still gives one warning turn before the grue attacks
+  Scenario: The mushroom trip's third eye lights up dark rooms, no grue warning needed
     When I send "fly to wine cellar"
     Then the game is alive
-    And the output matches "pitch black|grue"
-    When I send "wait"
-    Then the game is dead
-    And the output contains "grue"
+    And the output contains "MUSHROOM VISION"
+    And the output does not contain "pitch black"
 
   Scenario: The crypt wraith still kills an unprotected high player
     When I send "float to crypt"
