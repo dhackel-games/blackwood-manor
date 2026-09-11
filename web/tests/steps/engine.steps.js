@@ -318,6 +318,21 @@ Then("the page has a {string} prefill control", function (value) {
   assert.match(html, new RegExp(`data-prefill=["']${value}["']`));
 });
 
+Then("the page links the Bug control to {string}", function (url) {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, new RegExp(
+    `<a[^>]+id=["']bug-report["'][^>]+href=["']${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'][^>]+target=["']_blank["']`,
+  ));
+  assert.match(html, /id=["']bug-report["'][^>]+rel=["']noopener noreferrer["']/);
+});
+
+Then("the iOS wrapper opens new-window web links externally", function () {
+  const swift = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  assert.match(swift, /WKUIDelegate/);
+  assert.match(swift, /navigationAction\.targetFrame == nil/);
+  assert.match(swift, /UIApplication\.shared\.open\(url\)/);
+});
+
 Then("the TestFlight release refreshes the web bundle before generating the Xcode project", function () {
   const script = readFileSync(new URL("../../../ios/release-testflight.sh", import.meta.url), "utf8");
   const copyIndex = script.indexOf("./copy-web.sh");

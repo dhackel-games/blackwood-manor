@@ -124,23 +124,27 @@ body { -webkit-text-size-adjust: 100%; }
   margin-top: 0.4rem;
 }
 #controls .dpad, #controls .verbs { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
-#controls button {
+#controls button, #controls a {
   flex: 0 1 auto;             /* natural width, wrap+center (no giant stretched buttons) */
   min-width: 3.2rem;
   min-height: 2.5rem;
   padding: 0.4rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(67,255,122,0.06);
   border: 1px solid var(--dim);
   border-radius: 6px;
   color: var(--green-bright);
   font: inherit;
   font-size: 0.95rem;
+  text-decoration: none;
   text-shadow: inherit;
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
-#controls button:active { background: rgba(67,255,122,0.22); }
+#controls button:active, #controls a:active { background: rgba(67,255,122,0.22); }
 
 #inputline {
   position: relative; z-index: 1;
