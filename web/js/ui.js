@@ -167,15 +167,73 @@ function garySpeak(text) {
 }
 function stopSpeaking() { if ("speechSynthesis" in window) try { speechSynthesis.cancel(); } catch {} }
 
-// Ambient reactions — Gary editorializes on gross/dangerous turns, in the same
-// garbled voice, even when you're not on a call with him. Simple substring/flag
-// checks against the turn's output; no sound effects, just Gary being Gary.
-function garyReacts(out, prevFlags, flags) {
+// ---- Sound effects: fart/burp/barf/high noises, deliberately NOT Gary's voice ----
+// These used to be spoken as a one-liner in Gary's own TTS voice ("Classy.",
+// "Good god, that stinks."). Andy heard that as Gary randomly talking to him
+// out of nowhere ("Gary's a ghost") and found it confusing/creepy rather than
+// funny. The actual goal was a silly noise cue, not Gary editorializing — so
+// these are now synthesized tones through Web Audio, fully decoupled from
+// speechSynthesis/Gary's character voice.
+let sfxCtx = null;
+function sfxContext() {
+  if (!sfxCtx) {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) sfxCtx = new AC();
+  }
+  if (sfxCtx && sfxCtx.state === "suspended") sfxCtx.resume().catch(() => {});
+  return sfxCtx;
+}
+function sfxTone(ctx, { type = "sine", freqFrom, freqTo, start, dur, gain = 0.15 }) {
+  const osc = ctx.createOscillator();
+  const g = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freqFrom, start);
+  osc.frequency.linearRampToValueAtTime(freqTo, start + dur);
+  g.gain.setValueAtTime(gain, start);
+  g.gain.exponentialRampToValueAtTime(0.001, start + dur);
+  osc.connect(g).connect(ctx.destination);
+  osc.start(start);
+  osc.stop(start + dur + 0.02);
+}
+const SFX = {
+  burp: (ctx, t) => sfxTone(ctx, { type: "sawtooth", freqFrom: 160, freqTo: 70, start: t, dur: 0.35, gain: 0.18 }),
+  barf: (ctx, t) => {
+    sfxTone(ctx, { type: "sawtooth", freqFrom: 220, freqTo: 90, start: t, dur: 0.25, gain: 0.16 });
+    sfxTone(ctx, { type: "sawtooth", freqFrom: 90, freqTo: 260, start: t + 0.22, dur: 0.3, gain: 0.16 });
+  },
+  fart: (ctx, t) => sfxTone(ctx, { type: "square", freqFrom: 90, freqTo: 55, start: t, dur: 0.5, gain: 0.14 }),
+  diarrhea: (ctx, t) => {
+    sfxTone(ctx, { type: "square", freqFrom: 130, freqTo: 45, start: t, dur: 0.4, gain: 0.15 });
+    sfxTone(ctx, { type: "sawtooth", freqFrom: 300, freqTo: 60, start: t + 0.05, dur: 0.5, gain: 0.1 });
+  },
+  high: (ctx, t) => {
+    sfxTone(ctx, { type: "sine", freqFrom: 440, freqTo: 660, start: t, dur: 0.6, gain: 0.12 });
+    sfxTone(ctx, { type: "sine", freqFrom: 660, freqTo: 330, start: t + 0.15, dur: 0.6, gain: 0.1 });
+  },
+};
+function playSfx(kind) {
+  if (ttsMuted || !SFX[kind]) return;   // same "no surprise audio" gate as Gary's voice
+  const ctx = sfxContext();
+  if (!ctx) return;
+  try { SFX[kind](ctx, ctx.currentTime); } catch { /* ignore */ }
+}
+// Which noise (if any) this turn's output is narrating, keyed off the same
+// ASCII-art substrings the sick-line system stamps in.
+function ambientSfxKind(out, prevFlags, flags) {
+  if (out.includes("S P L U R T")) return "diarrhea";
+  if (out.includes("F O O M P")) return "fart";
+  if (out.includes("H U U U R K")) return "barf";
+  if (out.includes("B U R P")) return "burp";
+  if ((flags.high || 0) > 0 && !(prevFlags.high || 0)) return "high";
+  return null;
+}
+
+// Ambient reactions — Gary editorializes on gross/dangerous turns, even when
+// you're not on a call with him. Kept to genuine surprises (catching fire);
+// the fart/burp/barf/high events are now a sound effect instead (see above),
+// not a line spoken in Gary's voice.
+function garyReacts(prevFlags, flags) {
   if (flags.onFire && !prevFlags.onFire) return "Whoa! You're on fire!";
-  if (out.includes("H U U U R K")) return "Oh, that is repulsive.";
-  if (out.includes("F O O M P") || out.includes("S P L U R T")) return "Good god, that stinks.";
-  if (out.includes("B U R P")) return "Classy.";
-  if ((flags.high || 0) > 0 && !(prevFlags.high || 0)) return "You're tripping, aren't you.";
   return null;
 }
 
@@ -344,7 +402,9 @@ function handle(raw) {
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
-  const reaction = garyReacts(out, prevFlags, game.state.flags);
+  const sfxKind = ambientSfxKind(out, prevFlags, game.state.flags);
+  if (sfxKind) playSfx(sfxKind);       // noise cue, not Gary talking
+  const reaction = garyReacts(prevFlags, game.state.flags);
   if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
   if (game.state.won) print("\nType RESTART to play again.", "over");
   else if (!game.state.dead) saveGame(game);
