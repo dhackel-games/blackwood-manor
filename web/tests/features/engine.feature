@@ -66,12 +66,17 @@ Feature: Generic text-adventure engine
   Scenario: Room art appears on first entry and explicit inspection
     When I send "look"
     Then the output contains "[HALL ART]"
+    And the output contains line "Directions you can go: north, down"
     When I send "north"
     Then the output contains "[STUDY ART]"
+    And the output contains line "Directions you can go: south"
     When I send "south"
     Then the output does not contain "[HALL ART]"
+    And the output contains line "n, d"
+    And the output does not contain "Directions you can go:"
     When I send "search"
     Then the output contains "[HALL ART]"
+    And the output contains line "Directions you can go: north, down"
 
   Scenario: Locked containers can be opened and used with their key
     When I send "open box"

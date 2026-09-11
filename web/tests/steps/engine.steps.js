@@ -8,7 +8,7 @@ import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION } from "../../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a04:acoven";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a05:acoven";
 const NONE = "[none]";
 const EMPTY = "[empty]";
 
@@ -190,6 +190,14 @@ Then("the output does not contain {string}", function (text) {
 
 Then("the output does not start with {string}", function (text) {
   assert.ok(!this.output.startsWith(text));
+});
+
+Then("the output contains line {string}", function (line) {
+  assert.ok(this.output.split("\n").includes(line), `Missing line "${line}" in:\n${this.output}`);
+});
+
+Then("the output does not contain line {string}", function (line) {
+  assert.ok(!this.output.split("\n").includes(line), `Unexpected line "${line}" in:\n${this.output}`);
 });
 
 Then("the output contains these phrases in order:", function (table) {

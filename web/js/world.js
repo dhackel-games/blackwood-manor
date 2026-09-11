@@ -1059,6 +1059,7 @@ export const world = {
         }
         return "The statue and well have yielded what they hid. Only the grave-damp brazier still looks expectant.";
       },
+      extraDirections: ["down"],
       exits: { west: "gate", east: "privy" },
       on: {
         // "down" / "go down" / "climb down" all attempt the well.
@@ -1294,6 +1295,7 @@ export const world = {
           ? "The lowered attic ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
           : "The cord is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
       },
+      extraDirections: (ctx) => ctx.getFlag("ladderDown") ? ["up"] : [],
       exits: { down: "grandHall", west: "nursery", east: "masterBedroom", south: "study" },
       on: {
         // The attic ladder is flimsy: climb it laden and it — and you — come down hard.
@@ -1378,6 +1380,7 @@ export const world = {
         "Beyond her, an archway opens NORTH onto a growing dawn.",
       searchDesc:
         "The spirit guards nothing now. The silver mirror lifts freely from its pedestal, and the northern dawn feels like an ending.",
+      extraDirections: ["north"],
       exits: { south: "hollowPassage" },
       on: {
         // Step into the dawn to truly finish. Keeping the mirror earns a bonus.

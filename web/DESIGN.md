@@ -539,3 +539,12 @@ inside its allotted space rather than pushing the controls below the viewport. B
 prevent their default focus behavior, dispatch the associated command synchronously, keep the
 latest transcript output visible, and only return focus to the command field on pointer-fine
 desktop devices.
+
+## 12.20 Available-direction summaries
+
+First-entry, explicit-inspection, and verbose room descriptions append
+`Directions you can go: north, east, ...`. Brief revisits instead show only
+`n, e, ...` on a separate line. The list is derived from currently usable exits:
+routes gated by unopened doors or unrevealed passages remain absent. Handler-driven
+routes are data-declared through `extraDirections`, including the garden well,
+the attic after its ladder drops, and the sanctum's northern exit.

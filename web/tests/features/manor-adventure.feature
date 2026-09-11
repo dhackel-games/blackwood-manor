@@ -187,6 +187,33 @@ Feature: Blackwood Manor adventure
     And I send "enter cellar door"
     Then the current room is "wineCellar"
 
+  Scenario: Direction summaries expose only currently usable routes
+    Given the player is in room "porch"
+    When I send "look"
+    Then the output contains line "Directions you can go: south"
+    And the output does not contain line "Directions you can go: north, south"
+    Given item "frontKey" is carried
+    When I send "unlock door with iron key"
+    And I send "open door"
+    And I send "look"
+    Then the output contains line "Directions you can go: north, south"
+    Given a fresh manor game
+    And the player is in room "garden"
+    When I send "look"
+    Then the output contains line "Directions you can go: east, west, down"
+
+  Scenario: Handler-driven directions appear when available
+    Given the player is in room "landing"
+    When I send "look"
+    Then the output does not contain line "Directions you can go: east, south, west, up, down"
+    When I send "pull cord"
+    And I send "look"
+    Then the output contains line "Directions you can go: east, south, west, up, down"
+    Given a fresh manor game
+    And the player is in room "hollowSanctum"
+    When I send "look"
+    Then the output contains line "Directions you can go: north, south"
+
   Scenario: Ringing the prepared bell reveals rather than ends the hidden wing
     Given the player is in room "grandHall"
     And flag "curseLiftable" is set

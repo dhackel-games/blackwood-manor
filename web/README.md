@@ -21,6 +21,8 @@ auto-saves to your browser.
 
 - **Move:** `north` / `n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`, `up` / `u`,
   `down` / `d`, `in`, `out` — or just type the direction.
+  First-entry and extended descriptions name every currently usable direction;
+  brief revisits show their abbreviations on a separate line.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.

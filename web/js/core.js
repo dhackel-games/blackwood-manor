@@ -10,6 +10,17 @@
 import { parse, splitCommands } from "./parser.js";
 import { commands } from "./commands.js";
 
+const DIRECTION_ORDER = [
+  "north", "northeast", "east", "southeast",
+  "south", "southwest", "west", "northwest",
+  "up", "down", "in", "out",
+];
+const DIRECTION_SHORT = {
+  north: "n", northeast: "ne", east: "e", southeast: "se",
+  south: "s", southwest: "sw", west: "w", northwest: "nw",
+  up: "u", down: "d", in: "in", out: "out",
+};
+
 function cloneData(def, id) {
   const { on, ...data } = def;                 // strip handlers
   const copy = JSON.parse(JSON.stringify(data)); // deep-clone plain data
@@ -116,6 +127,22 @@ export function createGame(world) {
     return game.activeLights().length > 0;
   };
 
+  game.availableDirections = () => {
+    const room = world.rooms[state.room];
+    const directions = Object.entries(room.exits || {})
+      .filter(([, exit]) => {
+        if (typeof exit === "string") return true;
+        if (exit.locked) return false;
+        return !exit.via || !!state.flags[exit.via];
+      })
+      .map(([direction]) => direction);
+    const extra = typeof room.extraDirections === "function"
+      ? room.extraDirections(game)
+      : (room.extraDirections || []);
+    return [...new Set([...directions, ...extra])]
+      .sort((a, b) => DIRECTION_ORDER.indexOf(a) - DIRECTION_ORDER.indexOf(b));
+  };
+
   // --- room description ------------------------------------------------------
   game.describeRoom = (force) => {
     if (!game.isLit()) return "It is pitch black. You are likely to be eaten by a grue.";
@@ -123,9 +150,14 @@ export function createGame(world) {
     const first = !state.flags["seen:" + state.room];
     state.flags["seen:" + state.room] = true;
     const verbose = state.flags.__verbose;
+    const extended = force || first || verbose;
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
-    if (force || first || verbose) out += r.desc + "\n";
+    if (extended) out += r.desc + "\n";
+    const directions = game.availableDirections();
+    out += extended
+      ? `Directions you can go: ${directions.join(", ") || "nowhere"}\n`
+      : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery);
     for (const it of here) {
       out += (it.roomDesc || `There is a ${it.names[0]} here.`) + "\n";
