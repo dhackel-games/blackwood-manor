@@ -43,8 +43,9 @@ auto-saves to your browser.
 - **Touch controls:** direction and action buttons remain visible and usable at all
   times, including while the software keyboard is open. **🪲** opens the
   repository's new-issue form in a separate browser window and prefills its
-  title with the current room. Typing `bug <description>` also puts that text
-  into the issue body without advancing the game turn.
+  title with the current room and its body with `Describe issue here`. Typing
+  `bug <description>` instead puts that text into the issue body without
+  advancing the game turn.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived

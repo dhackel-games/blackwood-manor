@@ -5,7 +5,11 @@ import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
 import { HUD_SLOT_DEFINITIONS, HudSlot } from "../../js/hud.js";
-import { bugReportDescription, bugReportUrl } from "../../js/issue-report.js";
+import {
+  bugReportDescription,
+  bugReportUrl,
+  DEFAULT_ISSUE_DESCRIPTION,
+} from "../../js/issue-report.js";
 import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
 
@@ -329,6 +333,13 @@ Then("bug reports include the current room in the issue title", function () {
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /bugReportUrl\(game\.room\(\)\.name, description\)/);
+});
+
+Then("clicking the Bug button uses the default issue description", function () {
+  const url = new URL(bugReportUrl("Hall Bedroom", DEFAULT_ISSUE_DESCRIPTION));
+  assert.equal(url.searchParams.get("body"), "Describe issue here");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /openBugReport\(DEFAULT_ISSUE_DESCRIPTION\)/);
 });
 
 Then("a Bug command uses its phrase as the issue description", function () {
