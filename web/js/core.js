@@ -157,10 +157,15 @@ export function createGame(world) {
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
     if (extended) out += r.desc + "\n";
-    if (first && !force && (state.flags.high || 0) > 0) {
+    // Altered sight overlays the room's hidden 'astral' detail. The mushroom
+    // high reveals it on first entry; the nightshade third eye is an astral
+    // X-ray that also reveals it every time you LOOK.
+    const highOn = (state.flags.high || 0) > 0;
+    const eyeOn = (state.flags.thirdEye || 0) > 0;
+    if ((highOn || eyeOn) && (first || (eyeOn && force))) {
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
-      if (vision) out += `MUSHROOM VISION\n${vision}\n`;
+      if (vision) out += `${eyeOn ? "THIRD-EYE SIGHT" : "MUSHROOM VISION"}\n${vision}\n`;
     }
     const directions = game.availableDirections();
     out += extended

@@ -22,6 +22,15 @@ Feature: The nightshade third eye
     When I send "look"
     Then the output does not contain "pitch black"
 
+  Scenario: The third eye reveals hidden astral detail and shows a countdown
+    Given the player is in room "kitchen"
+    When I send "eat tomato"
+    And the player moves directly to room "masterBedroom"
+    When I send "look"
+    Then the output contains "THIRD-EYE SIGHT"
+    And the output contains "RUBY RING"
+    And the output matches "[0-9]+ turns of astral sight left"
+
   Scenario: The attic vault door opens only after the third eye has shown it
     Given the player is in room "attic"
     When I send "north"

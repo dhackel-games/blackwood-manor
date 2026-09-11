@@ -997,7 +997,8 @@ function statusBanner(ctx) {
   const parts = [];
   if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
   if ((ctx.getFlag("sick") || 0) > 0) { parts.push(SICK_ART); parts.push(digestiveGauge(ctx)); }
-  if ((ctx.getFlag("thirdEye") || 0) > 0) parts.push("👁  T H I R D   E Y E   O P E N  —  the dark is legible");
+  const eye = ctx.getFlag("thirdEye") || 0;
+  if (eye > 0) parts.push(`👁  T H I R D   E Y E   O P E N  —  ${eye} turn${eye === 1 ? "" : "s"} of astral sight left`);
   return parts.length ? parts.join("\n") : "";
 }
 
