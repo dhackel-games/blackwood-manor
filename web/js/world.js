@@ -1122,6 +1122,7 @@ export const world = {
       exits: {
         south: "porch", east: "parlor", west: "diningRoom", up: "landing",
         north: { to: "hollowPassage", via: "secretWingOpen",
+          revealedBy: "bellRung",
           lockedMsg: "There's a seam in the north wall now, but it won't open on its own." },
       },
       on: {
@@ -1195,7 +1196,8 @@ export const world = {
       },
       exits: {
         north: "parlor",
-        down: { to: "secretChamber", via: "leverPulled", lockedMsg: "The shelves stand solid and shut." },
+        down: { to: "secretChamber", via: "leverPulled", revealedBy: "leverPulled",
+          lockedMsg: "The shelves stand solid and shut." },
       },
     },
 

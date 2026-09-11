@@ -544,7 +544,8 @@ desktop devices.
 
 First-entry, explicit-inspection, and verbose room descriptions append
 `Directions you can go: north, east, ...`. Brief revisits instead show only
-`n, e, ...` on a separate line. The list is derived from currently usable exits:
-routes gated by unopened doors or unrevealed passages remain absent. Handler-driven
-routes are data-declared through `extraDirections`, including the garden well,
-the attic after its ladder drops, and the sanctum's northern exit.
+`n, e, ...` on a separate line. The list represents discovered exits: visible doors
+remain listed while closed or locked, while secret routes carry a `revealedBy` flag and
+join the list only after discovery. Handler-driven routes are data-declared through
+`extraDirections`, including the garden well, the attic after its ladder drops, and the
+sanctum's northern exit.

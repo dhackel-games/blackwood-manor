@@ -132,8 +132,7 @@ export function createGame(world) {
     const directions = Object.entries(room.exits || {})
       .filter(([, exit]) => {
         if (typeof exit === "string") return true;
-        if (exit.locked) return false;
-        return !exit.via || !!state.flags[exit.via];
+        return !exit.revealedBy || !!state.flags[exit.revealedBy];
       })
       .map(([direction]) => direction);
     const extra = typeof room.extraDirections === "function"
