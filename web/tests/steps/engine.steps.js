@@ -319,29 +319,27 @@ Then("the page has a {string} prefill control", function (value) {
   assert.match(html, new RegExp(`data-prefill=["']${value}["']`));
 });
 
-Then("the page links the Bug control to {string}", function (url) {
+Then("the page has an icon-only Bug button", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  assert.match(html, new RegExp(
-    `<a[^>]+id=["']bug-report["'][^>]+href=["']${url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'][^>]+target=["']_blank["']`,
-  ));
-  assert.match(html, /id=["']bug-report["'][^>]+rel=["']noopener noreferrer["']/);
-});
-
-Then("the Bug control contains only its icon", function () {
-  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  assert.match(html, /<a[^>]+id=["']bug-report["'][^>]*>\s*🪲\s*<\/a>/);
+  assert.match(html, /<button[^>]+id=["']bug-report["'][^>]+aria-label=["']report a bug on GitHub["'][^>]*>\s*🪲\s*<\/button>/);
 });
 
 Then("bug reports include the current room in the issue title", function () {
   const url = new URL(bugReportUrl("Hall Bedroom"));
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /bugReportUrl\(game\.room\(\)\.name\)/);
+  assert.match(ui, /window\.open\(bugReportUrl\(game\.room\(\)\.name\), "_blank", "noopener,noreferrer"\)/);
 });
 
 Then("Gary's send control contains only an up arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*↑\s*<\/button>/);
+});
+
+Then("the movement controls are labeled In and Out", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+data-cmd=["']in["'][^>]*>\s*In\s*<\/button>/);
+  assert.match(html, /<button[^>]+data-cmd=["']out["'][^>]*>\s*Out\s*<\/button>/);
 });
 
 Then("the iOS wrapper opens new-window web links externally", function () {

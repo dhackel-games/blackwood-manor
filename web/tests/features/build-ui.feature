@@ -24,13 +24,15 @@ Feature: Build metadata and touch-control contract
     Then the page has a "say " prefill control
 
   Scenario: Bug reports open the repository issue form outside the game
-    Then the page links the Bug control to "https://github.com/dhackel-games/blackwood-manor/issues/new"
-    And the Bug control contains only its icon
+    Then the page has an icon-only Bug button
     And bug reports include the current room in the issue title
     And the iOS wrapper opens new-window web links externally
 
   Scenario: Gary uses an icon-only send control
     Then Gary's send control contains only an up arrow
+
+  Scenario: In and Out controls use title case
+    Then the movement controls are labeled In and Out
 
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command
