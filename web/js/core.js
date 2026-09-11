@@ -124,7 +124,11 @@ export function createGame(world) {
   game.isLit = () => {
     const r = world.rooms[state.room];
     if (!r || !r.dark) return true;
-    return game.activeLights().length > 0;
+    // A carried flame, the temporary nightshade third eye, or the permanent
+    // Obsidian Eye all let you see in otherwise pitch-black rooms.
+    return game.activeLights().length > 0
+      || (state.flags.thirdEye || 0) > 0
+      || !!state.flags.darkSight;
   };
 
   game.availableDirections = () => {

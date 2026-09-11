@@ -847,6 +847,39 @@ function drinkMilk(ctx) {
     "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)";
 }
 
+// --- The nightshade third eye: astral sight from a rotten tomato -------------
+// A tomato is a NIGHTSHADE (Solanaceae), kin to belladonna — the witches'
+// visionary flying-herb. Rotten enough, it reverts to type: violent nausea, but
+// the pineal "third eye" cracks open. You see in the dark, and a vision reveals
+// the hidden attic vault. Survivable (no death); the sight fades on its own.
+const THIRD_EYE_DURATION = 16;
+const THIRD_EYE_LINES = [
+  "The nightshade churns in your gut — and the dark turns to legible grey.",
+  "A greasy, visionary nausea. The unseen keeps insisting on being seen.",
+  "Your stomach knots; your third eye does not blink. Shadow is just another colour.",
+  "The veil thins. Above you, that impossible attic door is still there, waiting.",
+];
+function eatRottenTomato(ctx) {
+  ctx.destroy("rottenTomato");
+  ctx.setFlag("thirdEye", THIRD_EYE_DURATION);
+  ctx.setFlag("vaultFound", true); // the vision SHOWS you the hidden door — permanently
+  ctx.addScore(1);
+  return "You bite into the weeping, furred tomato. It is a NIGHTSHADE — kin to belladonna, the witches' " +
+    "flying-herb — and rotten enough to remember it.\n\nYour gut heaves, cold sweat springs up, and then, " +
+    "between your brows, something OPENS. The dark of the house turns to legible grey. The astral layer bleeds " +
+    "through — and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, and behind it something " +
+    "that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark. It won't last — get UP to the attic.)";
+}
+function takeObsidianEye(ctx) {
+  if (ctx.has("obsidianEye")) return "You already carry the OBSIDIAN EYE.";
+  ctx.moveItem("obsidianEye", "inventory");
+  ctx.setFlag("darkSight", true); // permanent astral sight — no candle ever again
+  ctx.addScore(15);
+  return "You lift the OBSIDIAN EYE off its plinth. It fuses cold to the space between your brows for one " +
+    "heartbeat, then settles into your palm — and the black of the vault becomes plain grey sight. You will " +
+    "never again need a candle to see in the dark places of Blackwood Manor. (+15)";
+}
+
 // --- The ceremonial brazier: only YOUR fire is big enough to light it --------
 function lightBrazier(ctx) {
   if (ctx.getFlag("brazierLit")) return "The brazier already blazes, throwing gold-and-green light across the garden.";
@@ -876,6 +909,18 @@ function afflictionTick(ctx) {
     } else {
       ctx.setFlag("high", hi - 1);
       out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
+    }
+  }
+  const eye = ctx.getFlag("thirdEye") || 0;
+  if (eye > 0) {
+    const left = eye - 1;
+    ctx.setFlag("thirdEye", left);
+    if (left <= 0) {
+      out.push(ctx.getFlag("darkSight")
+        ? "The nightshade loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
+        : "The nightshade loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
+    } else {
+      out.push(THIRD_EYE_LINES[(THIRD_EYE_DURATION - left) % THIRD_EYE_LINES.length]);
     }
   }
   const sick = ctx.getFlag("sick") || 0;
@@ -952,6 +997,7 @@ function statusBanner(ctx) {
   const parts = [];
   if (ctx.getFlag("onFire")) parts.push(FIRE_ART);
   if ((ctx.getFlag("sick") || 0) > 0) { parts.push(SICK_ART); parts.push(digestiveGauge(ctx)); }
+  if ((ctx.getFlag("thirdEye") || 0) > 0) parts.push("👁  T H I R D   E Y E   O P E N  —  the dark is legible");
   return parts.length ? parts.join("\n") : "";
 }
 
@@ -1511,7 +1557,33 @@ export const world = {
         "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads down.",
       searchDesc:
         "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
-      exits: { down: "landing" },
+      exits: {
+        down: "landing",
+        // The astral door in the north gable — hidden and impassable until the
+        // nightshade third eye has shown it to you (sets vaultFound).
+        north: { to: "hiddenVault", via: "vaultFound", revealedBy: "vaultFound",
+          lockedMsg: "The north gable is blank plaster and close shadow. Your ordinary eyes find no seam." },
+      },
+    },
+
+    // --- The astral treasure vault, seen only through the nightshade third eye --
+    hiddenVault: {
+      name: "Hidden Vault",
+      art: [
+        "  .==============.",
+        "  |  .--------.  |",
+        "  |  |  (())  |  |",
+        "  |  '--------'  |",
+        "  '=============='",
+      ].join("\n"),
+      desc:
+        "A windowless vault the living were never meant to find, mortared behind the attic's north " +
+        "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
+        "seems to watch you back. The only way out is south, into the attic.",
+      searchDesc:
+        "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
+      dark: true,
+      exits: { south: "attic" },
     },
 
     // --- The hidden wing, revealed only after the curse is lifted (bell rung) ---
@@ -1641,6 +1713,22 @@ export const world = {
       on: {
         eat: eatBurrito,
       },
+    },
+    rottenTomato: {
+      names: ["tomato", "rotten tomato"], adjectives: ["rotten", "furred", "weeping", "nightshade", "mouldy", "moldy"],
+      loc: "kitchen", takeable: true, edible: true,
+      roomDesc: "A furred, weeping ROTTEN TOMATO sags in a cracked dish on the table.",
+      desc: "A tomato so far gone it has climbed back up its own family tree to deadly nightshade — kin to " +
+        "belladonna, the witches' visionary flying-herb. It promises violent nausea, an opened third eye, or both.",
+      on: { eat: eatRottenTomato },
+    },
+    obsidianEye: {
+      names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
+      loc: "hiddenVault", takeable: true,
+      roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
+      desc: "A sphere of black volcanic glass, cold as a crypt and faintly, wrongly aware. Held to the brow, it " +
+        "makes the dark stop being an enemy.",
+      on: { take: takeObsidianEye },
     },
     burritoWrapper: {
       names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
