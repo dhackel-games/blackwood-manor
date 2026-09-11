@@ -75,7 +75,9 @@ Feature: Fire and food consequences
   Scenario: Unchecked self-immolation is fatal and displays its status art
     Given item "matches" is carried
     When I send "light self on fire with match"
+    Then fire status has 6 turns
     And I send "look"
+    Then fire status has 5 turns
     Then the output matches "ON   F I R E|🔥"
     When I wait at most 12 turns until death
     Then the game is dead

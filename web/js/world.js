@@ -510,6 +510,10 @@ const BURN_LINES = [
 const BURN_DEATH =
   "With a final, dignified WHUMP, you go up like dry tinder. When the smoke clears there is only a tasteful " +
   "pile of ash, a faintly scorched candlestick, and — somewhere, unanswered — a phone ringing off the hook.";
+function fireStatus(ctx) {
+  if (!ctx.getFlag("onFire")) return null;
+  return { remaining: Math.max(0, BURN_LINES.length + 1 - (ctx.getFlag("burnTurns") || 0)) };
+}
 // Advance the burn by one step. Returns { dead, text }. Called both on world turns
 // (burnTick) AND on every line you say to Gary while ablaze (fireCallTalk).
 function stepBurn(ctx) {
@@ -1256,6 +1260,7 @@ export const world = {
   tick: worldTick,   // per-turn: burn-up timer + food afflictions (may kill)
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
+  fireStatus,        // remaining burn turns for the always-on HUD
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
 

@@ -311,6 +311,8 @@ the mansion.
   (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
   the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT
   taking turns — and it even advances **on the phone** (see §12.8), so you can burn up on hold.
+- The always-visible HUD shows `🔥 6 turns` immediately on ignition and counts down until
+  the fire is extinguished or becomes fatal.
 - **ASCII fire art** is stamped onto every room description while ablaze (`statusBanner`).
 - **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
 

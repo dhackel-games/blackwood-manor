@@ -208,6 +208,12 @@ Then("digestive status has {int} turns and phase {string}", function (remaining,
   assert.equal(status.name, phase);
 });
 
+Then("fire status has {int} turns", function (remaining) {
+  const status = world.fireStatus(this.game);
+  assert.ok(status, "fire status must be active");
+  assert.equal(status.remaining, remaining);
+});
+
 Then("the inline bowel status matches the current digestive state", function () {
   const status = world.digestiveStatus(this.game);
   assert.ok(status, "digestive status must be active");
