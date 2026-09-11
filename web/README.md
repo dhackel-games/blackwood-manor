@@ -28,9 +28,9 @@ auto-saves to your browser.
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
   `fly to <room>` carries you directly there. Eating another mushroom cluster
   adds its full duration to the remaining high. The trip's third eye reveals
-  hidden clues and lets you see in dark rooms. The HUD tracks vision as `👁️`
-  and flight as `🪽`, allowing their durations to differ. Supernatural hazards
-  still apply.
+  hidden clues and lets you see in dark rooms. The HUD tracks the trip itself
+  as `🍄`, vision as `👁️`, and flight as `🪽`, allowing those capabilities to
+  diverge. Supernatural hazards still apply.
 - **Equipment:** wearable items occupy HEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
   HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES

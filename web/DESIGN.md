@@ -611,15 +611,16 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
   still triggers the wraith.
 - Mushroom durations stack additively: both dried kitchen mushrooms and fresh
   TOILET-HOLE mushrooms add 12 turns. Eaten TOILET mushrooms can eventually regrow.
-  The always-visible HUD splits that duration into `👁️ <turns>` for vision and
-  `🪽 <turns>` for flight so future effects can vary independently.
+  The always-visible HUD keeps `🍄 <turns>` for the trip itself and also shows
+  `👁️ <turns>` for vision and `🪽 <turns>` for flight so future effects can vary
+  independently.
 
 ## 12.24 Declarative HUD slots
 
 `js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
 `emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
 updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
-pressure, digestive phase, vision, flight, fire countdown, and HEADLAMP
+pressure, digestive phase, mushroom high, vision, flight, fire countdown, and HEADLAMP
 battery are data entries in one registry rather than separate DOM mutations in `ui.js`.
 
 ## 12.25 Derived actions and player-known codes
