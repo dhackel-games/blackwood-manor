@@ -262,8 +262,10 @@ export const commands = {
   smell() { return "Dust, rot, and cold ash."; },
   climb(ctx, cmd) { return `You can't climb the ${cmd.dobj || "that"}.`; },
   enter(ctx, cmd) {
-    if (cmd.dobj) return commands.go(ctx, { ...cmd, dobj: "in" });
-    return "Enter what?";
+    if (!cmd.dobj) return "Enter what?";
+    const target = ctx.find(cmd.dobj);
+    if (target && target.enterTo) return commands.go(ctx, { ...cmd, dobj: target.enterTo });
+    return commands.go(ctx, { ...cmd, dobj: "in" });
   },
   give(ctx) { return "There's no one here to give it to."; },
   pray(ctx) { return "Nothing happens. Perhaps something is missing."; },

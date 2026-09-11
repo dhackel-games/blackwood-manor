@@ -1,0 +1,219 @@
+# manor-adventure.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+
+@walkthrough
+Feature: Blackwood Manor adventure
+  The complete mansion must remain solvable while its deliberate death traps,
+  hidden wing, inspection clues, and alternate movement phrases keep working.
+
+  Background:
+    Given a fresh manor game
+
+  Scenario: Complete the manor and escape with the hidden mirror
+    When I play this command sequence:
+      """
+      east
+      search statue
+      take iron key
+      west
+      north
+      unlock door with iron key
+      open door
+      north
+      west
+      take candlestick
+      south
+      take matches
+      take rope
+      light candle
+      open cellar
+      down
+      take decanter
+      up
+      north
+      east
+      put decanter in reliquary
+      south
+      south
+      east
+      enter well
+      take coin
+      west
+      north
+      north
+      put coin in reliquary
+      drop rope
+      up
+      south
+      read diary
+      north
+      west
+      open music box
+      take tiny key
+      take music box
+      east
+      east
+      unlock jewelry box with tiny key
+      open jewelry box
+      take ring
+      west
+      pull cord
+      drop tiny key
+      drop music box
+      drop ring
+      drop iron key
+      up
+      take miniature
+      down
+      take music box
+      take ring
+      down
+      put music box in reliquary
+      put ring in reliquary
+      put miniature in reliquary
+      east
+      move portrait
+      open safe
+      take talisman
+      wear talisman
+      south
+      pull lever
+      down
+      take grimoire
+      up
+      north
+      west
+      put grimoire in reliquary
+      west
+      south
+      down
+      south
+      take locket
+      north
+      up
+      north
+      east
+      put locket in reliquary
+      put candlestick in reliquary
+      ring bell
+      take bone key
+      unlock secret door with bone key
+      open secret door
+      north
+      north
+      take mirror
+      north
+      """
+    Then the game is won
+    And the game score is 155
+    And the player rank contains "Master of Blackwood Manor"
+
+  Scenario: Entering the well without a rope is fatal
+    When I play until death:
+      """
+      east
+      enter well
+      """
+    Then the game is dead
+
+  Scenario: Entering the crypt without the talisman is fatal
+    When I play until death:
+      """
+      east
+      search statue
+      take iron key
+      west
+      north
+      unlock door with iron key
+      open door
+      north
+      west
+      take candlestick
+      south
+      take matches
+      light candle
+      open cellar
+      down
+      south
+      """
+    Then the game is dead
+
+  Scenario: Climbing to the attic while overloaded is fatal
+    When I play until death:
+      """
+      east
+      search statue
+      take iron key
+      west
+      north
+      unlock door with iron key
+      open door
+      north
+      west
+      take candlestick
+      south
+      take rope
+      north
+      east
+      up
+      pull cord
+      up
+      """
+    Then the game is dead
+
+  Scenario: Going down reaches the garden well
+    When I send "east"
+    And I send "down"
+    Then the output matches "well|fall|plunge|dry"
+    And the game is dead
+
+  Scenario Outline: Entering the open front door walks into the house
+    Given the player is in room "porch"
+    And item "frontKey" is carried
+    When I send "unlock door with iron key"
+    And I send "open door"
+    And I send "enter <target>"
+    Then the current room is "grandHall"
+
+    Examples:
+      | target  |
+      | door    |
+      | house   |
+      | manor   |
+      | mansion |
+
+  Scenario: Entering the cellar door descends through it
+    Given the player is in room "kitchen"
+    When I send "open cellar"
+    And I send "enter cellar door"
+    Then the current room is "wineCellar"
+
+  Scenario: Ringing the prepared bell reveals rather than ends the hidden wing
+    Given the player is in room "grandHall"
+    And flag "curseLiftable" is set
+    When I send "ring bell"
+    Then the output matches "BONE KEY|SECRET DOOR"
+    And the game is not won
+    And item "boneKey" is in "grandHall"
+
+  Scenario: Every room has compact art and a closer-inspection tidbit
+    Then every manor room has searchable detail and narrow ASCII art
+
+  Scenario: Deep inspection reveals hidden objects through every inspection vocabulary
+    Given the player is in room "garden"
+    When I send "look"
+    Then the output contains "_[]_"
+    And the output contains "CLOSER INSPECTION"
+    And the output contains "statue"
+    And the output contains "movable"
+    And the output contains "THINGS YOU CAN ACT ON"
+    And the output contains "STATUE: MOVE, PUSH, EXAMINE"
+    When I send "look at statue"
+    Then the output contains "key"
+    And item "frontKey" is in "garden"
+    Given a fresh manor game
+    And the player is in room "parlor"
+    When I send "ex portrait"
+    Then the output contains "SAFE"
+    And item "safe" is in "parlor"
+
+# end manor-adventure.feature

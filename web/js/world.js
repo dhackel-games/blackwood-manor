@@ -1499,7 +1499,8 @@ export const world = {
       on: { sit: useToilet, use: useToilet, flush: useToilet, enter: useToilet },
     },
     frontDoor: {
-      names: ["door"], adjectives: ["front", "oak", "great"], loc: "porch", fixed: true, scenery: true,
+      names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
+      loc: "porch", fixed: true, scenery: true, enterTo: "north",
       openable: true, open: false, locked: true, keyId: "frontKey",
       desc: "A great oak door, black with age, with a heavy iron lock.",
       on: {
@@ -1542,7 +1543,8 @@ export const world = {
       desc: "A coil of stout rope, still sound.",
     },
     cellarDoor: {
-      names: ["cellar", "trapdoor"], adjectives: ["heavy"], loc: "kitchen", fixed: true, scenery: true,
+      names: ["cellar", "trapdoor", "door"], adjectives: ["heavy", "cellar"],
+      loc: "kitchen", fixed: true, scenery: true, enterTo: "down",
       desc: "A heavy trap-door set flush in the kitchen floor, iron-ringed.",
       on: {
         open(ctx) {
@@ -1696,7 +1698,7 @@ export const world = {
     },
     secretDoor: {
       names: ["door", "seam"], adjectives: ["secret", "hidden", "north"], loc: null, fixed: true, scenery: true,
-      openable: true, open: false, locked: true, keyId: "boneKey",
+      openable: true, open: false, locked: true, keyId: "boneKey", enterTo: "north",
       desc: "A door of black wood where no door was, fitted with a keyhole shaped like a tooth.",
       on: {
         open(ctx) {

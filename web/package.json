@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "npm run test:unit && npm run test:walkthrough",
-    "test:unit": "cucumber-js \"tests/features/**/*.feature\" --import \"tests/steps/**/*.js\"",
-    "test:walkthrough": "node tests/walkthrough.js"
+    "test": "cucumber-js \"tests/features/**/*.feature\" --import \"tests/steps/**/*.js\"",
+    "test:unit": "npm test -- --tags @unit",
+    "test:walkthrough": "npm test -- --tags @walkthrough"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^13.2.1"

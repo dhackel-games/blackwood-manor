@@ -1,5 +1,9 @@
 # Blackwood Manor — Implementation Plan
 
+> **Current test layout (2026-09-10):** This is the original implementation plan, so its
+> references to `tests/walkthrough.js` are historical. All executable tests now live as
+> Gherkin in `tests/features/`, with Cucumber definitions in `tests/steps/`; run `npm test`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **No-git zone:** This project lives in HackelFamilyBrain (iCloud). Do NOT run `git` here. The "checkpoint" step in each task is running the test suite — iCloud auto-saves the files.

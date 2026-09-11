@@ -42,9 +42,8 @@ haunted-mansion-adventure/
 │   ├── ui.js         # DOM adapter: terminal display, input, history
 │   └── save.js       # localStorage autosave + SAVE/RESTORE
 ├── tests/
-│   ├── features/         # executable Gherkin unit specifications
-│   ├── steps/            # Cucumber step definitions + fixtures
-│   └── walkthrough.js    # scripted solve + death paths, runs in Node
+│   ├── features/         # all executable Gherkin specifications
+│   └── steps/            # Cucumber step definitions + fixtures
 ├── DESIGN.md
 └── README.md         # how to play + how to add a room
 ```
@@ -201,10 +200,9 @@ the bottom, responsive for laptop/tablet. Up-arrow command history.
 
 ## 10. Testing
 
-Executable Gherkin under `tests/features/` covers the DOM-free engine units through
-Cucumber step definitions in `tests/steps/`. `tests/walkthrough.js` separately drives a
-**complete winning playthrough** and asserts victory + final score, plus death paths
-(well, crypt, and overloaded attic). Run both locally with `npm test`.
+Executable Gherkin under `tests/features/` covers the DOM-free engine, a **complete winning
+walkthrough**, Gary, fire and food behavior, map secrecy, and death paths. Cucumber step
+definitions and fixtures live in `tests/steps/`. Run the complete local suite with `npm test`.
 
 ---
 
@@ -349,11 +347,11 @@ the mansion.
 - 🧀 **"Ate Well"** — ate the good cheese.
 
 ## 12.11 Testing
-`npm run test:unit` runs the executable Gherkin unit specifications for engine state, parsing,
-commands, inspection, persistence, build metadata, touch contracts, and Gary's output guards.
-`npm run test:walkthrough` covers the full winning walkthrough, death traps, Gary conversation
-and billing, the hidden wing, source-gated self-immolation, the burrito cycle, map behavior,
-and badges. `npm test` runs both local suites in that order.
+`npm test` runs all executable Gherkin. `npm run test:unit` selects engine state, parsing,
+commands, inspection, persistence, build metadata, touch contracts, and Gary output guards via
+the `@unit` tag. `npm run test:walkthrough` selects the full winning walkthrough, death traps,
+Gary conversation and billing, the hidden wing, source-gated self-immolation, the burrito cycle,
+map behavior, and badges via the `@walkthrough` tag.
 
 ## 12.12 Command chaining (v2.1.0)
 `splitCommands()` in `parser.js` splits an input line on `.` `;` `,` and a standalone `then`,
@@ -384,8 +382,9 @@ detection, hang-ups, score, and the fire rescue. The model only re-voices turns 
 conversation.
 
 `world.garyTurnInfo(ctx, text)` is the gate. It returns `llmOk: false` for anything
-`MECHANICAL`, anything while `onFire`, and anything matching `CRISIS`. `tests/walkthrough.js`
-group 3b asserts this and will fail if a mechanical branch ever becomes model-voiced.
+`MECHANICAL`, anything while `onFire`, and anything matching `CRISIS`.
+`tests/features/gary-hotline.feature` asserts this and fails if a mechanical branch becomes
+model-voiced.
 
 **Providers** (`js/gary-brain.js`, tried in order, every failure path returns `""` = use canned):
 

@@ -1,5 +1,6 @@
 # parser.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 
+@unit
 Feature: Player command parsing
   Player phrasing must resolve to stable engine commands, and command chains
   must preserve their original order.

@@ -34,12 +34,13 @@ Gary's voice is **muted by default**; on the call screen tap **🔊 Gary: on** t
 
 ```bash
 cd web
-npm test                  # Cucumber unit scenarios + gameplay walkthrough
-npm run test:walkthrough  # gameplay walkthrough only
+npm test                  # all executable Gherkin scenarios
+npm run test:unit         # engine/unit-tagged scenarios only
+npm run test:walkthrough  # gameplay-tagged scenarios only
 ```
 
-Plays a complete winning walkthrough (asserts the score) plus the death traps and
-the Gary hint-line behavior.
+Runs the executable feature suite, including a complete winning walkthrough,
+death traps, and Gary hint-line behavior.
 
 ## Editing / expanding
 

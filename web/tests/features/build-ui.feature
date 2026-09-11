@@ -1,5 +1,6 @@
 # build-ui.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 
+@unit
 Feature: Build metadata and touch-control contract
   The local game build must identify itself consistently and keep every touch
   direction available without allowing the transcript to displace the controls.

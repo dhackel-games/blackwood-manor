@@ -1,5 +1,6 @@
 # gary-brain.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 
+@unit
 Feature: Gary model-output safeguards
   Model replies must be cleaned into Gary's voice, and only local pages may
   probe the on-device daemon.

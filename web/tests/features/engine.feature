@@ -1,5 +1,6 @@
 # engine.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 
+@unit
 Feature: Generic text-adventure engine
   The content-free engine must preserve game state, parser-driven actions,
   inspection behavior, hazards, persistence, and command chaining.

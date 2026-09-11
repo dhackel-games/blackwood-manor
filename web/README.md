@@ -31,7 +31,8 @@ auto-saves to your browser.
 - **Things:** `take <x>`, `drop <x>`, `inventory` (`i`)
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
-  `wear`/`remove <x>`, `ring <x>`, `enter <x>`
+  `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,
+  cellar, well, and toilet)
 - **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 
@@ -54,23 +55,22 @@ js/commands.js        generic verb handlers
 js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
 js/ui.js              browser terminal adapter
 js/save.js                 localStorage save/restore
-tests/features/*.feature   executable Gherkin unit specifications
-tests/steps/*.js           Cucumber step definitions and engine fixtures
-tests/walkthrough.js       full winning playthrough + death-path tests
+tests/features/*.feature   all executable Gherkin specifications
+tests/steps/*.js           Cucumber step definitions and fixtures
 DESIGN.md / PLAN.md        design doc and implementation plan
 ```
 
 ## Run the tests
 
 ```
-npm test                  # Cucumber unit scenarios + gameplay walkthrough
-npm run test:unit         # Cucumber unit scenarios only
-npm run test:walkthrough  # gameplay walkthrough only
+npm test                  # all executable Gherkin scenarios
+npm run test:unit         # engine/unit-tagged scenarios only
+npm run test:walkthrough  # gameplay-tagged scenarios only
 ```
 
-The unit behavior is written as executable Gherkin. The walkthrough then plays
-the entire game to victory, asserts the score, and confirms each death trap.
-Run the complete local suite after any change to the world.
+All test behavior is executable Gherkin. The gameplay-tagged scenarios play the
+entire game to victory, check its final score, and cover each death trap. Run the
+complete local suite after any change to the world.
 
 ## Expanding the game (the whole point)
 
@@ -129,5 +129,5 @@ Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
 `roomOf(id)`, `itemsIn(loc)`, `inventory()`, `find(phrase)`, `moveItem(id,to)`,
 `destroy(id)`, `addScore(n)`, `kill(msg)`, `win(msg)`, `describeRoom()`.
 
-After any change, **run `npm test`** — and update `tests/walkthrough.js` if you
-changed the solution path.
+After any change, **run `npm test`** — and update the gameplay feature and steps
+if you changed the solution path.
