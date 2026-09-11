@@ -108,7 +108,7 @@ Feature: Fire and food consequences
     Then flag "sick" equals 40
     And item "burritoWrapper" is in "inventory"
     When I send "look"
-    Then the output matches "FART-FIRE|🤢"
+    Then the output matches "FART|🤢"
     When I send "drink milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true

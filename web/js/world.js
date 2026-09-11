@@ -798,7 +798,7 @@ const DIGESTIVE_PHASES = [
   { name: "GURGLE", emoji: "🫧" },
   { name: "BARF", emoji: "🤮" },
   { name: "FART", emoji: "💨" },
-  { name: "SHIT", emoji: "💩" },
+  { name: "POOP", emoji: "💩" },
 ];
 // Per-event ASCII blasts, indexed to match SICK_LINES phases (0=burp, 1=barf,
 // 2=flaming fart, 3=sparking diarrhea). Stamped in right after the event line.
@@ -999,7 +999,7 @@ const FIRE_ART = [
   "      _(___)_(___)_",
 ].join("\n");
 const SICK_ART = [
-  "     \\o/   ~ B L E A R G H ~     🤢  BURP · BARF · FART-FIRE · DIARRHEA  🔥",
+  "     \\o/   ~ B L E A R G H ~     🤢  BURP · BARF · FART · POOP  🔥",
   "      |    ~ ~ ~",
   "     / \\   . : . : .",
 ].join("\n");
