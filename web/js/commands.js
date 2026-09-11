@@ -417,6 +417,7 @@ export const commands = {
       "wear / remove, eat / drink",
       "push / pull / move, reach into <x>, talk to / wake <x>, give <x> to <y>, ring <x>",
       "score save restore restart quit",
+      "bug <description> — open a GitHub issue for the current room",
       "ai — is Gary's on-device model running, or is he scripted?",
       "",
       "Chain commands with . ; , or THEN:",

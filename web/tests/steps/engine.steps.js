@@ -5,7 +5,7 @@ import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
 import { HUD_SLOT_DEFINITIONS, HudSlot } from "../../js/hud.js";
-import { bugReportUrl } from "../../js/issue-report.js";
+import { bugReportDescription, bugReportUrl } from "../../js/issue-report.js";
 import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
 
@@ -328,7 +328,19 @@ Then("bug reports include the current room in the issue title", function () {
   const url = new URL(bugReportUrl("Hall Bedroom"));
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /window\.open\(bugReportUrl\(game\.room\(\)\.name\), "_blank", "noopener,noreferrer"\)/);
+  assert.match(ui, /bugReportUrl\(game\.room\(\)\.name, description\)/);
+});
+
+Then("a Bug command uses its phrase as the issue description", function () {
+  const description = "the mirror shows two of me";
+  assert.equal(bugReportDescription(`bug ${description}`), description);
+  assert.equal(bugReportDescription("bug"), "");
+  assert.equal(bugReportDescription("buggy"), null);
+  const url = new URL(bugReportUrl("Hall Bedroom", description));
+  assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
+  assert.equal(url.searchParams.get("body"), description);
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
 });
 
 Then("Gary's send control contains only an up arrow", function () {
