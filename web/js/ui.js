@@ -253,7 +253,6 @@ function sfxContext() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (AC) sfxCtx = new AC();
   }
-  if (sfxCtx && sfxCtx.state === "suspended") sfxCtx.resume().catch(() => {});
   return sfxCtx;
 }
 function sfxTone(ctx, { type = "sine", freqFrom, freqTo, start, dur, gain = 0.15 }) {
@@ -288,7 +287,13 @@ function playSfx(kind) {
   if (sfxMuted || !SFX[kind]) return;   // own "no surprise audio" gate, independent of Gary's voice
   const ctx = sfxContext();
   if (!ctx) return;
-  try { SFX[kind](ctx, ctx.currentTime); } catch { /* ignore */ }
+  const fire = () => { try { SFX[kind](ctx, ctx.currentTime); } catch { /* ignore */ } };
+  // Safari keeps a freshly-created AudioContext "suspended" until resume()'s
+  // promise actually settles (a tick or two later, unlike some browsers that
+  // resolve it synchronously within a user gesture). Scheduling start() before
+  // that happens gets silently dropped there — wait for it, then fire.
+  if (ctx.state === "suspended") ctx.resume().then(fire).catch(() => {});
+  else fire();
 }
 // Which noise (if any) this turn's output is narrating, keyed off the same
 // ASCII-art substrings the sick-line system stamps in.
@@ -317,10 +322,10 @@ if (soundToggleBtn) {
   soundToggleBtn.addEventListener("click", () => {
     sfxMuted = !sfxMuted;
     setSoundToggleLabel();
-    // Create/resume the AudioContext inside this click handler so it's primed
-    // by the user gesture (autoplay policies block it otherwise), and give an
-    // audible confirmation the same way the phone's voice toggle does.
-    if (!sfxMuted) { const ctx = sfxContext(); if (ctx) SFX.burp(ctx, ctx.currentTime); }
+    // Prime the AudioContext inside this click handler (the user gesture) and
+    // give an audible confirmation, same as the phone's voice toggle. Routed
+    // through playSfx so it gets the same suspended-context resume handling.
+    if (!sfxMuted) playSfx("burp");
   });
 }
 
