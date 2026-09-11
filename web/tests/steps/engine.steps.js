@@ -326,6 +326,16 @@ Then("the page links the Bug control to {string}", function (url) {
   assert.match(html, /id=["']bug-report["'][^>]+rel=["']noopener noreferrer["']/);
 });
 
+Then("the Bug control contains only its icon", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /<a[^>]+id=["']bug-report["'][^>]*>\s*🐛\s*<\/a>/);
+});
+
+Then("Gary's send control contains only an up arrow", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*↑\s*<\/button>/);
+});
+
 Then("the iOS wrapper opens new-window web links externally", function () {
   const swift = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   assert.match(swift, /WKUIDelegate/);
