@@ -75,6 +75,14 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     },
   },
   {
+    id: "high",
+    emoji: "🍄",
+    calculate: ({ game }) => {
+      const turns = game.state.flags.high || 0;
+      return turns > 0 ? `${turns} turns` : null;
+    },
+  },
+  {
     id: "vision",
     emoji: "👁️",
     calculate: ({ game, world }) => {
