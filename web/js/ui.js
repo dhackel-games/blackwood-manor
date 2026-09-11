@@ -8,7 +8,11 @@ import { VERSION } from "./version.js";
 import { createHud } from "./hud.js";
 import * as garyBrain from "./gary-brain.js";
 import { MAP_MARK } from "./map.js";
-import { bugReportDescription, bugReportUrl } from "./issue-report.js";
+import {
+  bugReportDescription,
+  bugReportUrl,
+  DEFAULT_ISSUE_DESCRIPTION,
+} from "./issue-report.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -519,7 +523,7 @@ const phoneMicBtn = document.getElementById("phone-mic");
 micBtn.addEventListener("click", () => { listening ? stopListening() : startListening(input, micBtn); });
 phoneMicBtn.addEventListener("click", () => { listening ? stopListening() : startListening(phoneCmd, phoneMicBtn); });
 if (bugReport) {
-  bugReport.addEventListener("click", () => openBugReport());
+  bugReport.addEventListener("click", () => openBugReport(DEFAULT_ISSUE_DESCRIPTION));
 }
 
 // --- touch controls ---
