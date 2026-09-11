@@ -218,7 +218,7 @@ Everything player-facing lives in `js/world.js`:
 
 # 12. Current state — everything built since v1 (living record)
 
-*Last updated: 2026-09-09. This section supersedes the v1 spec where they differ.*
+*Last updated: 2026-09-10. This section supersedes the v1 spec where they differ.*
 
 Everything is still **content-in-`world.js`, engine stays generic**. A few small, generic
 hooks were added to the engine to support new content — none of them know anything about
@@ -295,7 +295,13 @@ the mansion.
   mirror).
 
 ## 12.6 The fire subsystem (Andy's idea, expanded)
-- **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` → `onFire`.
+- **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` requires
+  a real ignition source. With only the one-use match, the parser supplies `(with match)` and
+  consumes it. With both the match and burrito foil, it asks which source to use.
+- **Fart-flame ignition:** eating the kitchen burrito leaves its crumpled foil wrapper in
+  inventory. During the resulting digestive cycle, trying to ignite with the foil queues the
+  attempt until the next flaming fart. The wrapper is reusable while carried; dropping it
+  cancels a queued attempt.
 - **Burn-up timer:** 5 escalating warning turns, then you burn to **ash** on the 6th
   (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
   the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT
@@ -321,11 +327,14 @@ the mansion.
 
 ## 12.9 Food & afflictions (kitchen) + the privy
 - **Strange mushrooms** → `high` (trippy per-turn flavor, harmless).
-- **Rancid meat** → `sick` = violent vomiting & diarrhea; **lethal in ~20 turns if uncured**,
-  with an **ASCII sick banner** on every room description and escalating dehydration warnings.
+- **Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito** contains two kinds of beans,
+  three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
+  destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts
+  `sick`: stomach-acid burp → barf → flaming fart → spicy, sparking diarrhea. That four-turn
+  cycle repeats ten times and is lethal after its 40th uncured beat.
 - **Good cheese** → real food: cures affliction, +5, "fortified" (and the "Ate Well" badge).
 - **The privy** (ivy-choked outhouse east of the garden) has a **toilet**: `sit`/`use`/`flush`
-  cures the sickness ("private, thorough, deeply cathartic").
+  cures the sickness and cancels any queued fart-flame ignition.
 
 ## 12.10 End-screen badges (`endBadges`)
 - 🔥 **"Out Of The Frying Pan"** — escaped *while still on fire* (the escape banner also gets a
@@ -337,8 +346,9 @@ the mansion.
 ## 12.11 Testing
 `node tests/walkthrough.js` now covers **10 groups**: engine units, full winning walkthrough,
 death traps (attic/well/grue), Gary conversation + billing, hall-of-shame ranks, the hidden
-wing, the mailbox→burn→self-immolation→Gary fire call, and the burn-up timer + brazier + foods
-+ toilet + badges, plus the Gary voice-layer gate and the crisis guard. Keep it green on every change.
+wing, source-gated self-immolation and Gary's fire call, and the burn-up timer + brazier +
+burrito cycle + reusable fart-flame wrapper + cures + badges, plus the Gary voice-layer gate
+and the crisis guard. Keep it green on every change.
 
 ## 12.12 Command chaining (v2.1.0)
 `splitCommands()` in `parser.js` splits an input line on `.` `;` `,` and a standalone `then`,

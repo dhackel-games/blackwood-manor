@@ -37,8 +37,9 @@ function nextHint(ctx) {
     return "The front door's locked, shocker. Some genius buried the key under that leaning STATUE in the garden. MOVE the statue, grab the key, then unlock the front door. In you go. Riveting.";
   }
   if (!lit) {
-    if (ctx.roomOf("matches") === null && !ctx.has("candlestick")) {
-      return "You burned your only match already, didn't you. DIDN'T YOU. Look — grab the CANDLESTICK in the DINING ROOM anyway; you'll want it. Next time don't waste the match, pal.";
+    if (ctx.roomOf("matches") === null) {
+      return "You burned your only match already, didn't you. DIDN'T YOU. The CANDLESTICK is still in the DINING ROOM, " +
+        "but without that match it is now an extremely expensive paperweight. Next time don't waste the match, pal.";
     }
     return "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
   }
@@ -506,21 +507,68 @@ function burnTick(ctx) {
   return stepBurn(ctx).text;
 }
 
+const SELF_FIRE_NO_SOURCE =
+  "You make an earnest attempt, but nothing catches. This plan appears to be missing one small, hot source of ignition.";
+
+function carriedMatch(ctx) {
+  return ctx.inventory().find((it) =>
+    (it.names || []).some((name) => name === "match" || name === "matches"));
+}
+
+function requestedSelfFireSource(cmd) {
+  const source = `${cmd.prep || ""} ${cmd.iobj || ""}`.toLowerCase();
+  if (/\bmatch(?:es)?\b/.test(source)) return "match";
+  if (/\b(fart|gas|wrapper|foil|burrito)\b/.test(source)) return "fart";
+  return null;
+}
+
 // Self-immolation. Works in any room (see the interceptor injected at the bottom).
-function igniteSelf(ctx) {
+function igniteSelf(ctx, source, grantTickGrace = true) {
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+  if (source === "match") {
+    const match = carriedMatch(ctx);
+    if (!match) return "You pat every pocket twice. No match. No spark. No glorious personal inferno.";
+    ctx.destroy(match.id);
+  }
   ctx.setFlag("onFire", true);
   ctx.setFlag("burnTurns", 0);
-  ctx.setFlag("burnGrace", true);
+  ctx.setFlag("burnGrace", grantTickGrace);
+  ctx.setFlag("fartIgnitionQueued", false);
   ctx.addScore(-1);
+  if (source === "fart") {
+    return (
+      "The next flaming fart strikes. You snap open the crumpled burrito wrapper, angle its tin foil like a " +
+      "deranged signal mirror, and catch the blue-orange jet. The foil flashes; your clothes catch; the rest of " +
+      "you follows.\n\n" +
+      "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
+      "which means this appalling technique remains reusable while the burrito keeps firing."
+    );
+  }
   return (
-    "You... set yourself on fire.\n\n" +
+    "(with match)\n\nYou strike your one and only match and touch it to yourself. The spent match crumbles to ash.\n\n" +
     "AHAHAHAHA — YOU'RE ON FIRE! This is fine. This is, if anything, cozy. The portraits on the walls " +
     "lean in with something like respect.\n\n" +
     "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. Put yourself out, " +
     "dump the fire into something, or make it COUNT. (Gary lives for this.)"
   );
 }
+
+function queueFartIgnition(ctx) {
+  if (!ctx.has("burritoWrapper")) {
+    return "That plan needs something foil-lined to catch and redirect the flame. You do not currently have it.";
+  }
+  const sick = ctx.getFlag("sick") || 0;
+  if (sick <= 0) {
+    return "You ready the foil, but your digestive pilot light is out. No flaming fart is currently scheduled.";
+  }
+  ctx.setFlag("fartIgnitionQueued", true);
+  if ((SICK_DURATION - sick) % SICK_LINES.length === 2) {
+    return "You spread the crumpled wrapper's tin foil behind you. The pressure says your timing is catastrophically perfect.";
+  }
+  return "You cup the crumpled burrito wrapper behind you and prepare the tin foil. Wrong turn. " +
+    "You'll try when the next flaming fart strikes you.";
+}
+
 function putOutSelf(ctx) {
   if (!ctx.getFlag("onFire")) return null; // nothing to douse — let the generic handler answer
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
@@ -530,10 +578,22 @@ function putOutSelf(ctx) {
 function selfLightInterceptor(ctx, cmd) {
   const d = (cmd.dobj || "").toLowerCase();
   const i = (cmd.iobj || "").toLowerCase();
-  if (["self", "myself", "me", "yourself"].includes(d)) return igniteSelf(ctx);
-  if (["fire", "flame", "flames"].includes(d) && !ctx.find(d)) return igniteSelf(ctx); // "light fire"
-  if (!d && i === "fire") return igniteSelf(ctx);                                       // "light on fire"
-  return null; // not self-immolation — fall through to the generic light/burn command
+  const targetsSelf = ["self", "myself", "me", "yourself"].includes(d) ||
+    (["fire", "flame", "flames"].includes(d) && !ctx.find(d)) ||
+    (!d && i === "fire");
+  if (!targetsSelf) return null;
+  if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+
+  const requested = requestedSelfFireSource(cmd);
+  if (requested === "match") return igniteSelf(ctx, "match");
+  if (requested === "fart") return queueFartIgnition(ctx);
+
+  const hasMatch = !!carriedMatch(ctx);
+  const hasWrapper = ctx.has("burritoWrapper");
+  if (hasMatch && hasWrapper) return "(with match or fart flames?)";
+  if (hasMatch) return igniteSelf(ctx, "match");
+  if (hasWrapper && (ctx.getFlag("sick") || 0) > 0) return queueFartIgnition(ctx);
+  return SELF_FIRE_NO_SOURCE;
 }
 function selfExtinguishInterceptor(ctx, cmd) {
   const d = (cmd.dobj || "").toLowerCase();
@@ -654,11 +714,12 @@ const HIGH_LINES = [
   "You get the ghosts now. They're just vibes. Everything, really, is vibes.",
   "A single cobweb becomes, briefly, the most beautiful thing you have ever seen.",
 ];
+const SICK_DURATION = 40;
 const SICK_LINES = [
-  "Your stomach lurches. Something down there has Opinions.",
-  "A cold sweat blooms. The gurgling is coming from INSIDE the adventurer.",
-  "You double over. Whatever you ate is staging a full revolt — from both exits.",
-  "Nope. Nope nope nope. You need a bathroom this manor simply does not have.",
+  "A blast of stomach acid climbs your throat and escapes as a burp hot enough to tarnish silver.",
+  "You stop dead and BARF with the force and volume of a breached fire hydrant.",
+  "A FLAMING FART cracks behind you — blue at the core, orange at the edges, and deeply judgmental.",
+  "A spicy, sparking diarrhea disaster fills your pants. Tiny embers spit from the cuffs. This is now a repeating problem.",
 ];
 function eatMushrooms(ctx) {
   ctx.destroy("mushrooms");
@@ -666,17 +727,22 @@ function eatMushrooms(ctx) {
   return "You eat the strange mushrooms.\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here.";
 }
-function eatMeat(ctx) {
-  ctx.destroy("meat");
-  ctx.setFlag("sick", 20);
-  return "You eat the rancid meat.\n\nInstantly, catastrophically, you understand this was a mistake. Your gut " +
-    "clenches. Something is coming. Something is coming from BOTH DIRECTIONS. (You are now violently ill — find a " +
-    "TOILET or the good cheese soon, or this WILL kill you.)";
+function eatBurrito(ctx) {
+  ctx.destroy("burrito");
+  ctx.moveItem("burritoWrapper", "inventory");
+  ctx.setFlag("sick", SICK_DURATION);
+  ctx.setFlag("sickGrace", true);
+  ctx.setFlag("fartIgnitionQueued", false);
+  return "You eat Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
+    "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
+    "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or eat the good cheese before " +
+    "this completes ten full digestive laps.)";
 }
 function eatProvisions(ctx) {
   ctx.destroy("provisions");
   const wasAfflicted = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
   ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
+  ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("ateGood", true);
   ctx.addScore(5);
   return "You eat the good cheese. Real food, at last.\n\n" +
@@ -701,8 +767,8 @@ function lightBrazier(ctx) {
 }
 
 const SICK_DEATH =
-  "Your body, having expelled everything it ever contained and several things it never did, finally gives out. " +
-  "You collapse — hollow, dehydrated, and profoundly undignified — on the floor of a haunted house. What a way to go.";
+  "After the tenth complete lap, your body has expelled everything it ever contained and several things it never did. " +
+  "You collapse — hollow, dehydrated, lightly singed, and profoundly undignified — on the floor of a haunted house.";
 // --- Per-turn world tick: burn-up + food afflictions -------------------------
 function afflictionTick(ctx) {
   const out = [];
@@ -710,11 +776,27 @@ function afflictionTick(ctx) {
   if (hi > 0) { ctx.setFlag("high", hi - 1); out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]); }
   const sick = ctx.getFlag("sick") || 0;
   if (sick > 0) {
+    if (ctx.getFlag("sickGrace")) {
+      ctx.setFlag("sickGrace", false);
+      return out.length ? out.join("\n") : null;
+    }
+    const phase = (SICK_DURATION - sick) % SICK_LINES.length;
     const left = sick - 1;
     ctx.setFlag("sick", left);
-    if (left === 0) return ctx.kill(SICK_DEATH);           // ran the full course uncured -> death
-    out.push(SICK_LINES[(left) % SICK_LINES.length]);
-    if (left <= 3) out.push("You are dangerously dehydrated. Find a TOILET or the good cheese NOW.");
+    out.push(SICK_LINES[phase]);
+
+    if (ctx.getFlag("fartIgnitionQueued")) {
+      if (!ctx.has("burritoWrapper")) {
+        ctx.setFlag("fartIgnitionQueued", false);
+        out.push("Without the foil wrapper in your hands, the self-lighting plan is cancelled.");
+      } else if (phase === 2) {
+        out.push(igniteSelf(ctx, "fart", false));
+      }
+    }
+
+    if (left <= 4 && left > 0)
+      out.push("You are dangerously dehydrated. Find a TOILET or the good cheese NOW.");
+    if (left === 0) out.push(ctx.kill(SICK_DEATH));        // ten complete four-beat cycles
   }
   return out.length ? out.join("\n") : null;
 }
@@ -736,7 +818,7 @@ const FIRE_ART = [
   "      _(___)_(___)_",
 ].join("\n");
 const SICK_ART = [
-  "     \\o/   ~ B L E A R G H ~     🤢  VOMITING & DIARRHEA  🤮",
+  "     \\o/   ~ B L E A R G H ~     🤢  BURP · BARF · FART-FIRE · DIARRHEA  🔥",
   "      |    ~ ~ ~",
   "     / \\   . : . : .",
 ].join("\n");
@@ -751,8 +833,10 @@ function statusBanner(ctx) {
 function useToilet(ctx) {
   if ((ctx.getFlag("sick") || 0) > 0) {
     ctx.setFlag("sick", 0);
+    ctx.setFlag("sickGrace", false);
+    ctx.setFlag("fartIgnitionQueued", false);
     return "You reach the privy not one moment too soon. What follows is private, thorough, and — eventually — " +
-      "deeply cathartic. You emerge hollow and trembling, but CURED. The vomiting and diarrhea have passed.";
+      "deeply cathartic. You emerge hollow and trembling, but CURED. The burrito's four-stage assault has passed.";
   }
   if ((ctx.getFlag("high") || 0) > 0)
     return "You sit and contemplate the porcelain for what may be an hour, or an epoch. It is profound. It is also unhelpful.";
@@ -1132,12 +1216,25 @@ export const world = {
       desc: "Speckled purple mushrooms, faintly luminous. Eating these is self-evidently a terrible idea.",
       on: { eat: eatMushrooms },
     },
-    meat: {
-      names: ["meat", "roast", "ham"], adjectives: ["rancid", "grey", "questionable"],
+    burrito: {
+      names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A grey, questionable ROAST sits on the table, humming with flies.",
-      desc: "A joint of grey meat well past any defensible date. It smells like a decision you will regret.",
-      on: { eat: eatMeat },
+      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TACO STAND DEATH WISH SPICY BURRITO sweats on the table.",
+      desc: "Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
+        "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
+        "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
+        "available evidence, it may be edible if you're feeling adventurous.",
+      on: {
+        eat: eatBurrito,
+        search(ctx) { return ctx.item("burrito").desc; },
+      },
+    },
+    burritoWrapper: {
+      names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
+      loc: null, takeable: true,
+      roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
+      desc: "The used burrito wrapper is laminated with a stubborn sheet of tin foil. It smells dangerous, but " +
+        "its shiny inner surface looks capable of redirecting a brief digestive flame.",
     },
     provisions: {
       names: ["cheese", "wheel", "provisions", "rations"], adjectives: ["wax", "hard", "good"],
@@ -1180,8 +1277,7 @@ export const world = {
           const c = ctx.item("candlestick");
           if (c.lit) return "It is already lit.";
           if (c.fuel <= 0) return "The candle is a spent stub; it will not catch.";
-          const match = ctx.inventory().find((i) =>
-            (i.names || []).some((n) => n === "match" || n === "matches"));
+          const match = carriedMatch(ctx);
           if (!match) return "You have nothing to light it with.";
           c.lit = true;
           ctx.destroy(match.id);

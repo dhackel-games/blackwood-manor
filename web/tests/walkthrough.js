@@ -252,9 +252,15 @@ const WIN = [
   assert.match(g.send("burn letter"), /alight|ash|flakes/i, "letter can be burned");
   assert.equal(g.roomOf("letter"), null, "burned letter is destroyed");
 
+  const noSource = g.send("light self on fire");
+  assert.match(noSource, /source of ignition/i, "self-immolation needs an actual source");
+  assert.equal(g.getFlag("onFire"), undefined, "a source-less attempt must not ignite");
+
+  g.moveItem("matches", "inventory");
   const ablaze = g.send("light self on fire");
-  assert.match(ablaze, /on fire/i, "you can light yourself on fire");
+  assert.match(ablaze, /\(with match\).*on fire/is, "a sole carried match is selected automatically");
   assert.equal(g.getFlag("onFire"), true, "onFire flag set");
+  assert.equal(g.roomOf("matches"), null, "self-immolation consumes the one match");
 
   const greet = g.send("call gary");                 // dial in while ablaze
   assert.match(greet, /burning|on fire/i, "Gary notices you're on fire");
@@ -270,9 +276,20 @@ const WIN = [
 
   // self-immolation works anywhere; generic lighting stays intact
   const g2 = createGame(world);
+  assert.match(g2.send("burn self"), /source of ignition/i, "'burn self' also requires a source");
+  g2.moveItem("matches", "inventory");
   assert.match(g2.send("burn self"), /on fire/i, "'burn self' also ignites");
   assert.match(g2.send("extinguish self"), /no longer on fire/i, "stop-drop-roll puts you out");
   assert.equal(g2.send("light mailbox"), "You can't light that.", "normal lighting unaffected");
+
+  // The single match can light the candle OR the player, never both.
+  const candleFirst = createGame(world);
+  candleFirst.moveItem("candlestick", "inventory");
+  candleFirst.moveItem("matches", "inventory");
+  assert.match(candleFirst.send("light candle"), /spent match|no more matches/i);
+  assert.equal(candleFirst.roomOf("matches"), null, "lighting the candle consumes the one match");
+  assert.match(candleFirst.send("light self on fire"), /source of ignition/i,
+    "the consumed candle match cannot be reused on the player");
   console.log("OK: mailbox/letter/burn + self-immolation + Gary fire call");
 }
 
@@ -282,6 +299,7 @@ const WIN = [
 {
   // Burn-up: you last a few turns, then you're ash.
   const g = createGame(world);
+  g.moveItem("matches", "inventory");
   g.send("light self on fire");
   let dead = false;
   for (let i = 0; i < 12 && !dead; i++) { g.send("wait"); dead = g.state.dead; }
@@ -289,6 +307,7 @@ const WIN = [
 
   // Fire ASCII banner + sick ASCII banner appear in room descriptions.
   const g2 = createGame(world);
+  g2.moveItem("matches", "inventory");
   g2.send("light self on fire");
   assert.match(g2.send("look"), /ON   F I R E|🔥/, "fire art shows in the room description");
 
@@ -296,30 +315,89 @@ const WIN = [
   const g3 = createGame(world);
   g3.state.room = "garden";
   assert.match(g3.send("light brazier"), /whole person|hisses/i, "brazier won't light without your own fire");
+  g3.moveItem("matches", "inventory");
   g3.send("light self on fire");
   assert.match(g3.send("light brazier"), /EMBER STONE/, "on fire, the brazier lights and yields the ember");
   assert.equal(g3.getFlag("onFire"), false, "lighting the brazier dumps your fire into it");
   assert.equal(g3.roomOf("emberStone"), "garden", "ember stone appears");
   assert.equal(g3.getFlag("brazierLit"), true, "brazier is lit");
 
-  // Kitchen foods: high / sick / good.
+  // Kitchen foods: high / burrito disaster / good.
   let k = createGame(world); k.state.room = "kitchen";
   k.send("eat mushrooms"); assert.ok((k.getFlag("high") || 0) > 0, "mushrooms get you high");
   k = createGame(world); k.state.room = "kitchen";
-  k.send("eat meat"); assert.ok((k.getFlag("sick") || 0) > 0, "rancid meat makes you sick");
-  assert.match(k.send("look"), /VOMITING & DIARRHEA|🤢/, "sick art shows in the room description");
+  const examined = k.send("examine burrito");
+  assert.match(examined, /two kinds of beans.*three kinds of cheese.*four kinds of meat/is,
+    "the burrito examination inventories its escalating fillings");
+  assert.match(examined, /Cyclospora cayetanensis/i, "the questionable lettuce names the parasite");
+  assert.match(examined, /edible if you're feeling adventurous/i, "the description still invites disaster");
+  assert.match(k.send("search burrito"), /two kinds of beans.*Cyclospora/is,
+    "searching the burrito gives the same forensic description");
+  k.send("eat burrito");
+  assert.equal(k.getFlag("sick"), 40, "the burrito starts ten four-turn cycles");
+  assert.equal(k.roomOf("burritoWrapper"), "inventory", "eating retains the foil wrapper");
+  assert.match(k.send("look"), /FART-FIRE|🤢/, "burrito aftermath art shows in the room description");
   k.send("eat cheese"); assert.equal(k.getFlag("sick"), 0, "good cheese cures the sickness");
   assert.equal(k.getFlag("ateGood"), true, "eating the cheese is recorded for the badge");
 
-  // Sickness is lethal if uncured...
+  // Match + foil requires a source choice; explicitly choosing the match consumes it.
+  const choice = createGame(world); choice.state.room = "kitchen";
+  choice.send("take matches");
+  choice.send("eat burrito");
+  assert.match(choice.send("light self on fire"), /with match or fart flames/i,
+    "carrying both sources asks which one to use");
+  assert.equal(choice.getFlag("onFire"), undefined, "the source question does not ignite");
+  assert.match(choice.send("light self on fire with match"), /\(with match\).*on fire/is,
+    "the exact nested phrasing can explicitly select the match");
+  assert.equal(choice.roomOf("matches"), null, "the explicitly selected match is consumed");
+  assert.equal(choice.roomOf("burritoWrapper"), "inventory", "the unselected wrapper remains reusable");
+
+  const choiceFart = createGame(world); choiceFart.state.room = "kitchen";
+  choiceFart.send("take matches");
+  choiceFart.send("eat burrito");
+  assert.match(choiceFart.send("light self on fire with fart flames"), /next flaming fart strikes/i,
+    "the exact nested phrasing can explicitly select fart flames");
+  assert.equal(choiceFart.roomOf("matches"), "inventory", "choosing fart flames preserves the match");
+
+  // With only the wrapper, a wrong-turn attempt waits for the next flaming fart.
+  const fart = createGame(world); fart.state.room = "kitchen";
+  fart.send("eat burrito");
+  assert.match(fart.send("light self on fire"), /next flaming fart strikes/i,
+    "a non-fart turn queues the wrapper method");
+  assert.equal(fart.getFlag("onFire"), undefined, "waiting does not ignite early");
+  fart.send("wait"); // barf
+  const fartLit = fart.send("wait"); // flaming fart
+  assert.match(fartLit, /FLAMING FART.*tin foil.*comprehensively ablaze/is,
+    "the next fart ignites the player through the foil");
+  assert.equal(fart.getFlag("onFire"), true, "fart-flame ignition sets onFire");
+  assert.equal(fart.roomOf("burritoWrapper"), "inventory", "fart ignition does not consume the wrapper");
+  fart.send("extinguish self");
+  fart.send("light self on fire");
+  fart.send("wait");
+  fart.send("wait");
+  assert.equal(fart.getFlag("onFire"), true, "the retained wrapper can ignite the player again");
+
+  const dropped = createGame(world); dropped.state.room = "kitchen";
+  dropped.send("eat burrito");
+  dropped.send("light self on fire");
+  assert.match(dropped.send("drop wrapper"), /plan is cancelled/i,
+    "putting down the wrapper cancels a queued fart ignition");
+  assert.equal(dropped.getFlag("fartIgnitionQueued"), false);
+
+  // Untreated sickness runs ten complete acid/barf/fart/diarrhea cycles, then kills.
   const s = createGame(world); s.state.room = "kitchen";
-  s.send("eat meat");
-  let sdead = false;
-  for (let i = 0; i < 25 && !sdead; i++) { s.send("wait"); sdead = s.state.dead; }
-  assert.ok(sdead, "untreated sickness eventually kills you");
+  s.send("eat burrito");
+  let course = "";
+  for (let i = 0; i < 40 && !s.state.dead; i++) course += "\n" + s.send("wait");
+  assert.equal((course.match(/stomach acid climbs/gi) || []).length, 10, "ten acid-burp beats");
+  assert.equal((course.match(/BARF with/gi) || []).length, 10, "ten barf beats");
+  assert.equal((course.match(/FLAMING FART cracks/gi) || []).length, 10, "ten flaming-fart beats");
+  assert.equal((course.match(/spicy, sparking diarrhea/gi) || []).length, 10, "ten diarrhea beats");
+  assert.ok(s.state.dead, "the tenth untreated cycle is fatal");
+
   // ...but the privy toilet cures it.
   const s2 = createGame(world); s2.state.room = "kitchen";
-  s2.send("eat meat"); s2.state.room = "privy";
+  s2.send("eat burrito"); s2.state.room = "privy";
   assert.match(s2.send("use toilet"), /CURED/, "the toilet cures the sickness");
   assert.equal(s2.getFlag("sick"), 0, "sick flag cleared after the toilet");
 
