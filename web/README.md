@@ -31,11 +31,13 @@ auto-saves to your browser.
   hidden clues and lets you see in dark rooms. The HUD tracks the trip itself
   as `🍄`, vision as `👁️`, and flight as `🪽`, allowing those capabilities to
   diverge. Supernatural hazards still apply.
-- **Equipment:** wearable items occupy HEAD, EYES, FEET, FINGER, WRIST, or NECK.
+- **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
   HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES
   show `👁️ ∞` and reveal the same clues as mushroom vision; WINGED SHOES show
   `🪽 ∞` and provide permanent named-room flight while worn.
+  The OBSIDIAN EYE must be worn on the FOREHEAD to provide dark-sight; it can
+  coexist with XRAY GOGGLES and displays `💡 ∞`.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.

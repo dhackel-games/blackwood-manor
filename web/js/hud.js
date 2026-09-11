@@ -109,11 +109,12 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     },
   },
   {
-    id: "headlamp",
+    id: "light",
     emoji: "💡",
     calculate: ({ game, world }) => {
-      const status = world.headlampStatus?.(game);
-      return status ? `${status.remaining} turns` : null;
+      const status = world.lightStatus?.(game);
+      if (!status) return null;
+      return status.permanent ? "∞" : `${status.remaining} turns`;
     },
   },
 ]);
