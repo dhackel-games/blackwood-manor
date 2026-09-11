@@ -42,7 +42,8 @@ auto-saves to your browser.
   and `look at <thing>` all show its deeper details.
 - **Touch controls:** direction and action buttons remain visible and usable at all
   times, including while the software keyboard is open. **🪲** opens the
-  repository's new-issue form in a separate browser window.
+  repository's new-issue form in a separate browser window and prefills its
+  title with the current room.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived

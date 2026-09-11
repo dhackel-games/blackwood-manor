@@ -26,6 +26,7 @@ Feature: Build metadata and touch-control contract
   Scenario: Bug reports open the repository issue form outside the game
     Then the page links the Bug control to "https://github.com/dhackel-games/blackwood-manor/issues/new"
     And the Bug control contains only its icon
+    And bug reports include the current room in the issue title
     And the iOS wrapper opens new-window web links externally
 
   Scenario: Gary uses an icon-only send control
