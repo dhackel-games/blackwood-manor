@@ -23,7 +23,7 @@ let callSeconds = 0;
 // HUD (always-on score/turns/bill)
 const hudScore = document.getElementById("hud-score");
 const hudTurns = document.getElementById("hud-turns");
-const hudBill = document.getElementById("hud-bill");
+const hudBill = document.getElementById("hud-bill-amount");
 const hudBm = document.getElementById("hud-bm");
 const hudSick = document.getElementById("hud-sick");
 const hudHigh = document.getElementById("hud-high");
