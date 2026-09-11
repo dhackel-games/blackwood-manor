@@ -132,7 +132,7 @@ function endCallUI() {
 function updateHud() {
   hudScore.textContent = "Score " + game.state.score;
   hudTurns.textContent = game.state.turns + (game.state.turns === 1 ? " turn" : " turns");
-  hudBill.textContent = "☎ " + billText();
+  hudBill.textContent = billText();
 
   const digestion = typeof world.digestiveStatus === "function" ? world.digestiveStatus(game) : null;
   if (digestion) {
