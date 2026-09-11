@@ -11,6 +11,17 @@ Feature: Mushroom vision and flight
     And the player is in room "kitchen"
     When I send "eat mushrooms"
 
+  Scenario: Another mushroom cluster grows behind the outhouse
+    Given a fresh manor game
+    And the player is in room "garden"
+    When I send "look"
+    Then the output contains "Behind the OUTHOUSE"
+    And the output contains "MUSHROOMS"
+    When I send "eat mushrooms"
+    Then flag "high" is positive
+    And item "outhouseMushrooms" is destroyed
+    And item "mushrooms" is in "kitchen"
+
   Scenario: Eating mushrooms hints that named flight is possible
     Then the output contains "so light you could FLY TO any room you can name"
     And flag "high" is positive

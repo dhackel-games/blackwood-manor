@@ -795,8 +795,9 @@ const DIARRHEA_ART = [
   "         _||_   ( pants )  . ° tiny embers ° .",
 ].join("\n");
 const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
-function eatMushrooms(ctx) {
-  ctx.destroy("mushrooms");
+function eatMushrooms(ctx, cmd) {
+  const mushrooms = ctx.find(cmd.dobj);
+  if (mushrooms) ctx.destroy(mushrooms.id);
   ctx.setFlag("high", 6);
   return "You eat the strange mushrooms.\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
@@ -1119,7 +1120,7 @@ export const world = {
       desc:
         "Brambles have swallowed what was once a formal garden. A weathered stone STATUE " +
         "of a robed woman leans amid the weeds, and a crumbling WELL shaft plunges into " +
-        "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick privy squats to " +
+        "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick OUTHOUSE squats to " +
         "the east; the gate lies back to the west.",
       searchDesc(ctx) {
         if (!ctx.getFlag("statueMoved")) {
@@ -1551,6 +1552,14 @@ export const world = {
       loc: "kitchen", takeable: true, edible: true,
       roomDesc: "A cluster of speckled purple MUSHROOMS sprouts from the damp windowsill.",
       desc: "Speckled purple mushrooms, faintly luminous. Eating these is self-evidently a terrible idea.",
+      on: { eat: eatMushrooms },
+    },
+    outhouseMushrooms: {
+      names: ["mushrooms", "mushroom", "fungus"],
+      adjectives: ["outhouse", "damp", "purple"],
+      loc: "garden", takeable: true, edible: true,
+      roomDesc: "Behind the OUTHOUSE, a damp cluster of purple MUSHROOMS pushes through the weeds.",
+      desc: "Purple mushrooms thriving behind the outhouse. Their location raises questions their glow does not answer.",
       on: { eat: eatMushrooms },
     },
     burrito: {

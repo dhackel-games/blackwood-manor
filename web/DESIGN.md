@@ -331,7 +331,8 @@ the mansion.
 - Every line you speak while ablaze feeds the fire; dawdle long enough and you **burn up on hold**.
 
 ## 12.9 Food & afflictions (kitchen) + the privy
-- **Strange mushrooms** → `high` (trippy per-turn flavor, harmless).
+- **Strange mushrooms** → `high` (trippy per-turn flavor, harmless). One cluster grows
+  in the kitchen and another behind the garden OUTHOUSE; eating consumes only that cluster.
 - **Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito** contains two kinds of beans,
   three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
   destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts
