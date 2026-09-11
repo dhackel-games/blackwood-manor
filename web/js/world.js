@@ -1411,12 +1411,33 @@ function talkToTroll(ctx) {
   return "The TROLL scratches one stone-hard ear. \"No coin, no combat. Finish the missing word and I move.\"\n\n" +
     TROLL_RIDDLE;
 }
+function openTrollVault(ctx, answer, anticipated = false) {
+  ctx.setFlag("trollWrongGuesses", 0);
+  ctx.setFlag("trollAskedRiddle");
+  ctx.setFlag("dragonVaultOpen");
+  if (anticipated) {
+    return `You say ${answer.toUpperCase()}. The TROLL's eyebrows climb toward his craggy hairline. ` +
+      "\"You answered before I even asked. Nobody does that.\"\n\n" +
+      "He laughs, genuinely delighted, and lumbers aside. Deep locks answer one another inside the mountain, " +
+      "and the vault door rolls open.";
+  }
+  return `You answer ${answer.toUpperCase()}. The TROLL grins, pleased by the rhyme, and lumbers aside. ` +
+    "Deep locks answer one another inside the mountain, and the vault door rolls open.";
+}
 function answerTrollRiddle(ctx, cmd) {
+  const addressed = cmd.iobj ? ctx.find(cmd.iobj) : null;
+  const spoken = addressed?.id === "caveTroll"
+    ? (cmd.dobj || "")
+    : `${cmd.dobj || ""} ${cmd.iobj || ""}`;
+  const words = spoken.trim().toLowerCase().match(/[a-z]+/g) || [];
+  const answer = words.at(-1) || "";
   if (!ctx.getFlag("trollAskedRiddle")) {
+    if (TROLL_RHYMES.has(answer)) return openTrollVault(ctx, answer, true);
+    if (addressed?.id === "caveTroll") {
+      return `(talk to TROLL)\n\n${talkToTroll(ctx)}`;
+    }
     return "The TROLL folds his arms across the VAULT DOOR. Perhaps TALK TO TROLL before shouting answers.";
   }
-  const words = `${cmd.dobj || ""} ${cmd.iobj || ""}`.trim().toLowerCase().match(/[a-z]+/g) || [];
-  const answer = words.at(-1) || "";
   if (!TROLL_RHYMES.has(answer)) {
     const wrongGuesses = (ctx.getFlag("trollWrongGuesses") || 0) + 1;
     if (wrongGuesses >= 3) {
@@ -1431,10 +1452,7 @@ function answerTrollRiddle(ctx, cmd) {
     return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move. ` +
       `${remaining === 1 ? "One guess remains." : `${remaining} guesses remain.`}`;
   }
-  ctx.setFlag("trollWrongGuesses", 0);
-  ctx.setFlag("dragonVaultOpen");
-  return `You answer ${answer.toUpperCase()}. The TROLL grins, pleased by the rhyme, and lumbers aside. ` +
-    "Deep locks answer one another inside the mountain, and the vault door rolls open.";
+  return openTrollVault(ctx, answer);
 }
 
 // --- End-screen achievement badges -------------------------------------------
