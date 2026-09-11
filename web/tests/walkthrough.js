@@ -248,6 +248,7 @@ const WIN = [
   g.send("north");                                   // gate -> porch
   assert.match(g.send("open mailbox"), /letter/i, "mailbox opens to reveal the letter");
   assert.equal(g.send("get letter"), "Taken.", "letter is takeable");
+  assert.doesNotMatch(g.item("letter").text, /[\r\n]/, "letter text must wrap naturally without hard line breaks");
   assert.match(g.send("burn letter"), /alight|ash|flakes/i, "letter can be burned");
   assert.equal(g.roomOf("letter"), null, "burned letter is destroyed");
 

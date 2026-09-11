@@ -8,7 +8,7 @@ import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION } from "../../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a02:acoven";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a03:acoven";
 const NONE = "[none]";
 const EMPTY = "[empty]";
 

@@ -1435,10 +1435,9 @@ export const world = {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
       desc: "A single sheet of good paper, water-stained.",
       text:
-        "The letter reads:\n" +
-        "  \"To whoever inherits this cursed house — the family's heirlooms must be returned\n" +
-        "   to the reliquary in the hall, all of them, and the bell rung, or the curse will\n" +
-        "   never lift. Do not linger in the dark. And God help you in the crypt.\"",
+        "The letter reads: \"To whoever inherits this cursed house — the family's heirlooms must be returned " +
+        "to the reliquary in the hall, all of them, and the bell rung, or the curse will never lift. " +
+        "Do not linger in the dark. And God help you in the crypt.\"",
       on: { burn: burnLetter },
     },
 
