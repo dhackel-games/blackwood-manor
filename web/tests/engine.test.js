@@ -50,6 +50,8 @@ function fixture() {
     { verb: "unlock", dobj: "oak door", prep: "with", iobj: "brass key" });
   assert.deepEqual(p("look"), { verb: "look", dobj: null, prep: null, iobj: null });
   assert.deepEqual(p("turn on lamp"), { verb: "on", dobj: "lamp", prep: null, iobj: null });
+  assert.deepEqual(p("yes"), { verb: "yes", dobj: null, prep: null, iobj: null });
+  assert.deepEqual(p("no"), { verb: "no", dobj: null, prep: null, iobj: null });
   assert.equal(p("").error, "empty");
   assert.equal(p("frobnicate the widget").error, "unknown-verb");
   console.log("OK: parser");

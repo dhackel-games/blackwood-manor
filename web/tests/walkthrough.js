@@ -257,8 +257,11 @@ const WIN = [
   assert.equal(g.getFlag("onFire"), undefined, "a source-less attempt must not ignite");
 
   g.moveItem("matches", "inventory");
-  const ablaze = g.send("light self on fire");
-  assert.match(ablaze, /\(with match\).*on fire/is, "a sole carried match is selected automatically");
+  assert.equal(g.send("light self on fire"), "(with match?)", "a sole carried match requires confirmation");
+  assert.equal(g.getFlag("onFire"), undefined, "asking does not ignite");
+  assert.equal(g.roomOf("matches"), "inventory", "asking does not consume the match");
+  const ablaze = g.send("yes");
+  assert.match(ablaze, /\(with match\).*on fire/is, "confirming uses the match");
   assert.equal(g.getFlag("onFire"), true, "onFire flag set");
   assert.equal(g.roomOf("matches"), null, "self-immolation consumes the one match");
 
@@ -278,9 +281,17 @@ const WIN = [
   const g2 = createGame(world);
   assert.match(g2.send("burn self"), /source of ignition/i, "'burn self' also requires a source");
   g2.moveItem("matches", "inventory");
-  assert.match(g2.send("burn self"), /on fire/i, "'burn self' also ignites");
+  assert.equal(g2.send("burn self"), "(with match?)", "'burn self' asks before consuming the match");
+  assert.match(g2.send("yes"), /on fire/i, "confirmation ignites");
   assert.match(g2.send("extinguish self"), /no longer on fire/i, "stop-drop-roll puts you out");
   assert.equal(g2.send("light mailbox"), "You can't light that.", "normal lighting unaffected");
+
+  const declined = createGame(world);
+  declined.moveItem("matches", "inventory");
+  assert.equal(declined.send("light self on fire"), "(with match?)");
+  assert.match(declined.send("no"), /unused/i, "declining preserves the match");
+  assert.equal(declined.roomOf("matches"), "inventory");
+  assert.equal(declined.getFlag("onFire"), undefined);
 
   // The single match can light the candle OR the player, never both.
   const candleFirst = createGame(world);
@@ -300,7 +311,7 @@ const WIN = [
   // Burn-up: you last a few turns, then you're ash.
   const g = createGame(world);
   g.moveItem("matches", "inventory");
-  g.send("light self on fire");
+  g.send("light self on fire with match");
   let dead = false;
   for (let i = 0; i < 12 && !dead; i++) { g.send("wait"); dead = g.state.dead; }
   assert.ok(dead, "staying on fire should eventually kill you");
@@ -308,7 +319,7 @@ const WIN = [
   // Fire ASCII banner + sick ASCII banner appear in room descriptions.
   const g2 = createGame(world);
   g2.moveItem("matches", "inventory");
-  g2.send("light self on fire");
+  g2.send("light self on fire with match");
   assert.match(g2.send("look"), /ON   F I R E|🔥/, "fire art shows in the room description");
 
   // Brazier REQUIRES being on fire; lighting it rewards the ember + puts you out.
@@ -316,7 +327,7 @@ const WIN = [
   g3.state.room = "garden";
   assert.match(g3.send("light brazier"), /whole person|hisses/i, "brazier won't light without your own fire");
   g3.moveItem("matches", "inventory");
-  g3.send("light self on fire");
+  g3.send("light self on fire with match");
   assert.match(g3.send("light brazier"), /EMBER STONE/, "on fire, the brazier lights and yields the ember");
   assert.equal(g3.getFlag("onFire"), false, "lighting the brazier dumps your fire into it");
   assert.equal(g3.roomOf("emberStone"), "garden", "ember stone appears");

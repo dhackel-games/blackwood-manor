@@ -525,6 +525,7 @@ function requestedSelfFireSource(cmd) {
 // Self-immolation. Works in any room (see the interceptor injected at the bottom).
 function igniteSelf(ctx, source, grantTickGrace = true) {
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+  ctx.setFlag("selfFirePrompt", false);
   if (source === "match") {
     const match = carriedMatch(ctx);
     if (!match) return "You pat every pocket twice. No match. No spark. No glorious personal inferno.";
@@ -554,6 +555,7 @@ function igniteSelf(ctx, source, grantTickGrace = true) {
 }
 
 function queueFartIgnition(ctx) {
+  ctx.setFlag("selfFirePrompt", false);
   if (!ctx.has("burritoWrapper")) {
     return "That plan needs something foil-lined to catch and redirect the flame. You do not currently have it.";
   }
@@ -567,6 +569,17 @@ function queueFartIgnition(ctx) {
   }
   return "You cup the crumpled burrito wrapper behind you and prepare the tin foil. Wrong turn. " +
     "You'll try when the next flaming fart strikes you.";
+}
+
+function selfFireAnswerInterceptor(ctx, cmd) {
+  const prompt = ctx.getFlag("selfFirePrompt");
+  if (!prompt) return null;
+  if (cmd.verb === "no") {
+    ctx.setFlag("selfFirePrompt", false);
+    return "You put the match away unused. Probably wise.";
+  }
+  if (prompt === "match") return igniteSelf(ctx, "match");
+  return "(with match or fart flames?)";
 }
 
 function putOutSelf(ctx) {
@@ -583,6 +596,7 @@ function selfLightInterceptor(ctx, cmd) {
     (!d && i === "fire");
   if (!targetsSelf) return null;
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
+  ctx.setFlag("selfFirePrompt", false);
 
   const requested = requestedSelfFireSource(cmd);
   if (requested === "match") return igniteSelf(ctx, "match");
@@ -590,8 +604,14 @@ function selfLightInterceptor(ctx, cmd) {
 
   const hasMatch = !!carriedMatch(ctx);
   const hasWrapper = ctx.has("burritoWrapper");
-  if (hasMatch && hasWrapper) return "(with match or fart flames?)";
-  if (hasMatch) return igniteSelf(ctx, "match");
+  if (hasMatch && hasWrapper) {
+    ctx.setFlag("selfFirePrompt", "source");
+    return "(with match or fart flames?)";
+  }
+  if (hasMatch) {
+    ctx.setFlag("selfFirePrompt", "match");
+    return "(with match?)";
+  }
   if (hasWrapper && (ctx.getFlag("sick") || 0) > 0) return queueFartIgnition(ctx);
   return SELF_FIRE_NO_SOURCE;
 }
@@ -1505,8 +1525,11 @@ function revealSafe(ctx) {
 for (const room of Object.values(world.rooms)) {
   room.on = room.on || {};
   const pLight = room.on.light, pBurn = room.on.burn, pExt = room.on.extinguish, pOff = room.on.off;
+  const pYes = room.on.yes, pNo = room.on.no;
   room.on.light = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pLight ? pLight(ctx, cmd) : null);
   room.on.burn = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pBurn ? pBurn(ctx, cmd) : null);
   room.on.extinguish = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pExt ? pExt(ctx, cmd) : null);
   room.on.off = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pOff ? pOff(ctx, cmd) : null);
+  room.on.yes = (ctx, cmd) => selfFireAnswerInterceptor(ctx, cmd) ?? (pYes ? pYes(ctx, cmd) : null);
+  room.on.no = (ctx, cmd) => selfFireAnswerInterceptor(ctx, cmd) ?? (pNo ? pNo(ctx, cmd) : null);
 }

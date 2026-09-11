@@ -296,8 +296,9 @@ the mansion.
 
 ## 12.6 The fire subsystem (Andy's idea, expanded)
 - **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` requires
-  a real ignition source. With only the one-use match, the parser supplies `(with match)` and
-  consumes it. With both the match and burrito foil, it asks which source to use.
+  a real ignition source. With only the one-use match, the parser asks `(with match?)`; only
+  `YES` or an explicit `with match` consumes it. With both the match and burrito foil, it asks
+  which source to use.
 - **Fart-flame ignition:** eating the kitchen burrito leaves its crumpled foil wrapper in
   inventory. During the resulting digestive cycle, trying to ignite with the foil queues the
   attempt until the next flaming fart. The wrapper is reusable while carried; dropping it

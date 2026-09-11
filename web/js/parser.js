@@ -24,6 +24,7 @@ const VERBS = {
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
   map: ["map", "m", "chart", "floorplan"],
+  yes: ["yes", "y", "yeah", "yep"], no: ["no", "nope", "nah"],
   score: ["score"], save: ["save"], restore: ["restore", "load"], restart: ["restart"],
   verbose: ["verbose"], brief: ["brief"], help: ["help", "?", "commands"], quit: ["quit", "q"],
 };

@@ -223,6 +223,8 @@ export const commands = {
   sit(ctx, cmd) { return `You sit. ${cmd.dobj ? "The " + cmd.dobj + " is unmoved by the gesture." : "The floor is cold and unhelpful."}`; },
   use(ctx, cmd) { return cmd.dobj ? `You can't see a way to use the ${cmd.dobj}.` : "Use what?"; },
   flush(ctx, cmd) { return "There's nothing here to flush."; },
+  yes() { return "There is nothing waiting for confirmation."; },
+  no() { return "There is nothing waiting for refusal."; },
 
   wait() { return "Time passes."; },
 
