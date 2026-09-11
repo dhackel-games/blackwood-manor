@@ -7,4 +7,4 @@
 //
 // BUMP THIS in the same commit as any gameplay/engine change.
 export const VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a01:acoven";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a02:acoven";

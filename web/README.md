@@ -26,6 +26,8 @@ auto-saves to your browser.
   things you can act on. Room art also appears the first time you enter each room.
   With an object, `search <thing>`, `ex <thing>`, `examine <thing>`, `look <thing>`,
   and `look at <thing>` all show its deeper details.
+- **Touch controls:** direction and action buttons remain visible and usable at all
+  times, including while the software keyboard is open.
 - **Things:** `take <x>`, `drop <x>`, `inventory` (`i`)
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,

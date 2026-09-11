@@ -8,11 +8,27 @@ import { clean as garyClean, isLocalPage } from "../js/gary-brain.js";
 import { VERSION } from "../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a01:acoven";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a02:acoven";
 
 assert.equal(VERSION, COPYRIGHT_VERSION, "the displayed copyright-version must remain exact");
 const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 assert.equal(packageJson.version, "2026.9.10", "package SemVer must be the YYYY.M.D release date");
+
+const uiSource = readFileSync(new URL("../js/ui.js", import.meta.url), "utf8");
+const cssSource = readFileSync(new URL("../css/style.css", import.meta.url), "utf8");
+const htmlSource = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+assert.doesNotMatch(uiSource, /classList\.add\(["']typing["']\)/,
+  "touch focus must never enter a control-hiding state");
+assert.doesNotMatch(cssSource, /#crt\.typing\s+#controls/,
+  "touch controls must never be hidden while typing");
+assert.match(cssSource, /#transcript\s*\{[^}]*min-height:\s*0/s,
+  "the transcript must shrink and scroll instead of pushing controls off-screen");
+assert.match(cssSource, /#controls\s*\{[^}]*flex:\s*0 0 auto/s,
+  "touch controls must remain pinned in the viewport");
+for (const direction of ["north", "south", "east", "west", "up", "down"]) {
+  assert.match(htmlSource, new RegExp(`data-cmd=["']${direction}["']`),
+    `${direction} must have a touch control`);
+}
 
 // ---------- shared fixture ----------
 function fixture() {

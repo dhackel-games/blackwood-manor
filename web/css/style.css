@@ -41,6 +41,7 @@ body { -webkit-text-size-adjust: 100%; }
 /* Always-on status readout */
 #hud {
   position: relative; z-index: 1;
+  flex: 0 0 auto;
   display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.35rem; margin-bottom: 0.35rem;
@@ -58,6 +59,7 @@ body { -webkit-text-size-adjust: 100%; }
 
 #transcript {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   white-space: pre-wrap;
@@ -86,6 +88,7 @@ body { -webkit-text-size-adjust: 100%; }
 /* --- touch controls --- */
 #controls {
   position: relative; z-index: 1;
+  flex: 0 0 auto;
   display: flex; flex-direction: column; gap: 0.4rem;
   padding: 0.5rem 0 0.4rem;
   border-top: 1px solid var(--dim);
@@ -112,6 +115,7 @@ body { -webkit-text-size-adjust: 100%; }
 
 #inputline {
   position: relative; z-index: 1;
+  flex: 0 0 auto;
   display: flex; gap: 0.5rem; align-items: center;
   margin-top: 0.5rem;
   padding: 0.55rem 0.7rem;
@@ -149,10 +153,6 @@ body { -webkit-text-size-adjust: 100%; }
   #transcript { font-size: 14px; }        /* transcript can shrink; input stays 16px */
   #controls button { font-size: 0.9rem; min-height: 2.6rem; }
 }
-
-/* While typing (keyboard up) on touch devices, hide the tap-controls so the
-   transcript gets the full area instead of being squeezed to a sliver. */
-#crt.typing #controls { display: none; }
 
 /* mic / small icon buttons */
 .iconbtn {

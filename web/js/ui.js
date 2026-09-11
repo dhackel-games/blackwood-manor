@@ -333,17 +333,13 @@ document.getElementById("go").addEventListener("click", () => { handle(input.val
 const scrollBottom = () => { transcript.scrollTop = transcript.scrollHeight; };
 window.addEventListener("resize", () => setTimeout(scrollBottom, 60));
 
-// On touch devices, hide the tap-controls while the keyboard is up (typing),
-// so the transcript isn't squeezed. They return when the keyboard dismisses.
+// Keep controls visible on touch devices even while the keyboard is open.
 if (!canType) {
-  const crtEl = document.getElementById("crt");
   input.addEventListener("focus", () => {
-    crtEl.classList.add("typing");
     requestAnimationFrame(scrollBottom);
     setTimeout(scrollBottom, 350);   // after the reflow settles
   });
   input.addEventListener("blur", () => {
-    crtEl.classList.remove("typing");
     setTimeout(scrollBottom, 150);
   });
 }
@@ -402,7 +398,12 @@ phoneMicBtn.addEventListener("click", () => { listening ? stopListening() : star
 // --- touch controls ---
 // Action buttons run WITHOUT grabbing the keyboard (only refocus on desktop).
 document.querySelectorAll("#controls [data-cmd]").forEach((b) =>
-  b.addEventListener("click", () => { handle(b.dataset.cmd); if (canType) input.focus(); }));
+  b.addEventListener("click", (event) => {
+    event.preventDefault();
+    handle(b.dataset.cmd);
+    scrollBottom();
+    if (canType) input.focus();
+  }));
 // Prefill buttons (Examine/Take) need an object typed, so they DO open the keyboard.
 document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
   b.addEventListener("click", () => { input.value = b.dataset.prefill; input.focus(); }));

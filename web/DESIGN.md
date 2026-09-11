@@ -528,3 +528,12 @@ Every room defines a compact `art` string depicting either the space or its prim
 (`LOOK`, `SEARCH`, `EX`, or `EXAMINE`) renders it again before the room's `searchDesc` and
 actionable-item list. Ordinary repeat entry omits the art so navigation does not flood the
 transcript. Every art line is capped at 32 characters for the mobile layout.
+
+## 12.19 Persistent touch controls
+
+The direction and action controls are fixed flex children and never enter a hidden state.
+The transcript carries `min-height: 0` so additional room art and inspection text scroll
+inside its allotted space rather than pushing the controls below the viewport. Button taps
+prevent their default focus behavior, dispatch the associated command synchronously, keep the
+latest transcript output visible, and only return focus to the command field on pointer-fine
+desktop devices.
