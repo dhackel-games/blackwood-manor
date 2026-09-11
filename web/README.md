@@ -66,7 +66,8 @@ npm test          # or: node tests/walkthrough.js
 ```
 
 This plays the entire game to victory and asserts the score, then confirms each
-death trap still fires. Run it after any change to the world.
+death trap still fires. The same `npm test` command runs in GitHub Actions for
+every pull request and every push to `main`; Pages deployment waits for it.
 
 ## Expanding the game (the whole point)
 

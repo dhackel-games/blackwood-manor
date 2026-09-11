@@ -350,7 +350,8 @@ the mansion.
 death traps (attic/well/grue), Gary conversation + billing, hall-of-shame ranks, the hidden
 wing, source-gated self-immolation and Gary's fire call, and the burn-up timer + brazier +
 burrito cycle + reusable fart-flame wrapper + cures + badges, plus the Gary voice-layer gate
-and the crisis guard. Keep it green on every change.
+and the crisis guard. `.github/workflows/pages.yml` runs the same `npm test` entry point on
+every pull request and push to `main`; the Pages deployment job depends on that test job.
 
 ## 12.12 Command chaining (v2.1.0)
 `splitCommands()` in `parser.js` splits an input line on `.` `;` `,` and a standalone `then`,
