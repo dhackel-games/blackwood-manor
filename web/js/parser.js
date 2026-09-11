@@ -11,7 +11,7 @@ const DIRECTIONS = {
 const VERBS = {
   go: ["go", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
-  open: ["open"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
+  open: ["open", "pry", "force"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
   pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],

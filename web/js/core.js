@@ -129,11 +129,13 @@ export function createGame(world) {
   game.isLit = () => {
     const r = world.rooms[state.room];
     if (!r || !r.dark) return true;
-    // A carried flame, the temporary mushroom-trip third eye, or the permanent
-    // Obsidian Eye all let you see in otherwise pitch-black rooms.
+    // A carried flame, the temporary mushroom-trip third eye, worn X-RAY
+    // GOGGLES, or the permanent Obsidian Eye all let you see in otherwise
+    // pitch-black rooms.
     return game.activeLights().length > 0
       || !!state.flags.onFire
       || (state.flags.high || 0) > 0
+      || !!state.flags.gogglesOn
       || !!state.flags.darkSight;
   };
 

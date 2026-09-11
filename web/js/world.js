@@ -981,6 +981,8 @@ function worldTick(ctx) {
   if (ctx.state.dead) return parts.join("\n\n");
   const l = lightningTick(ctx);     // random manor-wide teleport (may also kill you)
   if (l) parts.push(l);
+  const g = mushroomRegrowTick(ctx); // small per-turn chance the toilet hole regrows
+  if (g) parts.push(g);
   return parts.length ? parts.join("\n\n") : null;
 }
 
@@ -1220,17 +1222,21 @@ function inspectToilet(ctx) {
     return "You lean over and LOOK IN the TOILET HOLE. Fresh purple MUSHROOMS are growing directly in a wet " +
       "bed of literal shit and piss. They glow twice as brightly as the dried kitchen ones.";
   }
-  if (mushrooms && mushrooms.loc != null) {
+  if (mushrooms && mushrooms.loc === "privy") {
     return "Inside the TOILET HOLE, the fresh MUSHROOMS remain rooted in literal shit and piss.";
   }
-  return "You look into the TOILET HOLE. Only shit, piss, and the torn roots of the mushrooms remain.";
+  if (mushrooms && mushrooms.loc === "inventory") {
+    return "The TOILET HOLE sits empty — you already pulled this crop free.";
+  }
+  return "You look into the TOILET HOLE. Only shit, piss, and the torn roots of the last crop remain. The " +
+    "muck looks fertile enough that another might push through, given time.";
 }
 function takeToiletMushrooms(ctx) {
   if (!ctx.getFlag("outhouseMushroomsFound")) {
     return "You stop before reaching blindly into the dark hole. You should LOOK IN THE TOILET first.";
   }
   const mushrooms = ctx.item("outhouseMushrooms");
-  if (!mushrooms || mushrooms.loc == null) return "The fresh mushrooms are already gone.";
+  if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just shit and piss.";
   if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
   if (ctx.inventory().length >= (ctx.world.config.maxCarry ?? 99))
     return "Your hands are full. You'll have to drop something before reaching into that.";
@@ -1250,6 +1256,22 @@ function deriveCommand(ctx, cmd) {
   if (!/\b(mushroom|mushrooms|fungus|toilet|hole)\b/.test(target)) return [];
   inspectToilet(ctx);
   return ["look in toilet"];
+}
+// Once a batch of fresh mushrooms has actually been EATEN (destroyed), the
+// TOILET HOLE has a small per-turn chance of growing a fresh crop — nature's
+// own respawn. Taking the mushrooms without eating them (loc "inventory")
+// doesn't trigger regrowth; the old batch is still out there, uneaten.
+const MUSHROOM_REGROW_CHANCE = 0.1;
+function mushroomRegrowTick(ctx) {
+  if (ctx.getFlag("__noChaos")) return null; // deterministic test harness kill-switch
+  if (!ctx.getFlag("outhouseMushroomsFound")) return null; // nothing has ever grown here
+  const mushrooms = ctx.item("outhouseMushrooms");
+  if (!mushrooms || mushrooms.loc !== null) return null; // still growing, in your pocket, or already regrown
+  if (Math.random() >= MUSHROOM_REGROW_CHANCE) return null;
+  ctx.moveItem("outhouseMushrooms", "privy");
+  return ctx.state.room === "privy"
+    ? "Something stirs in the TOILET HOLE — a fresh crop of purple MUSHROOMS has pushed up through the muck."
+    : null; // regrew somewhere you aren't standing; no need to announce it
 }
 const SAFE_CODE = "739";
 function safeCode(cmd) {
@@ -2003,7 +2025,8 @@ export const world = {
         "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
         "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
       searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
+        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are " +
+        "underlined in ink. The DESK's drawers are swollen shut — PRY it, or just OPEN it, and force one.",
       exits: { north: "landing" },
     },
 
@@ -2219,6 +2242,14 @@ export const world = {
         "makes the dark stop being an enemy.",
       on: { take: takeObsidianEye },
     },
+    xrayGoggles: {
+      names: ["x-ray goggles", "xray goggles", "goggles"], adjectives: ["x-ray", "xray", "brass", "leather"],
+      loc: null, takeable: true, wearable: true, worn: false,
+      roomDesc: "Wrapped in oilcloth in the drawer sits a pair of brass-rimmed X-RAY GOGGLES.",
+      desc: "A pair of brass-and-glass goggles, army-surplus strange, with thick smoked lenses. Worn, they seem " +
+        "to make the dark just... give up.",
+      on: { wear: wearGoggles, remove: removeGoggles },
+    },
     burritoWrapper: {
       names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
       loc: null, takeable: true,
@@ -2387,6 +2418,7 @@ export const world = {
     desk: {
       names: ["desk"], adjectives: ["oak"], loc: "study", fixed: true, scenery: true,
       desc: "A great oak desk, its drawers swollen shut.",
+      on: { open: searchDesk, pull: searchDesk },
     },
     diary: {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,
@@ -2551,6 +2583,32 @@ function revealWallGap(ctx) {
   ctx.setFlag("wallGapFound", true);
   return "You peel back a curling tongue of WALLPAPER — and keep peeling, because a whole panel of rotten " +
     "lath comes away in your hands, baring a gap just wide enough to squeeze IN, into the dark between the walls.";
+}
+
+// --- study desk -> a stuck drawer hiding a pair of x-ray goggles -------------
+function searchDesk(ctx) {
+  if (ctx.getFlag("deskDrawerOpen"))
+    return "The drawer hangs open, empty now except for warped wood and old dust.";
+  ctx.setFlag("deskDrawerOpen", true);
+  ctx.moveItem("xrayGoggles", "study");
+  return "You brace a foot on the desk and wrench. The swollen drawer shrieks and gives all at once — inside, " +
+    "wrapped in oilcloth, sits a pair of brass-rimmed X-RAY GOGGLES.";
+}
+function wearGoggles(ctx) {
+  const goggles = ctx.item("xrayGoggles");
+  if (!goggles || goggles.loc !== "inventory") return "You aren't carrying that.";
+  if (goggles.worn) return "You're already wearing the X-RAY GOGGLES.";
+  goggles.worn = true;
+  ctx.setFlag("gogglesOn", true);
+  return "You settle the brass-rimmed GOGGLES over your eyes. The lenses hum faintly, and the dark of the " +
+    "house resolves into a grainy, workable grey — you can see just fine now, whatever the light.";
+}
+function removeGoggles(ctx) {
+  const goggles = ctx.item("xrayGoggles");
+  if (!goggles || !goggles.worn) return "You aren't wearing that.";
+  goggles.worn = false;
+  ctx.setFlag("gogglesOn", false);
+  return "You push the GOGGLES up onto your forehead. The grainy grey sight cuts out at once.";
 }
 
 // --- Self-immolation & stop-drop-roll in ANY room (Andy's idea) --------------

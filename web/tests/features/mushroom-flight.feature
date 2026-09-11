@@ -25,6 +25,30 @@ Feature: Mushroom vision and flight
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
 
+  Scenario: An eaten batch of privy mushrooms can regrow given enough time
+    Given a fresh manor game
+    And the player is in room "privy"
+    When I send "look in toilet"
+    And I send "eat mushrooms"
+    Given chaos events (lightning jumps) are enabled
+    And the random number generator always returns 0.0
+    When I send "wait"
+    Then the output contains "stirs in the TOILET HOLE"
+    And item "outhouseMushrooms" is in "privy"
+    When I send "eat mushrooms"
+    Then flag "high" is positive
+
+  Scenario: A carried, uneaten batch of privy mushrooms does not regrow
+    Given a fresh manor game
+    And the player is in room "privy"
+    When I send "look in toilet"
+    And I send "take mushrooms"
+    Given chaos events (lightning jumps) are enabled
+    And the random number generator always returns 0.0
+    When I send "wait"
+    Then the output does not contain "stirs in the TOILET HOLE"
+    And item "outhouseMushrooms" is in "inventory"
+
   Scenario Outline: Getting toilet mushrooms derives the missing look
     Given a fresh manor game
     And the player is in room "privy"
