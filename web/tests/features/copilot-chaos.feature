@@ -68,7 +68,7 @@ Feature: Copilot's mystery package and lightning jumps
     Then the current room is "grandHall"
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
-    Given the random number generator returns 0.30 then 0.52
+    Given the random number generator returns 0.30 then 0.63
     When I send "open package"
     Then the game is dead
     And the output contains "WRAITH"
