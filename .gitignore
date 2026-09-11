@@ -10,6 +10,7 @@ ios/Resources/www/
 DerivedData/
 
 # regenerable / not source
+web/node_modules/
 web/assets/Blackwood.iconset/
 web/Blackwood Manor.app/
 mac/gary-daemon/.build/

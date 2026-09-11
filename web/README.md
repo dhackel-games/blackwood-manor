@@ -53,20 +53,24 @@ js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
 js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
 js/ui.js              browser terminal adapter
-js/save.js            localStorage save/restore
-tests/engine.test.js  engine unit tests
-tests/walkthrough.js  full winning playthrough + death-path tests
-DESIGN.md / PLAN.md   design doc and implementation plan
+js/save.js                 localStorage save/restore
+tests/features/*.feature   executable Gherkin unit specifications
+tests/steps/*.js           Cucumber step definitions and engine fixtures
+tests/walkthrough.js       full winning playthrough + death-path tests
+DESIGN.md / PLAN.md        design doc and implementation plan
 ```
 
 ## Run the tests
 
 ```
-npm test          # or: node tests/walkthrough.js
+npm test                  # Cucumber unit scenarios + gameplay walkthrough
+npm run test:unit         # Cucumber unit scenarios only
+npm run test:walkthrough  # gameplay walkthrough only
 ```
 
-This plays the entire game to victory and asserts the score, then confirms each
-death trap still fires. Run it after any change to the world.
+The unit behavior is written as executable Gherkin. The walkthrough then plays
+the entire game to victory, asserts the score, and confirms each death trap.
+Run the complete local suite after any change to the world.
 
 ## Expanding the game (the whole point)
 

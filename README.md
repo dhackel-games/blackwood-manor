@@ -34,7 +34,8 @@ Gary's voice is **muted by default**; on the call screen tap **🔊 Gary: on** t
 
 ```bash
 cd web
-npm test          # or: node tests/walkthrough.js
+npm test                  # Cucumber unit scenarios + gameplay walkthrough
+npm run test:walkthrough  # gameplay walkthrough only
 ```
 
 Plays a complete winning walkthrough (asserts the score) plus the death traps and

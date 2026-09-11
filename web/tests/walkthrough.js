@@ -1,10 +1,9 @@
 // walkthrough.js — end-to-end regression test for Blackwood Manor.
-// Runs the engine unit tests first, then plays the real world to victory and
-// verifies the cruel death traps fire. Run: node tests/walkthrough.js
+// Plays the real world to victory and verifies the cruel death traps fire.
+// Unit behavior lives in executable Gherkin under tests/features/.
 import assert from "node:assert";
 import { createGame } from "../js/core.js";
 import { world } from "../js/world.js";
-import "./engine.test.js"; // runs engine unit assertions on import
 
 function play(cmds, { stopOnDeath = false } = {}) {
   const g = createGame(world);
@@ -65,7 +64,7 @@ const WIN = [
 }
 
 // ---------------------------------------------------------------------------
-// 2. Death traps (content-specific; grue is covered in engine.test.js)
+// 2. Death traps (content-specific; grue is covered in engine.feature)
 // ---------------------------------------------------------------------------
 { // the dry well without a rope
   const { g } = play(["east", "enter well"], { stopOnDeath: true });

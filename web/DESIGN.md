@@ -41,7 +41,10 @@ haunted-mansion-adventure/
 │   ├── world.js      # ★ ALL CONTENT: rooms, items, puzzles — EDIT TO EXPAND
 │   ├── ui.js         # DOM adapter: terminal display, input, history
 │   └── save.js       # localStorage autosave + SAVE/RESTORE
-├── tests/walkthrough.js   # scripted solve + death paths, runs in Node
+├── tests/
+│   ├── features/         # executable Gherkin unit specifications
+│   ├── steps/            # Cucumber step definitions + fixtures
+│   └── walkthrough.js    # scripted solve + death paths, runs in Node
 ├── DESIGN.md
 └── README.md         # how to play + how to add a room
 ```
@@ -198,10 +201,10 @@ the bottom, responsive for laptop/tablet. Up-arrow command history.
 
 ## 10. Testing
 
-`tests/walkthrough.js` drives the DOM-free core through a **complete winning playthrough**
-and asserts victory + final score, plus a few **death-path assertions** (grue, well,
-overloaded attic). Run with `node tests/walkthrough.js` — the regression net for every
-future expansion.
+Executable Gherkin under `tests/features/` covers the DOM-free engine units through
+Cucumber step definitions in `tests/steps/`. `tests/walkthrough.js` separately drives a
+**complete winning playthrough** and asserts victory + final score, plus death paths
+(well, crypt, and overloaded attic). Run both locally with `npm test`.
 
 ---
 
@@ -211,8 +214,8 @@ Everything player-facing lives in `js/world.js`:
 - **Add a room:** add an entry to `rooms` and wire an exit from an existing room.
 - **Add an item:** add an entry to `items` with `loc` set to a room id.
 - **Add a puzzle:** attach an `on: { verb: handler }` to a room or item using the `ctx` API.
-- **Re-run** `node tests/walkthrough.js` to confirm nothing broke (update the walkthrough
-  if the solution path changed).
+- **Re-run** `npm test` to confirm nothing broke (update the walkthrough if the solution
+  path changed).
 
 ---
 
@@ -346,11 +349,11 @@ the mansion.
 - 🧀 **"Ate Well"** — ate the good cheese.
 
 ## 12.11 Testing
-`node tests/walkthrough.js` now covers **10 groups**: engine units, full winning walkthrough,
-death traps (attic/well/grue), Gary conversation + billing, hall-of-shame ranks, the hidden
-wing, source-gated self-immolation and Gary's fire call, and the burn-up timer + brazier +
-burrito cycle + reusable fart-flame wrapper + cures + badges, plus the Gary voice-layer gate
-and the crisis guard. Keep it green on every change.
+`npm run test:unit` runs the executable Gherkin unit specifications for engine state, parsing,
+commands, inspection, persistence, build metadata, touch contracts, and Gary's output guards.
+`npm run test:walkthrough` covers the full winning walkthrough, death traps, Gary conversation
+and billing, the hidden wing, source-gated self-immolation, the burrito cycle, map behavior,
+and badges. `npm test` runs both local suites in that order.
 
 ## 12.12 Command chaining (v2.1.0)
 `splitCommands()` in `parser.js` splits an input line on `.` `;` `,` and a standalone `then`,

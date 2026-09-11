@@ -3,5 +3,12 @@
   "version": "2026.9.10",
   "private": true,
   "type": "module",
-  "scripts": { "test": "node tests/walkthrough.js" }
+  "scripts": {
+    "test": "npm run test:unit && npm run test:walkthrough",
+    "test:unit": "cucumber-js \"tests/features/**/*.feature\" --import \"tests/steps/**/*.js\"",
+    "test:walkthrough": "node tests/walkthrough.js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.2.1"
+  }
 }
