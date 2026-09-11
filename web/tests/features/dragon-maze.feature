@@ -41,6 +41,20 @@ Feature: Dreadmaw's hedge maze and hoard
       | shake dragon   |
       | nudge dragon   |
 
+  Scenario Outline: Saying or yelling near sleeping Dreadmaw wakes her violently
+    Given the player is in room "dragonCaveMouth"
+    When I send "<command>"
+    Then the output contains these phrases in order:
+      | "Foo"                |
+      | DREADMAW THE DRAGON |
+      | ON FIRE             |
+    And flag "dragonMoved" is unset
+
+    Examples:
+      | command   |
+      | say "foo" |
+      | yell foo  |
+
   Scenario Outline: Offering the apple wakes Dreadmaw pleasantly
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"

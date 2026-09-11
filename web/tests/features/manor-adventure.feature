@@ -181,6 +181,43 @@ Feature: Blackwood Manor adventure
       | manor   |
       | mansion |
 
+  Scenario: IN with an object is ENTER with that object
+    Given the player is in room "porch"
+    And item "frontKey" is carried
+    When I send "in door"
+    Then the output contains "(unlock door with key, open door, in door)"
+    And the current room is "grandHall"
+
+  Scenario: Opening a locked door with its key derives unlock then open
+    Given the player is in room "porch"
+    And item "frontKey" is carried
+    When I send "open door with key"
+    Then the output contains "(unlock door with key, open door)"
+    And item "frontDoor" is open
+    And the current room is "porch"
+
+  Scenario: IN derives unlock, open, and enter for a carried door key
+    Given the player is in room "porch"
+    And item "frontKey" is carried
+    When I send "in"
+    Then the output contains "(unlock door with key, open door, enter door)"
+    And the current room is "grandHall"
+    When I send "out"
+    Then the current room is "porch"
+
+  Scenario Outline: LEAVE and EXIT use the room's OUT route
+    Given the player is in room "grandHall"
+    When I send "<command>"
+    Then the current room is "porch"
+
+    Examples:
+      | command |
+      | leave   |
+      | exit    |
+
+  Scenario: Every room explicitly tracks IN and OUT behavior
+    Then every manor room declares implicit IN and OUT routing
+
   Scenario: Entering the cellar door descends through it
     Given the player is in room "kitchen"
     When I send "open cellar"

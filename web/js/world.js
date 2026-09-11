@@ -1326,6 +1326,15 @@ function wakeDragon(ctx) {
   if (ctx.getFlag("dragonFriendly")) return talkToDragon(ctx);
   return dragonFire(ctx);
 }
+function spokenLine(cmd) {
+  const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "");
+  const spoken = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "...";
+  return `"${spoken}"`;
+}
+function sayNearDragon(ctx, cmd) {
+  if (ctx.getFlag("dragonFriendly")) return spokenLine(cmd) + "\n" + talkToDragon(ctx);
+  return spokenLine(cmd) + "\n" + dragonFire(ctx);
+}
 function giveDragon(ctx, cmd) {
   const offered = ctx.find(cmd.dobj, ctx.inventory());
   if (!offered || offered.id !== "apple") return "DREADMAW does not stir. Perhaps offer her something worth waking for.";
@@ -1516,6 +1525,36 @@ const ROOM_ART = {
   ].join("\n"),
 };
 
+const IMPLICIT_NAVIGATION = Object.freeze({
+  gate: { in: "north", out: null },
+  garden: { in: "enter well", out: "west" },
+  hedgeMazeGate: { in: "west", out: "east" },
+  hedgeMazeKnot: { in: "south", out: "east" },
+  hedgeMazeLoop: { in: "east", out: "west" },
+  dragonCaveMouth: { in: "east", out: "north" },
+  dragonAntechamber: { in: "east", out: "west" },
+  dreadmawVault: { in: null, out: "west" },
+  privy: { in: "enter toilet", out: "west" },
+  porch: { in: "enter door", out: "south" },
+  grandHall: { in: "enter secret door", out: "south" },
+  parlor: { in: "south", out: "west" },
+  library: { in: "down", out: "north" },
+  secretChamber: { in: null, out: "up" },
+  diningRoom: { in: "south", out: "east" },
+  kitchen: { in: "down", out: "north" },
+  wineCellar: { in: "south", out: "up" },
+  crypt: { in: null, out: "north" },
+  landing: { in: "up", out: "down" },
+  nursery: { in: null, out: "east" },
+  masterBedroom: { in: null, out: "west" },
+  study: { in: null, out: "north" },
+  attic: { in: "north", out: "down" },
+  hiddenVault: { in: null, out: "south" },
+  hollowPassage: { in: "north", out: "south" },
+  hollowSanctum: { in: "north", out: null },
+  betweenWalls: { in: null, out: "out" },
+});
+
 // ---- the world ---------------------------------------------------------------
 export const world = {
   config: { start: "gate", maxCarry: 6, title: "Blackwood Manor" },
@@ -1528,6 +1567,7 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   deriveCommand,     // content-specific missing steps the parser may safely infer
+  implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
 
@@ -1645,6 +1685,7 @@ export const world = {
           east: { to: "dragonAntechamber", via: "dragonMoved",
             lockedMsg: "DREADMAW is sleeping across the entire cave mouth. She has to move first." },
         },
+        on: { say: sayNearDragon },
       },
 
     dragonAntechamber: {
@@ -1666,7 +1707,7 @@ export const world = {
             east: { to: "dreadmawVault", via: "dragonVaultOpen",
             lockedMsg: "The inner VAULT DOOR remains sealed. It seems to be listening for a word." },
         },
-          on: { talk: answerTrollRiddle },
+          on: { say: answerTrollRiddle },
       },
 
     dreadmawVault: {
@@ -2234,6 +2275,7 @@ export const world = {
         "She is sleeping directly across the CAVE entrance.",
       on: {
         talk: talkToDragon, wake: wakeDragon, give: giveDragon, put: giveDragon,
+        say: sayNearDragon,
         move: dragonFire, push: dragonFire, pull: dragonFire, touch: dragonFire,
         attack: dragonFire, climb: dragonFire,
       },
@@ -2248,7 +2290,7 @@ export const world = {
       names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
       loc: "dragonAntechamber", fixed: true, scenery: true,
       desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
-      on: { talk: answerTrollRiddle },
+      on: { say: answerTrollRiddle },
     },
     caveTroll: {
       names: ["troll", "guard"], adjectives: ["cave", "warty", "broad", "male"],
@@ -2307,11 +2349,12 @@ export const world = {
     },
     cellarDoor: {
       names: ["cellar", "trapdoor", "door"], adjectives: ["heavy", "cellar"],
-      loc: "kitchen", fixed: true, scenery: true, enterTo: "down",
+      loc: "kitchen", fixed: true, scenery: true, enterTo: "down", openable: true, open: false,
       desc: "A heavy trap-door set flush in the KITCHEN floor, iron-ringed.",
       on: {
         open(ctx) {
           if (ctx.getFlag("cellarOpen")) return "The cellar door already gapes open.";
+          ctx.item("cellarDoor").open = true;
           ctx.setFlag("cellarOpen");
           return "You haul the heavy cellar door up on its hinges. Cold, wet air breathes up from stone steps descending into black.";
         },

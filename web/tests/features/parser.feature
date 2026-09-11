@@ -25,6 +25,12 @@ Feature: Player command parsing
       | wake up dragon                      | wake    | dragon    | [none]      | [none]    |
       | offer apple to dragon               | give    | apple     | to          | dragon    |
       | put apple on dragon                 | put     | apple     | on          | dragon    |
+      | say "foo"                           | say     | "foo"     | [none]      | [none]    |
+      | yell foo                            | say     | foo       | [none]      | [none]    |
+      | leave                               | go      | out       | [none]      | [none]    |
+      | exit                                | go      | out       | [none]      | [none]    |
+      | enter                               | go      | in        | [none]      | [none]    |
+      | in door                             | enter   | door      | [none]      | [none]    |
 
   Scenario: Invalid commands report parser errors
     Then parsing "[empty]" fails with "empty"

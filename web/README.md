@@ -20,7 +20,8 @@ auto-saves to your browser.
 ### Commands
 
 - **Move:** `north` / `n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`, `up` / `u`,
-  `down` / `d`, `in`, `out` — or just type the direction.
+  `down` / `d`, `in`, `out` — or just type the direction. The **In** and **Out**
+  buttons use each room's tracked entrance/exit. `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.
 - **While high:** hidden clues appear on first entry, vertical movement needs no
@@ -43,8 +44,12 @@ auto-saves to your browser.
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
   `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,
   cellar, well, and toilet)
+  `say <words>` and `yell <words>` repeat the utterance; the **Say** shortcut
+  prefills the command. Speech near sleeping DREADMAW wakes her violently.
   A revealed SAFE accepts `open safe with 7 3 9`, or `open safe` followed by
   typing `7 3 9`.
+  `open door with key` derives `(unlock door with key, open door)`; `enter door`
+  also derives any obvious unlock/open steps before going through.
 - **DREADMAW:** the FRONT GATE leads west into a small HEDGE MAZE. Jostling the
   sleeping dragon gets you burned; bring the kitchen APPLE and use variants such
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
