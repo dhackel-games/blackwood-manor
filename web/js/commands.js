@@ -311,6 +311,7 @@ export const commands = {
   listen() { return "You hear the old house settling, and something you'd rather not name."; },
   smell() { return "Dust, rot, and cold ash."; },
   climb(ctx, cmd) { return `You can't climb the ${cmd.dobj || "that"}.`; },
+  reach() { return "You reach into the darkness and find nothing useful."; },
   enter(ctx, cmd) {
     if (!cmd.dobj) return "Enter what?";
     const target = ctx.find(cmd.dobj);
@@ -365,7 +366,7 @@ export const commands = {
       "put <x> in <y>, read <x>",
       "light <x>, turn on/off <x>",
       "wear / remove, eat / drink",
-      "push / pull / move, ring <x>",
+      "push / pull / move, reach into <x>, ring <x>",
       "score save restore restart quit",
       "",
       "Chain commands with . ; , or THEN:",

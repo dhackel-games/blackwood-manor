@@ -18,7 +18,7 @@ const VERBS = {
   extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter"],
-  climb: ["climb", "descend"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
+  climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give"], pray: ["pray", "perform"],
   sit: ["sit"], use: ["use"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],

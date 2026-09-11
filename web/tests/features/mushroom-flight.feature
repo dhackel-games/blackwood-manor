@@ -16,12 +16,31 @@ Feature: Mushroom vision and flight
     And the player is in room "privy"
     When I send "look"
     Then the output contains "TOILET HOLE"
-    And the output contains "MUSHROOMS"
+    And the output contains "purple glimmer"
+    When I send "take mushrooms"
+    Then the output contains "can't see"
+    When I send "look in toilet"
+    Then the output contains "MUSHROOMS"
+    And the output contains "literal shit and piss"
+    When I send "get mushrooms from toilet"
+    Then the output contains "coated in literal shit and piss"
+    And item "outhouseMushrooms" is in "inventory"
     When I send "eat mushrooms"
-    Then the output contains "shit-fueled"
+    Then the output contains "literal shit and piss"
+    And the output contains "actual human waste"
     And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
+
+  Scenario: Reaching into the toilet requires looking first
+    Given a fresh manor game
+    And the player is in room "privy"
+    When I send "reach into toilet for mushrooms"
+    Then the output contains "LOOK IN THE TOILET first"
+    When I send "look in toilet"
+    And I send "reach into toilet for mushrooms"
+    Then the output contains "coated in literal shit and piss"
+    And item "outhouseMushrooms" is in "inventory"
 
   Scenario: Dried kitchen mushrooms are half-strength and hint that flight is possible
     Then the output contains "dried kitchen mushrooms"

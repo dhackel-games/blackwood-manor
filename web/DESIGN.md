@@ -332,8 +332,10 @@ the mansion.
 
 ## 12.9 Food & afflictions (kitchen) + the privy
 - **Strange mushrooms** → `high` (trippy per-turn flavor, harmless). The dried kitchen
-  cluster lasts 6 turns. Fresh, shit-fueled mushrooms grow inside the OUTHOUSE's TOILET HOLE
-  and last 12 turns. Eating consumes only that cluster.
+  cluster lasts 6 turns. A purple glimmer subtly invites the player to `LOOK IN TOILET`;
+  only then are the fresh, shit-and-piss-covered mushrooms revealed inside the OUTHOUSE's
+  TOILET HOLE. They last 12 turns. `GET MUSHROOMS FROM TOILET` or
+  `REACH INTO TOILET FOR MUSHROOMS` retrieves them after inspection.
 - **Gary's Mega Ass Blow Taco Stand Death Wish Spicy Burrito** contains two kinds of beans,
   three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
   destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts

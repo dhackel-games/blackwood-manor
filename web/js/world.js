@@ -801,7 +801,8 @@ function eatMushrooms(ctx, cmd) {
   ctx.setFlag("high", mushrooms?.highTurns || 6);
   ctx.setFlag("highGrace", true);
   const origin = mushrooms?.fresh
-    ? "You pluck the fresh, shit-fueled mushrooms from inside the TOILET HOLE and eat them. They are alarmingly potent."
+    ? "You eat the fresh mushrooms. They are slick with literal shit and piss from the TOILET HOLE — " +
+      "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway. They are alarmingly potent."
     : "You chew through the dried kitchen mushrooms. They are dusty, bitter, and only half-strength.";
   return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
     "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
@@ -948,6 +949,37 @@ function useToilet(ctx) {
 }
 function flushToilet() {
   return "It is a hole in the ground. There is no plumbing and nothing to flush.";
+}
+function inspectToilet(ctx) {
+  const mushrooms = ctx.item("outhouseMushrooms");
+  if (!ctx.getFlag("outhouseMushroomsFound")) {
+    ctx.setFlag("outhouseMushroomsFound");
+    ctx.moveItem("outhouseMushrooms", "privy");
+    return "You lean over and LOOK IN the TOILET HOLE. Fresh purple MUSHROOMS are growing directly in a wet " +
+      "bed of literal shit and piss. They glow twice as brightly as the dried kitchen ones.";
+  }
+  if (mushrooms && mushrooms.loc != null) {
+    return "Inside the TOILET HOLE, the fresh MUSHROOMS remain rooted in literal shit and piss.";
+  }
+  return "You look into the TOILET HOLE. Only shit, piss, and the torn roots of the mushrooms remain.";
+}
+function takeToiletMushrooms(ctx) {
+  if (!ctx.getFlag("outhouseMushroomsFound")) {
+    return "You stop before reaching blindly into the dark hole. You should LOOK IN THE TOILET first.";
+  }
+  const mushrooms = ctx.item("outhouseMushrooms");
+  if (!mushrooms || mushrooms.loc == null) return "The fresh mushrooms are already gone.";
+  if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
+  if (ctx.inventory().length >= (ctx.world.config.maxCarry ?? 99))
+    return "Your hands are full. You'll have to drop something before reaching into that.";
+  ctx.moveItem("outhouseMushrooms", "inventory");
+  return "You reach into the TOILET HOLE and pull the MUSHROOMS free. Your hand comes back coated in literal " +
+    "shit and piss. The mushrooms are not cleaner.";
+}
+function reachIntoToilet(ctx, cmd) {
+  const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
+  if (!/\b(toilet|hole|mushroom|fungus)\b/.test(target)) return null;
+  return takeToiletMushrooms(ctx);
 }
 
 // --- End-screen achievement badges -------------------------------------------
@@ -1169,8 +1201,9 @@ export const world = {
         "TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The garden lies west.",
       searchDesc:
         "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. The fresh " +
-        "MUSHROOMS inside look much more potent than the dried kitchen cluster.",
+        "source of the faint purple glimmer is somewhere down inside it. You would have to LOOK IN.",
       exits: { west: "garden" },
+      on: { reach: reachIntoToilet },
     },
 
     porch: {
@@ -1571,9 +1604,10 @@ export const world = {
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
       adjectives: ["fresh", "shit-fueled", "purple", "toilet"],
-      loc: "toilet", takeable: true, edible: true, fresh: true, highTurns: 12,
-      desc: "Fresh, shit-fueled purple mushrooms growing inside the TOILET HOLE. Their glow is twice as intense.",
-      on: { eat: eatMushrooms },
+      loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
+      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable shit and piss.",
+      desc: "Fresh, shit-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
+      on: { take: takeToiletMushrooms, eat: eatMushrooms },
     },
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
@@ -1604,9 +1638,12 @@ export const world = {
     toilet: {
       names: ["toilet", "hole", "latrine", "loo"], adjectives: ["outhouse", "dark", "earthen"],
       loc: "privy", fixed: true, container: true, open: true, capacity: 8,
-      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat, with fresh MUSHROOMS growing inside.",
-      desc: "A wooden seat over a raw hole in the earth. It has no plumbing and cannot flush.",
-      on: { sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet },
+      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. A faint purple glimmer leaks from below the rim.",
+      desc: "A wooden seat over a raw hole in the earth. Something faintly purple glimmers below. It has no plumbing.",
+      on: {
+        sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet,
+        examine: inspectToilet,
+      },
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
