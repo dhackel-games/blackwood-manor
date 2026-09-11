@@ -131,14 +131,14 @@ Feature: Fire and food consequences
     When I send "take matches"
     And I send "eat burrito"
     And I send "light self on fire with fart flames"
-    Then the output contains "next flaming fart strikes"
+    Then the output contains "next flaming fart or sparking diarrhea"
     And item "matches" is in "inventory"
 
-  Scenario: The foil wrapper waits for a fart and remains reusable
+  Scenario: The foil wrapper waits for a combustible turn and remains reusable
     Given the player is in room "kitchen"
     When I send "eat burrito"
     And I send "light self on fire"
-    Then the output contains "next flaming fart strikes"
+    Then the output contains "next flaming fart or sparking diarrhea"
     And flag "onFire" is unset
     When I send "wait"
     And I send "wait"
@@ -152,6 +152,18 @@ Feature: Fire and food consequences
     And I send "wait"
     And I send "wait"
     Then flag "onFire" is true
+
+  Scenario: The foil wrapper can ignite from sparking diarrhea
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "light self on fire"
+    Then the output contains "spicy, sparking diarrhea"
+    And the output contains "whole body catches"
+    And flag "onFire" is true
+    And item "burritoWrapper" is in "inventory"
 
   Scenario: Dropping the foil cancels queued fart ignition
     Given the player is in room "kitchen"

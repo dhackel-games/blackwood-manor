@@ -303,8 +303,8 @@ the mansion.
   which source to use.
 - **Fart-flame ignition:** eating the kitchen burrito leaves its crumpled foil wrapper in
   inventory. During the resulting digestive cycle, trying to ignite with the foil queues the
-  attempt until the next flaming fart. The wrapper is reusable while carried; dropping it
-  cancels a queued attempt.
+  attempt until the next flaming fart or spicy, sparking diarrhea beat. Either event can ignite
+  the player. The wrapper is reusable while carried; dropping it cancels a queued attempt.
 - **Burn-up timer:** 5 escalating warning turns, then you burn to **ash** on the 6th
   (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
   the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT

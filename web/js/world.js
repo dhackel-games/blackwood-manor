@@ -523,7 +523,7 @@ function requestedSelfFireSource(cmd) {
 }
 
 // Self-immolation. Works in any room (see the interceptor injected at the bottom).
-function igniteSelf(ctx, source, grantTickGrace = true) {
+function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
   ctx.setFlag("selfFirePrompt", false);
   if (source === "match") {
@@ -537,6 +537,15 @@ function igniteSelf(ctx, source, grantTickGrace = true) {
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.addScore(-1);
   if (source === "fart") {
+    if (digestivePhase === 3) {
+      return (
+        "The spicy, sparking diarrhea turn strikes. You spread the burrito wrapper's tin foil behind you, " +
+        "catch a spray of impossible sparks, and redirect them straight into your clothes. There is a flash, " +
+        "a deeply regrettable smell, and then your whole body catches.\n\n" +
+        "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
+        "ready for another appalling ignition while the burrito keeps cycling."
+      );
+    }
     return (
       "The next flaming fart strikes. You snap open the crumpled burrito wrapper, angle its tin foil like a " +
       "deranged signal mirror, and catch the blue-orange jet. The foil flashes; your clothes catch; the rest of " +
@@ -564,11 +573,11 @@ function queueFartIgnition(ctx) {
     return "You ready the foil, but your digestive pilot light is out. No flaming fart is currently scheduled.";
   }
   ctx.setFlag("fartIgnitionQueued", true);
-  if ((SICK_DURATION - sick) % SICK_LINES.length === 2) {
+  if ([2, 3].includes((SICK_DURATION - sick) % SICK_LINES.length)) {
     return "You spread the crumpled wrapper's tin foil behind you. The pressure says your timing is catastrophically perfect.";
   }
   return "You cup the crumpled burrito wrapper behind you and prepare the tin foil. Wrong turn. " +
-    "You'll try when the next flaming fart strikes you.";
+    "You'll try when the next flaming fart or sparking diarrhea blast strikes you.";
 }
 
 function selfFireAnswerInterceptor(ctx, cmd) {
@@ -809,8 +818,8 @@ function afflictionTick(ctx) {
       if (!ctx.has("burritoWrapper")) {
         ctx.setFlag("fartIgnitionQueued", false);
         out.push("Without the foil wrapper in your hands, the self-lighting plan is cancelled.");
-      } else if (phase === 2) {
-        out.push(igniteSelf(ctx, "fart", false));
+      } else if (phase === 2 || phase === 3) {
+        out.push(igniteSelf(ctx, "fart", false, phase));
       }
     }
 
