@@ -839,6 +839,7 @@ function eatMushrooms(ctx, cmd) {
 
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
+  const destinationName = destination.name.replace(/^The\s+/i, "");
   ctx.state.room = roomId;
   if (roomId === "crypt") {
     const talisman = ctx.item("talisman");
@@ -849,7 +850,7 @@ function floatToRoom(ctx, roomId) {
       );
     }
   }
-  return `You rise weightless and drift through the manor to ${destination.name}.\n\n${ctx.describeRoom()}`;
+  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}`;
 }
 function eatBurrito(ctx) {
   ctx.destroy("burrito");
