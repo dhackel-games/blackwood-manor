@@ -102,6 +102,9 @@ Feature: Fire and food consequences
     And flag "onFire" is false
     And flag "brazierLit" is true
     And item "emberStone" is in "garden"
+    When I send "take ember stone"
+    Then item "emberStone" is in "inventory"
+    And the output contains "+8"
 
   Scenario: Kitchen foods intoxicate, infect, or cure
     Given the player is in room "kitchen"

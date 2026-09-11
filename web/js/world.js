@@ -46,6 +46,9 @@ function nextHint(ctx) {
   if (!dep("rubyRing")) {
     return "Ruby ring's locked in a jewelry box in the MASTER BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
   }
+  if (!dep("musicBox")) {
+    return "Don't leave the JEWELED MUSIC BOX behind — the box ITSELF is a Blackwood heirloom, not just the tiny key's shell. Once you've got the tiny key out, TAKE the music box and PUT it in the RELIQUARY too.";
+  }
   if (!dep("ancientCoin")) {
     return ctx.has("rope")
       ? "You've got the rope, congratulations. Go to the garden and ENTER WELL — or just go DOWN. Coin's at the bottom. Try not to end up down there permanently."
@@ -1872,9 +1875,11 @@ export const world = {
         ].join("\n"),
         desc:
           "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. The TROLL GATE is WEST.",
+          "large gemstones fill DREADMAW'S VAULT. Among the dragon-gold, two pieces bear the Blackwood crest — " +
+          "a SILVER CHALICE and a JEWELED CROWN, family heirlooms this wyrm plainly stole long ago. The TROLL GATE is WEST.",
         searchDesc:
-          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes.",
+          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes, " +
+          "while the SILVER CHALICE and JEWELED CROWN are unmistakably BLACKWOOD work — they belong back in the RELIQUARY.",
         exits: { west: "trollGate" },
       },
 
@@ -1925,7 +1930,7 @@ export const world = {
         if (ctx.getFlag("curseLiftable")) {
           return "Every filled recess in the RELIQUARY glows faintly. Above it, the BELL rope trembles though the air is still.";
         }
-        return "The RELIQUARY contains seven heirloom-shaped recesses. The BELL rope hangs directly above them, " +
+        return "The RELIQUARY contains eight heirloom-shaped recesses. The BELL rope hangs directly above them, " +
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
@@ -1944,13 +1949,14 @@ export const world = {
           const it = ctx.find(cmd.dobj, ctx.inventory());
           if (!it) return "You aren't carrying that.";
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
-          if (!it.treasure) return `The reliquary is meant for the family heirlooms; it will not accept the ${it.names[0]}.`;
+          if (!it.treasure && !it.bonusTreasure) return `The reliquary is meant for treasure and heirlooms; it will not accept the ${it.names[0]}.`;
+          const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
           ctx.addScore(it.points || 0);
           let msg = `You lay the ${it.names[0]} in the reliquary. It settles with a low, resonant hum.`;
-          if (allTreasuresDeposited(ctx)) {
+          if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
-            msg += "\n\nAs the last heirloom touches stone, every heirloom begins to glow. The air " +
+            msg += "\n\nAs the last family heirloom touches stone, every heirloom begins to glow. The air " +
               "grows thick and cold, and the great brass bell above the reliquary trembles as if " +
               "it longs to be RUNG.";
           }
@@ -2110,21 +2116,23 @@ export const world = {
           ? "The lowered ATTIC ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
           : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
       },
-      extraDirections: (ctx) => (ctx.getFlag("high") || 0) > 0 || ctx.getFlag("ladderDown") ? ["up"] : [],
+      extraDirections: (ctx) => (canFly(ctx) || ctx.getFlag("ladderDown")) ? ["up"] : [],
       exits: { down: "grandHall", north: "hallBedroom", west: "nursery", east: "masterBedroom", south: "study" },
       on: {
         // The attic ladder is flimsy: climb it laden and it — and you — come down hard.
+        // Any flight source (mushroom high or worn WINGED SHOES) bypasses the ladder
+        // entirely, floating straight up through the shut trap-door.
         go(ctx, cmd) {
           if (cmd.dobj !== "up") return null;
-          if ((ctx.getFlag("high") || 0) > 0) {
+          if (canFly(ctx)) {
+            const byShoes = !((ctx.getFlag("high") || 0) > 0);
             ctx.state.room = "attic";
-            return "You float through the closed trap-door as if wood were only a suggestion.\n\n" + ctx.describeRoom();
+            return (byShoes
+              ? "The WINGED SHOES lift you straight up through the trap-door and into the ATTIC, the rotten ladder irrelevant."
+              : "You float through the closed trap-door as if wood were only a suggestion.")
+              + "\n\n" + ctx.describeRoom();
           }
           if (!ctx.getFlag("ladderDown")) return "There is no way up; the trap-door is shut.";
-          if (canFly(ctx)) {
-            ctx.state.room = "attic";
-            return "The WINGED SHOES carry you lightly beside the rotten ladder and into the ATTIC.\n\n" + ctx.describeRoom();
-          }
           if (ctx.inventoryLoad() > 2) {
             return ctx.kill(
               "You climb the flimsy attic ladder, but weighed down as you are, the rotted rungs " +
@@ -2413,6 +2421,15 @@ export const world = {
       names: ["ember", "emberstone", "stone"], adjectives: ["ember", "warm", "glowing"],
       loc: null, takeable: true, treasure: false,
       desc: "A smooth grey stone that holds a live coal's warmth and a faint inner glow. It never quite cools.",
+      on: {
+        take(ctx) {
+          if (ctx.has("emberStone")) return "You already carry the EMBER STONE.";
+          ctx.moveItem("emberStone", "inventory");
+          ctx.addScore(8);
+          return "You pocket the EMBER STONE. Its live-coal warmth settles against you like a small, patient " +
+            "heartbeat — a keepsake of the fire you gave away, and proof you walked back out of it. (+8)";
+        },
+      },
     },
 
     // --- kitchen edibles: high / sick / help ---
@@ -2527,9 +2544,24 @@ export const world = {
     },
     goldBar: {
       names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
-      loc: "dreadmawVault", takeable: true,
+      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 15,
       roomDesc: "A heavy GOLD BAR lies conspicuously apart from the rest of the hoard.",
-      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint.",
+      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint. Not a Blackwood heirloom, but the " +
+        "RELIQUARY will still gladly weigh it.",
+    },
+    silverChalice: {
+      names: ["chalice", "cup", "goblet"], adjectives: ["silver", "blackwood"],
+      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 20,
+      roomDesc: "A tarnished SILVER CHALICE chased with the Blackwood crest stands upright in the gold.",
+      desc: "A SILVER CHALICE worked with the Blackwood family crest — a raven over crossed keys. Dreadmaw " +
+        "hoarded it, but it was cast for the manor's own altar.",
+    },
+    jeweledCrown: {
+      names: ["crown", "coronet", "diadem"], adjectives: ["jeweled", "jewelled", "blackwood"],
+      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 25,
+      roomDesc: "A JEWELED CROWN, half-buried in coins, still catches what little light there is.",
+      desc: "A JEWELED CROWN of old Blackwood gold, its stones cold and deep. A relic of the family's " +
+        "prouder years, taken by the dragon and never returned — until now.",
     },
     wingedShoes: {
       names: ["shoes", "sandals"], adjectives: ["winged", "gold", "golden"],

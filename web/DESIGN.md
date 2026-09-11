@@ -691,3 +691,30 @@ whose ladder descends into the HIDDEN VAULT. Both flight sources can also target
 ROOF, BELFRY, HIDDEN VAULT, and every other named room directly. MAP renders the
 HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
 preserving spoiler hiding for both vaults.
+
+## 12.28 Bonus treasures, west-wing payoff, and consistency fixes
+
+Introduced a second treasure tier, `bonusTreasure`, alongside the eight required
+family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
+`points` on deposit, but `allTreasuresDeposited()` still counts only core
+`treasure` items, so they never gate the bell / curse-lifting / win. This lets
+optional content pay into the score economy without making it mandatory or
+breaking the canonical winning walkthrough.
+
+- **West-wing payoff.** DREADMAW'S VAULT now holds two stolen Blackwood heirlooms
+  — a SILVER CHALICE (+20) and a JEWELED CROWN (+25) — plus the former dead-end
+  GOLD BAR, now a `bonusTreasure` (+15). All three are RELIQUARY-depositable, giving
+  the apple→dragon→troll→vault chain a real reward while remaining optional.
+- **Ember stone.** The garden brazier's EMBER STONE keepsake now scores +8 on
+  pickup (previously a dead item), so the self-immolation puzzle pays off.
+- **Consistency fixes.** The RELIQUARY now reads "eight heirloom-shaped recesses"
+  (was "seven", stale after the ANCESTRAL PORTRAIT was added). WINGED SHOES flight
+  now floats up through the *shut* attic trap-door exactly like a mushroom high
+  (previously the shoes still required the ladder to be lowered). Gary's hint line
+  now explicitly reminds the player to deposit the JEWELED MUSIC BOX itself, not
+  just harvest its tiny key. The RELIQUARY no longer re-prints its "longs to be
+  RUNG" completion line when a bonus treasure is deposited after the core set is
+  already complete.
+
+Duplication across the game's several see-in-the-dark and flight mechanisms is a
+known, deliberately-deferred design topic (to be revisited later), not addressed here.

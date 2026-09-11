@@ -146,6 +146,36 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "goldBar" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
+  Scenario: The stolen Blackwood heirlooms return to the reliquary for score
+    Given item "silverChalice" is carried
+    And item "jeweledCrown" is carried
+    And item "goldBar" is carried
+    And the player is in room "grandHall"
+    When I send "put chalice in reliquary"
+    Then item "silverChalice" is in "reliquary"
+    And the game score is 20
+    When I send "put crown in reliquary"
+    Then item "jeweledCrown" is in "reliquary"
+    And the game score is 45
+    When I send "put gold bar in reliquary"
+    Then item "goldBar" is in "reliquary"
+    And the game score is 60
+
+  Scenario: Vault bonus treasures do not by themselves trigger the curse-lifting
+    Given item "silverChalice" is carried
+    And the player is in room "grandHall"
+    When I send "put chalice in reliquary"
+    Then flag "curseLiftable" is unset
+    And the output does not contain "longs to be RUNG"
+
+  Scenario: Winged shoes float up through the shut attic trap-door
+    Given item "wingedShoes" is carried
+    And the player is in room "landing"
+    When I send "wear winged shoes"
+    And I send "up"
+    Then the current room is "attic"
+    And the output contains "WINGED SHOES"
+
   Scenario: MAP charts the mine and roofline without spoiling their vaults
     Given the player is in room "mineGallery"
     When I send "map"
