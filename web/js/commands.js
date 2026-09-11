@@ -368,6 +368,7 @@ export const commands = {
       "wear / remove, eat / drink",
       "push / pull / move, reach into <x>, ring <x>",
       "score save restore restart quit",
+      "ai — is Gary's on-device model running, or is he scripted?",
       "",
       "Chain commands with . ; , or THEN:",
       "  n. open mailbox. read letter",
