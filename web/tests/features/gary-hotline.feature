@@ -31,6 +31,15 @@ Feature: Gary's hint line
     When I send "east"
     Then the output contains "GARDEN"
 
+  Scenario: A finished game hangs up the phone so you are never stranded on the call screen
+    Given the player is on fire
+    When I wait at most 12 turns until death
+    Then the game is dead
+    Given flag "onCall" is set
+    When I send "hang up"
+    Then flag "onCall" is false
+    And the output contains "game is over"
+
   Scenario: Mechanical hotline turns never reach the model
     When I send "call"
     Then these Gary lines are mechanical:

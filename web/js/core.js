@@ -256,7 +256,14 @@ export function createGame(world) {
   const MAX_CHAIN = 20;
 
   game.send = (input) => {
-    if (state.dead || state.won) return "The game is over. Type RESTART to play again.";
+    if (state.dead || state.won) {
+      // The game's over — you're no longer on the phone. Clearing this keeps a
+      // death or win that happened mid-call from stranding the player on the
+      // call screen, where the engine refuses every command (so hang-up can't
+      // clear the call) and RESTART would be the only way out.
+      state.flags.onCall = false;
+      return "The game is over. Type RESTART to play again.";
+    }
     // While on the hint line, everything you type goes to Gary verbatim (no
     // splitting — Gary should hear your commas) and no world turn passes.
     if (state.flags.onCall) {

@@ -258,7 +258,12 @@ function handle(raw) {
   }
   const low = cmd.toLowerCase();
 
-  // Meta-verbs handled at the UI layer — only when NOT on a call.
+  // restart/quit are UI meta-verbs and must work from ANYWHERE — including the
+  // call screen. Otherwise a game that ends mid-call strands you on the phone,
+  // where the engine refuses every command. Tear down the phone overlay first.
+  if (low === "restart") { if (onCall) endCallUI(); print("Restarting..."); newGame(); return; }
+  if (low === "quit") { if (onCall) endCallUI(); print("Thanks for playing. Refresh to return to Blackwood Manor."); input.disabled = true; return; }
+  // save/restore stay terminal-only.
   if (!onCall) {
     if (low === "save") { print(saveGame(game) ? "Game saved to this browser." : "Save failed."); return; }
     if (low === "restore") {
@@ -266,8 +271,6 @@ function handle(raw) {
       print(loadGame(game) ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
       return;
     }
-    if (low === "restart") { print("Restarting..."); newGame(); return; }
-    if (low === "quit") { print("Thanks for playing. Refresh to return to Blackwood Manor."); input.disabled = true; return; }
   }
 
   lastCmd = cmd;
