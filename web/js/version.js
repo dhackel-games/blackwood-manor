@@ -6,5 +6,5 @@
 // behind a push — if the version here doesn't match, hard-refresh).
 //
 // BUMP THIS in the same commit as any gameplay/engine change.
-export const VERSION = "2.7.0";
+export const VERSION = "2.8.0";
 export const BUILD_DATE = "2026-09-10";

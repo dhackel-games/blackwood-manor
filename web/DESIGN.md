@@ -518,3 +518,11 @@ reprints the room's base description first, then adds:
 Hidden-object anchors use the same canonical item inspection handler, so `SEARCH STATUE`,
 `EX STATUE`, and `LOOK AT STATUE` all discover the garden key rather than arbitrarily requiring
 one preferred synonym. The same rule applies to the hinged parlor portrait and its safe.
+
+## 12.18 Room ASCII art (v2.8.0)
+
+Every room defines a compact `art` string depicting either the space or its primary feature.
+`core.describeRoom()` renders it before the prose on first entry. Explicit nounless inspection
+(`LOOK`, `SEARCH`, `EX`, or `EXAMINE`) renders it again before the room's `searchDesc` and
+actionable-item list. Ordinary repeat entry omits the art so navigation does not flood the
+transcript. Every art line is capped at 32 characters for the mobile layout.

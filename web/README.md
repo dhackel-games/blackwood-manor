@@ -22,7 +22,8 @@ auto-saves to your browser.
 - **Move:** `north` / `n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`, `up` / `u`,
   `down` / `d`, `in`, `out` — or just type the direction.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
-  object reprint the room, add a closer-search hint, and list things you can act on.
+  object reprint the room, show its ASCII art, add a closer-search hint, and list
+  things you can act on. Room art also appears the first time you enter each room.
   With an object, `search <thing>`, `ex <thing>`, `examine <thing>`, `look <thing>`,
   and `look at <thing>` all show its deeper details.
 - **Things:** `take <x>`, `drop <x>`, `inventory` (`i`)

@@ -124,6 +124,7 @@ export function createGame(world) {
     state.flags["seen:" + state.room] = true;
     const verbose = state.flags.__verbose;
     let out = r.name.toUpperCase() + "\n";
+    if ((force || first) && r.art) out += r.art + "\n";
     if (force || first || verbose) out += r.desc + "\n";
     const here = game.itemsIn(state.room).filter((i) => !i.scenery);
     for (const it of here) {

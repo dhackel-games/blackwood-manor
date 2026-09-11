@@ -10,11 +10,11 @@ function fixture() {
   return {
     config: { start: "hall", maxCarry: 5 },
     rooms: {
-      hall: { name: "Hall", desc: "A dusty hall.",
+      hall: { name: "Hall", art: "[HALL ART]", desc: "A dusty hall.",
         searchDesc: "Scratches on the floor suggest the locked box has been moved recently.",
         exits: { north: "study", down: "cellar" } },
-      study: { name: "Study", desc: "A small study.", exits: { south: "hall" } },
-      cellar: { name: "Cellar", desc: "A damp cellar.", dark: true, exits: { up: "hall" } },
+      study: { name: "Study", art: "[STUDY ART]", desc: "A small study.", exits: { south: "hall" } },
+      cellar: { name: "Cellar", art: "[CELLAR ART]", desc: "A damp cellar.", dark: true, exits: { up: "hall" } },
     },
     items: {
       key: { names: ["key"], adjectives: ["brass"], loc: "hall", takeable: true, desc: "A brass key." },
@@ -111,6 +111,16 @@ function fixture() {
   console.log("OK: unified room + item inspection");
 }
 
+// ---------- room art display cadence ----------
+{
+  const g = createGame(fixture());
+  assert.match(g.send("look"), /\[HALL ART\]/, "explicit room inspection shows room art");
+  assert.match(g.send("north"), /\[STUDY ART\]/, "first entry shows room art");
+  assert.doesNotMatch(g.send("south"), /\[HALL ART\]/, "ordinary re-entry does not repeat room art");
+  assert.match(g.send("search"), /\[HALL ART\]/, "explicit search shows room art again");
+  console.log("OK: room art display cadence");
+}
+
 // ---------- Task 5: containers ----------
 {
   const g = createGame(fixture());
@@ -200,6 +210,11 @@ function fixture() {
   assert.match(out, /> go north/);
   assert.equal(g.state.turns, 2);
   assert.equal(g.state.room, "study");
+
+  const directions = createGame(fixture());
+  directions.send("n; s");
+  assert.equal(directions.state.turns, 2, "n; s runs as two turns");
+  assert.equal(directions.state.room, "hall", "n; s moves north and then returns south");
 
   // An unknown word aborts the rest of the line rather than half-executing it.
   const g2 = createGame(fixture());

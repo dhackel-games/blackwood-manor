@@ -311,11 +311,16 @@ const WIN = [
   for (const [id, room] of Object.entries(world.rooms)) {
     assert.ok(typeof room.searchDesc === "string" || typeof room.searchDesc === "function",
       `${id} must define a closer-inspection tidbit`);
+    assert.equal(typeof room.art, "string", `${id} must define ASCII room art`);
+    assert.ok(room.art.trim().length > 0, `${id} room art must not be empty`);
+    assert.ok(Math.max(...room.art.split("\n").map((line) => line.length)) <= 32,
+      `${id} room art must fit the narrow transcript`);
   }
 
   const garden = createGame(world);
   garden.state.room = "garden";
   const searched = garden.send("look");
+  assert.match(searched, /_\[\]_/, "explicit look includes the garden's ASCII art");
   assert.match(searched, /CLOSER INSPECTION[\s\S]*statue[\s\S]*movable/i,
     "nounless look gives the room's diegetic puzzle hint");
   assert.match(searched, /THINGS YOU CAN ACT ON[\s\S]*STATUE: MOVE, PUSH, EXAMINE/i,

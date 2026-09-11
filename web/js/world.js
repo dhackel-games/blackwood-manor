@@ -877,6 +877,143 @@ function endBadges(ctx) {
   return b.length ? "\n\n" + b.join("\n") : "";
 }
 
+const ROOM_ART = {
+  gate: [
+    "          /\\",
+    "     ____/  \\____",
+    "    /   BLACKWOOD \\",
+    "===|_|_|========|_|===",
+    "       ||      ||",
+  ].join("\n"),
+  garden: [
+    "      _[]_       ____",
+    "     / || \\     /    \\",
+    "       ||      |  ()  |",
+    "    __/  \\__    \\____/",
+    "  ~~ weeds ~~     ||",
+  ].join("\n"),
+  privy: [
+    "      _______",
+    "     / _____ \\",
+    "    | |  _  | |",
+    "    | | (_) | |",
+    "    |_|_____|_|",
+  ].join("\n"),
+  porch: [
+    "   ______________",
+    "  /              \\",
+    " | [MAIL]  ||||| |",
+    " |         | + | |",
+    "_|_________|___|_|_",
+  ].join("\n"),
+  grandHall: [
+    "       ( BELL )",
+    "          |",
+    "     _____|_____",
+    "    /  /     \\  \\",
+    "   /__/_______\\__\\",
+    "      [|||||]",
+  ].join("\n"),
+  parlor: [
+    "    .------------.",
+    "    |   .----.   |",
+    "    |  / o  o \\  |",
+    "    |  \\  --  /  |",
+    "    '----||------'",
+  ].join("\n"),
+  library: [
+    "  |[]|[]|[]|[]|",
+    "  |[]|[]|==|[]|",
+    "  |[]|[]|()|[]|",
+    "  |[]|[]|==|[]|",
+    "  '-------------'",
+  ].join("\n"),
+  secretChamber: [
+    "      ________",
+    "     /  ____  \\",
+    "    |  | /\\ |  |",
+    "    |  |/==\\|  |",
+    "    |___LECT___|",
+  ].join("\n"),
+  diningRoom: [
+    "  __________________",
+    " |                  |",
+    " |       \\ | /      |",
+    " |________\\|/_______|",
+    "          /_\\",
+  ].join("\n"),
+  kitchen: [
+    "  [MATCH]       __",
+    "     |         /__\\",
+    "   __|__      |____|",
+    "  | O  O|   __[____]__",
+    "  |_____|  | CELLAR  |",
+  ].join("\n"),
+  wineCellar: [
+    " |o| |o| |o| |o|",
+    " | | | | | | | |",
+    " |o| |o| |o| |o|",
+    " |_______________|",
+    "       /____\\",
+  ].join("\n"),
+  crypt: [
+    "       .-^-.",
+    "    .-'     '-.",
+    "   /  _______  \\",
+    "  |  /_______\\  |",
+    "  |_____________|",
+  ].join("\n"),
+  landing: [
+    "      _______",
+    "     |   o   |",
+    "     |   |   |",
+    " ____|___|___|",
+    "    /_/ /_/",
+  ].join("\n"),
+  nursery: [
+    "    __/\\__       ___",
+    " __/ o  o \\__   /_*_\\",
+    "   \\_====_/    |_____|",
+    "     /  \\        | |",
+    "   ROCKING      MUSIC",
+  ].join("\n"),
+  masterBedroom: [
+    "   ______________",
+    "  |\\            /|",
+    "  | \\__________/ |",
+    "  | |    BED   | |",
+    "  |_|__________|_|",
+  ].join("\n"),
+  study: [
+    "   ______________",
+    "  |  OPEN DIARY  |",
+    "  |_____/\\_______|",
+    "    |   DESK   |",
+    "    |__________|",
+  ].join("\n"),
+  attic: [
+    "       /\\",
+    "      /  \\",
+    "  ___/____\\___",
+    " /  []  /\\   \\",
+    "/______/__\\___\\",
+  ].join("\n"),
+  hollowPassage: [
+    "  /|            |\\",
+    " / |            | \\",
+    "|  |     ->     |  |",
+    " \\ |            | /",
+    "  \\|____________|/",
+  ].join("\n"),
+  hollowSanctum: [
+    "       .-***-.",
+    "     .'  (_)  '.",
+    "    /    /|\\    \\",
+    "   |     / \\  [ ]|",
+    "    \\____NORTH___/",
+  ].join("\n"),
+};
+
 // ---- the world ---------------------------------------------------------------
 export const world = {
   config: { start: "gate", maxCarry: 6, title: "Blackwood Manor" },
@@ -891,6 +1028,7 @@ export const world = {
   rooms: {
     gate: {
       name: "Front Gate",
+      art: ROOM_ART.gate,
       desc:
         "You stand at the rusted iron gate of Blackwood Manor as the last light drains " +
         "from the sky. The house looms beyond a dead lawn, its windows like sockets. A " +
@@ -904,6 +1042,7 @@ export const world = {
 
     garden: {
       name: "Overgrown Garden",
+      art: ROOM_ART.garden,
       desc:
         "Brambles have swallowed what was once a formal garden. A weathered stone statue " +
         "of a robed woman leans amid the weeds, and a crumbling well shaft plunges into " +
@@ -932,6 +1071,7 @@ export const world = {
 
     privy: {
       name: "Ivy-Choked Privy",
+      art: ROOM_ART.privy,
       desc:
         "A cramped brick outhouse strangled in ivy, containing one heroically old TOILET. Against all " +
         "odds and several laws of hygiene, it still flushes. The garden lies back to the west.",
@@ -943,6 +1083,7 @@ export const world = {
 
     porch: {
       name: "Front Porch",
+      art: ROOM_ART.porch,
       desc:
         "The porch boards sag underfoot. A brass mailbox is bolted beside a great oak " +
         "front door, its wood black with age. The path returns south to the gate.",
@@ -960,6 +1101,7 @@ export const world = {
 
     grandHall: {
       name: "Grand Hall",
+      art: ROOM_ART.grandHall,
       desc:
         "A vast, cobwebbed hall rises two storeys to a shattered chandelier. A grand " +
         "staircase climbs up into shadow. Set into the far wall is a stone RELIQUARY, and " +
@@ -1026,6 +1168,7 @@ export const world = {
 
     parlor: {
       name: "Parlor",
+      art: ROOM_ART.parlor,
       desc:
         "A mouldering parlor of draped furniture. Above the cold fireplace hangs a huge, " +
         "grim PORTRAIT of a bearded patriarch, whose eyes seem to track you. An archway " +
@@ -1040,6 +1183,7 @@ export const world = {
 
     library: {
       name: "Library",
+      art: ROOM_ART.library,
       desc:
         "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
         "LEVER where a book should be. The parlor lies north.",
@@ -1056,6 +1200,7 @@ export const world = {
 
     secretChamber: {
       name: "Hidden Chamber",
+      art: ROOM_ART.secretChamber,
       desc:
         "A cramped stone chamber that has not seen daylight in a century. A single lectern " +
         "stands at its centre. The only way out is the stair up.",
@@ -1067,6 +1212,7 @@ export const world = {
 
     diningRoom: {
       name: "Dining Room",
+      art: ROOM_ART.diningRoom,
       desc:
         "A long banquet table lies buried under dust and fallen plaster. Upon it, " +
         "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The hall " +
@@ -1079,6 +1225,7 @@ export const world = {
 
     kitchen: {
       name: "Kitchen",
+      art: ROOM_ART.kitchen,
       desc:
         "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
         "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR door is set in " +
@@ -1094,6 +1241,7 @@ export const world = {
 
     wineCellar: {
       name: "Wine Cellar",
+      art: ROOM_ART.wineCellar,
       desc:
         "Racks of burst and blackened bottles line a dripping vault. One survivor gleams: " +
         "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb up " +
@@ -1123,6 +1271,7 @@ export const world = {
 
     crypt: {
       name: "Crypt",
+      art: ROOM_ART.crypt,
       desc:
         "A low crypt of Blackwood dead. The wraith that guards it cowers from the talisman " +
         "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
@@ -1135,6 +1284,7 @@ export const world = {
 
     landing: {
       name: "Upstairs Landing",
+      art: ROOM_ART.landing,
       desc:
         "A long gallery landing overlooks the hall below. Doors open west to a nursery, " +
         "east to the master bedroom, and south to a study. A frayed CORD dangles from a " +
@@ -1165,6 +1315,7 @@ export const world = {
 
     nursery: {
       name: "Nursery",
+      art: ROOM_ART.nursery,
       desc:
         "A child's nursery, its wallpaper peeling in long tongues. A rocking horse stares " +
         "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The landing lies east.",
@@ -1175,6 +1326,7 @@ export const world = {
 
     masterBedroom: {
       name: "Master Bedroom",
+      art: ROOM_ART.masterBedroom,
       desc:
         "A great canopied bed rots beneath a collapsed tester. On the vanity stands a locked " +
         "JEWELRY BOX of dark walnut. The landing lies west.",
@@ -1185,6 +1337,7 @@ export const world = {
 
     study: {
       name: "Study",
+      art: ROOM_ART.study,
       desc:
         "A book-lined study with a great oak DESK. A leather-bound DIARY lies open upon it, " +
         "as though its writer had just stepped away. The landing lies north.",
@@ -1195,6 +1348,7 @@ export const world = {
 
     attic: {
       name: "Attic",
+      art: ROOM_ART.attic,
       desc:
         "A vast, raftered attic, silver with moonlight through a broken skylight. Amid the " +
         "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads down.",
@@ -1206,6 +1360,7 @@ export const world = {
     // --- The hidden wing, revealed only after the curse is lifted (bell rung) ---
     hollowPassage: {
       name: "Hollow Passage",
+      art: ROOM_ART.hollowPassage,
       desc:
         "A narrow passage of pale stone the manor kept hidden all this time. It is oddly warm, " +
         "and lit by no lamp you can find — as if the walls themselves remember daylight. The hall " +
@@ -1216,6 +1371,7 @@ export const world = {
     },
     hollowSanctum: {
       name: "The Hollow Sanctum",
+      art: ROOM_ART.hollowSanctum,
       desc:
         "A round, domed chamber at the manor's secret heart, filled with a soft grey light. The pale " +
         "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
