@@ -795,7 +795,7 @@ const SICK_LINES = [
   "A spicy, sparking diarrhea disaster fills your pants. Tiny embers spit from the cuffs. This is now a repeating problem.",
 ];
 const DIGESTIVE_PHASES = [
-  { name: "GURGLE", emoji: "🫧" },
+  { name: "BURP", emoji: "🫧" },
   { name: "BARF", emoji: "🤮" },
   { name: "FART", emoji: "💨" },
   { name: "POOP", emoji: "💩" },
