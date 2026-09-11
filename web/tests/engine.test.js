@@ -1,9 +1,18 @@
 // engine.test.js — unit tests for the generic engine (no mansion content).
 // Run: node tests/engine.test.js
 import assert from "node:assert";
+import { readFileSync } from "node:fs";
 import { createGame } from "../js/core.js";
 import { parse, splitCommands } from "../js/parser.js";
 import { clean as garyClean, isLocalPage } from "../js/gary-brain.js";
+import { VERSION } from "../js/version.js";
+
+const COPYRIGHT_VERSION =
+  "Copyright (c) dhackel-games 2026...2026-09-10.001:acoven. All Rights Reserved.";
+
+assert.equal(VERSION, COPYRIGHT_VERSION, "the displayed copyright-version must remain exact");
+const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+assert.equal(packageJson.version, "2026.9.10", "package SemVer must be the YYYY.M.D release date");
 
 // ---------- shared fixture ----------
 function fixture() {

@@ -4,7 +4,7 @@
 import { createGame } from "./core.js";
 import { world } from "./world.js";
 import { saveGame, loadGame, hasSave } from "./save.js";
-import { VERSION, BUILD_DATE } from "./version.js";
+import { VERSION } from "./version.js";
 import * as garyBrain from "./gary-brain.js";
 import { MAP_MARK } from "./map.js";
 
@@ -25,7 +25,7 @@ const hudScore = document.getElementById("hud-score");
 const hudTurns = document.getElementById("hud-turns");
 const hudBill = document.getElementById("hud-bill");
 const hudVersion = document.getElementById("hud-version");
-if (hudVersion) hudVersion.textContent = `v${VERSION}`;
+if (hudVersion) hudVersion.textContent = VERSION;
 
 let game = createGame(world);
 const history = [];
@@ -45,8 +45,8 @@ const BIG_BANNER =
  |____/|_|\\__,_|\\___|_|\\_\\  \\_/\\_/ \\___/ \\___/ \\__,_|
 
               M A N O R
-An Adventure in the Classic Style  ·  © you, for fun
-v${VERSION}  ·  built ${BUILD_DATE}
+An Adventure in the Classic Style
+${VERSION}
 
 Type HELP for commands.  Type LOOK to look around.  Beware the dark.`;
 
@@ -57,7 +57,7 @@ const SMALL_BANNER =
 |          M A N O R           |
 +------------------------------+
 An Adventure in the Classic Style
-v${VERSION}  ·  built ${BUILD_DATE}
+${VERSION}
 
 Type HELP for commands. Type LOOK
 to look around. Beware the dark.`;

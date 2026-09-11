@@ -41,15 +41,20 @@ body { -webkit-text-size-adjust: 100%; }
 /* Always-on status readout */
 #hud {
   position: relative; z-index: 1;
-  display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end;
+  display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.35rem; margin-bottom: 0.35rem;
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
 #hud .sep { opacity: 0.6; }
 #hud #hud-bill { color: var(--green); }
-/* Build stamp sits hard left; margin-auto pushes score/turns/bill to the right. */
-#hud #hud-version { margin-right: auto; opacity: 0.75; }
+/* The copyright-version gets its own wrapping row above the compact counters. */
+#hud #hud-version {
+  flex: 1 0 100%;
+  line-height: 1.25;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
 
 #transcript {
   flex: 1;

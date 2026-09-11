@@ -237,12 +237,13 @@ the mansion.
   use SSH and are unaffected). (Alternative that avoids switching accounts:
   `git -c credential.helper='!f() { echo username=dhackel-games; echo password=$T; }; f' push`
   with `T=$(gh auth token -u dhackel-games)`.)
-- **Version stamp:** `web/js/version.js` is the single source of truth (`VERSION`,
-  `BUILD_DATE`). It renders in the intro banner *and* in the always-visible HUD (top left),
-  so you can confirm at a glance which build a browser is actually running. **Bump it in the
-  same commit as any gameplay/engine change**, and keep `web/package.json` in sync. This
-  matters because Pages serves `js/` with `cache-control: max-age=600` — a tab can lag ~10
-  minutes behind a push, so if the HUD version is stale, hard-refresh (Cmd+Shift+R).
+- **Copyright-version stamp:** `web/js/version.js` is the single source of truth (`VERSION`).
+  It renders verbatim in the intro banner and always-visible HUD. Its format is
+  `Copyright (c) dhackel-games 2026...YYYY-MM-DD.NNN:username. All Rights Reserved.` where
+  `NNN` increments for each build on that date. **Bump it in the same commit as any
+  gameplay/engine change** and encode the release date in `web/package.json` as the date-only
+  SemVer `YYYY.M.D`. Pages serves `js/` with `cache-control: max-age=600`,
+  so a stale tab can lag about 10 minutes behind a push; hard-refresh when the HUD stamp differs.
 - **iOS:** `ios/` is a SwiftUI + `WKWebView` wrapper bundling `web/` for offline play, with a
   native `app://` scheme handler and a native speech-to-text bridge. Bundle
   `com.dhackel.BlackwoodManor`, team `9W789FP4LG`.
@@ -361,11 +362,12 @@ and `core.js` runs each fragment through `runOne()` in order. So
 - Capped at `MAX_CHAIN = 20`; `g`/`again` repeats the previous *chain*.
 - `game.send()` stays **synchronous** so the engine and tests are unaffected.
 
-## 12.13 The build stamp (v2.1.0)
-`js/version.js` is the single source of truth (`VERSION`, `BUILD_DATE`), shown in the banner and
-always-visible in the HUD. GitHub Pages serves `js/` with `cache-control: max-age=600` and module
-imports aren't cache-busted, so a tab can lag ~10 minutes behind a push. If the HUD version
-doesn't match what you deployed, hard-refresh. **Bump it in the same commit as any engine change.**
+## 12.13 The copyright-version stamp (introduced v2.1.0)
+`js/version.js` is the single source of truth for the exact copyright-version shown in the banner
+and always-visible HUD. The current format combines owner, copyright range, build date, same-day
+sequence, acting GitHub username, and rights notice. `package.json` carries the date-only SemVer
+(`YYYY.M.D`). GitHub Pages does not cache-bust module imports, so a tab can lag about
+10 minutes behind a push. If the HUD stamp differs from the deployed source, hard-refresh.
 
 ## 12.14 Gary's on-device brain (v2.2.0)
 Gary can now *think*. He runs on **Apple Foundation Models** — the ~3B on-device model in
