@@ -239,8 +239,8 @@ the mansion.
   with `T=$(gh auth token -u dhackel-games)`.)
 - **Copyright-version stamp:** `web/js/version.js` is the single source of truth (`VERSION`).
   It renders verbatim in the intro banner and always-visible HUD. Its format is
-  `Copyright (c) dhackel-games 2026...YYYY-MM-DD.NNN:username. All Rights Reserved.` where
-  `NNN` increments for each build on that date. **Bump it in the same commit as any
+  `Copyright (c) dhackel-games. All Rights Reserved. 2026...YYYY-MM-DD.0aNN:username` where
+  `0aNN` increments for each build on that date. **Bump it in the same commit as any
   gameplay/engine change** and encode the release date in `web/package.json` as the date-only
   SemVer `YYYY.M.D`. Pages serves `js/` with `cache-control: max-age=600`,
   so a stale tab can lag about 10 minutes behind a push; hard-refresh when the HUD stamp differs.
@@ -365,7 +365,7 @@ and `core.js` runs each fragment through `runOne()` in order. So
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
 `js/version.js` is the single source of truth for the exact copyright-version shown in the banner
 and always-visible HUD. The current format combines owner, copyright range, build date, same-day
-sequence, acting GitHub username, and rights notice. `package.json` carries the date-only SemVer
+alphanumeric sequence, acting GitHub username, and rights notice. `package.json` carries the date-only SemVer
 (`YYYY.M.D`). GitHub Pages does not cache-bust module imports, so a tab can lag about
 10 minutes behind a push. If the HUD stamp differs from the deployed source, hard-refresh.
 

@@ -8,7 +8,7 @@ import { clean as garyClean, isLocalPage } from "../js/gary-brain.js";
 import { VERSION } from "../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games 2026...2026-09-10.001:acoven. All Rights Reserved.";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a01:acoven";
 
 assert.equal(VERSION, COPYRIGHT_VERSION, "the displayed copyright-version must remain exact");
 const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
