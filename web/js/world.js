@@ -12,7 +12,7 @@
 // A handler that returns a string intercepts the default verb; returning null/
 // undefined lets the default behaviour run.
 
-import { renderMap } from "./map.js";
+import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
 function allTreasuresDeposited(ctx) {
@@ -855,7 +855,7 @@ function afflictionTick(ctx) {
     const left = sick - 1;
     ctx.setFlag("sick", left);
     out.push(SICK_LINES[phase]);
-    if (SICK_EVENT_ART[phase]) out.push(SICK_EVENT_ART[phase]);
+    if (SICK_EVENT_ART[phase]) out.push(MAP_MARK + SICK_EVENT_ART[phase] + MAP_MARK);
 
     if (ctx.getFlag("fartIgnitionQueued")) {
       if (!ctx.has("burritoWrapper")) {

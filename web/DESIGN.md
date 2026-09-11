@@ -304,7 +304,9 @@ the mansion.
 - **Fart-flame ignition:** eating the kitchen burrito leaves its crumpled foil wrapper in
   inventory. During the resulting digestive cycle, trying to ignite with the foil queues the
   attempt until the next flaming fart or spicy, sparking diarrhea beat. Either event can ignite
-  the player. The wrapper is reusable while carried; dropping it cancels a queued attempt.
+  the player. After the illness is cured or completes, the wrapper and permanent digestive
+  pilot light allow on-demand self-immolation anywhere. The wrapper is reusable while carried;
+  dropping it cancels a queued attempt.
 - **Burn-up timer:** 5 escalating warning turns, then you burn to **ash** on the 6th
   (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
   the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT
@@ -334,7 +336,8 @@ the mansion.
   three cheeses, four meats, and lettuce suggestive of *Cyclospora cayetanensis*. Eating it
   destroys the burrito, moves its crumpled wrapper and tin foil into inventory, and starts
   `sick`: stomach-acid burp → barf → flaming fart → spicy, sparking diarrhea. That four-turn
-  cycle repeats ten times and is lethal after its 40th uncured beat.
+  cycle repeats ten times and is lethal after its 40th uncured beat. Each event carries its
+  own non-wrapping ASCII drawing rendered through the same mobile-safe block path as MAP MODE.
 - **Good cheese** → real food: cures affliction, +5, "fortified" (and the "Ate Well" badge).
 - **The privy** (ivy-choked outhouse east of the garden) has a **toilet**: `sit`/`use`/`flush`
   cures the sickness and cancels any queued fart-flame ignition.
@@ -556,3 +559,12 @@ sanctum's northern exit.
 objects exposed inside open containers. The operation respects `maxCarry`, reports each
 pickup, and names anything left behind when the player's hands fill. If no portable object
 is reachable, it says so explicitly.
+
+## 12.22 TestFlight release
+
+`ios/release-testflight.sh` refreshes `ios/Resources/www` from canonical `web/` before
+generating the Xcode project, so an archive cannot silently contain stale game files.
+TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
+`web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
+integer build number. The script archives and exports locally with `--no-upload`, or also
+validates and uploads when App Store Connect credentials are available.

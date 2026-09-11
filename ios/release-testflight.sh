@@ -5,12 +5,12 @@
 #   1. App record for com.dhackel.BlackwoodManor exists in App Store Connect.
 #   2. An App Store Connect API key is present:
 #        ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8
-#      and these env vars are exported (put them in ~/.zshrc or pass inline):
+#      and these env vars are available from your private shell environment:
 #        export ASC_KEY_ID=XXXXXXXXXX
 #        export ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 #
 # Usage:
-#   cd ~/repos/blackwood-manor/ios
+#   cd <blackwood-manor-repo>/ios
 #   ./release-testflight.sh              # bump build, archive, export, upload
 #   ./release-testflight.sh --no-upload  # build + export only (dry run, no creds needed)
 #
@@ -20,18 +20,27 @@ cd "$(dirname "$0")"
 SCHEME="BlackwoodManor"
 ARCHIVE="build/BlackwoodManor.xcarchive"
 EXPORT_DIR="build/export"
-TEAM="9W789FP4LG"
 UPLOAD=1
 [[ "${1:-}" == "--no-upload" ]] && UPLOAD=0
 
-echo "==> Regenerating project (xcodegen)"
-xcodegen generate
+echo "==> Refreshing bundled web game"
+./copy-web.sh
+
+MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
+if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Invalid YYYY.M.D package version: $MARKETING_VERSION" >&2
+  exit 1
+fi
+echo "==> Setting app version to ${MARKETING_VERSION}"
+sed -i '' -E "s/MARKETING_VERSION: \"[^\"]+\"/MARKETING_VERSION: \"${MARKETING_VERSION}\"/g" project.yml
 
 # Auto-bump CURRENT_PROJECT_VERSION so each TestFlight upload has a unique build number.
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
 NEXT=$((CUR + 1))
 echo "==> Bumping build number ${CUR} -> ${NEXT}"
 sed -i '' "s/CURRENT_PROJECT_VERSION: \"${CUR}\"/CURRENT_PROJECT_VERSION: \"${NEXT}\"/g" project.yml
+
+echo "==> Regenerating project (xcodegen)"
 xcodegen generate
 
 echo "==> Archiving"
@@ -52,7 +61,7 @@ xcodebuild -exportArchive \
   -allowProvisioningUpdates
 
 IPA=$(ls "$EXPORT_DIR"/*.ipa | head -1)
-echo "==> Built: $IPA (build ${NEXT})"
+echo "==> Built: $IPA (version ${MARKETING_VERSION}, build ${NEXT})"
 
 if [[ "$UPLOAD" -eq 0 ]]; then
   echo "==> --no-upload set; stopping before upload."
@@ -70,5 +79,5 @@ echo "==> Uploading to TestFlight"
 xcrun altool --upload-app -f "$IPA" -t ios \
   --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID"
 
-echo "==> Done. Build ${NEXT} uploaded. It will appear in TestFlight after ~5-30 min of processing."
+echo "==> Done. Version ${MARKETING_VERSION} build ${NEXT} uploaded. It will appear in TestFlight after ~5-30 min of processing."
 echo "    Then add testers (e.g. Andy) in App Store Connect > TestFlight."

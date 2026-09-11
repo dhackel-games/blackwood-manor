@@ -2,6 +2,7 @@
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
+import { MAP_MARK } from "../../js/map.js";
 import { world } from "../../js/world.js";
 
 function commandsFrom(docString) {
@@ -189,6 +190,13 @@ Then("Gary's phone ranks are:", function (table) {
 Then("the accumulated output contains {string} {int} times", function (text, count) {
   const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   assert.equal((this.accumulatedOutput.match(new RegExp(escaped, "gi")) || []).length, count);
+});
+
+Then("every sickness event drawing is marked as non-wrapping output", function () {
+  const artBlocks = this.accumulatedOutput.split(MAP_MARK).filter((_, index) => index % 2 === 1);
+  for (const marker of ["B U R P", "B L E A R G H", "F O O M P", "S P L U R T"]) {
+    assert.ok(artBlocks.some((block) => block.includes(marker)), `${marker} must be in an art block`);
+  }
 });
 
 Then("the output contains regex {string} exactly {int} time", function (pattern, count) {

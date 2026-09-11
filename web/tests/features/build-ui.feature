@@ -26,4 +26,9 @@ Feature: Build metadata and touch-control contract
       | up        |
       | down      |
 
+  Scenario: TestFlight packages the canonical web game
+    Then the TestFlight release refreshes the web bundle before generating the Xcode project
+    And the iOS app version matches the date-only package version
+    And the TestFlight release synchronizes the app version from the package
+
 # end build-ui.feature

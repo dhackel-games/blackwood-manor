@@ -8,7 +8,7 @@ import { parse, splitCommands } from "../../js/parser.js";
 import { VERSION } from "../../js/version.js";
 
 const COPYRIGHT_VERSION =
-  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-10.0a09:dhackel";
+  "Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-11.0a11:acoven";
 const NONE = "[none]";
 const EMPTY = "[empty]";
 
@@ -263,7 +263,7 @@ Then("the copyright-version is exact", function () {
 
 Then("the package version is the release date", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  assert.equal(packageJson.version, "2026.9.10");
+  assert.equal(packageJson.version, "2026.9.11");
 });
 
 Then("the touch UI has no control-hiding typing state", function () {
@@ -286,6 +286,29 @@ Then("the controls remain pinned inside the viewport", function () {
 Then("the page has a {string} touch command", function (direction) {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, new RegExp(`data-cmd=["']${direction}["']`));
+});
+
+Then("the TestFlight release refreshes the web bundle before generating the Xcode project", function () {
+  const script = readFileSync(new URL("../../../ios/release-testflight.sh", import.meta.url), "utf8");
+  const copyIndex = script.indexOf("./copy-web.sh");
+  const generateIndex = script.indexOf("xcodegen generate");
+  assert.ok(copyIndex >= 0, "release script must invoke copy-web.sh");
+  assert.ok(generateIndex > copyIndex, "copy-web.sh must run before xcodegen");
+});
+
+Then("the iOS app version matches the date-only package version", function () {
+  const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+  const project = readFileSync(new URL("../../../ios/project.yml", import.meta.url), "utf8");
+  const versions = [...project.matchAll(/MARKETING_VERSION:\s*"([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(versions.length > 0, "project.yml must define MARKETING_VERSION");
+  assert.ok(versions.every((version) => version === packageJson.version),
+    `Expected every iOS app version to equal ${packageJson.version}; got ${versions.join(", ")}`);
+});
+
+Then("the TestFlight release synchronizes the app version from the package", function () {
+  const script = readFileSync(new URL("../../../ios/release-testflight.sh", import.meta.url), "utf8");
+  assert.match(script, /require\("\.\.\/web\/package\.json"\)\.version/);
+  assert.match(script, /MARKETING_VERSION/);
 });
 
 Then("Gary cleaning produces:", function (table) {

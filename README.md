@@ -60,3 +60,17 @@ open BlackwoodManor.xcodeproj
 ```
 
 Requires `xcodegen` (`brew install xcodegen`) and Xcode.
+
+To make a TestFlight archive, refresh the bundled web game, increment the iOS
+build number, archive, export, and optionally upload:
+
+```bash
+cd ios
+./release-testflight.sh --no-upload  # archive and export locally
+./release-testflight.sh              # archive, export, and upload
+```
+
+The release script runs `copy-web.sh` before generating the Xcode project, so the
+archive always contains the current canonical files from `web/`. It also reads
+the date-only `YYYY.M.D` version from `web/package.json` for TestFlight's app
+version, then increments the separate integer build number.

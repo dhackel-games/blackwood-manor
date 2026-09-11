@@ -212,6 +212,7 @@ Feature: Fire and food consequences
     And the accumulated output contains "B L E A R G H" 10 times
     And the accumulated output contains "F O O M P" 10 times
     And the accumulated output contains "S P L U R T" 10 times
+    And every sickness event drawing is marked as non-wrapping output
     And the game is dead
 
   Scenario Outline: Using or entering the toilet cures burrito sickness
