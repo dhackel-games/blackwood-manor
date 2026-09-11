@@ -81,8 +81,9 @@ items: {
 }
 ```
 
-Item flags: `takeable, container, openable, open, locked, key (which lock), lightSource,
-lit, fuel, fixed, treasure, worn, edible, weight, points, capacity, contents`.
+Item flags: `takeable, container, openable, open, locked, keyId, lightSource,
+selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, worn, edible,
+points, capacity, roomDesc`.
 
 Room fields: `name, desc, exits, dark, flags`. Exits are either a room id string or an
 object `{ to, via (flag required), locked, lockedMsg }`.
@@ -129,6 +130,7 @@ Classic Infocom style, richer than strict two-word.
   wraith (fatal without protection), the rotted attic floor (crashes through if you're
   overloaded).
 - **Inventory limit:** carry capacity forces planning; interacts with the attic trap.
+  Equipped items remain in inventory but do not count toward this limit.
 - **Poison / wrong-item deaths** for the reckless.
 - **Soft-locks:** one or two authentic unwinnable states are possible (e.g., wasting a
   one-use consumable). Autosave + SAVE/RESTORE are the safety net.
@@ -455,8 +457,9 @@ Gary tells you to type it and a hint line that lies to you is worse than no hint
 
 - Rooms you haven't entered render as `?????`, so you get the *shape* of the house — how many
   rooms, how they connect — without being handed the contents.
-- The secret wing (`hollowPassage`, `hollowSanctum`) and the hidden chamber (`secretChamber`)
-  are the best discoveries in the game, so they aren't drawn at all until you stand in one.
+- The secret wing (`hollowPassage`, `hollowSanctum`), hidden chamber (`secretChamber`),
+  HIDDEN VAULT, and DREADMAW'S inner vault are discoveries, so they aren't drawn at all
+  until you stand in one.
   Hiding them leaves gaps in the grid, and a conspicuous gap is itself a spoiler — hence the
   row compaction in `drawFloor()`.
 - Landmarks like `(Porch)` repeat a room on another floor's panel for orientation. An anchor
@@ -584,24 +587,26 @@ validates and uploads when App Store Connect credentials are available.
 Eating the strange mushrooms explicitly hints that the player feels light enough to
 `FLY TO` a named room. While `high` remains positive:
 
-- First entry appends `MUSHROOM VISION` with `highDesc` clues for hidden objects.
+- Room descriptions append `MUSHROOM VISION` with `highDesc` clues for hidden objects.
+  Worn XRAY GOGGLES provide the same clue visibility and label it `XRAY VISION`.
 - `GO TO <room>`, `FLOAT TO <room>`, and `FLY TO <room>` resolve room IDs or names and
-  move there directly.
+  move there directly. Worn WINGED SHOES provide the same named-room flight without
+  a countdown.
 - The player can descend the garden well without a rope and float through the attic
   trap-door without lowering its ladder or shedding inventory.
-- Darkness still starts the normal one-turn grue warning, and an unprotected arrival in
-  the crypt still triggers the wraith.
-- Mushroom durations stack additively: dried kitchen mushrooms add 6 turns and fresh
-  TOILET-HOLE mushrooms add 12. The always-visible HUD shows `🍄 <turns>`; the TOMATO's
-  independent third-eye countdown shows `🍅 <turns>`.
+- Mushroom vision sees through darkness, but an unprotected arrival in the crypt
+  still triggers the wraith.
+- Mushroom durations stack additively: both dried kitchen mushrooms and fresh
+  TOILET-HOLE mushrooms add 12 turns. Eaten TOILET mushrooms can eventually regrow.
+  The always-visible HUD shows `🍄 <turns>`.
 
 ## 12.24 Declarative HUD slots
 
 `js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
 `emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
 updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
-pressure, digestive phase, mushroom high, TOMATO sight, and fire countdown are data entries
-in one registry rather than separate DOM mutations in `ui.js`.
+pressure, digestive phase, mushroom high, fire countdown, and HEADLAMP
+battery are data entries in one registry rather than separate DOM mutations in `ui.js`.
 
 ## 12.25 Derived actions and player-known codes
 
@@ -627,18 +632,42 @@ The FRONT GATE is the grounds fork: east leads to the original garden, OUTHOUSE,
 WELL; west enters a three-room HEDGE MAZE whose short route is west, west, south.
 The maze reaches DREADMAW THE DRAGON, an ancient female dragon sleeping across the
 cave entrance. TALK, WAKE, MOVE, PUSH, PULL, TOUCH, ATTACK, CLIMB, SHAKE, or NUDGE
-makes her breathe fire over the player and settle back without moving.
+makes her randomly breathe fire, belch flame, spin and fart fire, strike with her
+tail, swat with a foreclaw, or flick the player with her nose. Fire outcomes leave
+the player burning at the cave; physical outcomes inflict injury and launch the
+player over the HEDGE MAZE to crash at the FRONT GATE. None moves DREADMAW.
 SAY/YELL/SHOUT near sleeping DREADMAW first echoes the utterance, then triggers
 the same immobile dragonfire response. Elsewhere, speech echoes and does nothing;
 inside the cave, SAY/ANSWER/RECITE supplies the TROLL's rhyme answer.
 
 Only offering the kitchen APPLE wakes DREADMAW pleasantly and moves her aside.
 `OFFER`/`GIVE`/`FEED`/`PUT APPLE TO`/`WITH`/`ON DRAGON` all use the same handler.
-She awards a GOLD DOUBLOON and allows passage. Inside, a male cave TROLL blocks the
-inner VAULT DOOR. `TALK TO TROLL` makes him recite a poem whose final word is missing.
+She awards a GOLD DOUBLOON and allows passage. The outer ANTECHAMBER leads through
+a MINING GALLERY, where a 40-turn HEADLAMP hangs, and down a dark DEEP MINING SHAFT
+to the TROLL GATE. A male cave TROLL blocks the inner VAULT DOOR there.
+`TALK TO TROLL` makes him recite a poem whose final word is missing.
 He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including MORE,
 DOOR, FLOOR, CORE, ROAR, LORE, SHORE, STORE, and BEFORE. A valid rhyme makes him move
 and opens DREADMAW'S VAULT. The intended environmental clue is optional:
 `EXAMINE DOUBLOON` reveals LORE etched around its edge, while GORE and other rhymes can
-still solve the poem independently. Mushroom flight cannot bypass either the sleeping
-dragon or sealed inner door.
+still solve the poem independently. The vault contains a GOLD BAR and WINGED SHOES.
+
+## 12.27 Equipment, hall bedroom, and roofline
+
+Wearable items declare one of six exclusive body slots: `head`, `eyes`, `feet`,
+`finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
+or put into a container until removed, and contributes zero to `inventoryLoad()`.
+The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
+XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
+
+The HEADLAMP activates when worn, has 40 turns of battery life, lights every room,
+and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
+the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
+that provide permanent mushroom-style clue vision and darkness sight while worn.
+
+Either an active mushroom high or worn WINGED SHOES enables named-room flight.
+From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,
+whose ladder descends into the HIDDEN VAULT. Both flight sources can also target
+ROOF, BELFRY, HIDDEN VAULT, and every other named room directly. MAP renders the
+HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
+preserving spoiler hiding for both vaults.

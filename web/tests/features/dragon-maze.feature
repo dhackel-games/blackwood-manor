@@ -17,15 +17,11 @@ Feature: Dreadmaw's hedge maze and hoard
     Then the current room is "dragonCaveMouth"
     And the output contains "DREADMAW THE DRAGON"
 
-  Scenario Outline: Jostling Dreadmaw ignites the player but never moves her
+  Scenario Outline: Jostling Dreadmaw burns or launches the player but never moves her
     Given the player is in room "dragonCaveMouth"
     When I send "<command>"
-    Then flag "onFire" is true
+    Then Dreadmaw's rebuke burns the player or launches them to the front gate
     And flag "dragonMoved" is unset
-    And the output contains "without moving an inch"
-    When I send "east"
-    Then the current room is "dragonCaveMouth"
-    And the output contains "sleeping across the entire cave mouth"
 
     Examples:
       | command        |
@@ -47,13 +43,21 @@ Feature: Dreadmaw's hedge maze and hoard
     Then the output contains these phrases in order:
       | "Foo"                |
       | DREADMAW THE DRAGON |
-      | ON FIRE             |
+    And Dreadmaw's rebuke burns the player or launches them to the front gate
     And flag "dragonMoved" is unset
 
     Examples:
       | command   |
       | say "foo" |
       | yell foo  |
+
+  Scenario: A hostile wake-up never clears the cave entrance
+    Given the player is in room "dragonCaveMouth"
+    When I send "wake dragon"
+    And the player moves directly to room "dragonCaveMouth"
+    And I send "east"
+    Then the current room is "dragonCaveMouth"
+    And the output contains "sleeping across the entire cave mouth"
 
   Scenario Outline: Offering the apple wakes Dreadmaw pleasantly
     Given item "apple" is carried
@@ -98,6 +102,13 @@ Feature: Dreadmaw's hedge maze and hoard
     When I send "offer apple to dragon"
     And I send "east"
     Then the current room is "dragonAntechamber"
+    When I play this command sequence:
+      """
+      east
+      down
+      east
+      """
+    Then the current room is "trollGate"
     When I send "talk to troll"
     Then the output contains "Past this door lie gold and ore"
     And the output contains "Treasure, terror, blood, and ____"
@@ -124,7 +135,13 @@ Feature: Dreadmaw's hedge maze and hoard
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"
     When I send "offer apple to dragon"
-    And I send "east"
+    And I play this command sequence:
+      """
+      east
+      east
+      down
+      east
+      """
     And I send "talk to troll"
     And I send "answer banana"
     Then flag "dragonVaultOpen" is unset
@@ -134,19 +151,22 @@ Feature: Dreadmaw's hedge maze and hoard
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"
     When I send "offer apple to dragon"
-    And I send "east"
+    And I play this command sequence:
+      """
+      east
+      east
+      down
+      east
+      """
     And I send "answer more"
     Then flag "dragonVaultOpen" is unset
     And the output contains "TALK TO TROLL"
 
-  Scenario: Mushroom flight cannot bypass the sleeping dragon or sealed vault
-    Given flag "high" is set
+  Scenario: Mushroom flight can reach named rooms beyond the dragon and troll
+    Given flag "high" is 4
     When I send "fly to dragon cave antechamber"
-    Then the current room is "gate"
-    And the output contains "sealed barrier"
-    Given flag "high" is set
+    Then the current room is "dragonAntechamber"
     When I send "fly to dreadmaw vault"
-    Then the current room is "gate"
-    And the output contains "sealed barrier"
+    Then the current room is "dreadmawVault"
 
 # end dragon-maze.feature

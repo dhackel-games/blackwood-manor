@@ -24,11 +24,17 @@ auto-saves to your browser.
   buttons use each room's tracked entrance/exit. `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.
-- **While high:** hidden clues appear on first entry, vertical movement needs no
-  rope or ladder, and `go to <room>`, `float to <room>`, or `fly to <room>`
-  carries you directly there. Eating another mushroom cluster adds its full
-  duration to the remaining high. The HUD shows the countdown as `🍄`; TOMATO
-  third-eye time appears as `🍅`. Darkness and supernatural hazards still apply.
+- **Mushroom powers:** while high, hidden clues appear on first entry, vertical
+  movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
+  `fly to <room>` carries you directly there. Eating another mushroom cluster
+  adds its full duration to the remaining high. The HUD shows the countdown as
+  `🍄`; the trip's third eye also reveals hidden clues and lets you see in dark
+  rooms. Supernatural hazards still apply.
+- **Equipment:** wearable items occupy HEAD, EYES, FEET, FINGER, WRIST, or NECK.
+  Worn gear is marked in INVENTORY and does not consume carrying capacity. A
+  HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES
+  reveal the same clues as mushroom vision; WINGED SHOES provide permanent
+  named-room flight while worn.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.
@@ -53,6 +59,8 @@ auto-saves to your browser.
 - **DREADMAW:** the FRONT GATE leads west into a small HEDGE MAZE. Jostling the
   sleeping dragon gets you burned; bring the kitchen APPLE and use variants such
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
+  Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
+  DREADMAW'S VAULT.
 - **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 
@@ -121,8 +129,8 @@ items: {
 ```
 
 Useful item flags: `takeable, fixed, scenery, treasure, points, container,
-openable, open, locked, keyId, capacity, lightSource, lit, fuel, wearable,
-worn, readable, text, edible, drinkable, roomDesc`.
+openable, open, locked, keyId, capacity, lightSource, selfPowered, lit, fuel,
+wearable, wearSlot, worn, readable, text, edible, drinkable, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
 part of the win condition (all treasures must reach the reliquary).
@@ -147,8 +155,9 @@ lever: {
 ```
 
 Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
-`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `find(phrase)`, `moveItem(id,to)`,
-`destroy(id)`, `addScore(n)`, `kill(msg)`, `win(msg)`, `describeRoom()`.
+`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `inventoryLoad()`, `equipped(slot)`,
+`find(phrase)`, `moveItem(id,to)`, `destroy(id)`, `addScore(n)`, `kill(msg)`,
+`win(msg)`, `describeRoom()`.
 
 After any change, **run `npm test`** — and update the gameplay feature and steps
 if you changed the solution path.

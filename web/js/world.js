@@ -61,7 +61,7 @@ function nextHint(ctx) {
     return "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first.";
   }
   if (!dep("goldLocket")) {
-    return "The gold locket's in the CRYPT, past the wine cellar — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PORTRAIT in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the crypt. In that order. Write it down.";
+    return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
@@ -467,7 +467,7 @@ function garyTurnInfo(ctx, text) {
 }
 
 function descendWell(ctx) {
-  const floating = (ctx.getFlag("high") || 0) > 0;
+  const floating = canFly(ctx);
   if (!ctx.has("rope") && !floating) {
     return ctx.kill(
       "You clamber over the mossy lip of the well and lower yourself into the dark — " +
@@ -846,12 +846,22 @@ function eatMushrooms(ctx, cmd) {
     "detail keeps revealing itself while the trip lasts.)";
 }
 
+function canFly(ctx) {
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) => item.worn && item.grantsFlight);
+}
+function hasMushroomVision(ctx) {
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) =>
+      item.worn && (item.grantsMushroomVision || item.id === "xrayGoggles"));
+}
+function headlampStatus(ctx) {
+  const lamp = ctx.item("headlamp");
+  return lamp?.worn && lamp.lit && lamp.fuel > 0 ? { remaining: lamp.fuel } : null;
+}
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
   const destinationName = destination.name.replace(/^The\s+/i, "");
-  if (destination.flightRequires && !ctx.getFlag(destination.flightRequires)) {
-    return `You drift toward the ${destinationName}, but a sealed barrier turns even mushroom flight aside.`;
-  }
   ctx.state.room = roomId;
   if (roomId === "crypt") {
     const talisman = ctx.item("talisman");
@@ -1238,7 +1248,7 @@ function takeToiletMushrooms(ctx) {
   const mushrooms = ctx.item("outhouseMushrooms");
   if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just shit and piss.";
   if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
-  if (ctx.inventory().length >= (ctx.world.config.maxCarry ?? 99))
+  if (ctx.inventoryLoad() >= (ctx.world.config.maxCarry ?? 99))
     return "Your hands are full. You'll have to drop something before reaching into that.";
   ctx.moveItem("outhouseMushrooms", "inventory");
   return "You reach into the TOILET HOLE and pull the MUSHROOMS free. Your hand comes back coated in literal " +
@@ -1312,12 +1322,47 @@ const TROLL_RIDDLE =
   "Old crowns, old bones, and something more.\\n" +
   "What fills a dragon's hidden store?\\n" +
   "Treasure, terror, blood, and ____.\"";
+const DRAGON_REBUKES = [
+  {
+    fire: true,
+    text: "DREADMAW THE DRAGON cracks one eye and breathes a sheet of dragonfire over you. You are ON FIRE. " +
+      "Then she lowers her head across the cave mouth again without moving an inch.",
+  },
+  {
+    fire: true,
+    text: "DREADMAW THE DRAGON opens her jaws, releases a cavern-shaking BELCH, and bathes you in burning apple-scented gas. " +
+      "You are ON FIRE. She settles back across the cave mouth.",
+  },
+  {
+    fire: true,
+    text: "DREADMAW THE DRAGON rises just enough to spin around and unleash a thunderous FLAMING FART directly at you. " +
+      "You are ON FIRE. She completes the turn and lies back down across the entrance.",
+  },
+  {
+    text: "DREADMAW THE DRAGON'S tail snaps sideways like a siege engine. It launches you into open air, over the entire " +
+      "HEDGE MAZE, and back to the FRONT GATE in a bruising crash landing.",
+  },
+  {
+    text: "DREADMAW THE DRAGON swats you with one enormous foreclaw. You achieve involuntary flight across the GROUNDS and " +
+      "crash beside the FRONT GATE, battered and several opinions poorer.",
+  },
+  {
+    text: "DREADMAW THE DRAGON flicks you with the tip of her nose. The casual gesture sends you cartwheeling over the HEDGE " +
+      "MAZE before you crater into the gravel at the FRONT GATE.",
+  },
+];
 function dragonFire(ctx) {
-  ctx.setFlag("onFire", true);
-  ctx.setFlag("burnTurns", 0);
-  ctx.setFlag("burnGrace", true);
-  return "DREADMAW THE DRAGON cracks one eye and breathes a sheet of dragonfire over you. You are ON FIRE. " +
-    "Then she lowers her head across the cave mouth again without moving an inch.";
+  const outcome = DRAGON_REBUKES[Math.floor(Math.random() * DRAGON_REBUKES.length)];
+  if (outcome.fire) {
+    ctx.setFlag("onFire", true);
+    ctx.setFlag("burnTurns", 0);
+    ctx.setFlag("burnGrace", true);
+  } else {
+    ctx.state.room = "gate";
+    ctx.setFlag("dragonInjuries", (ctx.getFlag("dragonInjuries") || 0) + 1);
+    ctx.addScore(-3);
+  }
+  return outcome.text;
 }
 function talkToDragon(ctx) {
   if (ctx.getFlag("dragonFriendly")) {
@@ -1537,6 +1582,9 @@ const IMPLICIT_NAVIGATION = Object.freeze({
   hedgeMazeLoop: { in: "east", out: "west" },
   dragonCaveMouth: { in: "east", out: "north" },
   dragonAntechamber: { in: "east", out: "west" },
+  mineGallery: { in: "down", out: "west" },
+  deepShaft: { in: "east", out: "up" },
+  trollGate: { in: "east", out: "west" },
   dreadmawVault: { in: null, out: "west" },
   privy: { in: "enter toilet", out: "west" },
   porch: { in: "enter door", out: "south" },
@@ -1551,8 +1599,11 @@ const IMPLICIT_NAVIGATION = Object.freeze({
   landing: { in: "up", out: "down" },
   nursery: { in: null, out: "east" },
   masterBedroom: { in: null, out: "west" },
+  hallBedroom: { in: null, out: "south" },
   study: { in: null, out: "north" },
   attic: { in: "north", out: "down" },
+  roof: { in: "east", out: "down" },
+  belfry: { in: "down", out: "west" },
   hiddenVault: { in: null, out: "south" },
   hollowPassage: { in: "north", out: "south" },
   hollowSanctum: { in: "north", out: null },
@@ -1561,7 +1612,12 @@ const IMPLICIT_NAVIGATION = Object.freeze({
 
 // ---- the world ---------------------------------------------------------------
 export const world = {
-  config: { start: "gate", maxCarry: 6, title: "Blackwood Manor" },
+  config: {
+    start: "gate",
+    maxCarry: 6,
+    title: "Blackwood Manor",
+    equipmentSlots: ["head", "eyes", "feet", "finger", "wrist", "neck"],
+  },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
   garyTurnInfo, // classifies a hotline turn for the optional LLM voice layer
@@ -1570,6 +1626,9 @@ export const world = {
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
+  headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
+  canFly,            // temporary mushroom flight or worn WINGED SHOES
+  hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
@@ -1694,30 +1753,77 @@ export const world = {
 
     dragonAntechamber: {
         name: "Dragon Cave Antechamber",
-        flightRequires: "dragonMoved",
         art: [
           "  |\\            /|",
-          "  | \\  [####]  / |",
-          "  |  \\  DOOR  /  |",
+          "  | \\  rails   / |",
+          "  |  \\=====>  /  |",
           "  |___\\______/___|",
         ].join("\n"),
         desc:
-            "The outer CAVE narrows at a seamless black VAULT DOOR. A broad, warty TROLL sits directly " +
-            "in front of it. DREADMAW'S CAVE MOUTH is WEST; the hoard lies EAST.",
+          "The outer CAVE widens around rusted mine rails and abandoned ore carts. DREADMAW'S CAVE MOUTH " +
+          "is WEST; the tunnel continues EAST into a MINING GALLERY.",
         searchDesc:
-            "No keyhole interrupts the VAULT DOOR. The TROLL watches you expectantly, as if waiting to ask something.",
-        exits: {
-          west: "dragonCaveMouth",
-            east: { to: "dreadmawVault", via: "dragonVaultOpen",
-            lockedMsg: "The inner VAULT DOOR remains sealed. It seems to be listening for a word." },
-        },
-          on: { say: answerTrollRiddle },
+          "The rails vanish EAST beneath old timber braces. Pick marks in the basalt suggest someone mined here before DREADMAW arrived.",
+        exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
+
+    mineGallery: {
+      name: "Mining Gallery",
+      art: [
+        "  |--|--|--|--|",
+        "  |  o==>      |",
+        "  |_/|\\________|",
+        "    / \\  rails",
+      ].join("\n"),
+      desc:
+        "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. " +
+        "The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
+      searchDesc:
+        "The HEADLAMP still has a sealed battery pack. The rails and fresher TROLL footprints both continue DOWN.",
+      exits: { west: "dragonAntechamber", down: "deepShaft" },
+    },
+
+    deepShaft: {
+      name: "Deep Mining Shaft",
+      art: [
+        "  |\\          /|",
+        "  | \\   ||   / |",
+        "  |  \\  ||  /  |",
+        "  |___\\_||_/___|",
+      ].join("\n"),
+      desc:
+        "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
+        "abandoned seams. The MINING GALLERY is UP; a worked tunnel runs EAST to the TROLL GATE.",
+      searchDesc:
+        "Heavy bare footprints lead EAST. Without a reliable light, every ledge here would be a wager with the dark.",
+      dark: true,
+      exits: { up: "mineGallery", east: "trollGate" },
+    },
+
+    trollGate: {
+      name: "Troll Gate",
+      art: [
+        "  |\\    TROLL   /|",
+        "  | \\  .-^^-.  / |",
+        "  |  \\[ DOOR ]/  |",
+        "  |___\\______/___|",
+      ].join("\n"),
+      desc:
+        "The tunnel ends at a seamless black VAULT DOOR. A broad, warty TROLL sits directly in front of it. " +
+        "The DEEP MINING SHAFT lies WEST; DREADMAW'S hoard is sealed EAST.",
+      searchDesc:
+        "No keyhole interrupts the VAULT DOOR. The TROLL watches you expectantly, as if waiting to ask something.",
+      exits: {
+        west: "deepShaft",
+        east: { to: "dreadmawVault", via: "dragonVaultOpen",
+          lockedMsg: "The inner VAULT DOOR remains sealed behind the TROLL." },
+      },
+      on: { say: answerTrollRiddle },
+    },
 
     dreadmawVault: {
         name: "Dreadmaw's Vault",
         aliases: ["dreadmaw vault", "dragon hoard", "cave of riches", "hoard"],
-        flightRequires: "dragonVaultOpen",
         art: [
           "   $  *  $  *  $",
           "  /_____________\\",
@@ -1726,10 +1832,10 @@ export const world = {
         ].join("\n"),
         desc:
           "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. The DRAGON CAVE ANTECHAMBER is WEST.",
+          "large gemstones fill DREADMAW'S VAULT. The TROLL GATE is WEST.",
         searchDesc:
-          "This is generational dragon wealth, not loose change. DREADMAW's gifted DOUBLOON is the one piece explicitly yours.",
-        exits: { west: "dragonAntechamber" },
+          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes.",
+        exits: { west: "trollGate" },
       },
 
     privy: {
@@ -1757,7 +1863,6 @@ export const world = {
           ? "The open MAILBOX has no false back. The FRONT DOOR's iron lock is old but functional; it needs a real KEY."
           : "The MAILBOX lid has a finger-worn edge and no lock. The FRONT DOOR's iron keyhole is too large for subtle tools.";
       },
-      highDesc: "The wall behind the PORTRAIT shimmers around the hard rectangular outline of an IRON SAFE.",
       exits: {
         south: "gate",
         north: { to: "grandHall", via: "frontDoorOpen", lockedMsg: "The front door is shut fast." },
@@ -1798,6 +1903,7 @@ export const world = {
           if (!dest || dest.id !== "reliquary") return null; // let generic put handle other containers
           const it = ctx.find(cmd.dobj, ctx.inventory());
           if (!it) return "You aren't carrying that.";
+          if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
           if (!it.treasure) return `The reliquary is meant for the family heirlooms; it will not accept the ${it.names[0]}.`;
           ctx.moveItem(it.id, "reliquary");
           ctx.addScore(it.points || 0);
@@ -1838,13 +1944,14 @@ export const world = {
       art: ROOM_ART.parlor,
       desc:
         "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PORTRAIT of a bearded patriarch, whose eyes seem to track you. An archway " +
+        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
         "returns WEST to the GRAND HALL; a low door leads SOUTH to the LIBRARY.",
       searchDesc(ctx) {
         return ctx.getFlag("safeRevealed")
-          ? "Behind the swung-aside PORTRAIT, the iron SAFE's combination dial shows recent fingerprints."
-          : "The PORTRAIT frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
+          ? "Behind the swung-aside PROFILE PAINTING, the iron SAFE's combination dial shows recent fingerprints."
+          : "The PROFILE PAINTING frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
       },
+      highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
       exits: { west: "grandHall", south: "library" },
       on: { code: enterSafeCode },
     },
@@ -1956,7 +2063,7 @@ export const world = {
       art: ROOM_ART.landing,
       desc:
         "A long UPSTAIRS LANDING overlooks the GRAND HALL below. Doors open WEST to the NURSERY, " +
-        "EAST to the MASTER BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
+        "EAST to the MASTER BEDROOM, NORTH to the HALL BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
         "trap-door in the ceiling. The stairs go DOWN.",
       searchDesc(ctx) {
         return ctx.getFlag("ladderDown")
@@ -1964,7 +2071,7 @@ export const world = {
           : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
       },
       extraDirections: (ctx) => (ctx.getFlag("high") || 0) > 0 || ctx.getFlag("ladderDown") ? ["up"] : [],
-      exits: { down: "grandHall", west: "nursery", east: "masterBedroom", south: "study" },
+      exits: { down: "grandHall", north: "hallBedroom", west: "nursery", east: "masterBedroom", south: "study" },
       on: {
         // The attic ladder is flimsy: climb it laden and it — and you — come down hard.
         go(ctx, cmd) {
@@ -1974,7 +2081,11 @@ export const world = {
             return "You float through the closed trap-door as if wood were only a suggestion.\n\n" + ctx.describeRoom();
           }
           if (!ctx.getFlag("ladderDown")) return "There is no way up; the trap-door is shut.";
-          if (ctx.inventory().length > 2) {
+          if (canFly(ctx)) {
+            ctx.state.room = "attic";
+            return "The WINGED SHOES carry you lightly beside the rotten ladder and into the ATTIC.\n\n" + ctx.describeRoom();
+          }
+          if (ctx.inventoryLoad() > 2) {
             return ctx.kill(
               "You climb the flimsy attic ladder, but weighed down as you are, the rotted rungs " +
               "give way — and then the attic floor itself. You fall through in a roar of splintered " +
@@ -2025,9 +2136,24 @@ export const world = {
         "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
         "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
       searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are " +
-        "underlined in ink. The DESK's drawers are swollen shut — PRY it, or just OPEN it, and force one.",
+        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
       exits: { north: "landing" },
+    },
+
+    hallBedroom: {
+      name: "Hall Bedroom",
+      art: [
+        "  .--------------.",
+        "  | BED    ( O ) |",
+        "  |        [_]   |",
+        "  '----DOOR------'",
+      ].join("\n"),
+      desc:
+        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. " +
+        "Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
+      searchDesc:
+        "The BED is untouched, the MIRROR is clouded, and the NIGHT TABLE'S DRAWER has a cheap plastic handle.",
+      exits: { south: "landing" },
     },
 
     attic: {
@@ -2038,6 +2164,7 @@ export const world = {
         "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
       searchDesc:
         "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
+      extraDirections: (ctx) => canFly(ctx) ? ["up"] : [],
       exits: {
         down: "landing",
         // The astral door in the north gable — hidden and impassable until the
@@ -2045,9 +2172,51 @@ export const world = {
         north: { to: "hiddenVault", via: "vaultFound", revealedBy: "vaultFound",
           lockedMsg: "The NORTH gable is blank plaster and close shadow. Your ordinary eyes find no seam." },
       },
+      on: {
+        go(ctx, cmd) {
+          if (cmd.dobj !== "up") return null;
+          if (!canFly(ctx))
+            return "The broken skylight is far above you. You need MUSHROOM flight or something worn on your FEET.";
+          ctx.state.room = "roof";
+          return "You rise through the broken skylight and settle onto the ROOF.\n\n" + ctx.describeRoom();
+        },
+      },
     },
 
-    // --- The astral treasure vault, seen only through the mushroom trip's third eye --
+    roof: {
+      name: "Manor Roof",
+      aliases: ["roof"],
+      art: [
+        "       /\\       |^|",
+        "  ____/  \\______| |",
+        " /_______________\\|",
+        "      ROOFLINE",
+      ].join("\n"),
+      desc:
+        "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
+        "a narrow ridge runs EAST to the BELFRY.",
+      searchDesc:
+        "Only someone able to fly could cross the missing slates safely. The BELFRY'S louvers stand open.",
+      exits: { down: "attic", east: "belfry" },
+    },
+
+    belfry: {
+      name: "Belfry",
+      art: [
+        "      ______",
+        "     / BELL \\",
+        "    |   ()   |",
+        "    |___||___|",
+      ].join("\n"),
+      desc:
+        "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. " +
+        "A narrow maintenance hatch descends DOWN into the HIDDEN VAULT.",
+      searchDesc:
+        "The hatch bypasses the sealed ATTIC gable entirely. Its iron ladder drops directly beside the OBSIDIAN EYE.",
+      exits: { west: "roof", down: "hiddenVault" },
+    },
+
+    // --- The astral treasure vault, reached by altered sight, flight, or belfry --
     hiddenVault: {
       name: "Hidden Vault",
       art: [
@@ -2060,11 +2229,11 @@ export const world = {
       desc:
         "A windowless HIDDEN VAULT the living were never meant to find, mortared behind the ATTIC'S NORTH " +
         "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
-        "seems to watch you back. The only way out is SOUTH, into the ATTIC.",
+        "seems to watch you back. The ATTIC lies SOUTH; a BELFRY ladder climbs UP.",
       searchDesc:
         "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
       dark: true,
-      exits: { south: "attic" },
+      exits: { south: "attic", up: "belfry" },
     },
 
     // --- The hidden wing, revealed only after the curse is lifted (bell rung) ---
@@ -2242,14 +2411,6 @@ export const world = {
         "makes the dark stop being an enemy.",
       on: { take: takeObsidianEye },
     },
-    xrayGoggles: {
-      names: ["x-ray goggles", "xray goggles", "goggles"], adjectives: ["x-ray", "xray", "brass", "leather"],
-      loc: null, takeable: true, wearable: true, worn: false,
-      roomDesc: "Wrapped in oilcloth in the drawer sits a pair of brass-rimmed X-RAY GOGGLES.",
-      desc: "A pair of brass-and-glass goggles, army-surplus strange, with thick smoked lenses. Worn, they seem " +
-        "to make the dark just... give up.",
-      on: { wear: wearGoggles, remove: removeGoggles },
-    },
     burritoWrapper: {
       names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
       loc: null, takeable: true,
@@ -2300,13 +2461,13 @@ export const world = {
     },
     dragonVaultDoor: {
       names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
-      loc: "dragonAntechamber", fixed: true, scenery: true,
+      loc: "trollGate", fixed: true, scenery: true,
       desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
       on: { say: answerTrollRiddle },
     },
     caveTroll: {
       names: ["troll", "guard"], adjectives: ["cave", "warty", "broad", "male"],
-      loc: "dragonAntechamber", fixed: true, scenery: true,
+      loc: "trollGate", fixed: true, scenery: true,
       desc: "A broad male TROLL with granite-coloured warts sits before the VAULT DOOR. He looks more literary than hungry.",
       on: { talk: talkToTroll, wake: talkToTroll },
     },
@@ -2314,6 +2475,59 @@ export const world = {
       names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
       loc: "dreadmawVault", fixed: true, scenery: true,
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
+    },
+    headlamp: {
+      names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
+      loc: "mineGallery", takeable: true, wearable: true, wearSlot: "head",
+      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 40,
+      lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
+      outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
+      roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
+      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises forty turns of light.",
+    },
+    goldBar: {
+      names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
+      loc: "dreadmawVault", takeable: true,
+      roomDesc: "A heavy GOLD BAR lies conspicuously apart from the rest of the hoard.",
+      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint.",
+    },
+    wingedShoes: {
+      names: ["shoes", "sandals"], adjectives: ["winged", "gold", "golden"],
+      loc: "dreadmawVault", takeable: true, wearable: true, wearSlot: "feet", grantsFlight: true,
+      roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
+      desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
+    },
+    hallBed: {
+      names: ["bed"], adjectives: ["hall", "narrow", "made"],
+      loc: "hallBedroom", fixed: true, scenery: true,
+      desc: "A narrow BED made with yellowed but carefully tucked linen.",
+    },
+    hallMirror: {
+      names: ["mirror"], adjectives: ["hall", "bedroom", "tarnished"],
+      loc: "hallBedroom", fixed: true, scenery: true,
+      desc: "A tarnished MIRROR that makes every reflection look slightly farther away than it should.",
+    },
+    nightTable: {
+      names: ["table", "nightstand"], adjectives: ["night", "bedside", "small"],
+      loc: "hallBedroom", fixed: true, scenery: true,
+      desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
+    },
+    nightDrawer: {
+      names: ["drawer"], adjectives: ["night", "table", "bedside"],
+      loc: "hallBedroom", fixed: true, scenery: true,
+      container: true, openable: true, open: false, capacity: 3,
+      desc: "A cheap wooden DRAWER in the NIGHT TABLE.",
+    },
+    bedsideLamp: {
+      names: ["lamp"], adjectives: ["night", "bedside", "table"],
+      loc: "hallBedroom", fixed: true, scenery: true,
+      lightSource: true, selfPowered: true, lit: false,
+      desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
+    },
+    xrayGoggles: {
+      names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
+      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes", grantsMushroomVision: true,
+      desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
@@ -2393,11 +2607,11 @@ export const world = {
       text: "The grimoire is written in a hand that hurts to follow. You snap it shut. Some things are worth money, not reading.",
     },
 
-    // --- parlor safe (behind the portrait) ---
+    // --- parlor safe (behind the profile painting) ---
     portrait: {
-      names: ["portrait", "painting"], adjectives: ["grim", "patriarch", "huge"], loc: "parlor",
+      names: ["painting", "profile", "portrait"], adjectives: ["grim", "patriarch", "huge"], loc: "parlor",
       fixed: true, scenery: true,
-      desc: "A grim patriarch glares from the canvas. The frame stands slightly proud of the wall, as if hinged.",
+      desc: "A grim PROFILE PAINTING of the patriarch. The frame stands slightly proud of the wall, as if hinged.",
       on: { move: revealSafe, push: revealSafe, examine: revealSafe },
     },
     safe: {
@@ -2410,7 +2624,7 @@ export const world = {
     },
     talisman: {
       names: ["talisman", "amulet"], adjectives: ["silver", "protective"], loc: "safe", takeable: true,
-      wearable: true, worn: false,
+      wearable: true, worn: false, wearSlot: "neck",
       desc: "A silver talisman on a chain, warm to the touch, graven with wards against the dead.",
     },
 
@@ -2418,7 +2632,6 @@ export const world = {
     desk: {
       names: ["desk"], adjectives: ["oak"], loc: "study", fixed: true, scenery: true,
       desc: "A great oak desk, its drawers swollen shut.",
-      on: { open: searchDesk, pull: searchDesk },
     },
     diary: {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,
@@ -2428,7 +2641,7 @@ export const world = {
         read(ctx) {
           ctx.setFlag("knowsCombo");
           return "The last entry reads:\n" +
-            "  \"I have hidden the TALISMAN in the wall-safe behind my own PORTRAIT in the PARLOR.\n" +
+            "  \"I have hidden the TALISMAN in the wall-safe behind my own PROFILE PAINTING in the PARLOR.\n" +
             "   The combination, lest I forget in my terror: 7 left, 3 right, 9 left. If the wraith\n" +
             "   takes me, whoever comes after must WEAR the TALISMAN before they dare the CRYPT.\"";
         },
@@ -2464,7 +2677,7 @@ export const world = {
     },
     rubyRing: {
       names: ["ring"], adjectives: ["ruby", "red"], loc: "jewelryBox", takeable: true,
-      treasure: true, points: 20,
+      treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
       desc: "A heavy gold ring set with a ruby like a drop of blood.",
     },
 
@@ -2572,10 +2785,10 @@ function revealKey(ctx) {
   return "You heave the mossy statue aside. Beneath its plinth, half-sunk in the earth, lies a heavy iron key.";
 }
 function revealSafe(ctx) {
-  if (ctx.getFlag("safeRevealed")) return "The portrait already hangs aside, baring the iron safe.";
+  if (ctx.getFlag("safeRevealed")) return "The PROFILE PAINTING already hangs aside, baring the iron SAFE.";
   ctx.setFlag("safeRevealed");
   ctx.moveItem("safe", "parlor");
-  return "You swing the heavy portrait aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE.";
+  return "You swing the PROFILE PAINTING aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE.";
 }
 function revealWallGap(ctx) {
   if (ctx.getFlag("wallGapFound"))
@@ -2583,32 +2796,6 @@ function revealWallGap(ctx) {
   ctx.setFlag("wallGapFound", true);
   return "You peel back a curling tongue of WALLPAPER — and keep peeling, because a whole panel of rotten " +
     "lath comes away in your hands, baring a gap just wide enough to squeeze IN, into the dark between the walls.";
-}
-
-// --- study desk -> a stuck drawer hiding a pair of x-ray goggles -------------
-function searchDesk(ctx) {
-  if (ctx.getFlag("deskDrawerOpen"))
-    return "The drawer hangs open, empty now except for warped wood and old dust.";
-  ctx.setFlag("deskDrawerOpen", true);
-  ctx.moveItem("xrayGoggles", "study");
-  return "You brace a foot on the desk and wrench. The swollen drawer shrieks and gives all at once — inside, " +
-    "wrapped in oilcloth, sits a pair of brass-rimmed X-RAY GOGGLES.";
-}
-function wearGoggles(ctx) {
-  const goggles = ctx.item("xrayGoggles");
-  if (!goggles || goggles.loc !== "inventory") return "You aren't carrying that.";
-  if (goggles.worn) return "You're already wearing the X-RAY GOGGLES.";
-  goggles.worn = true;
-  ctx.setFlag("gogglesOn", true);
-  return "You settle the brass-rimmed GOGGLES over your eyes. The lenses hum faintly, and the dark of the " +
-    "house resolves into a grainy, workable grey — you can see just fine now, whatever the light.";
-}
-function removeGoggles(ctx) {
-  const goggles = ctx.item("xrayGoggles");
-  if (!goggles || !goggles.worn) return "You aren't wearing that.";
-  goggles.worn = false;
-  ctx.setFlag("gogglesOn", false);
-  return "You push the GOGGLES up onto your forehead. The grainy grey sight cuts out at once.";
 }
 
 // --- Self-immolation & stop-drop-roll in ANY room (Andy's idea) --------------

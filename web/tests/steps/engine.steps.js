@@ -290,12 +290,13 @@ Then("the controls remain pinned inside the viewport", function () {
   assert.match(css, /#controls\s*\{[^}]*flex:\s*0 0 auto/s);
 });
 
-Then("the HUD has bowel pressure, sickness phase, mushroom, and fire indicators", function () {
+Then("the HUD has bowel pressure, sickness phase, mushroom, fire, and headlamp indicators", function () {
   const slots = new Map(HUD_SLOT_DEFINITIONS.map((slot) => [slot.id, slot]));
   assert.equal(slots.get("bm").emoji, "💩");
   assert.equal(slots.get("sick").emoji, "🤮");
   assert.equal(slots.get("high").emoji, "🍄");
   assert.equal(slots.get("fire").emoji, "🔥");
+  assert.equal(slots.get("headlamp").emoji, "💡");
 });
 
 Then("every HUD status is a HudSlot with an emoji and calculation", function () {

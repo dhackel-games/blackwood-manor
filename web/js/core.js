@@ -59,6 +59,8 @@ export function createGame(world) {
   game.itemsIn = (loc) =>
     Object.values(state.items).filter((it) => it.loc === loc);
   game.inventory = () => game.itemsIn("inventory");
+  game.inventoryLoad = () => game.inventory().filter((item) => !item.worn).length;
+  game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
   game.item = (id) => state.items[id] || null;
 
@@ -129,13 +131,13 @@ export function createGame(world) {
   game.isLit = () => {
     const r = world.rooms[state.room];
     if (!r || !r.dark) return true;
-    // A carried flame, the temporary mushroom-trip third eye, worn X-RAY
-    // GOGGLES, or the permanent Obsidian Eye all let you see in otherwise
-    // pitch-black rooms.
+    const enhancedVision = typeof world.hasMushroomVision === "function"
+      && world.hasMushroomVision(game);
+    // A carried flame, mushroom/XRAY vision, or the permanent Obsidian Eye
+    // lets you see in otherwise pitch-black rooms.
     return game.activeLights().length > 0
       || !!state.flags.onFire
-      || (state.flags.high || 0) > 0
-      || !!state.flags.gogglesOn
+      || enhancedVision
       || !!state.flags.darkSight;
   };
 
@@ -144,7 +146,9 @@ export function createGame(world) {
     const directions = Object.entries(room.exits || {})
       .filter(([, exit]) => {
         if (typeof exit === "string") return true;
-        return (state.flags.high || 0) > 0 || !exit.revealedBy || !!state.flags[exit.revealedBy];
+        const enhancedVision = (state.flags.high || 0) > 0
+          || (typeof world.hasMushroomVision === "function" && world.hasMushroomVision(game));
+        return enhancedVision || !exit.revealedBy || !!state.flags[exit.revealedBy];
       })
       .map(([direction]) => direction);
     const extra = typeof room.extraDirections === "function"
@@ -168,13 +172,16 @@ export function createGame(world) {
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
     if (extended) out += r.desc + "\n";
-    // Altered sight overlays the room's hidden 'astral' detail. The mushroom
-    // trip is an astral X-ray that keeps revealing it every time you LOOK.
+    // Mushroom and XRAY vision reveal hidden detail on entry and every LOOK.
     const highOn = (state.flags.high || 0) > 0;
-    if (highOn) {
+    const enhancedVision = typeof world.hasMushroomVision === "function"
+      ? world.hasMushroomVision(game)
+      : highOn;
+    if (enhancedVision) {
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
-      if (vision) out += `MUSHROOM VISION\n${vision}\n`;
+      const label = highOn ? "MUSHROOM VISION" : "XRAY VISION";
+      if (vision) out += `${label}\n${vision}\n`;
     }
     const directions = game.availableDirections();
     out += extended
@@ -207,9 +214,13 @@ export function createGame(world) {
     state.turns++;
     for (const it of game.activeLights()) {
       if (typeof it.fuel === "number") {
+        if (it.lightGrace) { it.lightGrace = false; continue; }
         it.fuel--;
-        if (it.fuel === 3) pending = "The flame gutters low; it won't last much longer.";
-        if (it.fuel <= 0) { it.lit = false; pending = `The ${it.names[0]} flickers and goes out.`; }
+        if (it.fuel === 3) pending = it.lowFuelMsg || "The flame gutters low; it won't last much longer.";
+        if (it.fuel <= 0) {
+          it.lit = false;
+          pending = it.outOfFuelMsg || `The ${it.names[0]} flickers and goes out.`;
+        }
       }
     }
     if (game.isLit()) {
@@ -303,7 +314,7 @@ export function createGame(world) {
     if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
     const item = game.find(cmd.dobj);
     if (!item || !item.takeable || game.has(item.id)) return null;
-    if (game.inventory().length >= (world.config.maxCarry ?? 99)) {
+    if (game.inventoryLoad() >= (world.config.maxCarry ?? 99)) {
       return {
         blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
         step: `get ${item.names[0]}`,

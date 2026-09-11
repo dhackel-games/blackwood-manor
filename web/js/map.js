@@ -19,16 +19,19 @@ const ROWH = 3; // lines between one row of rooms and the next
 // Short names, because a sketch has no room for "Master Bedroom".
 const LABELS = {
   hedgeMazeGate: "Hedge Maze", dragonCaveMouth: "Dragon Cave",
+  dragonAntechamber: "Antechamber", mineGallery: "Mine Gallery",
+  deepShaft: "Deep Shaft", trollGate: "Troll Gate", dreadmawVault: "Dreadmaw Vault",
   gate: "Front Gate", garden: "Garden", privy: "Privy", porch: "Porch",
   grandHall: "Grand Hall", parlor: "Parlor", library: "Library",
   diningRoom: "Dining Rm", kitchen: "Kitchen", landing: "Landing",
-  nursery: "Nursery", masterBedroom: "Master Bed", study: "Study",
+  nursery: "Nursery", masterBedroom: "Master Bed", hallBedroom: "Hall Bedroom", study: "Study",
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
+  roof: "Roof", belfry: "Belfry", hiddenVault: "Hidden Vault",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
 };
 
 // Rooms that must not appear on the map until you have been there.
-const SECRET = new Set(["hollowPassage", "hollowSanctum", "secretChamber"]);
+const SECRET = new Set(["hollowPassage", "hollowSanctum", "secretChamber", "hiddenVault", "dreadmawVault"]);
 
 // Each floor: rooms placed on a grid, plus the links between them. `note` is the
 // little annotation on a connector ("down", "ladder").
@@ -41,15 +44,31 @@ const FLOORS = [
       { id: "landing", col: 1, row: 1 },
       { id: "masterBedroom", col: 2, row: 1 },
       { id: "study", col: 1, row: 2 },
+      { id: "hallBedroom", col: 2, row: 2 },
     ],
     links: [
       { a: "attic", b: "landing", note: "ladder" },
       { a: "nursery", b: "landing" },
       { a: "landing", b: "masterBedroom" },
       { a: "landing", b: "study" },
+      { a: "landing", b: "hallBedroom" },
     ],
     foot: "Landing goes DOWN to the Grand Hall.",
     footIf: "landing",
+  },
+  {
+    title: "ROOFLINE",
+    rooms: [
+      { id: "attic", col: 0, row: 0, anchor: true },
+      { id: "roof", col: 1, row: 0 },
+      { id: "belfry", col: 2, row: 0 },
+      { id: "hiddenVault", col: 2, row: 1 },
+    ],
+    links: [
+      { a: "attic", b: "roof", note: "fly" },
+      { a: "roof", b: "belfry" },
+      { a: "belfry", b: "hiddenVault", note: "down" },
+    ],
   },
   {
     title: "GROUND FLOOR",
@@ -110,6 +129,24 @@ const FLOORS = [
       { a: "kitchen", b: "wineCellar", note: "down" },
       { a: "wineCellar", b: "crypt" },
       { a: "library", b: "secretChamber", note: "down" },
+    ],
+  },
+  {
+    title: "DREADMAW'S CAVE",
+    rooms: [
+      { id: "dragonCaveMouth", col: 0, row: 0, anchor: true },
+      { id: "dragonAntechamber", col: 1, row: 0 },
+      { id: "mineGallery", col: 2, row: 0 },
+      { id: "deepShaft", col: 2, row: 1 },
+      { id: "trollGate", col: 3, row: 1 },
+      { id: "dreadmawVault", col: 4, row: 1 },
+    ],
+    links: [
+      { a: "dragonCaveMouth", b: "dragonAntechamber" },
+      { a: "dragonAntechamber", b: "mineGallery" },
+      { a: "mineGallery", b: "deepShaft", note: "down" },
+      { a: "deepShaft", b: "trollGate" },
+      { a: "trollGate", b: "dreadmawVault" },
     ],
   },
 ];
