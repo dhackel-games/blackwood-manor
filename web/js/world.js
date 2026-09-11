@@ -993,6 +993,9 @@ function worldTick(ctx) {
   if (ctx.state.dead) return parts.join("\n\n");
   const a = afflictionTick(ctx);    // may also kill you (sickness runs its course)
   if (a) parts.push(a);
+  if (ctx.state.dead) return parts.join("\n\n");
+  const l = lightningTick(ctx);     // random manor-wide teleport (may also kill you)
+  if (l) parts.push(l);
   return parts.length ? parts.join("\n\n") : null;
 }
 
@@ -1048,6 +1051,126 @@ function statusBanner(ctx) {
   const eye = ctx.getFlag("thirdEye") || 0;
   if (eye > 0) parts.push(`👁  T H I R D   E Y E   O P E N  —  ${eye} turn${eye === 1 ? "" : "s"} of astral sight left`);
   return parts.length ? parts.join("\n") : "";
+}
+
+// --- Random teleport, shared by the mystery package and lightning jumps ------
+// Picks any room but the one you're standing in (including BETWEEN THE WALLS,
+// which has no ordinary door — this random draw and the package below are the
+// only ways in). Reuses the crypt/wraith safeguard so an unlucky draw can
+// genuinely kill you, same as walking in on purpose without the talisman.
+function teleportRandom(ctx, flavor) {
+  const ids = Object.keys(ctx.world.rooms).filter((id) => id !== ctx.state.room);
+  const roomId = ids[Math.floor(Math.random() * ids.length)];
+  ctx.state.room = roomId;
+  if (roomId === "crypt") {
+    const talisman = ctx.item("talisman");
+    if (!(talisman && talisman.loc === "inventory" && talisman.worn)) {
+      return `${flavor}\n\n` + ctx.kill(
+        "You reappear in the CRYPT with a graceless thud — no warning, no weightlessness, nothing to soften it. " +
+        "The WRAITH is on you before your eyes adjust, and your heart simply stops."
+      );
+    }
+  }
+  const firstTime = roomId === "betweenWalls" && !ctx.getFlag("seen:betweenWalls");
+  if (roomId === "betweenWalls") ctx.setFlag("seen:betweenWalls", true);
+  if (firstTime) ctx.addScore(20);
+  const landing = roomId === "betweenWalls"
+    ? "You don't so much land as get FILED somewhere the house forgot to build.\n\n"
+    : `You land, with a graceless thump, in ${ctx.world.rooms[roomId].name.toUpperCase()}.\n\n`;
+  return `${flavor}\n\n${landing}${ctx.describeRoom()}` +
+    (firstTime ? "\n\n(A place no door leads to. Nobody finds this on purpose. +20.)" : "");
+}
+
+// --- Copilot's Mystery Package: a gift-wrapped box that does NOT want to be
+// opened. Seven possible outcomes, evenly weighted, roughly half good news and
+// half catastrophe — including the two ways to become instantly on fire AND
+// sick at once, and the one in twenty chance of the game's only doorless room.
+const PACKAGE_EFFECTS = [
+  // 1. Cure whatever ails you.
+  (ctx) => {
+    const was = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
+    ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
+    ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
+    ctx.setFlag("digestivePhase", null);
+    ctx.addScore(3);
+    return "A warm, golden light spills out of the box and washes over you like your mother checking your " +
+      "forehead for a fever." + (was
+        ? " Whatever was wrong with you a second ago simply... isn't, anymore. Miraculous. Suspicious. (+3)"
+        : " You feel great, if a little cheated that nothing was wrong with you to begin with. (+3)");
+  },
+  // 2. Instant burrito-grade sickness, no burrito required.
+  (ctx) => {
+    ctx.setFlag("sick", SICK_DURATION);
+    ctx.setFlag("sickGrace", true);
+    ctx.setFlag("digestivePhase", 0);
+    ctx.setFlag("fartIgnitionQueued", false);
+    ctx.setFlag("ateBurrito", true);
+    return "A wet, meaty stench rolls out of the box, like Gary's burrito has been marinating in there since " +
+      "the dawn of time. Your stomach drops. This is going to be a whole THING.";
+  },
+  // 3. Random teleport — anywhere in the manor, including nowhere at all.
+  (ctx) => teleportRandom(ctx, "The box hums, the floor tilts sideways, and reality politely excuses itself."),
+  // 4. A small, undeserved windfall.
+  (ctx) => {
+    ctx.addScore(10);
+    return "A single, absurdly lucky coin rolls out, glints once, and posts itself directly into your pocket. " +
+      "You feel weirdly, unearnedly blessed. (+10)";
+  },
+  // 5. Spontaneous combustion.
+  (ctx) => {
+    if (ctx.getFlag("onFire"))
+      return "The box smoulders threateningly. You are already on fire, so: no meaningful change.";
+    ctx.setFlag("onFire", true);
+    return "The box IGNITES in your hands with a WHUMP like a struck match the size of a dog. You are, once " +
+      "again, ON FIRE.";
+  },
+  // 6. The one the card was warning you about: flaming diarrhea, immediately.
+  (ctx) => {
+    ctx.setFlag("sick", SICK_DURATION);
+    ctx.setFlag("sickGrace", true);
+    ctx.setFlag("digestivePhase", 0);
+    ctx.setFlag("fartIgnitionQueued", false);
+    ctx.setFlag("ateBurrito", true);
+    ctx.setFlag("onFire", true);
+    return "This is, somehow, the single worst possible outcome. FLAMING. DIARRHEA. Immediately, both at once, " +
+      "no countdown, no warning. You are on fire AND extremely unwell and cannot decide which problem to " +
+      "address first. Neither, probably. Both are bad. Run.";
+  },
+  // 7. A face full of spores.
+  (ctx) => {
+    ctx.setFlag("high", (ctx.getFlag("high") || 0) + 10);
+    ctx.setFlag("highGrace", true);
+    return "A single spore drifts out of the box and you inhale it before you can stop yourself. Oh no. Oh no, " +
+      "here we go. The walls are breathing again.";
+  },
+];
+function openMysteryPackage(ctx) {
+  ctx.destroy("mysteryPackage");
+  const effect = PACKAGE_EFFECTS[Math.floor(Math.random() * PACKAGE_EFFECTS.length)];
+  return "Against every instinct, and the express written warning on the card, you tear the ribbon and lift " +
+    "the lid.\n\n" + effect(ctx);
+}
+
+// --- Lightning Jumps: the manor's own random teleport, no wrapping paper -----
+// Once you're inside (front door open), every turn has a small chance of a
+// bolt hurling you to a random room — the same doorless BETWEEN THE WALLS
+// included, the same crypt-wraith risk included. While you're high on the
+// mushrooms, you're already loose enough from your body that the lightning
+// can't grab hold of you at all — you keep your own steering (FLY TO / FLOAT
+// TO any room by name) instead of being yanked somewhere at random.
+const LIGHTNING_CHANCE = 0.06;
+const LIGHTNING_FLAVOR =
+  "LIGHTNING CRACKS somewhere far too close, and the air suddenly tastes like a dropped fork on a battery.";
+function lightningTick(ctx) {
+  if (ctx.getFlag("__noChaos")) return null; // deterministic test harness kill-switch
+  if (!ctx.getFlag("frontDoorOpen")) return null; // the manor's lightning only hunts you once you're inside
+  if (Math.random() >= LIGHTNING_CHANCE) return null;
+  if ((ctx.getFlag("high") || 0) > 0) {
+    return `${LIGHTNING_FLAVOR}\n\nIt should have grabbed you. It doesn't — you're already halfway out of your ` +
+      "body, and the bolt just drifts through the space where you used to be. (You're high enough to FLY TO or " +
+      "FLOAT TO any room you like, any time you like — nothing forces your hand while you're this loose.)";
+  }
+  return teleportRandom(ctx, LIGHTNING_FLAVOR);
 }
 
 // --- The privy: use the outhouse hole to end the vomiting & diarrhea ----------
@@ -1287,6 +1410,12 @@ const ROOM_ART = {
     "    /    /|\\    \\",
     "   |     / \\  [ ]|",
     "    \\____NORTH___/",
+  ].join("\n"),
+  betweenWalls: [
+    "||   ?    ?   ||",
+    "||  /|   /|   ||",
+    "|| / |  / |   ||",
+    "||_______watch||",
   ].join("\n"),
 };
 
@@ -1719,6 +1848,21 @@ export const world = {
         },
       },
     },
+
+    // --- The one room with no door — reachable only by random teleport ------
+    betweenWalls: {
+      name: "The Space Between the Walls",
+      art: ROOM_ART.betweenWalls,
+      desc:
+        "You are somewhere the blueprints of Blackwood Manor insist does not exist: a dust-soft crawl-gap " +
+        "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
+        "and a tarnished BACKWARDS WATCH ticks, counter-clockwise, from a bent nail. There is no door here — " +
+        "only an unnatural OUT.",
+      searchDesc:
+        "Whoever built this space built it to be forgotten. The BACKWARDS WATCH is the only thing in it that " +
+        "isn't dust.",
+      exits: { out: "grandHall" },
+    },
   },
 
   items: {
@@ -1731,6 +1875,19 @@ export const world = {
       names: ["bell", "rope"], adjectives: ["brass", "great"], loc: "grandHall", fixed: true, scenery: true,
       desc: "A great brass bell hung above the reliquary, a frayed pull-rope trailing from it.",
       searchActions: ["ring"],
+    },
+
+    // --- a gift that very much does not want to be opened ---
+    mysteryPackage: {
+      names: ["package", "box", "parcel", "gift"], adjectives: ["mystery", "nice", "wrapped", "ribboned"],
+      loc: "grandHall", takeable: true, readable: true,
+      roomDesc: "A suspiciously nice, ribbon-tied PACKAGE sits on the floor, propped against the wall.",
+      desc: "A beautifully wrapped package, ribbon and all, entirely out of place in this cobwebbed ruin. A " +
+        "small card is tucked under the bow. It reads:\n\n" +
+        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+      text:
+        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+      on: { open: openMysteryPackage },
     },
 
     // --- getting inside ---
@@ -2063,6 +2220,24 @@ export const world = {
       names: ["mirror"], adjectives: ["silver"], loc: "hollowSanctum", takeable: true,
       desc: "An age-clouded silver hand-mirror. In it, for just a moment, you see the manor whole and " +
         "bright and full of the living.",
+    },
+
+    // --- the only thing in the space between the walls ---
+    backwardsWatch: {
+      names: ["watch", "pocket watch"], adjectives: ["backwards", "tarnished", "brass"],
+      loc: "betweenWalls", takeable: true,
+      roomDesc: "A tarnished BACKWARDS WATCH hangs from a bent nail, its hands sweeping the wrong way.",
+      desc: "A brass pocket watch, badly tarnished, ticking backwards at a perfectly ordinary speed. It has " +
+        "clearly been here since before there was a \"here.\"",
+      on: {
+        take(ctx) {
+          if (ctx.has("backwardsWatch")) return "You already have the backwards watch.";
+          ctx.moveItem("backwardsWatch", "inventory");
+          ctx.addScore(12);
+          return "You pluck the BACKWARDS WATCH off its nail. Its ticking doesn't change, but you could swear " +
+            "it just ticked FORWARD once, just to see how you'd react. (+12)";
+        },
+      },
     },
   },
 };

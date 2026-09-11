@@ -1,9 +1,15 @@
 // manor.steps.js Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 import assert from "node:assert";
-import { Given, Then, When } from "@cucumber/cucumber";
+import { After, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
 import { world } from "../../js/world.js";
+
+const realMathRandom = Math.random;
+
+After(function () {
+  Math.random = realMathRandom;
+});
 
 function commandsFrom(docString) {
   return docString.split("\n").map((line) => line.trim()).filter(Boolean);
@@ -25,6 +31,23 @@ Given("a fresh manor game", function () {
   this.game = createGame(world);
   this.output = "";
   this.accumulatedOutput = "";
+  // Lightning Jumps are a random per-turn hazard; scripted scenarios need
+  // deterministic turns, so chaos is off unless a scenario explicitly re-enables it.
+  this.game.setFlag("__noChaos", true);
+});
+
+Given("chaos events \\(lightning jumps) are enabled", function () {
+  this.game.setFlag("__noChaos", false);
+});
+
+Given("the random number generator always returns {float}", function (value) {
+  Math.random = () => value;
+});
+
+Given("the random number generator returns {float} then {float}", function (first, second) {
+  const seq = [first, second];
+  let i = 0;
+  Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
 });
 
 Given("the player is in room {string}", function (room) {
@@ -41,6 +64,10 @@ Given("item {string} is carried", function (item) {
 
 Given("flag {string} is set", function (flag) {
   this.game.setFlag(flag);
+});
+
+Given("flag {string} is {int}", function (flag, value) {
+  this.game.setFlag(flag, value);
 });
 
 When("I play this command sequence:", function (docString) {
