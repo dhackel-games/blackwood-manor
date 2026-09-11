@@ -75,6 +75,11 @@ body { -webkit-text-size-adjust: 100%; }
   opacity: 0.75;
   overflow-wrap: anywhere;
 }
+/* Sound toggle: tiny icon button that sits inline in the HUD row — always
+   reachable without opening the phone, independent of Gary's voice mute. */
+#sound-toggle {
+  min-height: 1.6rem; min-width: 1.8rem; padding: 0.15rem 0.4rem; font-size: 0.9rem;
+}
 
 #transcript {
   flex: 1;
@@ -191,6 +196,7 @@ body { -webkit-text-size-adjust: 100%; }
   cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
 }
 .iconbtn:active { background: rgba(67, 255, 122, 0.25); }
+#sound-toggle.on { background: rgba(67, 255, 122, 0.28); border-color: var(--green); }
 .iconbtn.listening {
   background: #b0322a; border-color: #e0483c; color: #fff;
   animation: micpulse 1s ease-in-out infinite;

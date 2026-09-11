@@ -207,7 +207,11 @@ function stopSpeaking() { if ("speechSynthesis" in window) try { speechSynthesis
 // out of nowhere ("Gary's a ghost") and found it confusing/creepy rather than
 // funny. The actual goal was a silly noise cue, not Gary editorializing — so
 // these are now synthesized tones through Web Audio, fully decoupled from
-// speechSynthesis/Gary's character voice.
+// speechSynthesis/Gary's character voice. They also have their OWN mute flag
+// (sfxMuted, below) — burping/farting can happen anywhere in the manor, with
+// or without ever calling Gary, so gating them behind his call-screen voice
+// toggle would mean never hearing them unless you dial the phone first.
+let sfxMuted = true;
 let sfxCtx = null;
 function sfxContext() {
   if (!sfxCtx) {
@@ -246,7 +250,7 @@ const SFX = {
   },
 };
 function playSfx(kind) {
-  if (ttsMuted || !SFX[kind]) return;   // same "no surprise audio" gate as Gary's voice
+  if (sfxMuted || !SFX[kind]) return;   // own "no surprise audio" gate, independent of Gary's voice
   const ctx = sfxContext();
   if (!ctx) return;
   try { SFX[kind](ctx, ctx.currentTime); } catch { /* ignore */ }
@@ -260,6 +264,29 @@ function ambientSfxKind(out, prevFlags, flags) {
   if (out.includes("B U R P")) return "burp";
   if ((flags.high || 0) > 0 && !(prevFlags.high || 0)) return "high";
   return null;
+}
+
+// Sound-effects toggle — lives in the main HUD (not the phone screen), since
+// burping/farting/getting high can happen anywhere in the manor and shouldn't
+// require ever calling Gary first. Muted by default, same "no surprise audio"
+// policy as everything else; tap the HUD icon to turn it on.
+const soundToggleBtn = document.getElementById("sound-toggle");
+function setSoundToggleLabel() {
+  if (!soundToggleBtn) return;
+  soundToggleBtn.textContent = sfxMuted ? "🔇" : "🔊";
+  soundToggleBtn.classList.toggle("on", !sfxMuted);
+  soundToggleBtn.setAttribute("aria-pressed", String(!sfxMuted));
+}
+setSoundToggleLabel();
+if (soundToggleBtn) {
+  soundToggleBtn.addEventListener("click", () => {
+    sfxMuted = !sfxMuted;
+    setSoundToggleLabel();
+    // Create/resume the AudioContext inside this click handler so it's primed
+    // by the user gesture (autoplay policies block it otherwise), and give an
+    // audible confirmation the same way the phone's voice toggle does.
+    if (!sfxMuted) { const ctx = sfxContext(); if (ctx) SFX.burp(ctx, ctx.currentTime); }
+  });
 }
 
 // Ambient reactions — Gary editorializes on gross/dangerous turns, even when
