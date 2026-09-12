@@ -108,7 +108,7 @@ throw <thing> at <target>: Throw a carried item.
 unlock <thing> with <key>: Unlock something with a matching key.
 use <thing>: Use an object whose purpose is clear.
 verbose: Always print full room descriptions.
-(ver)sion: Compare the iOS cached content with the current GitHub.io version.
+(ver)sion/build: Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z): Let one turn pass.
 wear <thing>: Put on carried equipment.
 

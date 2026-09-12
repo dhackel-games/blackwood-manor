@@ -505,7 +505,8 @@ function printContentStatus(message) {
 }
 window.__contentVersions = (current, remote) => {
   printContentStatus(
-    `Cached version: ${current || "unknown"}\nGitHub.io version: ${remote || "unavailable"}`);
+    `${versionText()}\n  Cached content: ${current || "unknown"}\n` +
+    `  GitHub.io content: ${remote || "unavailable"}`);
 };
 window.__contentRefreshFailed = (message) => {
   printContentStatus(message || "GitHub.io refresh failed. The current cache was left unchanged.");
@@ -585,10 +586,10 @@ function handle(raw) {
   if (low === "restart") { if (onCall) endCallUI(); print("Restarting..."); newGame(); return; }
   const traceCommands = onCall ? [submitted] : splitCommands(submitted);
   for (const command of traceCommands) recordBugCommand(bugTrace, command);
-  if (low === "ver" || low === "version") {
+  if (low === "ver" || low === "version" || low === "build") {
     const message = nativeContent
       ? "Checking cached and GitHub.io versions..."
-      : `Cached version: ${VERSION}\nGitHub.io version: unavailable outside the iOS app`;
+      : `${versionText()}\n  GitHub.io version: unavailable outside the iOS app`;
     onCall ? printToPhone(message, "sys") : print(message, "sys");
     if (nativeContent) nativeContent.postMessage({ action: "version" });
     return;
@@ -910,6 +911,18 @@ export function modelStatusText() {
   const fix = s.fix || (s.native ? "" : "");
   return "[AI check] On-device model NOT ACTIVE — Gary is using his scripted lines.\n" +
          `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
+}
+
+// What's actually loaded right now. VERSION is the stamp baked into this web code;
+// on the iOS app the native layer also exposes window.__activeBuildLabel — the
+// label (incl. commit SHA) of the content actually being served, which is the
+// only thing that distinguishes a self-updated web push from the shipped bundle.
+export function versionText() {
+  const lines = ["[version] " + VERSION];
+  const label = (typeof window !== "undefined" && window.__activeBuildLabel) || "";
+  if (label) lines.push("  Loaded content: " + label);
+  else lines.push("  Loaded content: running in browser (no self-update layer).");
+  return lines.join("\n");
 }
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.
