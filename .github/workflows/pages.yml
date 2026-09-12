@@ -22,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Generate web manifest (for iOS self-update)
+        run: node web/tools/gen-web-manifest.mjs web "$(git show -s --format=%ct HEAD)" "$(git rev-parse --short HEAD)"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

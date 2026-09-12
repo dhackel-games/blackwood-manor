@@ -464,6 +464,16 @@ window.__speech = (text, isFinal) => {
 };
 window.__speechEnd = () => { setListening(false); };
 
+// Called by the native iOS harness after it has downloaded and swapped in a newer
+// web bundle from GitHub Pages (see ios/Sources/BlackwoodApp.swift). Surfaces the
+// self-update to the player so they can see they're now on the latest code.
+window.__appUpdateNotice = (from, to) => {
+  print("\n— UPDATE —", "sys");
+  print("Cached version: " + (from || "unknown"), "sys");
+  print("New version found: " + (to || "unknown"), "sys");
+  print("Running the latest from GitHub.\n", "sys");
+};
+
 function newGame() {
   game = createGame(world);
   print("\n" + game.describeRoom(true));

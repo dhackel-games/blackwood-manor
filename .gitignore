@@ -14,3 +14,6 @@ web/node_modules/
 web/assets/Blackwood.iconset/
 web/Blackwood Manor.app/
 mac/gary-daemon/.build/
+
+# generated at deploy/build time (Pages CI + copy-web.sh)
+web/manifest.json

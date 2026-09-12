@@ -39,3 +39,25 @@ targets:
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 9W789FP4LG
         SWIFT_VERSION: "5.0"
+
+  BlackwoodManorTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+      - path: Sources/WebContent.swift   # logic-only: recompiled into the test module
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.dhackel.BlackwoodManorTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+
+schemes:
+  BlackwoodManor:
+    build:
+      targets:
+        BlackwoodManor: all
+        BlackwoodManorTests: [test]
+    test:
+      targets:
+        - BlackwoodManorTests

@@ -27,6 +27,10 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private var webView: WKWebView!
     private var speechBridge: SpeechBridge?
     private var garyBridge: AnyObject?
+    private var schemeHandler: AppSchemeHandler!
+    private let contentStore = WebContentStore()
+    private lazy var contentUpdater = WebContentUpdater(store: contentStore)
+    private var pendingUpdateNotice: (from: String, to: String)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +38,8 @@ final class GameViewController: UIViewController, WKUIDelegate {
         view.backgroundColor = bg
 
         let config = WKWebViewConfiguration()
-        config.setURLSchemeHandler(AppSchemeHandler(), forURLScheme: "app")
+        schemeHandler = AppSchemeHandler(baseURL: contentStore.activeRoot())
+        config.setURLSchemeHandler(schemeHandler, forURLScheme: "app")
         config.websiteDataStore = .default()
 
         // Native speech-to-text bridge, exposed to JS as window.webkit.messageHandlers.speech
@@ -77,6 +82,7 @@ final class GameViewController: UIViewController, WKUIDelegate {
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.uiDelegate = self
+        webView.navigationDelegate = self
         bridge.webView = webView
         if #available(iOS 26.0, macOS 26.0, *) {
             (garyBridge as? GaryBridge)?.webView = webView
@@ -104,6 +110,23 @@ final class GameViewController: UIViewController, WKUIDelegate {
         if let url = URL(string: "app://local/index.html") {
             webView.load(URLRequest(url: url))
         }
+
+        // Non-blocking self-update: the game is already on screen from the bundle
+        // (or last cache); if GitHub Pages has something newer, fetch it into the
+        // cache and reload into it. Offline or no-update => this quietly no-ops.
+        let fromLabel = contentStore.activeLabel()
+        contentUpdater.checkForUpdate { [weak self] result in
+            guard let self, case .updated(let toLabel) = result else { return }
+            DispatchQueue.main.async {
+                self.pendingUpdateNotice = (from: fromLabel, to: toLabel)
+                self.schemeHandler.baseURL = self.contentStore.cacheRoot
+                if let url = URL(string: "app://local/index.html") {
+                    self.webView.load(URLRequest(url: url,
+                                                 cachePolicy: .reloadIgnoringLocalCacheData,
+                                                 timeoutInterval: 30))
+                }
+            }
+        }
     }
 
     func webView(
@@ -119,6 +142,20 @@ final class GameViewController: UIViewController, WKUIDelegate {
         }
         UIApplication.shared.open(url)
         return nil
+    }
+}
+
+// MARK: - Navigation delegate (announce a completed self-update to the web layer)
+
+extension GameViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard let notice = pendingUpdateNotice else { return }
+        pendingUpdateNotice = nil
+        let payload = (try? JSONSerialization.data(withJSONObject: [notice.from, notice.to]))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "[\"\",\"\"]"
+        webView.evaluateJavaScript(
+            "window.__appUpdateNotice && window.__appUpdateNotice.apply(null, \(payload));",
+            completionHandler: nil)
     }
 }
 
@@ -237,55 +274,6 @@ final class SpeechBridge: NSObject, WKScriptMessageHandler {
         try? session.setActive(true, options: .notifyOthersOnDeactivation)
         jsSend(text, final: true)
         jsEnd()
-    }
-}
-
-// MARK: - App:// scheme handler (serves the bundled web game offline)
-
-final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
-    func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {
-        guard let url = task.request.url else {
-            task.didFailWithError(URLError(.badURL)); return
-        }
-        var path = url.path
-        if path.hasPrefix("/") { path.removeFirst() }
-        if path.isEmpty { path = "index.html" }
-
-        let full = "www/" + path
-        let ns = full as NSString
-        let dir = ns.deletingLastPathComponent
-        let file = ns.lastPathComponent as NSString
-        let name = file.deletingPathExtension
-        let ext = file.pathExtension
-
-        guard let fileURL = Bundle.main.url(forResource: name, withExtension: ext,
-                                            subdirectory: dir.isEmpty ? "www" : dir),
-              let data = try? Data(contentsOf: fileURL) else {
-            task.didFailWithError(URLError(.fileDoesNotExist)); return
-        }
-
-        let response = HTTPURLResponse(
-            url: url, statusCode: 200, httpVersion: "HTTP/1.1",
-            headerFields: ["Content-Type": Self.mime(for: ext),
-                           "Content-Length": String(data.count)])!
-        task.didReceive(response)
-        task.didReceive(data)
-        task.didFinish()
-    }
-
-    func webView(_ webView: WKWebView, stop task: WKURLSchemeTask) {}
-
-    static func mime(for ext: String) -> String {
-        switch ext.lowercased() {
-        case "html", "htm": return "text/html; charset=utf-8"
-        case "js", "mjs":   return "text/javascript; charset=utf-8"
-        case "css":         return "text/css; charset=utf-8"
-        case "json":        return "application/json"
-        case "png":         return "image/png"
-        case "svg":         return "image/svg+xml"
-        case "ico":         return "image/x-icon"
-        default:            return "application/octet-stream"
-        }
     }
 }
 
