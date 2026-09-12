@@ -12,7 +12,7 @@ Feature: Hidden compound prompt shortcuts
   Scenario: The hidden menu is generated from the prompt catalog
     Then the hidden cheat menu command is "::"
     And the magic menu unlock passwords are "werdna,evad"
-    And the hidden cheat catalog defines "::powerup,::winquick,::winmax"
+    And the hidden cheat catalog defines "::powerup,::winquick,::garycliff,::winmax"
     And hidden shortcuts replace the editable command prompt without executing
     And public HELP does not reveal hidden cheat commands
     And no hidden cheat prompt uses the removed su command
@@ -70,6 +70,14 @@ Feature: Hidden compound prompt shortcuts
     And I execute hidden cheat "::winquick"
     Then the game is won
     And the game is alive
+    And every required family item is in the reliquary
+
+  Scenario: Gary cliffhanger collects the minimum heirlooms and descends
+    When I execute hidden cheat "::garycliff"
+    Then the game is won
+    And the current room is "garysLair"
+    And the output contains "FREEDOM"
+    And the output contains "TO BE CONTINUED"
     And every required family item is in the reliquary
 
   Scenario: Maximum win sets the attainable maximum score

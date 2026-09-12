@@ -215,6 +215,12 @@ export const CHEAT_PROMPTS = Object.freeze([
     compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, ...DAWN_ENDING]),
   }),
   Object.freeze({
+    cmd: "::garycliff",
+    name: "Gary Cliffhanger",
+    description: "Collect the minimum required heirlooms and descend to Gary's call-cave.",
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "down"]),
+  }),
+  Object.freeze({
     cmd: "::winmax",
     name: "Maximum Win",
     description: "Collect every scoring reward and take the dawn ending with the mirror.",
