@@ -330,9 +330,10 @@ the mansion.
 - **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
 
 ## 12.7 The brazier fire-puzzle (garden)
-- A cold iron **brazier** whose grave-damp moss a match cannot light — the only way to light
-  it is to be **on fire yourself** and `light brazier`. Your fire leaps into it: you're put
-  out, the bowl blazes, and it yields an **EMBER STONE (+10)**. Optional, self-contained.
+- A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
+  **lit candlestick** can ignite it by patiently lighting several points, or the player
+  can be **on fire** and `light brazier` to transfer the whole blaze. Either route yields
+  the required **EMBER STONE** and awards +10 for solving the fire puzzle.
 
 ## 12.8 Gary while you're on fire
 - Dialing in ablaze: Gary smells smoke, quotes a **$1.99** premium (`fireTab`, tracked

@@ -91,11 +91,14 @@ Feature: Fire and food consequences
     And the output does not contain "pitch black"
     And the output contains "HIDDEN CHAMBER"
 
-  Scenario: The garden brazier requires the player's whole fire
+  Scenario: The garden brazier rejects a lone match but accepts the player's whole fire
     Given the player is in room "garden"
     When I send "light brazier"
-    Then the output matches "whole person|hisses"
+    Then the output contains "lone MATCH"
     Given item "matches" is carried
+    When I send "light brazier with match"
+    Then the output contains "lone MATCH"
+    And flag "brazierLit" is unset
     When I send "light self on fire with match"
     And I send "light brazier"
     Then the output contains "EMBER STONE"
@@ -110,6 +113,18 @@ Feature: Fire and food consequences
     Then item "emberStone" is in "reliquary"
     And the game score is 17
     And the output contains "Family heirlooms: 1/11"
+
+  Scenario: A lit candlestick can patiently ignite the garden brazier
+    Given the player is in room "garden"
+    And item "candlestick" is carried
+    And item "matches" is carried
+    When I send "light candle"
+    And I send "light brazier"
+    Then flag "brazierLit" is true
+    And flag "onFire" is unset
+    And item "emberStone" is in "garden"
+    And the output contains "LIT CANDLESTICK"
+    And the output contains "EMBER STONE"
 
   Scenario: Kitchen foods intoxicate, infect, or cure
     Given the player is in room "kitchen"
