@@ -178,6 +178,13 @@ body { -webkit-text-size-adjust: 100%; }
   text-shadow: inherit; cursor: pointer; touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+#go span,
+#phone-go span {
+  display: inline-block;
+  line-height: 1;
+  font-weight: 900;
+  transform: scale(2);
+}
 #go:active { background: rgba(67, 255, 122, 0.25); }
 
 /* thin CRT scrollbar (desktop) */
@@ -346,11 +353,6 @@ body { -webkit-text-size-adjust: 100%; }
   background: rgba(67, 255, 122, 0.1); border: 1px solid var(--dim);
   border-radius: 6px; color: var(--green-bright); font: inherit; font-size: 0.95rem;
   text-shadow: inherit; cursor: pointer; touch-action: manipulation;
-}
-#phone-go span {
-  display: inline-block;
-  line-height: 1;
-  transform: scale(2);
 }
 #phone-go:active { background: rgba(67, 255, 122, 0.25); }
 #phone-end {

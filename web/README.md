@@ -24,6 +24,8 @@ auto-saves to your browser.
   buttons use each room's tracked entrance/exit. `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.
+  `go <visible door/object>` infers `enter <object>`, including obvious unlock
+  and open steps; named-room GO remains available while flying.
 - **Mushroom powers:** while high, hidden clues appear on first entry, vertical
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
   `fly to <room>` carries you directly there. Eating another mushroom cluster

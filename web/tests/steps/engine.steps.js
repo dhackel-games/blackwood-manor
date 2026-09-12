@@ -400,11 +400,12 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
 });
 
-Then("Gary's send arrow is visually doubled without resizing its button", function () {
+Then("both send arrows are visually doubled and bold without resizing their buttons", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+id=["']go["'][^>]+aria-label=["']submit command["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
   assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
-  assert.match(css, /#phone-go span\s*\{[^}]*transform:\s*scale\(2\)/s);
+  assert.match(css, /#go span,\s*#phone-go span\s*\{[^}]*font-weight:\s*900[^}]*transform:\s*scale\(2\)/s);
 });
 
 Then("Gary's circular voice toggle contains a speaker icon", function () {
