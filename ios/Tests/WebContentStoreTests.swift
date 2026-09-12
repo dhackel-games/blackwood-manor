@@ -47,6 +47,16 @@ final class WebContentStoreTests: XCTestCase {
         XCTAssertEqual(store.activeLabel(), "cache-2000")
     }
 
+    func testEqualVersionCacheWinsAfterForcedRefresh() {
+        let bundle = root("bundle")
+        let cache = root("cache")
+        writeManifest(version: 1000, label: "bundle-1000", at: bundle)
+        writeManifest(version: 1000, label: "remote-1000", at: cache)
+        let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
+        XCTAssertEqual(store.activeRoot(), cache)
+        XCTAssertEqual(store.activeLabel(), "remote-1000")
+    }
+
     func testStaleCacheDiscardedWhenBundleNewer() {
         let bundle = root("bundle")
         let cache = root("cache")

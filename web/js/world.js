@@ -2934,7 +2934,9 @@ export const world = {
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
-      extraDirections: (ctx) => ctx.getFlag("floorDoorOpen") ? ["down"] : [],
+      extraDirections: (ctx) =>
+        ctx.getFlag("floorDoorOpen") && ctx.getFlag("reliquarySealed")
+          && !ctx.item("reliquary").open ? ["down"] : [],
       exits: {
         south: "porch", east: "parlor", west: "diningRoom", up: "landing",
         north: { to: "hollowPassage", via: "secretWingOpen",
@@ -2993,15 +2995,17 @@ export const world = {
             ctx.setFlag("floorDoorOpen");
             msg += "\n\nThen — with every family heirloom gathered — the faint RINGING " +
               "you've half-heard all night swells beneath your feet, and answers. With a grind of stone the " +
-              "flagstones before the reliquary split and fold away, revealing a narrow STAIRCASE spiraling " +
-              "DOWN into the dark, toward the source of the sound. (You can still RING the BELL to end things " +
-              "in the dawn — or go DOWN, and finally find out who's been ringing.)";
+              "flagstones before the reliquary split and fold away, revealing a narrow STAIRCASE into the dark. " +
+              "CLOSE RELIQUARY to seal the collection before the staircase becomes usable.";
           }
           return msg;
         },
         // The secret ending: with the floor stair open, descend to meet Gary.
         go(ctx, cmd) {
           if (cmd.dobj !== "down" || !ctx.getFlag("floorDoorOpen")) return null;
+          if (ctx.item("reliquary").open || !ctx.getFlag("reliquarySealed")) {
+            return "The hidden stair shudders beneath the open cabinet but refuses to admit you. CLOSE RELIQUARY first.";
+          }
           ctx.state.room = "garysLair";
           return garyEnding(ctx);
         },
@@ -3423,7 +3427,10 @@ export const world = {
           const reliquary = ctx.item("reliquary");
           reliquary.open = false;
           ctx.setFlag("reliquarySealed", true);
-          return "You close the RELIQUARY'S glass doors and press until the ritual latch clicks.";
+          return "You close the RELIQUARY'S glass doors and press until the ritual latch clicks." +
+            (ctx.getFlag("floorDoorOpen")
+              ? " The hidden staircase locks into place; the route DOWN is now open."
+              : "");
         },
       },
     },

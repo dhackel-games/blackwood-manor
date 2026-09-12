@@ -108,11 +108,11 @@ final class WebContentStore {
     var cacheVersion: Int { manifest(at: cacheRoot)?.version ?? -1 }
     var currentVersion: Int { max(bundleVersion, cacheVersion) }
 
-    /// The directory to serve right now: the cache if it's newer than the bundle,
+    /// The directory to serve right now: the cache if it's at least as new as the bundle,
     /// otherwise the bundle. If the bundle is newer (a fresh TestFlight build that
     /// shipped newer web code than we last cached), drop the stale cache.
     func activeRoot() -> URL {
-        if cacheVersion > bundleVersion { return cacheRoot }
+        if cacheVersion >= bundleVersion && cacheVersion >= 0 { return cacheRoot }
         if cacheVersion >= 0 { try? FileManager.default.removeItem(at: cacheRoot) }
         return bundleRoot
     }
@@ -123,9 +123,16 @@ final class WebContentStore {
 
 final class WebContentUpdater {
     enum UpdateResult: Equatable { case upToDate, updated(label: String), failed }
+    struct VersionLabels: Equatable {
+        let current: String
+        let remote: String?
+    }
 
     private let store: WebContentStore
     private let session: URLSession
+    private let updateLock = NSLock()
+    private var updateInFlight = false
+    private var pendingUpdates: [(force: Bool, completion: (UpdateResult) -> Void)] = []
 
     // Session is injectable so tests can stub the network with a URLProtocol.
     init(store: WebContentStore, session: URLSession? = nil) {
@@ -140,20 +147,71 @@ final class WebContentUpdater {
         }
     }
 
-    func checkForUpdate(completion: @escaping (UpdateResult) -> Void) {
+    private func fetchRemoteManifest(completion: @escaping (WebManifest?, Data?) -> Void) {
         let manifestURL = WebContentStore.remoteBase.appendingPathComponent("manifest.json")
-        session.dataTask(with: manifestURL) { [weak self] data, resp, _ in
-            guard let self else { return }
+        session.dataTask(with: manifestURL) { data, resp, _ in
             guard let data,
                   (resp as? HTTPURLResponse)?.statusCode == 200,
-                  let remote = try? JSONDecoder().decode(WebManifest.self, from: data),
-                  remote.version > self.store.currentVersion else {
-                completion(.upToDate); return
+                  let remote = try? JSONDecoder().decode(WebManifest.self, from: data) else {
+                completion(nil, nil); return
+            }
+            completion(remote, data)
+        }.resume()
+    }
+
+    func versionLabels(completion: @escaping (VersionLabels) -> Void) {
+        let current = store.activeLabel()
+        fetchRemoteManifest { remote, _ in
+            completion(VersionLabels(current: current, remote: remote?.label))
+        }
+    }
+
+    func checkForUpdate(force: Bool = false, completion: @escaping (UpdateResult) -> Void) {
+        updateLock.lock()
+        if updateInFlight {
+            pendingUpdates.append((force, completion))
+            updateLock.unlock()
+            return
+        }
+        updateInFlight = true
+        updateLock.unlock()
+        performUpdate(force: force, completion: completion)
+    }
+
+    private func performUpdate(force: Bool, completion: @escaping (UpdateResult) -> Void) {
+        fetchRemoteManifest { [weak self] remote, data in
+            guard let self else { return }
+            guard let remote, let data else {
+                self.finishUpdate(force ? .failed : .upToDate, completion: completion)
+                return
+            }
+            guard remote.version >= self.store.currentVersion else {
+                self.finishUpdate(force ? .failed : .upToDate, completion: completion)
+                return
+            }
+            guard force || remote.version > self.store.currentVersion else {
+                self.finishUpdate(.upToDate, completion: completion)
+                return
             }
             self.downloadBundle(remote, manifestData: data) { ok in
-                completion(ok ? .updated(label: remote.label) : .failed)
+                self.finishUpdate(ok ? .updated(label: remote.label) : .failed,
+                                  completion: completion)
             }
-        }.resume()
+        }
+    }
+
+    private func finishUpdate(_ result: UpdateResult,
+                              completion: @escaping (UpdateResult) -> Void) {
+        completion(result)
+        updateLock.lock()
+        if pendingUpdates.isEmpty {
+            updateInFlight = false
+            updateLock.unlock()
+            return
+        }
+        let next = pendingUpdates.removeFirst()
+        updateLock.unlock()
+        performUpdate(force: next.force, completion: next.completion)
     }
 
     private func downloadBundle(_ manifest: WebManifest, manifestData: Data,
@@ -195,13 +253,25 @@ final class WebContentUpdater {
             catch { try? fm.removeItem(at: staging); completion(false); return }
             // Swap the freshly-downloaded bundle into place. Only after a fully
             // successful download, so a dropped connection never corrupts the cache.
+            let parent = self.store.cacheRoot.deletingLastPathComponent()
+            let backup = parent.appendingPathComponent(
+                "webcache-backup-\(UUID().uuidString)", isDirectory: true)
+            var movedExistingCache = false
             do {
-                try? fm.createDirectory(at: self.store.cacheRoot.deletingLastPathComponent(),
-                                        withIntermediateDirectories: true)
-                try? fm.removeItem(at: self.store.cacheRoot)
+                try fm.createDirectory(at: parent, withIntermediateDirectories: true)
+                if fm.fileExists(atPath: self.store.cacheRoot.path) {
+                    try fm.moveItem(at: self.store.cacheRoot, to: backup)
+                    movedExistingCache = true
+                }
                 try fm.moveItem(at: staging, to: self.store.cacheRoot)
+                try? fm.removeItem(at: backup)
                 completion(true)
             } catch {
+                if movedExistingCache
+                    && !fm.fileExists(atPath: self.store.cacheRoot.path)
+                    && fm.fileExists(atPath: backup.path) {
+                    try? fm.moveItem(at: backup, to: self.store.cacheRoot)
+                }
                 try? fm.removeItem(at: staging)
                 completion(false)
             }

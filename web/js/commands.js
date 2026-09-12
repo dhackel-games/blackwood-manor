@@ -94,6 +94,7 @@ put <thing> in <container>: Place a carried item inside.
 (q)uit: End the session.
 reach into <thing>: Reach into an opening.
 read <thing>: Read visible writing.
+refresh: Force the iOS app to redownload its GitHub.io web cache.
 remove <thing>: Take off worn equipment.
 restart: Start a fresh game.
 restore: Restore the browser's saved game.
@@ -107,7 +108,7 @@ throw <thing> at <target>: Throw a carried item.
 unlock <thing> with <key>: Unlock something with a matching key.
 use <thing>: Use an object whose purpose is clear.
 verbose: Always print full room descriptions.
-version/build: Show which build is loaded (and, in the app, the live web content).
+(ver)sion/build: Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z): Let one turn pass.
 wear <thing>: Put on carried equipment.
 

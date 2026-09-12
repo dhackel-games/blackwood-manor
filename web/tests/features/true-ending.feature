@@ -11,8 +11,14 @@ Feature: The secret Gary cliffhanger ending
     And every treasure but the "familyCrest" is already in the reliquary
     When I send "put family crest in reliquary"
     Then the output contains "STAIRCASE"
-    And the output contains "DOWN"
+    And the output does not contain "route DOWN"
     And flag "floorDoorOpen" equals 1
+    When I send "look"
+    Then the output does not contain line "Directions you can go: east, south, west, up, down"
+    When I send "close reliquary"
+    Then the output contains "route DOWN"
+    When I send "look"
+    Then the output contains line "Directions you can go: east, south, west, up, down"
 
   Scenario: Descending the floor stair triggers the Gary cliffhanger ending
     Given a fresh manor game
@@ -20,6 +26,7 @@ Feature: The secret Gary cliffhanger ending
     And the player is in room "grandHall"
     And every treasure but the "familyCrest" is already in the reliquary
     When I send "put family crest in reliquary"
+    And I send "close reliquary"
     And I send "down"
     Then the current room is "garysLair"
     And the output contains "GARY"

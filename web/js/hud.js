@@ -46,21 +46,25 @@ export class HudSlot {
 export const HUD_SLOT_DEFINITIONS = Object.freeze([
   {
     id: "score",
+    label: "Score/turns",
     emoji: "🏆",
     calculate: ({ game }) => `${game.state.score}/${game.state.turns}`,
   },
   {
     id: "inventory",
+    label: "Capacity",
     emoji: ({ game }) => game.has("backpack") ? "👜" : "👤",
     calculate: ({ game }) => `${game.inventoryLoad()}/${game.inventoryCapacity()}`,
   },
   {
     id: "bill",
+    label: "Phone bill",
     emoji: "☎",
     calculate: ({ game }) => `$${((game.state.flags.phoneBill || 0) / 100).toFixed(2)}`,
   },
   {
     id: "reliquary",
+    label: "Reliquary",
     emoji: "💎",
     calculate: ({ game, world }) => {
       const status = world.reliquaryStatus?.(game);
@@ -70,6 +74,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "bm",
+    label: "Bowel pressure",
     emoji: "💩",
     calculate: ({ game, world }) => {
       const status = world.digestiveStatus?.(game);
@@ -81,6 +86,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "sick",
+    label: "Sickness",
     emoji: "🤮",
     calculate: ({ game, world }) => {
       const status = world.digestiveStatus?.(game);
@@ -91,6 +97,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "high",
+    label: "Mushrooms",
     emoji: "🍄",
     calculate: ({ game }) => {
       const turns = game.state.flags.high || 0;
@@ -99,6 +106,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "vision",
+    label: "Hidden sight",
     emoji: "👁️",
     calculate: ({ game, world }) => {
       const status = world.visionStatus?.(game);
@@ -108,6 +116,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "flight",
+    label: "Flight",
     emoji: "🪽",
     calculate: ({ game, world }) => {
       const status = world.flightStatus?.(game);
@@ -117,6 +126,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "fire",
+    label: "Fire",
     emoji: "🔥",
     calculate: ({ game, world }) => {
       const status = world.fireStatus?.(game);
@@ -125,6 +135,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "light",
+    label: "Light",
     emoji: "💡",
     calculate: ({ game, world }) => {
       const status = world.lightStatus?.(game);
@@ -133,6 +144,17 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     },
   },
 ]);
+
+export function hudStateSummary(context) {
+  return HUD_SLOT_DEFINITIONS.map((definition) => {
+    const emoji = typeof definition.emoji === "function"
+      ? definition.emoji(context)
+      : definition.emoji;
+    const value = definition.calculate(context);
+    const state = value === null || value === undefined || value === "" ? "inactive" : String(value);
+    return `${definition.label}: ${emoji ? `${emoji} ` : ""}${state}`;
+  }).join("; ");
+}
 
 export function createHud(document) {
   const container = document.getElementById("hud-slots");

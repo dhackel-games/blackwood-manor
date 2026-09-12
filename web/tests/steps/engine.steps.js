@@ -5,11 +5,16 @@ import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { HELP_TEXT } from "../../js/commands.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
-import { HUD_SLOT_DEFINITIONS, HudSlot } from "../../js/hud.js";
+import { HUD_SLOT_DEFINITIONS, HudSlot, hudStateSummary } from "../../js/hud.js";
 import {
+  bugReportBody,
   bugReportDescription,
   bugReportUrl,
+  createBugTrace,
   DEFAULT_ISSUE_DESCRIPTION,
+  formatCommandHistory,
+  MAX_BUG_HISTORY_CHARS,
+  recordBugCommand,
 } from "../../js/issue-report.js";
 import {
   GARY_VOICE_PRESETS,
@@ -343,6 +348,7 @@ Then("every HUD status is a HudSlot with an emoji and calculation", function () 
   for (const definition of HUD_SLOT_DEFINITIONS) {
     const slot = new HudSlot(definition);
     assert.equal(slot.id, definition.id);
+    assert.equal(typeof definition.label, "string");
     assert.equal(slot.emoji, definition.emoji || "");
     assert.equal(typeof slot.calculate, "function");
   }
@@ -429,12 +435,13 @@ Then("bug reports include the current room in the issue title", function () {
   const url = new URL(bugReportUrl("Hall Bedroom"));
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /bugReportUrl\(game\.room\(\)\.name, description\)/);
+  assert.match(ui, /bugReportUrl\(game\.room\(\)\.name, body\)/);
 });
 
 Then("clicking the Bug button uses the default issue description", function () {
-  const url = new URL(bugReportUrl("Hall Bedroom", DEFAULT_ISSUE_DESCRIPTION));
-  assert.equal(url.searchParams.get("body"), "Describe issue here");
+  const body = bugReportBody({ description: DEFAULT_ISSUE_DESCRIPTION });
+  const url = new URL(bugReportUrl("Hall Bedroom", body));
+  assert.equal(url.searchParams.get("body").split("\n")[0], "Describe issue here");
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /openBugReport\(DEFAULT_ISSUE_DESCRIPTION\)/);
 });
@@ -444,11 +451,59 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.equal(bugReportDescription(`bug ${description}`), description);
   assert.equal(bugReportDescription("bug"), "");
   assert.equal(bugReportDescription("buggy"), null);
-  const url = new URL(bugReportUrl("Hall Bedroom", description));
+  const body = bugReportBody({ description });
+  const url = new URL(bugReportUrl("Hall Bedroom", body));
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
-  assert.equal(url.searchParams.get("body"), description);
+  assert.equal(url.searchParams.get("body").split("\n")[0], description);
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
+});
+
+Then("bug reports include the full session trail, HUD state, and inventory", function () {
+  const trace = createBugTrace("page reload");
+  recordBugCommand(trace, "east");
+  recordBugCommand(trace, "  take   rope ");
+  recordBugCommand(trace, "again");
+  recordBugCommand(trace, "bug the mirror shows two of me");
+  trace.turns = 2;
+  const game = createGame(fixture());
+  const hud = hudStateSummary({ game, world: fixture() });
+  const body = bugReportBody({
+    description: "the mirror shows two of me",
+    turns: trace.turns,
+    origin: trace.origin,
+    commands: trace.commands,
+    hud,
+    inventory: ["BRASS KEY", "CANDLE (WORN)"],
+  });
+  assert.match(body,
+    /^the mirror shows two of me\n\n2 turns from page reload: east; take rope; again; bug the mirror shows two of me/m);
+  assert.match(body, /\nHUD: Score\/turns: 🏆 0\/0;/);
+  assert.match(body, /\nInv: BRASS KEY, CANDLE \(WORN\)$/);
+  const decoded = new URL(bugReportUrl("Hall Bedroom", body)).searchParams.get("body");
+  assert.equal(decoded, body);
+  assert.match(bugReportBody({ origin: "restart" }), /\n\n0 turns from restart:/);
+
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /createBugTrace\("page reload"\)/);
+  assert.match(ui, /bugTrace = createBugTrace\(origin\)/);
+  assert.match(ui, /const submitted = cmd/);
+  assert.match(ui, /recordBugCommand\(bugTrace, submitted\)[\s\S]*openBugReport/);
+  assert.match(ui, /splitCommands\(submitted\)/);
+  assert.match(ui, /recordBugCommand\(bugTrace, command\)/);
+  assert.match(ui, /if \(!action\.handled\) return false;\s*recordBugCommand\(bugTrace, command\)/);
+  assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
+  assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
+  assert.match(ui, /inventoryForBugReport\(\)/);
+});
+
+Then("overlong bug histories preserve both ends and mark the omission", function () {
+  const commands = Array.from({ length: 1000 }, (_, index) => `command-${index}`);
+  const formatted = formatCommandHistory(commands);
+  assert.ok(formatted.length <= MAX_BUG_HISTORY_CHARS);
+  assert.match(formatted, /^command-0;/);
+  assert.match(formatted, /middle history omitted for URL length/);
+  assert.match(formatted, /command-999$/);
 });
 
 Then("both send arrows are visually doubled and bold without resizing their buttons", function () {
@@ -534,6 +589,31 @@ Then("the iOS wrapper opens new-window web links externally", function () {
   assert.match(swift, /WKUIDelegate/);
   assert.match(swift, /navigationAction\.targetFrame == nil/);
   assert.match(swift, /UIApplication\.shared\.open\(url\)/);
+});
+
+Then("Version reports cached and GitHub.io content through the native bridge", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
+  assert.match(ui, /low === "ver" \|\| low === "version"/);
+  assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
+  assert.match(ui, /versionText\(\).*Cached content:.*GitHub\.io content:/s);
+  assert.match(ui, /window\.__activeBuildLabel/);
+  assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
+  assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
+  assert.match(app, /window\.__activeBuildLabel =/);
+  assert.match(updater, /func versionLabels\(completion:/);
+});
+
+Then("Refresh forces a GitHub.io cache download through the native bridge", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
+  assert.match(ui, /low === "refresh"/);
+  assert.match(ui, /nativeContent\.postMessage\(\{ action: "refresh" \}\)/);
+  assert.match(app, /case "refresh":[\s\S]*checkForUpdate\(force: true\)/);
+  assert.match(updater, /func checkForUpdate\(force: Bool = false/);
+  assert.match(updater, /guard force \|\| remote\.version > self\.store\.currentVersion/);
 });
 
 Then("the TestFlight release refreshes the web bundle before generating the Xcode project", function () {

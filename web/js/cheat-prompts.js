@@ -218,7 +218,7 @@ export const CHEAT_PROMPTS = Object.freeze([
     cmd: "::garycliff",
     name: "Gary Cliffhanger",
     description: "Collect the minimum required heirlooms and descend to Gary's call-cave.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "down"]),
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close reliquary", "down"]),
   }),
   Object.freeze({
     cmd: "::winmax",
