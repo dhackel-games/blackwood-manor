@@ -145,7 +145,8 @@ openable, open, locked, keyId, capacity, lightSource, selfPowered, lit, fuel,
 wearable, wearSlot, worn, readable, text, edible, drinkable, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
-part of the win condition (all treasures must reach the reliquary).
+part of the win condition. `REQUIRED_FAMILY_ITEM_COUNT` records how many required
+family treasures must reach the reliquary.
 
 ### Add a puzzle
 

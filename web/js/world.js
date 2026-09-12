@@ -15,10 +15,18 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-function allTreasuresDeposited(ctx) {
+export const REQUIRED_FAMILY_ITEM_COUNT = 9;
+
+function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
-    .filter(([, d]) => d.treasure)
-    .every(([id]) => ctx.roomOf(id) === "reliquary");
+    .filter(([, definition]) => definition.treasure)
+    .filter(([id]) => ctx.roomOf(id) === "reliquary")
+    .length;
+}
+function allTreasuresDeposited(ctx) {
+  const requiredItems = Object.values(ctx.world.items).filter((definition) => definition.treasure);
+  return requiredItems.length === REQUIRED_FAMILY_ITEM_COUNT
+    && depositedFamilyItemCount(ctx) === REQUIRED_FAMILY_ITEM_COUNT;
 }
 
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
@@ -65,6 +73,15 @@ function nextHint(ctx) {
   }
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
+  }
+  if (!dep("familyCrest")) {
+    if (!ctx.getFlag("dragonMoved")) {
+      return "The last family heirloom is the BLACKWOOD FAMILY CREST in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON.";
+    }
+    if (!ctx.getFlag("dragonVaultOpen")) {
+      return "Follow DREADMAW'S cave through the MINING GALLERY and DEEP SHAFT. TALK TO TROLL at the TROLL GATE, then finish his rhyme.";
+    }
+    return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
@@ -1684,6 +1701,7 @@ export const world = {
     start: "gate",
     maxCarry: 6,
     title: "Blackwood Manor",
+    requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
     equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck"],
   },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
@@ -1904,11 +1922,11 @@ export const world = {
         ].join("\n"),
         desc:
           "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. Among the dragon-gold, two pieces bear the Blackwood crest — " +
-          "a SILVER CHALICE and a JEWELED CROWN, family heirlooms this wyrm plainly stole long ago. The TROLL GATE is WEST.",
+          "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
+          "a SILVER CHALICE and a JEWELED CROWN stolen from the family long ago. The TROLL GATE is WEST.",
         searchDesc:
-          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes, " +
-          "while the SILVER CHALICE and JEWELED CROWN are unmistakably BLACKWOOD work — they belong back in the RELIQUARY.",
+          "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
+          "essential heirloom, while the SILVER CHALICE and JEWELED CROWN are valuable optional prizes.",
         exits: { west: "trollGate" },
       },
 
@@ -1959,7 +1977,7 @@ export const world = {
         if (ctx.getFlag("curseLiftable")) {
           return "Every filled recess in the RELIQUARY glows faintly. Above it, the BELL rope trembles though the air is still.";
         }
-        return "The RELIQUARY contains eight heirloom-shaped recesses. The BELL rope hangs directly above them, " +
+        return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. The BELL rope hangs directly above them, ` +
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
@@ -2573,12 +2591,12 @@ export const world = {
       roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
       desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
-    goldBar: {
-      names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
-      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 15,
-      roomDesc: "A heavy GOLD BAR lies conspicuously apart from the rest of the hoard.",
-      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint. Not a Blackwood heirloom, but the " +
-        "RELIQUARY will still gladly weigh it.",
+    familyCrest: {
+      names: ["crest", "emblem", "arms"], adjectives: ["family", "blackwood", "silver"],
+      loc: "dreadmawVault", takeable: true, treasure: true, points: 15,
+      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
+      desc: "The BLACKWOOD FAMILY CREST, cast in blackened silver: a raven above crossed keys. One of the " +
+        `${REQUIRED_FAMILY_ITEM_COUNT} heirlooms required by the RELIQUARY.`,
     },
     silverChalice: {
       names: ["chalice", "cup", "goblet"], adjectives: ["silver", "blackwood"],

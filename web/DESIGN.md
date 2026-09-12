@@ -178,9 +178,9 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**~7 heirloom treasures**, each worth points: silver candlestick, gold locket,
+**9 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
-decanter (wine cellar).
+decanter (wine cellar), ancestral portrait, and the Blackwood family crest.
 
 ---
 
@@ -672,7 +672,7 @@ without spending a guess; anticipating a valid rhyme before he asks delights him
 opens the VAULT immediately. After three wrong answers, the TROLL folds the
 tunnel around the player and sends them back to the FRONT GATE; the three-guess attempt
 then resets. Once the VAULT is open, the TROLL no longer repeats the challenge. The vault
-contains a GOLD BAR and WINGED SHOES.
+contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 
 ## 12.27 Equipment, hall bedroom, and roofline
 
@@ -700,21 +700,21 @@ preserving spoiler hiding for both vaults.
 
 ## 12.28 Bonus treasures, west-wing payoff, and consistency fixes
 
-Introduced a second treasure tier, `bonusTreasure`, alongside the eight required
+Introduced a second treasure tier, `bonusTreasure`, alongside the required
 family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
 `points` on deposit, but `allTreasuresDeposited()` still counts only core
 `treasure` items, so they never gate the bell / curse-lifting / win. This lets
 optional content pay into the score economy without making it mandatory or
 breaking the canonical winning walkthrough.
 
-- **West-wing payoff.** DREADMAW'S VAULT now holds two stolen Blackwood heirlooms
-  — a SILVER CHALICE (+20) and a JEWELED CROWN (+25) — plus the former dead-end
-  GOLD BAR, now a `bonusTreasure` (+15). All three are RELIQUARY-depositable, giving
-  the apple→dragon→troll→vault chain a real reward while remaining optional.
+- **West-wing payoff.** DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
+  (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
+  `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
+  source for the win threshold and RELIQUARY recess count.
 - **Ember stone.** The garden brazier's EMBER STONE keepsake now scores +8 on
   pickup (previously a dead item), so the self-immolation puzzle pays off.
-- **Consistency fixes.** The RELIQUARY now reads "eight heirloom-shaped recesses"
-  (was "seven", stale after the ANCESTRAL PORTRAIT was added). WINGED SHOES flight
+- **Consistency fixes.** The RELIQUARY reads its heirloom-recess count from the
+  shared required-item constant. WINGED SHOES flight
   now floats up through the *shut* attic trap-door exactly like a mushroom high
   (previously the shoes still required the ladder to be lowered). Gary's hint line
   now explicitly reminds the player to deposit the JEWELED MUSIC BOX itself, not

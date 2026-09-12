@@ -139,17 +139,17 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       | hidden vault | hiddenVault |
       | dreadmaw vault | dreadmawVault |
 
-  Scenario: Dreadmaw's vault contains the gold bar and winged shoes
+  Scenario: Dreadmaw's vault contains the family crest and winged shoes
     Given the player is in room "dreadmawVault"
-    When I send "take gold bar"
+    When I send "take family crest"
     And I send "wear winged shoes"
-    Then item "goldBar" is in "inventory"
+    Then item "familyCrest" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
   Scenario: The stolen Blackwood heirlooms return to the reliquary for score
     Given item "silverChalice" is carried
     And item "jeweledCrown" is carried
-    And item "goldBar" is carried
+    And item "familyCrest" is carried
     And the player is in room "grandHall"
     When I send "put chalice in reliquary"
     Then item "silverChalice" is in "reliquary"
@@ -157,9 +157,12 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "put crown in reliquary"
     Then item "jeweledCrown" is in "reliquary"
     And the game score is 45
-    When I send "put gold bar in reliquary"
-    Then item "goldBar" is in "reliquary"
+    When I send "put family crest in reliquary"
+    Then item "familyCrest" is in "reliquary"
     And the game score is 60
+
+  Scenario: Nine family heirlooms are required to lift the curse
+    Then the required family item count is 9
 
   Scenario: Vault bonus treasures do not by themselves trigger the curse-lifting
     Given item "silverChalice" is carried

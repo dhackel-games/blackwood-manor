@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { After, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
-import { world } from "../../js/world.js";
+import { REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
 const realMathRandom = Math.random;
 
@@ -179,6 +179,12 @@ Then("item {string} is unlit", function (item) {
 
 Then("the inventory load is {int}", function (load) {
   assert.equal(this.game.inventoryLoad(), load);
+});
+
+Then("the required family item count is {int}", function (count) {
+  assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
+  assert.equal(this.game.world.config.requiredFamilyItemCount, count);
+  assert.equal(Object.values(this.game.world.items).filter((item) => item.treasure).length, count);
 });
 
 Then("flag {string} is false", function (flag) {

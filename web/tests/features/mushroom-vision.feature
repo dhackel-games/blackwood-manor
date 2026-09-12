@@ -66,7 +66,7 @@ Feature: The mushroom trip's third eye
     When I send "wear eye"
     Then item "obsidianEye" is worn in slot "forehead"
     And vision status is permanent
-    And light status has 38 turns
+    And light status has 198 turns
     Given the player is in room "garden"
     When I send "look"
     Then the output contains "THIRD EYE (👁️ ∞)"
