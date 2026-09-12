@@ -316,6 +316,11 @@ function setSoundToggleLabel() {
   soundToggleBtn.textContent = sfxMuted ? "🔇" : "🔊";
   soundToggleBtn.classList.toggle("on", !sfxMuted);
   soundToggleBtn.setAttribute("aria-pressed", String(!sfxMuted));
+  const state = sfxMuted
+    ? "Sound effects off — click to turn on"
+    : "Sound effects on — click to mute";
+  soundToggleBtn.setAttribute("aria-label", state);
+  soundToggleBtn.title = state;
 }
 setSoundToggleLabel();
 if (soundToggleBtn) {
@@ -527,7 +532,9 @@ function handle(raw) {
     if (low === "save") { print(saveGame(game) ? "Game saved to this browser." : "Save failed."); return; }
     if (low === "restore") {
       if (!hasSave()) { print("There is no saved game."); return; }
-      print(loadGame(game) ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
+      const restored = loadGame(game);
+      print(restored ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
+      if (restored) updateHud();
       return;
     }
   }

@@ -71,7 +71,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
       if (!status) return null;
       const width = 8;
       const filled = Math.min(width, Math.round((status.percent / 100) * width));
-      return `BM ▐${"█".repeat(filled)}${"░".repeat(width - filled)}▌ ${status.percent}%`;
+      return `BM ▐${"█".repeat(filled)}${"░".repeat(width - filled)} ${status.percent}%`;
     },
   },
   {

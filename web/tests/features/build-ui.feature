@@ -20,6 +20,16 @@ Feature: Build metadata and touch-control contract
   Scenario: HUD statuses use declarative slots
     Then every HUD status is a HudSlot with an emoji and calculation
 
+  Scenario: The compact HUD explains sound state without wasting a row
+    Then the sound-effects toggle is leftmost in the HUD slots and explains its state
+    And the bowel meter has no trailing solid cap
+
+  Scenario: Static game controls use half-size boxes
+    Then the static control boxes are half size with readable text
+
+  Scenario: Restoring a game refreshes effect countdowns
+    Then a successful restore updates the HUD before returning
+
   Scenario: Say is available as a shortcut prefill
     Then the page has a "say " prefill control
 
