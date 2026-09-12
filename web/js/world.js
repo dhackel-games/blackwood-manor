@@ -345,7 +345,7 @@ function nextHint(ctx) {
   }
   if (!dep("emberStone")) {
     if (!ctx.getFlag("brazierLit")) {
-      return "The EMBER STONE is a Blackwood heirloom hidden in the GARDEN BRAZIER. A match is too small — LIGHT YOURSELF ON FIRE, then LIGHT BRAZIER.";
+      return "The EMBER STONE is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first.";
     }
     return "The BRAZIER yielded the EMBER STONE. TAKE it and PUT it in the RELIQUARY.";
   }
@@ -1227,16 +1227,24 @@ function takeObsidianEye(ctx) {
     "more useful. WEAR EYE on your FOREHEAD if you want to see what the MANOR keeps hidden. (+15)";
 }
 
-// --- The ceremonial brazier: only YOUR fire is big enough to light it --------
+// --- The ceremonial brazier: sustained candle flame or one burning person ----
 function lightBrazier(ctx) {
   if (ctx.getFlag("brazierLit")) return "The brazier already blazes, throwing gold-and-green light across the garden.";
-  if (!ctx.getFlag("onFire"))
-    return "The moss is grave-damp and the kindling packed tight — a match, even a lit candle, just hisses and dies " +
-      "against it. It would take a far bigger, more reckless flame. Something like... a whole person, say.";
+  const candle = ctx.item("candlestick");
+  const hasLitCandle = candle?.loc === "inventory" && candle.lit && candle.fuel > 0;
+  if (!ctx.getFlag("onFire") && !hasLitCandle) {
+    return "The moss is grave-damp and the kindling packed tight. A lone MATCH flares too briefly; you need a " +
+      "carried LIT CANDLESTICK to work around the whole bowl, or a far bigger, more reckless flame.";
+  }
   ctx.setFlag("brazierLit", true);
-  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
   ctx.addScore(10);
   ctx.moveItem("emberStone", "garden");
+  if (hasLitCandle && !ctx.getFlag("onFire")) {
+    return "You press the LIT CANDLESTICK to one sodden knot of moss after another, patiently building heat " +
+      "until the scattered flames join. The BRAZIER roars up in gold-and-green fire.\n\n" +
+      "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)";
+  }
+  ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
   return "You fling your burning self against the brazier — and the fire LEAPS off you into the moss with a WHUMP. " +
     "You stagger back, smoking but no longer ablaze, as the bowl roars up in gold-and-green flame.\n\n" +
     "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)\n\n" +
@@ -2849,7 +2857,8 @@ export const world = {
       loc: "garden", fixed: true,
       roomDesc: "A cold iron BRAZIER stands on a tripod amid the weeds, heaped with damp moss.",
       desc: "A cold iron brazier on a rusted tripod, heaped with grave-damp moss and packed black kindling. " +
-        "Old scorch-marks ring its base — it has been lit before, for something. A mere match won't touch moss this wet.",
+        "Old scorch-marks ring its base. A lone match won't touch moss this wet, but a sustained candle flame " +
+        "worked around the whole bowl might.",
       on: { light: lightBrazier, burn: lightBrazier },
     },
     emberStone: {
