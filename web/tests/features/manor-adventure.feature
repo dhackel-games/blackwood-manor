@@ -225,6 +225,14 @@ Feature: Blackwood Manor adventure
     And item "frontDoor" is open
     And the current room is "porch"
 
+  Scenario: GO DOOR infers ENTER and derives the required door actions
+    Given the player is in room "porch"
+    And item "frontKey" is carried
+    When I send "go door"
+    Then the output contains "(unlock door with key, open door, enter door)"
+    And item "frontDoor" is open
+    And the current room is "grandHall"
+
   Scenario: IN derives unlock, open, and enter for a carried door key
     Given the player is in room "porch"
     And item "frontKey" is carried

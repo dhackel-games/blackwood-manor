@@ -360,6 +360,14 @@ export function createGame(world) {
     return `talk to ${talkable[0].names[0].toUpperCase()}`;
   }
 
+  function inferGoEntryTarget(cmd) {
+    if (cmd.verb !== "go" || !cmd.dobj || game.room().exits?.[cmd.dobj]) return null;
+    const target = game.find(cmd.dobj);
+    if (!target?.enterTo) return null;
+    cmd.verb = "enter";
+    return `enter ${target.names[0]}`;
+  }
+
   // --- main loop -------------------------------------------------------------
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
@@ -374,8 +382,9 @@ export function createGame(world) {
       : cmd.verb === "go" && cmd.dobj === "out" ? roomNavigation?.out
       : null;
     if (implicitNavigation) cmd = parse(implicitNavigation);
+    const implicitEntry = inferGoEntryTarget(cmd);
     const implicitTalk = inferSoleTalkTarget(cmd);
-    const executionLabel = implicitNavigation || implicitTalk || input.trim().toLowerCase();
+    const executionLabel = implicitNavigation || implicitEntry || implicitTalk || input.trim().toLowerCase();
 
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || [])
@@ -406,7 +415,7 @@ export function createGame(world) {
       }
       const sequence = preparationBlocked ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join(", ")})\n\n${text}`;
-    } else if (implicitNavigation || implicitTalk) {
+    } else if (implicitNavigation || implicitEntry || implicitTalk) {
       text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();

@@ -642,6 +642,8 @@ Every room also has an explicit entry in `world.implicitNavigation`. Typed or to
 `IN` and `OUT` resolve through that table; `LEAVE` and `EXIT` are aliases for `OUT`.
 Entering a closed door derives OPEN, and a carried matching key additionally derives UNLOCK.
 `OPEN DOOR WITH KEY` runs and displays `(unlock door with key, open door)` as one turn.
+`GO <visible door/object>` is normalized to `ENTER <object>` before those derived steps;
+named-room GO remains flight when no visible enterable object matches.
 
 ## 12.26 Dreadmaw's maze and vault
 

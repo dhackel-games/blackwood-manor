@@ -40,8 +40,8 @@ Feature: Build metadata and touch-control contract
     And a Bug command uses its phrase as the issue description
     And the iOS wrapper opens new-window web links externally
 
-  Scenario: Gary uses large icon-only voice controls
-    Then Gary's send arrow is visually doubled without resizing its button
+  Scenario: Game and Gary use large icon-only submit controls
+    Then both send arrows are visually doubled and bold without resizing their buttons
     And Gary's circular voice toggle contains a speaker icon
 
   Scenario: Gary offers persistent icon-only computer and Australian voice presets
