@@ -178,9 +178,9 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**~7 heirloom treasures**, each worth points: silver candlestick, gold locket,
+**9 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
-decanter (wine cellar).
+decanter (wine cellar), ancestral portrait, and the Blackwood family crest.
 
 ---
 
@@ -659,7 +659,7 @@ inside the cave, SAY/ANSWER/RECITE supplies the TROLL's rhyme answer.
 Only offering the kitchen APPLE wakes DREADMAW pleasantly and moves her aside.
 `OFFER`/`GIVE`/`FEED`/`PUT APPLE TO`/`WITH`/`ON DRAGON` all use the same handler.
 She awards a GOLD DOUBLOON and allows passage. The outer ANTECHAMBER leads through
-a MINING GALLERY, where a 40-turn HEADLAMP hangs, and down a dark DEEP MINING SHAFT
+a MINING GALLERY, where a 200-turn HEADLAMP hangs, and down a dark DEEP MINING SHAFT
 to the TROLL GATE. A male cave TROLL blocks the inner VAULT DOOR there.
 `TALK TO TROLL` makes him recite a poem whose final word is missing.
 He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including MORE,
@@ -672,7 +672,7 @@ without spending a guess; anticipating a valid rhyme before he asks delights him
 opens the VAULT immediately. After three wrong answers, the TROLL folds the
 tunnel around the player and sends them back to the FRONT GATE; the three-guess attempt
 then resets. Once the VAULT is open, the TROLL no longer repeats the challenge. The vault
-contains a GOLD BAR and WINGED SHOES.
+contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 
 ## 12.27 Equipment, hall bedroom, and roofline
 
@@ -682,13 +682,14 @@ or put into a container until removed, and contributes zero to `inventoryLoad()`
 The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
-The HEADLAMP activates when worn, has 40 turns of battery life, lights every room,
+The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
 the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
 that provide permanent mushroom-style clue vision and darkness sight while worn,
 shown as `👁️ ∞`. WINGED SHOES similarly show permanent flight as `🪽 ∞`.
 The OBSIDIAN EYE must be worn on the FOREHEAD, where it can coexist with EYES-slot
-goggles; its permanent dark-sight displays as `💡 ∞`.
+goggles. It permanently reveals hidden details (`👁️ ∞`) but does not illuminate
+dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light source.
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,
@@ -699,21 +700,21 @@ preserving spoiler hiding for both vaults.
 
 ## 12.28 Bonus treasures, west-wing payoff, and consistency fixes
 
-Introduced a second treasure tier, `bonusTreasure`, alongside the eight required
+Introduced a second treasure tier, `bonusTreasure`, alongside the required
 family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
 `points` on deposit, but `allTreasuresDeposited()` still counts only core
 `treasure` items, so they never gate the bell / curse-lifting / win. This lets
 optional content pay into the score economy without making it mandatory or
 breaking the canonical winning walkthrough.
 
-- **West-wing payoff.** DREADMAW'S VAULT now holds two stolen Blackwood heirlooms
-  — a SILVER CHALICE (+20) and a JEWELED CROWN (+25) — plus the former dead-end
-  GOLD BAR, now a `bonusTreasure` (+15). All three are RELIQUARY-depositable, giving
-  the apple→dragon→troll→vault chain a real reward while remaining optional.
+- **West-wing payoff.** DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
+  (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
+  `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
+  source for the win threshold and RELIQUARY recess count.
 - **Ember stone.** The garden brazier's EMBER STONE keepsake now scores +8 on
   pickup (previously a dead item), so the self-immolation puzzle pays off.
-- **Consistency fixes.** The RELIQUARY now reads "eight heirloom-shaped recesses"
-  (was "seven", stale after the ANCESTRAL PORTRAIT was added). WINGED SHOES flight
+- **Consistency fixes.** The RELIQUARY reads its heirloom-recess count from the
+  shared required-item constant. WINGED SHOES flight
   now floats up through the *shut* attic trap-door exactly like a mushroom high
   (previously the shoes still required the ladder to be lowered). Gary's hint line
   now explicitly reminds the player to deposit the JEWELED MUSIC BOX itself, not

@@ -15,10 +15,18 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-function allTreasuresDeposited(ctx) {
+export const REQUIRED_FAMILY_ITEM_COUNT = 9;
+
+function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
-    .filter(([, d]) => d.treasure)
-    .every(([id]) => ctx.roomOf(id) === "reliquary");
+    .filter(([, definition]) => definition.treasure)
+    .filter(([id]) => ctx.roomOf(id) === "reliquary")
+    .length;
+}
+function allTreasuresDeposited(ctx) {
+  const requiredItems = Object.values(ctx.world.items).filter((definition) => definition.treasure);
+  return requiredItems.length === REQUIRED_FAMILY_ITEM_COUNT
+    && depositedFamilyItemCount(ctx) === REQUIRED_FAMILY_ITEM_COUNT;
 }
 
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
@@ -65,6 +73,15 @@ function nextHint(ctx) {
   }
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
+  }
+  if (!dep("familyCrest")) {
+    if (!ctx.getFlag("dragonMoved")) {
+      return "The last family heirloom is the BLACKWOOD FAMILY CREST in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON.";
+    }
+    if (!ctx.getFlag("dragonVaultOpen")) {
+      return "Follow DREADMAW'S cave through the MINING GALLERY and DEEP SHAFT. TALK TO TROLL at the TROLL GATE, then finish his rhyme.";
+    }
+    return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
@@ -858,7 +875,7 @@ function capabilityStatus(ctx, equipmentFlag) {
 }
 function visionStatus(ctx) {
   if (ctx.inventory().some((item) =>
-    item.worn && (item.grantsMushroomVision || item.grantsDarkSight))) {
+    item.worn && (item.grantsMushroomVision || item.grantsHiddenSight))) {
     return { permanent: true };
   }
   const remaining = ctx.getFlag("high") || 0;
@@ -872,17 +889,19 @@ function canFly(ctx) {
 }
 function hasMushroomVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
-    || ctx.inventory().some((item) => item.worn && item.grantsMushroomVision);
+    || ctx.inventory().some((item) =>
+      item.worn && (item.grantsMushroomVision || item.grantsHiddenSight));
 }
 function hasDarkVision(ctx) {
-  return ctx.inventory().some((item) => item.worn && item.grantsDarkSight);
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) => item.worn && item.grantsDarkVision);
 }
 function headlampStatus(ctx) {
   const lamp = ctx.item("headlamp");
   return lamp?.worn && lamp.lit && lamp.fuel > 0 ? { remaining: lamp.fuel } : null;
 }
 function lightStatus(ctx) {
-  return hasDarkVision(ctx) ? { permanent: true } : headlampStatus(ctx);
+  return headlampStatus(ctx);
 }
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
@@ -938,7 +957,7 @@ function takeObsidianEye(ctx) {
   ctx.setFlag("obsidianEyeClaimed");
   ctx.addScore(15);
   return "You lift the OBSIDIAN EYE off its plinth. It clings coldly to your palm, eager to adhere somewhere " +
-    "more useful. WEAR EYE on your FOREHEAD if you want its sight. (+15)";
+    "more useful. WEAR EYE on your FOREHEAD if you want to see what the MANOR keeps hidden. (+15)";
 }
 
 // --- The ceremonial brazier: only YOUR fire is big enough to light it --------
@@ -972,7 +991,7 @@ function afflictionTick(ctx) {
       ctx.setFlag("high", left);
       if (left <= 0) {
         out.push(hasDarkVision(ctx)
-          ? "The trip loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
+          ? "The trip loosens its grip and the grey fades — but the XRAY GOGGLES keep the dark legible."
           : "The trip loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
       } else {
         out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
@@ -1682,6 +1701,7 @@ export const world = {
     start: "gate",
     maxCarry: 6,
     title: "Blackwood Manor",
+    requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
     equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck"],
   },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
@@ -1693,12 +1713,12 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
-  lightStatus,       // HEADLAMP duration or permanent worn OBSIDIAN EYE
+  lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
   flightStatus,      // temporary mushroom flight or permanent worn WINGED SHOES
   canFly,            // temporary mushroom flight or worn WINGED SHOES
-  hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
-  hasDarkVision,     // permanent darkness sight from the worn OBSIDIAN EYE
+  hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
+  hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
@@ -1902,11 +1922,11 @@ export const world = {
         ].join("\n"),
         desc:
           "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. Among the dragon-gold, two pieces bear the Blackwood crest — " +
-          "a SILVER CHALICE and a JEWELED CROWN, family heirlooms this wyrm plainly stole long ago. The TROLL GATE is WEST.",
+          "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
+          "a SILVER CHALICE and a JEWELED CROWN stolen from the family long ago. The TROLL GATE is WEST.",
         searchDesc:
-          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes, " +
-          "while the SILVER CHALICE and JEWELED CROWN are unmistakably BLACKWOOD work — they belong back in the RELIQUARY.",
+          "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
+          "essential heirloom, while the SILVER CHALICE and JEWELED CROWN are valuable optional prizes.",
         exits: { west: "trollGate" },
       },
 
@@ -1957,7 +1977,7 @@ export const world = {
         if (ctx.getFlag("curseLiftable")) {
           return "Every filled recess in the RELIQUARY glows faintly. Above it, the BELL rope trembles though the air is still.";
         }
-        return "The RELIQUARY contains eight heirloom-shaped recesses. The BELL rope hangs directly above them, " +
+        return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. The BELL rope hangs directly above them, ` +
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
@@ -2490,10 +2510,11 @@ export const world = {
     obsidianEye: {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
       loc: "hiddenVault", takeable: true, wearable: true, worn: false,
-      wearSlot: "forehead", grantsDarkSight: true,
+      wearSlot: "forehead", grantsHiddenSight: true,
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
       desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
-        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to make the dark stop being an enemy.",
+        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
+        "It does not produce light.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {
@@ -2564,18 +2585,18 @@ export const world = {
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
       loc: "mineGallery", takeable: true, wearable: true, wearSlot: "head",
-      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 40,
+      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
       roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
-      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises forty turns of light.",
+      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
-    goldBar: {
-      names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
-      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 15,
-      roomDesc: "A heavy GOLD BAR lies conspicuously apart from the rest of the hoard.",
-      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint. Not a Blackwood heirloom, but the " +
-        "RELIQUARY will still gladly weigh it.",
+    familyCrest: {
+      names: ["crest", "emblem", "arms"], adjectives: ["family", "blackwood", "silver"],
+      loc: "dreadmawVault", takeable: true, treasure: true, points: 15,
+      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
+      desc: "The BLACKWOOD FAMILY CREST, cast in blackened silver: a raven above crossed keys. One of the " +
+        `${REQUIRED_FAMILY_ITEM_COUNT} heirlooms required by the RELIQUARY.`,
     },
     silverChalice: {
       names: ["chalice", "cup", "goblet"], adjectives: ["silver", "blackwood"],
@@ -2626,7 +2647,8 @@ export const world = {
     },
     xrayGoggles: {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
-      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes", grantsMushroomVision: true,
+      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
+      grantsMushroomVision: true, grantsDarkVision: true,
       desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {

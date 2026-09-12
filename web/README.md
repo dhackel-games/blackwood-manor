@@ -33,11 +33,11 @@ auto-saves to your browser.
   diverge. Supernatural hazards still apply.
 - **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
-  HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES
+  HEADLAMP provides 200 turns of light with a `💡` HUD countdown; XRAY GOGGLES
   show `👁️ ∞` and reveal the same clues as mushroom vision; WINGED SHOES show
   `🪽 ∞` and provide permanent named-room flight while worn.
-  The OBSIDIAN EYE must be worn on the FOREHEAD to provide dark-sight; it can
-  coexist with XRAY GOGGLES and displays `💡 ∞`.
+  The OBSIDIAN EYE must be worn on the FOREHEAD to provide permanent hidden
+  sight (`👁️ ∞`); it can coexist with XRAY GOGGLES but does not illuminate darkness.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.
@@ -145,7 +145,8 @@ openable, open, locked, keyId, capacity, lightSource, selfPowered, lit, fuel,
 wearable, wearSlot, worn, readable, text, edible, drinkable, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
-part of the win condition (all treasures must reach the reliquary).
+part of the win condition. `REQUIRED_FAMILY_ITEM_COUNT` records how many required
+family treasures must reach the reliquary.
 
 ### Add a puzzle
 
