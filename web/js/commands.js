@@ -66,6 +66,59 @@ function inspectRoom(ctx) {
     notableItems(ctx);
 }
 
+export const HELP_TEXT = `COMMANDS
+again/(g): Repeat the previous command.
+ai: Report whether Gary is scripted or using an on-device model.
+attack <thing>: Attack a visible target.
+brief: Use shorter room descriptions after the first visit.
+bug <description>: Open a GitHub issue for the current room.
+call/hint: Call Gary's paid hint line.
+close <thing>: Close an open door or container.
+directions/go: Travel with n, s, e, w, ne, nw, se, sw, up, down, in, or out.
+drink <thing>: Drink a visible beverage.
+drop <thing>/all: Drop one carried item or every unworn item.
+eat <thing>: Eat visible food.
+extinguish <thing>: Put out a light or flame.
+give <thing> to <character>: Hand over an item.
+help/(?): Show this command reference.
+(i)nventory: List everything you carry and wear.
+light <thing>: Ignite a usable light source.
+lock <thing> with <key>: Lock something with a matching key.
+(l)ook/e(x)amine/search: Inspect the room or a visible thing more closely.
+(m)ap: Show Gary's map of visited locations.
+move <thing>: Shift or jostle something.
+open <thing>: Open a door or container.
+pull <thing>: Pull something.
+push <thing>: Push something.
+put <thing> in <container>: Place a carried item inside.
+(q)uit: End the session.
+reach into <thing>: Reach into an opening.
+read <thing>: Read visible writing.
+remove <thing>: Take off worn equipment.
+restart: Start a fresh game.
+restore: Restore the browser's saved game.
+ring <thing>: Ring a bell or similar object.
+save: Save the current game in this browser.
+say <words>: Speak aloud.
+score: Show points, turns, and rank.
+take <thing>/all: Take one visible item or everything portable.
+talk to <character>: Start a conversation.
+throw <thing> at <target>: Throw a carried item.
+unlock <thing> with <key>: Unlock something with a matching key.
+use <thing>: Use an object whose purpose is clear.
+verbose: Always print full room descriptions.
+wait/(z): Let one turn pass.
+wear <thing>: Put on carried equipment.
+
+CHAINING
+Separate commands with ".", ";", ",", or THEN.
+Example: n; open mailbox; read letter
+A chain stops at the first unknown word.
+
+GARY'S HINT LINE
+CALL or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
+Say HANG UP to end the call. HELP only prints this reference; it never calls Gary.`;
+
 function takeAll(ctx, cmd) {
   const candidates = ctx.visibleItems().filter((item) => item.takeable && !ctx.has(item.id));
   if (!candidates.length) return "There is nothing here you can take.";
@@ -78,8 +131,16 @@ function takeAll(ctx, cmd) {
       leftBehind.push(item.names[0]);
       continue;
     }
-    const handler = ctx.world.items[item.id]?.on?.take;
-    const handled = handler ? handler(ctx, { ...cmd, dobj: item.names[0] }) : null;
+    const blocked = ctx.acquisitionBlock?.(item);
+    if (blocked) {
+      results.push(`${item.names[0]}: ${blocked}`);
+      continue;
+    }
+    const itemCommand = { ...cmd, dobj: item.names[0], itemId: item.id };
+    const itemHandler = ctx.world.items[item.id]?.on?.take;
+    let handled = itemHandler ? itemHandler(ctx, itemCommand) : null;
+    const roomHandler = ctx.world.rooms[ctx.state.room]?.on?.take;
+    if (handled == null && roomHandler) handled = roomHandler(ctx, itemCommand);
     if (handled != null) {
       results.push(`${item.names[0]}: ${handled}`);
       continue;
@@ -166,6 +227,8 @@ export const commands = {
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (ctx.has(it.id)) return "You already have that.";
+    const blocked = ctx.acquisitionBlock?.(it);
+    if (blocked) return blocked;
     if (it.fixed || !it.takeable) return "That's hardly portable.";
     if (ctx.inventoryLoad() >= Math.max(ctx.inventoryCapacity(), it.carryCapacity || 0))
       return "Your hands are full. You'll have to drop something first.";
@@ -259,6 +322,7 @@ export const commands = {
     if (!cmd.iobj) return "Put it where?";
     const dest = ctx.find(cmd.iobj);
     if (!dest) return `You can't see any ${cmd.iobj} here.`;
+    if (dest.id === it.id) return `You can't put the ${it.names[0]} inside itself.`;
     if (!dest.container) return "You can't put anything in that.";
     if (dest.openable && !dest.open) return `The ${dest.names[0]} is closed.`;
     if (ctx.itemsIn(dest.id).length >= (dest.capacity ?? 99)) return "There's no room left in it.";
@@ -411,6 +475,7 @@ export const commands = {
   hotline(ctx) {
     if (typeof ctx.world.hotline !== "function")
       return "There's no phone here, and no one who'd pick up if there were.";
+    ctx.setFlag("usedGaryHelp", true);
     ctx.setFlag("onCall", true); // you're now on the line — see core.send routing
     return ctx.world.hotline(ctx);
   },
@@ -431,33 +496,8 @@ export const commands = {
   verbose(ctx) { ctx.setFlag("__verbose", true); return "Maximum verbosity."; },
   brief(ctx) { ctx.setFlag("__verbose", false); return "Brief descriptions."; },
   again() { return null; }, // handled by UI (repeat last); no-op in core
-  help() {
-    return [
-      "COMMANDS",
-      "Move: n s e w  ne nw se sw  up down",
-      "  in out   (or: go <dir>)",
-      "look (l), examine (ex/x), search — inspect the room more closely",
-      "look at <x>, examine <x>, search <x> — inspect an item",
-      "map — Gary's floor plan of the manor (MAP MODE)",
-      "take <x>, take all, drop <x>, drop all, inventory (i)",
-      "open / close / unlock <x> with <y>",
-      "put <x> in <y>, read <x>",
-      "light <x>, turn on/off <x>",
-      "wear / remove, eat / drink",
-      "push / pull / move, reach into <x>, talk to / wake <x>, give <x> to <y>, ring <x>",
-      "score save restore restart quit",
-      "bug <description> — open a GitHub issue for the current room",
-      "ai — is Gary's on-device model running, or is he scripted?",
-      "",
-      "Chain commands with . ; , or THEN:",
-      "  n. open mailbox. read letter",
-      "(the line stops at the first word",
-      " I don't know)",
-      "",
-      "Stuck? Tap CALL (or type CALL) for",
-      "Gary's hint line. Say HANG UP to",
-      "leave. Beware the dark — keep a",
-      "light burning.",
-    ].join("\n");
+  help(ctx) {
+    ctx.setFlag("usedHelp", true);
+    return HELP_TEXT;
   },
 };

@@ -173,6 +173,12 @@ Feature: Generic text-adventure engine
     When I send "score"
     Then the output contains "Trespasser"
 
+  Scenario: HELP is an alphabetized data block with one command per line
+    When I send "help"
+    Then HELP is one alphabetized command-per-line data block
+    And the output contains "CALL or HINT"
+    And the output contains "HELP only prints this reference"
+
   Scenario: Content handlers override generic commands
     Given a fresh fixture game with a working lever
     When I send "pull lever"

@@ -30,6 +30,21 @@ function cloneData(def, id) {
   return copy;
 }
 
+const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace"];
+
+function restoreItems(worldItems, savedItems = {}) {
+  return Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
+    const restored = cloneData(definition, id);
+    const saved = savedItems[id];
+    if (saved) {
+      for (const key of MUTABLE_ITEM_STATE) {
+        if (Object.prototype.hasOwnProperty.call(saved, key)) restored[key] = saved[key];
+      }
+    }
+    return [id, restored];
+  }));
+}
+
 export function createGame(world) {
   const cfg = world.config || {};
   const state = {
@@ -67,6 +82,13 @@ export function createGame(world) {
   game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
   game.item = (id) => state.items[id] || null;
+  game.acquisitionBlock = (item) => {
+    const container = item ? game.item(item.loc) : null;
+    return item?.treasure && container?.locksTreasures
+      ? `The ${container.names[0].toUpperCase()} grips the ${item.names[0]} in its fitted recess. ` +
+        "A seated family heirloom cannot be withdrawn."
+      : null;
+  };
 
   game.visibleItems = () => {
     const out = [...game.inventory(), ...game.itemsIn(state.room)];
@@ -337,10 +359,27 @@ export function createGame(world) {
     return target.locked ? result : null;
   }
 
+  function prepareAutoOpenContainer(cmd, derivedSteps) {
+    if (!["put", "take"].includes(cmd.verb) || !cmd.iobj) return null;
+    const container = game.find(cmd.iobj);
+    if (!container?.autoOpenOnAccess || !container.openable || container.open) return null;
+    if (cmd.verb === "put" && !game.find(cmd.dobj, game.inventory())) return null;
+    const result = dispatchWithoutTick({
+      verb: "open",
+      dobj: container.names[0],
+      prep: null,
+      iobj: null,
+    });
+    derivedSteps.push(`open ${container.names[0]}`);
+    return container.open ? null : result;
+  }
+
   function implicitlyAcquire(cmd) {
     if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
     const item = game.find(cmd.dobj);
     if (!item || !item.takeable || game.has(item.id)) return null;
+    const blocked = game.acquisitionBlock(item);
+    if (blocked) return { blocked, step: `get ${item.names[0]}` };
     if (game.inventoryLoad() >= Math.max(game.inventoryCapacity(), item.carryCapacity || 0)) {
       return {
         blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
@@ -393,11 +432,17 @@ export function createGame(world) {
     if (acquisition) derivedSteps.push(acquisition.step);
     const preparationBlocked = acquisition?.blocked
       || prepareOpenWithKey(cmd, derivedSteps)
-      || prepareEntry(cmd, derivedSteps);
+      || prepareEntry(cmd, derivedSteps)
+      || prepareAutoOpenContainer(cmd, derivedSteps);
+    const directItem = cmd.verb === "take" && cmd.dobj !== "all" && cmd.dobj !== "everything"
+      ? game.find(cmd.dobj)
+      : null;
+    const acquisitionBlocked = preparationBlocked || game.acquisitionBlock(directItem);
 
     deferStatusBanner = true;
     describedRoomThisTurn = false;
-    const override = preparationBlocked || runHandlers(cmd);
+    if (["look", "examine", "search"].includes(cmd.verb)) game.setFlag("usedInspection");
+    const override = acquisitionBlocked || runHandlers(cmd);
     let text;
     if (override != null) {
       text = override;
@@ -413,7 +458,7 @@ export function createGame(world) {
       if (cmd.verb === "open" && derivedSteps.some((step) => step.startsWith("unlock "))) {
         finalStep = `open ${cmd.dobj}`;
       }
-      const sequence = preparationBlocked ? derivedSteps : [...derivedSteps, finalStep];
+      const sequence = acquisitionBlocked ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join(", ")})\n\n${text}`;
     } else if (implicitNavigation || implicitEntry || implicitTalk) {
       text = `(${executionLabel})\n\n${text}`;
@@ -477,6 +522,9 @@ export function createGame(world) {
   game.snapshot = () => ({ state: JSON.parse(JSON.stringify(state)) });
   game.restore = (snap) => {
     const c = JSON.parse(JSON.stringify(snap.state));
+    const savedItems = c.items;
+    c.items = restoreItems(world.items || {}, savedItems);
+    if (typeof world.migrateState === "function") world.migrateState(c, { savedItems });
     for (const k of Object.keys(state)) delete state[k];
     Object.assign(state, c);
     return true;

@@ -30,8 +30,14 @@ Feature: Build metadata and touch-control contract
   Scenario: Restoring a game refreshes effect countdowns
     Then a successful restore updates the HUD before returning
 
+  Scenario: Explicit save-state actions are recorded for end-game awards
+    Then Save and Restore mark the no-takebacks disqualifier
+
   Scenario: Say is available as a shortcut prefill
     Then the page has a "say " prefill control
+
+  Scenario: Redundant inspection and hint-line buttons stay out of the shortcut strip
+    Then the shortcut strip keeps Look, Call, and question-mark Help without Examine or Hint
 
   Scenario: Bug reports open the repository issue form outside the game
     Then the page has an icon-only Bug button

@@ -3,6 +3,7 @@ import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
+import { HELP_TEXT } from "../../js/commands.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
 import { HUD_SLOT_DEFINITIONS, HudSlot } from "../../js/hud.js";
 import {
@@ -253,6 +254,23 @@ Then("the turn count is {int}", function (turns) {
   assert.equal(this.game.state.turns, turns);
 });
 
+Then("HELP is one alphabetized command-per-line data block", function () {
+  const source = readFileSync(new URL("../../js/commands.js", import.meta.url), "utf8");
+  assert.match(source, /export const HELP_TEXT = `COMMANDS[\s\S]+`;/);
+  assert.match(source, /help\(\) \{ return HELP_TEXT; \}/);
+  const commandLines = HELP_TEXT.split("\n").slice(1, HELP_TEXT.indexOf("\n\n") > -1
+    ? HELP_TEXT.slice(0, HELP_TEXT.indexOf("\n\n")).split("\n").length
+    : undefined);
+  assert.ok(commandLines.every((line) => line.includes(":")), "each command must occupy one described line");
+  const labels = commandLines.map((line) =>
+    line.slice(0, line.indexOf(":")).replace(/[()]/g, "").split("/")[0].toLowerCase());
+  const sorted = [...labels].sort((a, b) => a.localeCompare(b));
+  assert.deepEqual(labels, sorted);
+  assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search:/);
+  assert.match(HELP_TEXT, /\nCHAINING\n/);
+  assert.match(HELP_TEXT, /\nGARY'S HINT LINE\n/);
+});
+
 Then("the following commands parse as:", function (table) {
   for (const row of table.hashes()) {
     assert.deepEqual(parse(value(row.input)), {
@@ -307,7 +325,9 @@ Then("the controls remain pinned inside the viewport", function () {
 
 Then("the HUD has inventory, reliquary, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators", function () {
   const slots = new Map(HUD_SLOT_DEFINITIONS.map((slot) => [slot.id, slot]));
-  assert.equal(slots.get("turns").emoji, "⏱️");
+  assert.equal(slots.get("score").emoji, "🏆");
+  assert.equal(slots.get("score").calculate({ game: { state: { score: 42, turns: 17 } } }), "42/17");
+  assert.equal(slots.has("turns"), false);
   assert.equal(typeof slots.get("inventory").emoji, "function");
   assert.equal(slots.get("reliquary").emoji, "💎");
   assert.equal(slots.get("bm").emoji, "💩");
@@ -358,6 +378,12 @@ Then("a successful restore updates the HUD before returning", function () {
     /if \(low === "restore"\)[\s\S]*?const restored = loadGame\(game\)[\s\S]*?if \(restored\) updateHud\(\)/);
 });
 
+Then("Save and Restore mark the no-takebacks disqualifier", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /low === "save"[\s\S]*setFlag\("usedSaveRestore", true\)[\s\S]*saveGame\(game\)/);
+  assert.match(ui, /low === "restore"[\s\S]*loadGame\(game\)[\s\S]*setFlag\("usedSaveRestore", true\)/);
+});
+
 Then("the inventory HUD shows {string} with {string}", function (emoji, value) {
   const definition = HUD_SLOT_DEFINITIONS.find((slot) => slot.id === "inventory");
   assert.ok(definition, "Missing inventory HUD slot");
@@ -383,6 +409,15 @@ Then("the page has a {string} touch command", function (direction) {
 Then("the page has a {string} prefill control", function (value) {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, new RegExp(`data-prefill=["']${value}["']`));
+});
+
+Then("the shortcut strip keeps Look, Call, and question-mark Help without Examine or Hint", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /<button[^>]+data-cmd=["']look["'][^>]*>\s*Look\s*<\/button>/);
+  assert.match(html, /<button[^>]+data-cmd=["']call["'][^>]*>\s*Call\s*<\/button>/);
+  assert.match(html, /<button[^>]+data-cmd=["']help["'][^>]+aria-label=["']help["'][^>]*>\s*\?\s*<\/button>/);
+  assert.doesNotMatch(html, /<button[^>]+data-prefill=["']examine /);
+  assert.doesNotMatch(html, /<button[^>]+data-cmd=["']hint["']/);
 });
 
 Then("the page has an icon-only Bug button", function () {

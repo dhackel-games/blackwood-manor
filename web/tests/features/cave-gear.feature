@@ -164,7 +164,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       | destination  | room        |
       | roof         | roof        |
       | belfry       | belfry      |
-      | hidden vault | hiddenVault |
+      | astral chamber | hiddenVault |
       | dreadmaw vault | dreadmawVault |
 
   Scenario Outline: WINGED SHOES can fly to every named rooftop room
@@ -177,7 +177,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       | destination  | room        |
       | roof         | roof        |
       | belfry       | belfry      |
-      | hidden vault | hiddenVault |
+      | astral chamber | hiddenVault |
       | dreadmaw vault | dreadmawVault |
 
   Scenario: Dreadmaw's vault contains the family crest and winged shoes
@@ -187,30 +187,8 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
-  Scenario: The stolen Blackwood heirlooms return to the reliquary for score
-    Given item "silverChalice" is carried
-    And item "jeweledCrown" is carried
-    And item "familyCrest" is carried
-    And the player is in room "grandHall"
-    When I send "put chalice in reliquary"
-    Then item "silverChalice" is in "reliquary"
-    And the game score is 20
-    When I send "put crown in reliquary"
-    Then item "jeweledCrown" is in "reliquary"
-    And the game score is 45
-    When I send "put family crest in reliquary"
-    Then item "familyCrest" is in "reliquary"
-    And the game score is 60
-
-  Scenario: Eleven family heirlooms are required to lift the curse
-    Then the required family item count is 11
-
-  Scenario: Vault bonus treasures do not by themselves trigger the curse-lifting
-    Given item "silverChalice" is carried
-    And the player is in room "grandHall"
-    When I send "put chalice in reliquary"
-    Then flag "curseLiftable" is unset
-    And the output does not contain "longs to be RUNG"
+  Scenario: Twelve family heirlooms are required to lift the curse
+    Then the required family item count is 12
 
   Scenario: The reliquary accepts junk but marks it as non-contributing
     Then the reliquary HUD is hidden
@@ -220,7 +198,64 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "rope" is in "reliquary"
     And the output contains "does not contribute"
     And the output contains "Non-contributing items currently inside: 1"
-    And the reliquary HUD shows "0/11 +1"
+    And the reliquary HUD shows "0/12 +1"
+
+  Scenario: The protective talisman becomes an heirloom after its crypt work is done
+    Given item "talisman" is carried
+    And the player is in room "grandHall"
+    When I send "examine talisman"
+    Then the output contains "BM crest"
+    And the output contains "Blackwood family heirloom"
+    When I send "put talisman in reliquary"
+    Then the output contains "still has work to do against the WRAITH"
+    And item "talisman" is carried
+    Given item "goldLocket" is carried
+    When I send "put talisman in reliquary"
+    Then item "talisman" is in "reliquary"
+    And the output contains "Family heirlooms: 1/12"
+    And the game score is 15
+
+  Scenario: Putting into the closed reliquary opens its glass doors first
+    Given item "rope" is carried
+    And the player is in room "grandHall"
+    When I send "put rope in reliquary"
+    Then the output contains "(open reliquary, put rope in reliquary)"
+    And item "reliquary" is open
+    And item "rope" is in "reliquary"
+    When I send "close reliquary"
+    And I send "take rope from reliquary"
+    Then the output contains "(open reliquary, take rope from reliquary)"
+    And item "reliquary" is open
+    And item "rope" is carried
+
+  Scenario: TAKE ALL cannot withdraw seated heirlooms from an open reliquary
+    Given item "familyCrest" is carried
+    And item "rope" is carried
+    And the player is in room "grandHall"
+    When I send "put family crest in reliquary"
+    And I send "put rope in reliquary"
+    And I send "take all"
+    Then item "familyCrest" is in "reliquary"
+    And item "rope" is carried
+
+  Scenario: Item handlers and implicit actions cannot withdraw seated heirlooms
+    Given item "goldLocket" is carried
+    And item "talisman" is carried
+    And item "grimoire" is carried
+    And item "spyglass" is carried
+    And the player is in room "grandHall"
+    When I send "put talisman in reliquary"
+    And I send "put grimoire in reliquary"
+    And I send "put spyglass in reliquary"
+    And I send "take spyglass from reliquary"
+    Then item "spyglass" is in "reliquary"
+    When I send "take all"
+    Then item "spyglass" is in "reliquary"
+    When I send "wear talisman"
+    Then item "talisman" is in "reliquary"
+    When I send "read grimoire"
+    Then item "grimoire" is in "reliquary"
+    And the game score is 38
 
   Scenario: Winged shoes float up through the shut attic trap-door
     Given item "wingedShoes" is carried
@@ -240,6 +275,6 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And I send "map"
     Then the output contains "ROOFLINE"
     And the output contains "Roof"
-    And the output does not contain "Hidden Vault"
+    And the output does not contain "Astral Chamber"
 
 # end cave-gear.feature

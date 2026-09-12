@@ -70,13 +70,28 @@ Feature: Blackwood Manor adventure
       light self on fire
       light brazier
       take ember stone
+      east
+      east
+      take green stone
+      take blue stone
+      put ember stone in mechanism
+      put green stone in mechanism
+      put blue stone in mechanism
+      enter platform
+      wait
+      take spyglass
+      wait
+      enter platform
+      wait
+      west
+      west
       enter well
       take ancient coin
       west
       north
       north
       put ancient coin in reliquary
-      put ember stone in reliquary
+      put spyglass in reliquary
       drop rope
       up
       south
@@ -128,7 +143,10 @@ Feature: Blackwood Manor adventure
       north
       east
       put locket in reliquary
+      remove talisman
+      put talisman in reliquary
       put candlestick in reliquary
+      close reliquary
       ring bell
       take bone key
       unlock secret door with bone key
@@ -139,8 +157,28 @@ Feature: Blackwood Manor adventure
       north
       """
     Then the game is won
-    And the game score is 222
+    And the game score is 262
     And the player rank contains "Master of Blackwood Manor"
+
+  Scenario: The silver mirror is an optional thirty-point trophy
+    Given the player is in room "hollowSanctum"
+    And flag "usedHelp" is set
+    And flag "usedInspection" is set
+    And flag "usedSaveRestore" is set
+    When I send "north"
+    Then the game is won
+    And the game score is 0
+    And the output contains "optional 30 points"
+    Given a fresh manor game
+    And the player is in room "hollowSanctum"
+    And item "silverMirror" is carried
+    And flag "usedHelp" is set
+    And flag "usedInspection" is set
+    And flag "usedSaveRestore" is set
+    When I send "north"
+    Then the game is won
+    And the game score is 30
+    And the output contains "optional trophy"
 
   Scenario: Entering the well without a rope is fatal
     When I play until death:
@@ -303,7 +341,8 @@ Feature: Blackwood Manor adventure
     When I send "look"
     Then the output does not contain line "Directions you can go: north, east, south, west, up"
     Given flag "curseLiftable" is set
-    When I send "ring bell"
+    When I send "close reliquary"
+    And I send "ring bell"
     And I send "look"
     Then the output contains line "Directions you can go: north, east, south, west, up"
 
@@ -322,7 +361,8 @@ Feature: Blackwood Manor adventure
   Scenario: Ringing the prepared bell reveals rather than ends the hidden wing
     Given the player is in room "grandHall"
     And flag "curseLiftable" is set
-    When I send "ring bell"
+    When I send "close reliquary"
+    And I send "ring bell"
     Then the output matches "BONE KEY|SECRET DOOR"
     And the game is not won
     And item "boneKey" is in "grandHall"
@@ -330,6 +370,19 @@ Feature: Blackwood Manor adventure
     And I send "unlock secret door with bone key"
     Then item "boneKey" is destroyed
     And item "secretDoor" is unlocked
+
+  Scenario: The prepared bell remains inert until the reliquary is closed
+    Given the player is in room "grandHall"
+    And flag "curseLiftable" is set
+    When I send "open reliquary"
+    And I send "ring bell"
+    Then the output contains "CLOSE RELIQUARY"
+    And flag "bellRung" is unset
+    And item "boneKey" is destroyed
+    When I send "close reliquary"
+    And I send "ring bell"
+    Then flag "bellRung" is set
+    And item "boneKey" is in "grandHall"
 
   Scenario: Reading a nearby diary implicitly gets it first
     Given the player is in room "study"
