@@ -16,7 +16,7 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 9;
+export const REQUIRED_FAMILY_ITEM_COUNT = 10;
 
 function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
@@ -74,6 +74,9 @@ function nextHint(ctx) {
   }
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
+  }
+  if (!dep("familyRing")) {
+    return "You missed the dusty BLACKWOOD FAMILY RING marked BM in an abandoned ore cart in the DRAGON CAVE ANTECHAMBER. TAKE it and PUT it in the RELIQUARY.";
   }
   if (!dep("familyCrest")) {
     if (!ctx.getFlag("dragonMoved")) {
@@ -1851,10 +1854,10 @@ export const world = {
           "  |___\\______/___|",
         ].join("\n"),
         desc:
-          "The outer CAVE widens around rusted mine rails and abandoned ore carts. DREADMAW'S CAVE MOUTH " +
-          "is WEST; the tunnel continues EAST into a MINING GALLERY.",
+          "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
+          "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
         searchDesc:
-          "The rails vanish EAST beneath old timber braces. Pick marks in the basalt suggest someone mined here before DREADMAW arrived.",
+          "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
         exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
 
@@ -2583,6 +2586,13 @@ export const world = {
       names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
       loc: "dreadmawVault", fixed: true, scenery: true,
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
+    },
+    familyRing: {
+      names: ["ring", "signet"], adjectives: ["dusty", "family", "blackwood", "bm"],
+      loc: "dragonAntechamber", takeable: true, treasure: true, points: 20,
+      wearable: true, worn: false, wearSlot: "finger",
+      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
+      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
     },
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],

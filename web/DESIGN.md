@@ -17,7 +17,6 @@ house and the catacombs beneath it. Your goal: **recover the family heirlooms, d
 them in the reliquary in the Grand Hall, and lift the curse to escape alive.** Linger in
 the dark too long, and something finds you.
 
-This is the haunted analog of Zork's "collect treasures into the trophy case."
 **Win condition:** all heirlooms deposited in the reliquary + the final ritual performed.
 
 Difficulty: **classic / cruel** — sudden death, darkness kills, limited light, inventory
@@ -178,9 +177,10 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**9 required family heirlooms**, each worth points: silver candlestick, gold locket,
+**10 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
-decanter (wine cellar), ancestral portrait, and the Blackwood family crest.
+decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
+Blackwood family ring marked BM.
 
 ---
 
@@ -712,7 +712,8 @@ family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
 optional content pay into the score economy without making it mandatory or
 breaking the canonical winning walkthrough.
 
-- **West-wing payoff.** DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
+- **West-wing payoff.** An ore cart in the CAVE ANTECHAMBER holds the required
+  BLACKWOOD FAMILY RING (+20). DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
   (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
   `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
   source for the win threshold and RELIQUARY recess count.
