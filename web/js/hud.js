@@ -6,6 +6,7 @@ export class HudSlot {
     this.emoji = emoji;
     this.calculate = calculate;
     this.element = null;
+    this.emojiElement = null;
     this.valueElement = null;
   }
 
@@ -19,8 +20,9 @@ export class HudSlot {
       const emoji = document.createElement("span");
       emoji.className = "hud-slot-emoji";
       emoji.setAttribute("aria-hidden", "true");
-      emoji.textContent = this.emoji;
+      emoji.textContent = typeof this.emoji === "function" ? "" : this.emoji;
       element.append(emoji, " ");
+      this.emojiElement = emoji;
     }
 
     this.valueElement = document.createElement("span");
@@ -34,6 +36,9 @@ export class HudSlot {
     const value = this.calculate(context);
     const visible = value !== null && value !== undefined && value !== "";
     this.element.hidden = !visible;
+    if (this.emojiElement && typeof this.emoji === "function") {
+      this.emojiElement.textContent = this.emoji(context);
+    }
     this.valueElement.textContent = visible ? String(value) : "";
   }
 }
@@ -47,6 +52,11 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     id: "turns",
     calculate: ({ game }) =>
       `${game.state.turns} ${game.state.turns === 1 ? "turn" : "turns"}`,
+  },
+  {
+    id: "inventory",
+    emoji: ({ game }) => game.has("backpack") ? "👜" : "👤",
+    calculate: ({ game }) => `${game.inventoryLoad()}/${game.inventoryCapacity()}`,
   },
   {
     id: "bill",
@@ -72,6 +82,14 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
       return status
         ? `${status.remaining} turns · ${status.name} ${status.emoji} (${status.phaseIndex + 1}/4)`
         : null;
+    },
+  },
+  {
+    id: "high",
+    emoji: "🍄",
+    calculate: ({ game }) => {
+      const turns = game.state.flags.high || 0;
+      return turns > 0 ? `${turns} turns` : null;
     },
   },
   {
@@ -101,11 +119,12 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     },
   },
   {
-    id: "headlamp",
+    id: "light",
     emoji: "💡",
     calculate: ({ game, world }) => {
-      const status = world.headlampStatus?.(game);
-      return status ? `${status.remaining} turns` : null;
+      const status = world.lightStatus?.(game);
+      if (!status) return null;
+      return status.permanent ? "∞" : `${status.remaining} turns`;
     },
   },
 ]);

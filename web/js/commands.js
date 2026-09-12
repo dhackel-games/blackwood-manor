@@ -72,8 +72,8 @@ function takeAll(ctx, cmd) {
 
   const results = [];
   const leftBehind = [];
-  const limit = ctx.world.config.maxCarry ?? 99;
   for (const item of candidates) {
+    const limit = Math.max(ctx.inventoryCapacity(), item.carryCapacity || 0);
     if (ctx.inventoryLoad() >= limit) {
       leftBehind.push(item.names[0]);
       continue;
@@ -85,7 +85,9 @@ function takeAll(ctx, cmd) {
       continue;
     }
     ctx.moveItem(item.id, "inventory");
-    results.push(`${item.names[0].toUpperCase()}: Taken.`);
+    const autoWorn = item.autoWearOnTake && (!item.wearSlot || !ctx.equipped(item.wearSlot));
+    if (autoWorn) item.worn = true;
+    results.push(`${item.names[0].toUpperCase()}: ${autoWorn ? "Taken and worn." : "Taken."}`);
   }
   if (leftBehind.length) {
     results.push(`Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
@@ -149,9 +151,13 @@ export const commands = {
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (ctx.has(it.id)) return "You already have that.";
     if (it.fixed || !it.takeable) return "That's hardly portable.";
-    if (ctx.inventoryLoad() >= (ctx.world.config.maxCarry ?? 99))
+    if (ctx.inventoryLoad() >= Math.max(ctx.inventoryCapacity(), it.carryCapacity || 0))
       return "Your hands are full. You'll have to drop something first.";
     ctx.moveItem(it.id, "inventory");
+    if (it.autoWearOnTake && (!it.wearSlot || !ctx.equipped(it.wearSlot))) {
+      it.worn = true;
+      return "Taken and worn.";
+    }
     return "Taken.";
   },
 

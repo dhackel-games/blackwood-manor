@@ -24,6 +24,7 @@ Feature: Blackwood Manor adventure
       south
       take matches
       take rope
+      take apple
       light candle
       open cellar
       down
@@ -34,13 +35,41 @@ Feature: Blackwood Manor adventure
       put decanter in reliquary
       south
       south
+      west
+      west
+      south
+      offer apple to dragon
+      east
+      take family ring
+      east
+      wear headlamp
+      down
+      east
+      say lore to troll
+      east
+      take family crest
+      west
+      west
+      up
+      west
+      west
+      north
+      east
+      east
+      north
+      north
+      put family crest in reliquary
+      put family ring in reliquary
+      drop doubloon
+      south
+      south
       east
       enter well
-      take coin
+      take ancient coin
       west
       north
       north
-      put coin in reliquary
+      put ancient coin in reliquary
       drop rope
       up
       south
@@ -104,7 +133,7 @@ Feature: Blackwood Manor adventure
       north
       """
     Then the game is won
-    And the game score is 155
+    And the game score is 200
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

@@ -8,7 +8,30 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
   Background:
     Given a fresh manor game
 
-  Scenario: The mining headlamp lights the deep shaft for forty turns
+  Scenario: The abandoned mining backpack expands carrying capacity
+    Then the inventory HUD shows "👤" with "0/6"
+    Given flag "dragonMoved" is set
+    And the player is in room "mineGallery"
+    When I send "wear headlamp"
+    And I send "down"
+    Then the output contains "BACKPACK"
+    When I send "take backpack"
+    Then the output contains "Taken and worn"
+    And item "backpack" is worn in slot "back"
+    And the inventory capacity is 20
+    And the inventory load is 0
+    And the inventory HUD shows "👜" with "0/20"
+
+  Scenario: A dusty Blackwood family ring waits in an ore cart
+    Given the player is in room "dragonAntechamber"
+    When I send "take family ring"
+    Then item "familyRing" is in "inventory"
+    When the player moves directly to room "grandHall"
+    And I send "put family ring in reliquary"
+    Then item "familyRing" is in "reliquary"
+    And the game score is 20
+
+  Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set
     And the player is in room "dragonCaveMouth"
     When I play this command sequence:
@@ -20,16 +43,16 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then the current room is "mineGallery"
     And item "headlamp" is worn in slot "head"
     And the inventory load is 0
-    And headlamp status has 40 turns
+    And headlamp status has 200 turns
     When I send "down"
     Then the current room is "deepShaft"
     And the output does not contain "pitch black"
-    And headlamp status has 39 turns
+    And headlamp status has 199 turns
 
-  Scenario: The headlamp battery expires after forty illuminated turns
+  Scenario: The headlamp battery expires after two hundred illuminated turns
     Given item "headlamp" is carried
     When I send "wear headlamp"
-    And I wait 39 turns
+    And I wait 199 turns
     Then headlamp status has 1 turn
     When I send "wait"
     Then the output contains "battery dies"
@@ -139,17 +162,17 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       | hidden vault | hiddenVault |
       | dreadmaw vault | dreadmawVault |
 
-  Scenario: Dreadmaw's vault contains the gold bar and winged shoes
+  Scenario: Dreadmaw's vault contains the family crest and winged shoes
     Given the player is in room "dreadmawVault"
-    When I send "take gold bar"
+    When I send "take family crest"
     And I send "wear winged shoes"
-    Then item "goldBar" is in "inventory"
+    Then item "familyCrest" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
   Scenario: The stolen Blackwood heirlooms return to the reliquary for score
     Given item "silverChalice" is carried
     And item "jeweledCrown" is carried
-    And item "goldBar" is carried
+    And item "familyCrest" is carried
     And the player is in room "grandHall"
     When I send "put chalice in reliquary"
     Then item "silverChalice" is in "reliquary"
@@ -157,9 +180,12 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "put crown in reliquary"
     Then item "jeweledCrown" is in "reliquary"
     And the game score is 45
-    When I send "put gold bar in reliquary"
-    Then item "goldBar" is in "reliquary"
+    When I send "put family crest in reliquary"
+    Then item "familyCrest" is in "reliquary"
     And the game score is 60
+
+  Scenario: Ten family heirlooms are required to lift the curse
+    Then the required family item count is 10
 
   Scenario: Vault bonus treasures do not by themselves trigger the curse-lifting
     Given item "silverChalice" is carried

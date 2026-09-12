@@ -3,7 +3,7 @@ import assert from "node:assert";
 import { After, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
-import { world } from "../../js/world.js";
+import { REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
 const realMathRandom = Math.random;
 
@@ -193,6 +193,16 @@ Then("the inventory load is {int}", function (load) {
   assert.equal(this.game.inventoryLoad(), load);
 });
 
+Then("the inventory capacity is {int}", function (capacity) {
+  assert.equal(this.game.inventoryCapacity(), capacity);
+});
+
+Then("the required family item count is {int}", function (count) {
+  assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
+  assert.equal(this.game.world.config.requiredFamilyItemCount, count);
+  assert.equal(Object.values(this.game.world.items).filter((item) => item.treasure).length, count);
+});
+
 Then("flag {string} is false", function (flag) {
   assert.equal(this.game.getFlag(flag), false);
 });
@@ -325,6 +335,18 @@ Then("headlamp status has {int} turn(s)", function (remaining) {
   const status = world.headlampStatus(this.game);
   assert.ok(status, "headlamp status must be active");
   assert.equal(status.remaining, remaining);
+});
+
+Then("light status is permanent", function () {
+  assert.deepEqual(world.lightStatus(this.game), { permanent: true });
+});
+
+Then("light status has {int} turn(s)", function (remaining) {
+  assert.deepEqual(world.lightStatus(this.game), { remaining });
+});
+
+Then("light status is inactive", function () {
+  assert.equal(world.lightStatus(this.game), null);
 });
 
 Then("vision status has {int} turn(s)", function (remaining) {

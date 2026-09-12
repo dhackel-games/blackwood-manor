@@ -169,6 +169,16 @@ Feature: Dreadmaw's hedge maze and hoard
     And the output contains "does not rhyme"
     And the output contains "2 guesses remain"
 
+  Scenario: A rejected rhyme gets accurate feedback
+    Given flag "trollAskedRiddle" is set
+    And the player is in room "trollGate"
+    When I send "answer gore"
+    Then flag "dragonVaultOpen" is unset
+    And flag "trollWrongGuesses" equals 1
+    And the output contains "It does rhyme"
+    And the output contains "not the word"
+    And the output does not contain "does not rhyme"
+
   Scenario: Three wrong rhymes send the player back to the front gate
     Given flag "trollAskedRiddle" is set
     And the player is in room "trollGate"
@@ -184,7 +194,7 @@ Feature: Dreadmaw's hedge maze and hoard
     Then the current room is "gate"
     And flag "trollWrongGuesses" equals 0
     And flag "trollAskedRiddle" is false
-    And the output contains "Three wrong rhymes"
+    And the output contains "Three wrong answers"
     And the output contains "FRONT GATE"
 
   Scenario: Speech directed to the troll starts his conversation
@@ -210,6 +220,17 @@ Feature: Dreadmaw's hedge maze and hoard
     And the output contains "Past this door lie gold and ore"
     And the troll riddle uses real line breaks
     And flag "trollAskedRiddle" is set
+
+  Scenario: The troll does not repeat his challenge after opening the vault
+    Given flag "dragonVaultOpen" is set
+    And flag "trollAskedRiddle" is set
+    And the player is in room "trollGate"
+    When I send "talk to troll"
+    Then the output contains "You solved it"
+    And the output does not contain "Past this door lie gold and ore"
+    When I send "say hello to troll"
+    Then the output contains "Go admire the loot"
+    And the output does not contain "Treasure, terror, blood"
 
   Scenario: Mushroom flight can reach named rooms beyond the dragon and troll
     Given flag "high" is 4

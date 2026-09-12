@@ -60,6 +60,10 @@ export function createGame(world) {
     Object.values(state.items).filter((it) => it.loc === loc);
   game.inventory = () => game.itemsIn("inventory");
   game.inventoryLoad = () => game.inventory().filter((item) => !item.worn).length;
+  game.inventoryCapacity = () => Math.max(
+    world.config.maxCarry ?? 99,
+    ...game.inventory().map((item) => item.carryCapacity || 0),
+  );
   game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
   game.item = (id) => state.items[id] || null;
@@ -131,14 +135,13 @@ export function createGame(world) {
   game.isLit = () => {
     const r = world.rooms[state.room];
     if (!r || !r.dark) return true;
-    const enhancedVision = typeof world.hasMushroomVision === "function"
-      && world.hasMushroomVision(game);
-    // A carried flame, mushroom/XRAY vision, or the permanent Obsidian Eye
-    // lets you see in otherwise pitch-black rooms.
+    const darkVision = typeof world.hasDarkVision === "function"
+      && world.hasDarkVision(game);
+    // A carried flame, the mushroom trip, or XRAY vision lets you see in
+    // otherwise pitch-black rooms. Hidden sight alone does not create light.
     return game.activeLights().length > 0
       || !!state.flags.onFire
-      || enhancedVision
-      || !!state.flags.darkSight;
+      || darkVision;
   };
 
   game.availableDirections = () => {
@@ -322,7 +325,7 @@ export function createGame(world) {
     if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
     const item = game.find(cmd.dobj);
     if (!item || !item.takeable || game.has(item.id)) return null;
-    if (game.inventoryLoad() >= (world.config.maxCarry ?? 99)) {
+    if (game.inventoryLoad() >= Math.max(game.inventoryCapacity(), item.carryCapacity || 0)) {
       return {
         blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
         step: `get ${item.names[0]}`,

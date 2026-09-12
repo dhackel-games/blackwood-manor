@@ -28,14 +28,16 @@ auto-saves to your browser.
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
   `fly to <room>` carries you directly there. Eating another mushroom cluster
   adds its full duration to the remaining high. The trip's third eye reveals
-  hidden clues and lets you see in dark rooms. The HUD tracks vision as `👁️`
-  and flight as `🪽`, allowing their durations to differ. Supernatural hazards
-  still apply.
-- **Equipment:** wearable items occupy HEAD, EYES, FEET, FINGER, WRIST, or NECK.
+  hidden clues and lets you see in dark rooms. The HUD tracks the trip itself
+  as `🍄`, vision as `👁️`, and flight as `🪽`, allowing those capabilities to
+  diverge. Supernatural hazards still apply.
+- **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
-  HEADLAMP provides 40 turns of light with a `💡` HUD countdown; XRAY GOGGLES
+  HEADLAMP provides 200 turns of light with a `💡` HUD countdown; XRAY GOGGLES
   show `👁️ ∞` and reveal the same clues as mushroom vision; WINGED SHOES show
   `🪽 ∞` and provide permanent named-room flight while worn.
+  The OBSIDIAN EYE must be worn on the FOREHEAD to provide permanent hidden
+  sight (`👁️ ∞`); it can coexist with XRAY GOGGLES but does not illuminate darkness.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
   object reprint the room, show its ASCII art, add a closer-search hint, and list
   things you can act on. Room art also appears the first time you enter each room.
@@ -52,6 +54,9 @@ auto-saves to your browser.
   male/female presets and remembers your choice. MIC stays active across pauses
   until tapped again to submit.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
+- **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
+  DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
+  and changes that indicator to `👜 used/20`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived
   sequence. TOILET mushrooms also derive the missing `look in toilet` step.
@@ -139,11 +144,13 @@ items: {
 ```
 
 Useful item flags: `takeable, fixed, scenery, treasure, points, container,
-openable, open, locked, keyId, capacity, lightSource, selfPowered, lit, fuel,
-wearable, wearSlot, worn, readable, text, edible, drinkable, roomDesc`.
+openable, open, locked, keyId, capacity, carryCapacity, lightSource, selfPowered,
+lit, fuel, wearable, wearSlot, autoWearOnTake, worn, readable, text, edible,
+drinkable, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
-part of the win condition (all treasures must reach the reliquary).
+part of the win condition. `REQUIRED_FAMILY_ITEM_COUNT` records how many required
+family treasures must reach the reliquary.
 
 ### Add a puzzle
 
@@ -165,9 +172,9 @@ lever: {
 ```
 
 Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
-`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `inventoryLoad()`, `equipped(slot)`,
-`find(phrase)`, `moveItem(id,to)`, `destroy(id)`, `addScore(n)`, `kill(msg)`,
-`win(msg)`, `describeRoom()`.
+`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `inventoryLoad()`,
+`inventoryCapacity()`, `equipped(slot)`, `find(phrase)`, `moveItem(id,to)`,
+`destroy(id)`, `addScore(n)`, `kill(msg)`, `win(msg)`, `describeRoom()`.
 
 After any change, **run `npm test`** — and update the gameplay feature and steps
 if you changed the solution path.

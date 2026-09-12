@@ -6,7 +6,8 @@
 //   ctx.print via return value      ctx.getFlag(f) / ctx.setFlag(f,[v])
 //   ctx.has(id) (in inventory)      ctx.here(id) (in current room)
 //   ctx.item(id) -> live item       ctx.roomOf(id) -> location
-//   ctx.itemsIn(loc) / ctx.inventory() / ctx.find(phrase[,scope])
+//   ctx.itemsIn(loc) / ctx.inventory() / ctx.inventoryLoad()
+//   ctx.inventoryCapacity() / ctx.find(phrase[,scope])
 //   ctx.moveItem(id,to) / ctx.destroy(id)
 //   ctx.addScore(n) / ctx.kill(msg) / ctx.win(msg) / ctx.describeRoom()
 // A handler that returns a string intercepts the default verb; returning null/
@@ -15,10 +16,18 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-function allTreasuresDeposited(ctx) {
+export const REQUIRED_FAMILY_ITEM_COUNT = 10;
+
+function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
-    .filter(([, d]) => d.treasure)
-    .every(([id]) => ctx.roomOf(id) === "reliquary");
+    .filter(([, definition]) => definition.treasure)
+    .filter(([id]) => ctx.roomOf(id) === "reliquary")
+    .length;
+}
+function allTreasuresDeposited(ctx) {
+  const requiredItems = Object.values(ctx.world.items).filter((definition) => definition.treasure);
+  return requiredItems.length === REQUIRED_FAMILY_ITEM_COUNT
+    && depositedFamilyItemCount(ctx) === REQUIRED_FAMILY_ITEM_COUNT;
 }
 
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
@@ -65,6 +74,18 @@ function nextHint(ctx) {
   }
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
+  }
+  if (!dep("familyRing")) {
+    return "You missed the dusty BLACKWOOD FAMILY RING marked BM in an abandoned ore cart in the DRAGON CAVE ANTECHAMBER. TAKE it and PUT it in the RELIQUARY.";
+  }
+  if (!dep("familyCrest")) {
+    if (!ctx.getFlag("dragonMoved")) {
+      return "The last family heirloom is the BLACKWOOD FAMILY CREST in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON.";
+    }
+    if (!ctx.getFlag("dragonVaultOpen")) {
+      return "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE.";
+    }
+    return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
@@ -857,7 +878,12 @@ function capabilityStatus(ctx, equipmentFlag) {
   return remaining > 0 ? { permanent: false, remaining } : null;
 }
 function visionStatus(ctx) {
-  return capabilityStatus(ctx, "grantsMushroomVision");
+  if (ctx.inventory().some((item) =>
+    item.worn && (item.grantsMushroomVision || item.grantsHiddenSight))) {
+    return { permanent: true };
+  }
+  const remaining = ctx.getFlag("high") || 0;
+  return remaining > 0 ? { permanent: false, remaining } : null;
 }
 function flightStatus(ctx) {
   return capabilityStatus(ctx, "grantsFlight");
@@ -866,11 +892,20 @@ function canFly(ctx) {
   return !!flightStatus(ctx);
 }
 function hasMushroomVision(ctx) {
-  return !!visionStatus(ctx);
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) =>
+      item.worn && (item.grantsMushroomVision || item.grantsHiddenSight));
+}
+function hasDarkVision(ctx) {
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) => item.worn && item.grantsDarkVision);
 }
 function headlampStatus(ctx) {
   const lamp = ctx.item("headlamp");
   return lamp?.worn && lamp.lit && lamp.fuel > 0 ? { remaining: lamp.fuel } : null;
+}
+function lightStatus(ctx) {
+  return headlampStatus(ctx);
 }
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
@@ -920,12 +955,13 @@ function drinkMilk(ctx) {
 // too, so the trip no longer needs to be running for it to work.
 function takeObsidianEye(ctx) {
   if (ctx.has("obsidianEye")) return "You already carry the OBSIDIAN EYE.";
+  const firstClaim = !ctx.getFlag("obsidianEyeClaimed");
   ctx.moveItem("obsidianEye", "inventory");
-  ctx.setFlag("darkSight", true); // permanent astral sight — no candle ever again
+  if (!firstClaim) return "You retrieve the OBSIDIAN EYE. It clings coldly to your palm, waiting to be worn.";
+  ctx.setFlag("obsidianEyeClaimed");
   ctx.addScore(15);
-  return "You lift the OBSIDIAN EYE off its plinth. It fuses cold to the space between your brows for one " +
-    "heartbeat, then settles into your palm — and the black of the vault becomes plain grey sight. You will " +
-    "never again need a candle to see in the dark places of Blackwood Manor. (+15)";
+  return "You lift the OBSIDIAN EYE off its plinth. It clings coldly to your palm, eager to adhere somewhere " +
+    "more useful. WEAR EYE on your FOREHEAD if you want to see what the MANOR keeps hidden. (+15)";
 }
 
 // --- The ceremonial brazier: only YOUR fire is big enough to light it --------
@@ -958,8 +994,8 @@ function afflictionTick(ctx) {
       const left = hi - 1;
       ctx.setFlag("high", left);
       if (left <= 0) {
-        out.push(ctx.getFlag("darkSight")
-          ? "The trip loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
+        out.push(hasDarkVision(ctx)
+          ? "The trip loosens its grip and the grey fades — but the XRAY GOGGLES keep the dark legible."
           : "The trip loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
       } else {
         out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
@@ -1277,7 +1313,7 @@ function takeToiletMushrooms(ctx) {
   const mushrooms = ctx.item("outhouseMushrooms");
   if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just shit and piss.";
   if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
-  if (ctx.inventoryLoad() >= (ctx.world.config.maxCarry ?? 99))
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
     return "Your hands are full. You'll have to drop something before reaching into that.";
   ctx.moveItem("outhouseMushrooms", "inventory");
   return "You reach into the TOILET HOLE and pull the MUSHROOMS free. Your hand comes back coated in literal " +
@@ -1346,6 +1382,11 @@ function openSafe(ctx, cmd) {
 }
 
 const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
+const TROLL_REJECTED_RHYMES = new Set([
+  "adore", "boar", "bore", "chore", "explore", "fore", "four", "gore",
+  "ignore", "oar", "or", "pore", "poor", "pour", "score", "snore",
+  "sore", "therefore", "tore", "war", "wore", "yore",
+]);
 const TROLL_RIDDLE =
   "\"Past this door lie gold and ore,\n" +
   "Old crowns, old bones, and something more.\n" +
@@ -1428,6 +1469,9 @@ function giveDragon(ctx, cmd) {
     "The troll inside decides who reaches the hoard.\" (+10)";
 }
 function talkToTroll(ctx) {
+  if (ctx.getFlag("dragonVaultOpen")) {
+    return "The TROLL stands aside from the open VAULT DOOR. \"You solved it. Go admire the loot.\"";
+  }
   ctx.setFlag("trollAskedRiddle");
   return "The TROLL scratches one stone-hard ear. \"No coin, no combat. Finish the missing word and I move.\"\n\n" +
     TROLL_RIDDLE;
@@ -1446,6 +1490,7 @@ function openTrollVault(ctx, answer, anticipated = false) {
     "Deep locks answer one another inside the mountain, and the vault door rolls open.";
 }
 function answerTrollRiddle(ctx, cmd) {
+  if (ctx.getFlag("dragonVaultOpen")) return talkToTroll(ctx);
   const addressed = cmd.iobj ? ctx.find(cmd.iobj) : null;
   const spoken = addressed?.id === "caveTroll"
     ? (cmd.dobj || "")
@@ -1460,17 +1505,20 @@ function answerTrollRiddle(ctx, cmd) {
     return "The TROLL folds his arms across the VAULT DOOR. Perhaps TALK TO TROLL before shouting answers.";
   }
   if (!TROLL_RHYMES.has(answer)) {
+    const rejection = TROLL_REJECTED_RHYMES.has(answer)
+      ? "It does rhyme, but it is not the word the TROLL is looking for."
+      : "It does not rhyme with the TROLL's verse.";
     const wrongGuesses = (ctx.getFlag("trollWrongGuesses") || 0) + 1;
     if (wrongGuesses >= 3) {
       ctx.setFlag("trollWrongGuesses", 0);
       ctx.setFlag("trollAskedRiddle", false);
       ctx.state.room = "gate";
-      return `You offer "${answer || "..."}." The TROLL holds up three stony fingers. "Three wrong rhymes." ` +
+      return `You offer "${answer || "..."}." ${rejection} The TROLL holds up three stony fingers. "Three wrong answers." ` +
         "He stamps one enormous foot, the tunnel folds inside out, and you tumble onto the gravel at the FRONT GATE.";
     }
     ctx.setFlag("trollWrongGuesses", wrongGuesses);
     const remaining = 3 - wrongGuesses;
-    return `You offer "${answer || "..."}." It does not rhyme with the TROLL's verse, and he does not move. ` +
+    return `You offer "${answer || "..."}." ${rejection} He does not move. ` +
       `${remaining === 1 ? "One guess remains." : `${remaining} guesses remain.`}`;
   }
   return openTrollVault(ctx, answer);
@@ -1675,7 +1723,8 @@ export const world = {
     start: "gate",
     maxCarry: 6,
     title: "Blackwood Manor",
-    equipmentSlots: ["head", "eyes", "feet", "finger", "wrist", "neck"],
+    requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
+    equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck", "back"],
   },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
@@ -1686,10 +1735,12 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
-  visionStatus,      // temporary mushroom sight or permanent worn XRAY GOGGLES
+  lightStatus,       // remaining wearable HEADLAMP turns for the HUD
+  visionStatus,      // temporary mushroom sight or permanent worn eye equipment
   flightStatus,      // temporary mushroom flight or permanent worn WINGED SHOES
   canFly,            // temporary mushroom flight or worn WINGED SHOES
-  hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
+  hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
+  hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
@@ -1821,10 +1872,10 @@ export const world = {
           "  |___\\______/___|",
         ].join("\n"),
         desc:
-          "The outer CAVE widens around rusted mine rails and abandoned ore carts. DREADMAW'S CAVE MOUTH " +
-          "is WEST; the tunnel continues EAST into a MINING GALLERY.",
+          "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
+          "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
         searchDesc:
-          "The rails vanish EAST beneath old timber braces. Pick marks in the basalt suggest someone mined here before DREADMAW arrived.",
+          "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
         exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
 
@@ -1854,9 +1905,10 @@ export const world = {
       ].join("\n"),
       desc:
         "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
-        "abandoned seams. The MINING GALLERY is UP; a worked tunnel runs EAST to the TROLL GATE.",
+        "abandoned seams. A discarded miner's BACKPACK rests on a dry ledge. The MINING GALLERY is UP; " +
+        "a worked tunnel runs EAST to the TROLL GATE.",
       searchDesc:
-        "Heavy bare footprints lead EAST. Without a reliable light, every ledge here would be a wager with the dark.",
+        "The BACKPACK still looks sturdy despite its years underground. Heavy bare footprints lead EAST.",
       dark: true,
       exits: { up: "mineGallery", east: "trollGate" },
     },
@@ -1893,11 +1945,11 @@ export const world = {
         ].join("\n"),
         desc:
           "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. Among the dragon-gold, two pieces bear the Blackwood crest — " +
-          "a SILVER CHALICE and a JEWELED CROWN, family heirlooms this wyrm plainly stole long ago. The TROLL GATE is WEST.",
+          "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
+          "a SILVER CHALICE and a JEWELED CROWN stolen from the family long ago. The TROLL GATE is WEST.",
         searchDesc:
-          "This is generational dragon wealth, not loose change. A GOLD BAR and WINGED SHOES sit apart as the TROLL'S prizes, " +
-          "while the SILVER CHALICE and JEWELED CROWN are unmistakably BLACKWOOD work — they belong back in the RELIQUARY.",
+          "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
+          "essential heirloom, while the SILVER CHALICE and JEWELED CROWN are valuable optional prizes.",
         exits: { west: "trollGate" },
       },
 
@@ -1948,7 +2000,7 @@ export const world = {
         if (ctx.getFlag("curseLiftable")) {
           return "Every filled recess in the RELIQUARY glows faintly. Above it, the BELL rope trembles though the air is still.";
         }
-        return "The RELIQUARY contains eight heirloom-shaped recesses. The BELL rope hangs directly above them, " +
+        return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. The BELL rope hangs directly above them, ` +
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
@@ -2480,10 +2532,12 @@ export const world = {
     },
     obsidianEye: {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
-      loc: "hiddenVault", takeable: true,
+      loc: "hiddenVault", takeable: true, wearable: true, worn: false,
+      wearSlot: "forehead", grantsHiddenSight: true,
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
-      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Held to the brow, it " +
-        "makes the dark stop being an enemy.",
+      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
+        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
+        "It does not produce light.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {
@@ -2551,21 +2605,35 @@ export const world = {
       loc: "dreadmawVault", fixed: true, scenery: true,
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
+    familyRing: {
+      names: ["ring", "signet"], adjectives: ["dusty", "family", "blackwood", "bm"],
+      loc: "dragonAntechamber", takeable: true, treasure: true, points: 20,
+      wearable: true, worn: false, wearSlot: "finger",
+      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
+      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
+    },
+    backpack: {
+      names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
+      loc: "deepShaft", takeable: true, wearable: true, worn: false,
+      wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
+      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
+      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
+    },
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
       loc: "mineGallery", takeable: true, wearable: true, wearSlot: "head",
-      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 40,
+      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
       roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
-      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises forty turns of light.",
+      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
-    goldBar: {
-      names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
-      loc: "dreadmawVault", takeable: true, bonusTreasure: true, points: 15,
-      roomDesc: "A heavy GOLD BAR lies conspicuously apart from the rest of the hoard.",
-      desc: "A brutally heavy GOLD BAR stamped with a forgotten royal mint. Not a Blackwood heirloom, but the " +
-        "RELIQUARY will still gladly weigh it.",
+    familyCrest: {
+      names: ["crest", "emblem", "arms"], adjectives: ["family", "blackwood", "silver"],
+      loc: "dreadmawVault", takeable: true, treasure: true, points: 15,
+      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
+      desc: "The BLACKWOOD FAMILY CREST, cast in blackened silver: a raven above crossed keys. One of the " +
+        `${REQUIRED_FAMILY_ITEM_COUNT} heirlooms required by the RELIQUARY.`,
     },
     silverChalice: {
       names: ["chalice", "cup", "goblet"], adjectives: ["silver", "blackwood"],
@@ -2616,7 +2684,8 @@ export const world = {
     },
     xrayGoggles: {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
-      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes", grantsMushroomVision: true,
+      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
+      grantsMushroomVision: true, grantsDarkVision: true,
       desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {
