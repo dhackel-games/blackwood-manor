@@ -67,6 +67,17 @@ Feature: Generic text-adventure engine
     When I send "take all"
     Then the output equals "There is nothing here you can take."
 
+  Scenario: Drop all moves every unworn inventory item into the room
+    When I send "take all"
+    And I send "drop all"
+    Then inventory contains exactly ""
+    And room "hall" contains exactly "box,candle,key,match"
+    And the output contains "Dropped:"
+
+  Scenario: Drop all reports an empty inventory
+    When I send "drop everything"
+    Then the output equals "You aren't carrying anything."
+
   Scenario Outline: Every item-inspection phrase shows item detail
     When I send "<command>"
     Then the output contains "brass key"

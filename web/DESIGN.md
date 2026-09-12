@@ -578,12 +578,13 @@ join the list only after discovery. Handler-driven routes are data-declared thro
 `extraDirections`, including the garden well, the attic after its ladder drops, and the
 sanctum's northern exit.
 
-## 12.21 Bulk pickup
+## 12.21 Bulk inventory actions
 
 `TAKE ALL` and `GET ALL` collect every currently visible portable object, including
 objects exposed inside open containers. The operation respects `maxCarry`, reports each
 pickup, and names anything left behind when the player's hands fill. If no portable object
-is reachable, it says so explicitly.
+is reachable, it says so explicitly. `DROP ALL` moves every unworn carried item into the
+current room and lists worn equipment that remains equipped.
 
 ## 12.22 TestFlight release
 

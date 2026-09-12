@@ -53,7 +53,10 @@ auto-saves to your browser.
   The adjacent icon selector offers robot male/female and Australian
   male/female presets and remembers your choice. MIC stays active across pauses
   until tapped again to submit.
-- **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
+- **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
+  burp, barf, fart, and mushroom sounds; the icon shows the current state.
+- **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
+  `inventory` (`i`). DROP ALL leaves worn equipment equipped.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.

@@ -16,9 +16,11 @@
     <!-- Always-visible status: score / turns / phone bill -->
     <div id="hud">
       <span id="hud-version" title="Copyright version"></span>
-      <button id="sound-toggle" class="iconbtn" type="button"
-              aria-label="toggle in-game sound effects (burp, barf, fart, etc.)">🔇</button>
-      <span id="hud-slots"></span>
+      <span id="hud-slots">
+        <button id="sound-toggle" class="iconbtn" type="button" aria-pressed="false"
+                aria-label="sound effects off; click to turn on"
+                title="Sound effects off — click to turn on">🔇</button>
+      </span>
     </div>
 
     <div id="transcript" aria-live="polite"></div>

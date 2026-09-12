@@ -95,6 +95,22 @@ function takeAll(ctx, cmd) {
   return results.join("\n");
 }
 
+function dropAll(ctx) {
+  const inventory = ctx.inventory();
+  if (!inventory.length) return "You aren't carrying anything.";
+  const droppable = inventory.filter((item) => !item.worn);
+  const worn = inventory.filter((item) => item.worn);
+  for (const item of droppable) ctx.moveItem(item.id, ctx.state.room);
+
+  const lines = droppable.length
+    ? ["Dropped:", ...droppable.map((item) => `  ${item.names[0].toUpperCase()}`)]
+    : ["You have nothing unworn to drop."];
+  if (worn.length) {
+    lines.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
+  }
+  return lines.join("\n");
+}
+
 export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
@@ -163,6 +179,7 @@ export const commands = {
 
   drop(ctx, cmd) {
     if (!cmd.dobj) return "Drop what?";
+    if (cmd.dobj === "all" || cmd.dobj === "everything") return dropAll(ctx);
     const it = ctx.find(cmd.dobj, ctx.inventory());
     if (!it) return "You aren't carrying that.";
     if (it.worn) return `Remove the ${it.names[0]} before dropping it.`;
@@ -417,7 +434,7 @@ export const commands = {
       "look (l), examine (ex/x), search — inspect the room more closely",
       "look at <x>, examine <x>, search <x> — inspect an item",
       "map — Gary's floor plan of the manor (MAP MODE)",
-      "take <x>, take all, drop <x>, inventory (i)",
+      "take <x>, take all, drop <x>, drop all, inventory (i)",
       "open / close / unlock <x> with <y>",
       "put <x> in <y>, read <x>",
       "light <x>, turn on/off <x>",
