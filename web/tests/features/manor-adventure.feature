@@ -326,6 +326,12 @@ Feature: Blackwood Manor adventure
     And item "diary" is in "inventory"
     And flag "knowsCombo" is true
 
+  Scenario: The ruby ring is visibly a Blackwood heirloom
+    Given item "rubyRing" is carried
+    When I send "examine ruby ring"
+    Then the output contains "BM"
+    And the output contains "Blackwood family heirloom"
+
   Scenario: A known safe code can be typed without reading the diary
     Given the player is in room "parlor"
     When I send "move painting"
