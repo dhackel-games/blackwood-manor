@@ -545,6 +545,15 @@ function handle(raw) {
     if (onCall) phoneT.scrollTop = phoneT.scrollHeight;
     return;
   }
+  // "version"/"build" reports which build is loaded — and, in the app, which web
+  // content the self-updater is actually serving (its SHA). A meta-verb so you
+  // can check it from anywhere, including mid-call.
+  if (low === "version" || low === "ver" || low === "build") {
+    const text = versionText();
+    onCall ? printToPhone(text, "sys") : print(text, "sys");
+    if (onCall) phoneT.scrollTop = phoneT.scrollHeight;
+    return;
+  }
   // save/restore stay terminal-only.
   if (!onCall) {
     if (low === "save") {
@@ -842,6 +851,18 @@ export function modelStatusText() {
   const fix = s.fix || (s.native ? "" : "");
   return "[AI check] On-device model NOT ACTIVE — Gary is using his scripted lines.\n" +
          `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
+}
+
+// What's actually loaded right now. VERSION is the stamp baked into this web code;
+// on the iOS app the native layer also exposes window.__activeBuildLabel — the
+// label (incl. commit SHA) of the content actually being served, which is the
+// only thing that distinguishes a self-updated web push from the shipped bundle.
+export function versionText() {
+  const lines = ["[version] " + VERSION];
+  const label = (typeof window !== "undefined" && window.__activeBuildLabel) || "";
+  if (label) lines.push("  Loaded content: " + label);
+  else lines.push("  Loaded content: running in browser (no self-update layer).");
+  return lines.join("\n");
 }
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.

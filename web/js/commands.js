@@ -107,6 +107,7 @@ throw <thing> at <target>: Throw a carried item.
 unlock <thing> with <key>: Unlock something with a matching key.
 use <thing>: Use an object whose purpose is clear.
 verbose: Always print full room descriptions.
+version/build: Show which build is loaded (and, in the app, the live web content).
 wait/(z): Let one turn pass.
 wear <thing>: Put on carried equipment.
 

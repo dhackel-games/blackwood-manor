@@ -149,6 +149,14 @@ final class GameViewController: UIViewController, WKUIDelegate {
 
 extension GameViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        // Expose the label of the content we're actually serving (bundle or the
+        // self-updated cache, incl. the commit SHA) so the web `version` command
+        // can report exactly which build is loaded on the device.
+        let label = contentStore.activeLabel()
+        let json = (try? JSONEncoder().encode(label))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "\"\""
+        webView.evaluateJavaScript("window.__activeBuildLabel = \(json);", completionHandler: nil)
+
         guard let notice = pendingUpdateNotice else { return }
         pendingUpdateNotice = nil
         let payload = (try? JSONSerialization.data(withJSONObject: [notice.from, notice.to]))
