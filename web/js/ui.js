@@ -19,6 +19,7 @@ import {
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js";
+import { cheatMenu, cheatPrompt } from "./cheat-prompts.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -596,13 +597,34 @@ function handle(raw) {
   else if (!game.state.dead) saveGame(game);
 }
 
+function applyCheatPrompt(raw) {
+  const command = String(raw || "").trim();
+  if (command === ":?") {
+    print(cheatMenu(), "sys");
+    input.value = "";
+    return true;
+  }
+  const shortcut = cheatPrompt(command);
+  if (!shortcut) return false;
+  input.value = shortcut.compoundPrompt;
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+  return true;
+}
+
 // --- input wiring (terminal) ---
 input.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") { handle(input.value); input.value = ""; }
+  if (e.key === "Enter") {
+    e.preventDefault();
+    if (!applyCheatPrompt(input.value)) { handle(input.value); input.value = ""; }
+  }
   else if (e.key === "ArrowUp") { if (hi > 0) { hi--; input.value = history[hi] || ""; } e.preventDefault(); }
   else if (e.key === "ArrowDown") { if (hi < history.length) { hi++; input.value = history[hi] || ""; } e.preventDefault(); }
 });
-document.getElementById("go").addEventListener("click", () => { handle(input.value); input.value = ""; if (canType) input.focus(); });
+document.getElementById("go").addEventListener("click", () => {
+  if (!applyCheatPrompt(input.value)) { handle(input.value); input.value = ""; }
+  if (canType) input.focus();
+});
 
 // Keep the newest text visible whenever the layout changes (keyboard show/hide
 // resizes the view, which would otherwise leave the transcript scrolled up).

@@ -107,9 +107,11 @@ const SU_HELP = [
   "  su where            dump this room's exits + items",
   "  su map              reveal and print the whole map",
   "  su items            list every item and where it is",
-  "  su give <item>      put an item in your hands",
-  "  su fill             deposit EVERY treasure in the reliquary",
-  "                      (opens BOTH the bell and floor endings)",
+  "  su give <item|all>  put portable item(s) in inventory",
+  "  su equip all        equip one power item in every body slot",
+  "  su fill [required]  deposit required or EVERY treasure",
+  "                      (all treasure opens both endings)",
+  "  su maxscore         set the maximum attainable score",
   "  su win              jump to the dawn ending",
   "  su gary             jump to the secret Gary ending",
   "  su light            toggle seeing in the dark",
@@ -154,6 +156,14 @@ function suResolveItem(ctx, phrase) {
     }
   }
   return partial;
+}
+
+const MAX_NON_ITEM_SCORE = 102;
+function maximumScore(ctx) {
+  const itemPoints = Object.values(ctx.world.items)
+    .filter((item) => item.treasure || item.bonusTreasure)
+    .reduce((total, item) => total + (item.points || 0), 0);
+  return itemPoints + MAX_NON_ITEM_SCORE;
 }
 
 function superUser(ctx, argString) {
@@ -217,17 +227,44 @@ function superUser(ctx, argString) {
       return suWrap(`[su] ${lines.length} items:\n` + lines.join("\n"));
     }
     case "give": case "get": case "spawn": {
+      if (/^(all|everything)$/i.test(rest)) {
+        let count = 0;
+        for (const [id, definition] of Object.entries(ctx.world.items)) {
+          if (!definition.takeable) continue;
+          ctx.moveItem(id, "inventory");
+          if (ctx.item(id)) ctx.item(id).worn = false;
+          count++;
+        }
+        return `[su] ${count} portable items are now in your inventory.`;
+      }
       const id = suResolveItem(ctx, rest);
       if (!id) return suWrap(`[su] no item matches "${rest}". Try: su items`);
       ctx.moveItem(id, "inventory");
       if (ctx.item(id)) ctx.item(id).worn = false;
       return `[su] ${id} is now in your inventory.`;
     }
+    case "equip": case "wear": case "powerup": {
+      const preferred = [
+        "backpack", "headlamp", "xrayGoggles", "wingedShoes",
+        "talisman", "rubyRing", "obsidianEye",
+      ];
+      const equipped = [];
+      for (const id of preferred) {
+        const item = ctx.item(id);
+        if (!item || item.loc !== "inventory") continue;
+        item.worn = true;
+        if (item.activatesOnWear && (item.fuel == null || item.fuel > 0)) item.lit = true;
+        equipped.push(id);
+      }
+      return `[su] equipped: ${equipped.join(", ") || "(nothing)"}.`;
+    }
     case "fill": case "reliquary": case "deposit": {
+      const requiredOnly = /^(required|minimum|min)$/i.test(rest);
       let n = 0, pts = 0;
       for (const id of Object.keys(ctx.world.items)) {
         const def = ctx.world.items[id];
-        if ((def.treasure || def.bonusTreasure) && ctx.roomOf(id) !== "reliquary") {
+        const selected = def.treasure || (!requiredOnly && def.bonusTreasure);
+        if (selected && ctx.roomOf(id) !== "reliquary") {
           ctx.moveItem(id, "reliquary");
           ctx.addScore(def.points || 0);
           pts += def.points || 0;
@@ -235,9 +272,11 @@ function superUser(ctx, argString) {
         }
       }
       ctx.setFlag("curseLiftable");
-      ctx.setFlag("floorDoorOpen");
-      return `[su] deposited ${n} treasure(s) (+${pts}). The BELL is ready and the floor STAIRCASE is open.\n` +
-        "Go to the GRAND HALL, then RING BELL (dawn ending) or go DOWN (Gary ending).";
+      if (!requiredOnly) ctx.setFlag("floorDoorOpen");
+      return requiredOnly
+        ? `[su] deposited ${n} required heirloom(s) (+${pts}). The BELL is ready.`
+        : `[su] deposited ${n} treasure(s) (+${pts}). The BELL is ready and the floor STAIRCASE is open.\n` +
+          "Go to the GRAND HALL, then RING BELL (dawn ending) or go DOWN (Gary ending).";
     }
     case "win": case "dawn": {
       ctx.setFlag("seen:hollowSanctum", true);
@@ -272,6 +311,11 @@ function superUser(ctx, argString) {
       if (Number.isNaN(n)) return suWrap("[su] usage: su score <number>");
       ctx.state.score = n;
       return `[su] score set to ${n}.`;
+    }
+    case "maxscore": case "max": {
+      const score = maximumScore(ctx);
+      ctx.state.score = score;
+      return `[su] score set to the attainable maximum: ${score}.`;
     }
     case "flags": case "state": {
       const flags = ctx.state.flags;
@@ -2081,6 +2125,7 @@ export const world = {
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
   superUser,         // hidden `su` debug console for human playtesting (§12.31)
+  maximumScore,      // computed ceiling used by hidden playtesting shortcuts
 
   rooms: {
     gate: {
