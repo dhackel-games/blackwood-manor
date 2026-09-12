@@ -44,6 +44,8 @@ Feature: Build metadata and touch-control contract
     And bug reports include the current room in the issue title
     And clicking the Bug button uses the default issue description
     And a Bug command uses its phrase as the issue description
+    And bug reports include the full session trail, HUD state, and inventory
+    And overlong bug histories preserve both ends and mark the omission
     And the iOS wrapper opens new-window web links externally
 
   Scenario: Game and Gary use large icon-only submit controls
@@ -82,5 +84,9 @@ Feature: Build metadata and touch-control contract
     Then the TestFlight release refreshes the web bundle before generating the Xcode project
     And the iOS app version matches the date-only package version
     And the TestFlight release synchronizes the app version from the package
+
+  Scenario: Version and refresh commands control the iOS web cache
+    Then Version reports cached and GitHub.io content through the native bridge
+    And Refresh forces a GitHub.io cache download through the native bridge
 
 # end build-ui.feature

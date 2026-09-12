@@ -27,6 +27,7 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private var webView: WKWebView!
     private var speechBridge: SpeechBridge?
     private var garyBridge: AnyObject?
+    private var contentBridge: WebContentBridge?
     private var schemeHandler: AppSchemeHandler!
     private let contentStore = WebContentStore()
     private lazy var contentUpdater = WebContentUpdater(store: contentStore)
@@ -47,6 +48,10 @@ final class GameViewController: UIViewController, WKUIDelegate {
         let ucc = WKUserContentController()
         ucc.add(bridge, name: "speech")
         speechBridge = bridge
+        let updaterBridge = WebContentBridge()
+        updaterBridge.controller = self
+        ucc.add(updaterBridge, name: "content")
+        contentBridge = updaterBridge
 
         // Gary's on-device brain (Apple Foundation Models). Registered ONLY when the
         // model is actually usable, because js/gary-brain.js decides whether to use
@@ -117,14 +122,58 @@ final class GameViewController: UIViewController, WKUIDelegate {
         let fromLabel = contentStore.activeLabel()
         contentUpdater.checkForUpdate { [weak self] result in
             guard let self, case .updated(let toLabel) = result else { return }
-            DispatchQueue.main.async {
-                self.pendingUpdateNotice = (from: fromLabel, to: toLabel)
-                self.schemeHandler.baseURL = self.contentStore.cacheRoot
-                if let url = URL(string: "app://local/index.html") {
-                    self.webView.load(URLRequest(url: url,
-                                                 cachePolicy: .reloadIgnoringLocalCacheData,
-                                                 timeoutInterval: 30))
+            self.activateDownloadedContent(from: fromLabel, to: toLabel)
+        }
+    }
+
+    fileprivate func handleContentCommand(_ action: String) {
+        switch action {
+        case "version":
+            contentUpdater.versionLabels { [weak self] labels in
+                self?.sendContentVersions(labels)
+            }
+        case "refresh":
+            let fromLabel = contentStore.activeLabel()
+            contentUpdater.checkForUpdate(force: true) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .updated(let toLabel):
+                    self.activateDownloadedContent(from: fromLabel, to: toLabel)
+                case .failed, .upToDate:
+                    self.evaluateContentCallback(
+                        "window.__contentRefreshFailed",
+                        values: ["GitHub.io refresh failed. The current cache was left unchanged."])
                 }
+            }
+        default:
+            break
+        }
+    }
+
+    private func sendContentVersions(_ labels: WebContentUpdater.VersionLabels) {
+        evaluateContentCallback(
+            "window.__contentVersions",
+            values: [labels.current, labels.remote ?? NSNull()])
+    }
+
+    private func evaluateContentCallback(_ function: String, values: [Any]) {
+        let payload = (try? JSONSerialization.data(withJSONObject: values))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "[]"
+        DispatchQueue.main.async {
+            self.webView.evaluateJavaScript(
+                "\(function) && \(function).apply(null, \(payload));",
+                completionHandler: nil)
+        }
+    }
+
+    private func activateDownloadedContent(from: String, to: String) {
+        DispatchQueue.main.async {
+            self.pendingUpdateNotice = (from: from, to: to)
+            self.schemeHandler.baseURL = self.contentStore.activeRoot()
+            if let url = URL(string: "app://local/index.html") {
+                self.webView.load(URLRequest(url: url,
+                                             cachePolicy: .reloadIgnoringLocalCacheData,
+                                             timeoutInterval: 30))
             }
         }
     }
@@ -140,8 +189,21 @@ final class GameViewController: UIViewController, WKUIDelegate {
               ["http", "https"].contains(url.scheme?.lowercased() ?? "") else {
             return nil
         }
+
         UIApplication.shared.open(url)
         return nil
+    }
+}
+
+final class WebContentBridge: NSObject, WKScriptMessageHandler {
+    weak var controller: GameViewController?
+
+    func userContentController(_ userContentController: WKUserContentController,
+                               didReceive message: WKScriptMessage) {
+        let action = (message.body as? [String: Any])?["action"] as? String
+            ?? (message.body as? String)
+        guard let action else { return }
+        controller?.handleContentCommand(action)
     }
 }
 

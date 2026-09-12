@@ -769,7 +769,8 @@ not a single scripted finish.
   the HOLLOW SANCTUM, and step into the dawn. This is the "good" ending and is
   untouched.
 - **The secret cliffhanger ending.** When every required heirloom is deposited,
-  a hidden STAIRCASE grinds open in the floor of the ROYAL HALL. Go DOWN and you
+  a hidden STAIRCASE grinds open in the floor of the ROYAL HALL. CLOSE the
+  RELIQUARY to seal the collection; only then does DOWN become available. Go DOWN and you
   finally meet the voice that's been "helping" you all night: GARY, in the flesh,
   in his squalid basement call-cave — rotary phone, spicy burrito, mushrooms, and
   a fridge of milk (recontextualising his hint-line persona). He clubs you with the
@@ -779,9 +780,9 @@ not a single scripted finish.
 - **Mechanics.**
   - `everythingDeposited(ctx)` — every required `treasure` item resting in the
     RELIQUARY. When the final piece lands, the ROYAL HALL `put` handler sets the
-    `floorDoorOpen` flag, reveals a `down` direction (via `extraDirections`), and
-    announces the opening stair. Both the BELL (dawn) and the floor stair (Gary) are
-    then available — the player picks.
+    `floorDoorOpen` flag and announces the hidden stair. `extraDirections` and
+    the DOWN handler additionally require `reliquarySealed`, set only by an
+    explicit CLOSE; both the BELL and floor stair then become available.
   - A new terminal state `game.finish(msg, banner)` in `core.js` sits alongside
     `win`/`kill`: it stops the game via `won` and still prints the score/rank, but
     with fully custom framing (no "escaped alive" / "you have died" boilerplate).
@@ -826,3 +827,27 @@ flags, so all twelve entries appear before any repeats and SAVE/RESTORE preserve
 the next position. Random rolls still decide whether ambient events occur;
 one-use mechanical outcomes such as the mystery package remain random rather
 than being mistaken for repeatable flavor.
+
+### 12.33 Reproduction-rich bug reports
+
+The browser keeps an in-memory command trail and actual turn count beginning at
+page reload, or resets both with origin `restart` when RESTART starts a new game.
+Both `BUG <description>` and the 🪲 button append the trail, every HUD slot
+(including inactive states), version/SFX state, and a comma-separated `Inv:`
+line to the prefilled GitHub issue body. `URLSearchParams` safely encodes the
+line breaks. The full trail remains in memory; only exceptionally long issue
+URLs compact command history to a 6,000-character budget while retaining both
+ends and an explicit omission marker.
+
+### 12.34 iOS web-content checks and forced refresh
+
+The native wrapper serves the bundled or cached game immediately, then checks
+the GitHub Pages `manifest.json` once from `GameViewController.viewDidLoad`.
+Normal startup updates download only when the remote commit-timestamp version is
+newer. The native `content` message bridge adds two terminal meta-commands:
+
+- `VER` / `VERSION` fetches the live manifest and prints the active
+  cached-or-bundled label beside the current GitHub.io label.
+- `REFRESH` downloads and atomically swaps every manifest file even when the
+  versions are equal, reloads from the store-selected cache, and preserves the
+  old cache on failure. It refuses an older remote manifest to prevent downgrade.

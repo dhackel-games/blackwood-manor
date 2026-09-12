@@ -5,13 +5,16 @@ import { createGame } from "./core.js";
 import { world } from "./world.js";
 import { saveGame, loadGame, hasSave } from "./save.js";
 import { VERSION } from "./version.js";
-import { createHud } from "./hud.js";
+import { createHud, hudStateSummary } from "./hud.js";
 import * as garyBrain from "./gary-brain.js";
 import { MAP_MARK } from "./map.js";
 import {
+  bugReportBody,
   bugReportDescription,
   bugReportUrl,
+  createBugTrace,
   DEFAULT_ISSUE_DESCRIPTION,
+  recordBugCommand,
 } from "./issue-report.js";
 import {
   DEFAULT_GARY_VOICE_PRESET,
@@ -20,6 +23,7 @@ import {
   pickGaryVoice,
 } from "./gary-voice.js";
 import { cheatMenu, expandCheatPrompt, magicMenuAction } from "./cheat-prompts.js";
+import { splitCommands } from "./parser.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -39,6 +43,7 @@ const phoneCmd = document.getElementById("phone-cmd");
 const phoneTimer = document.getElementById("phone-timer");
 const phoneBillEl = document.getElementById("phone-bill");
 const garyVoiceSelect = document.getElementById("gary-voice");
+const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
@@ -49,6 +54,7 @@ const hudVersion = document.getElementById("hud-version");
 if (hudVersion) hudVersion.textContent = VERSION;
 
 let game = createGame(world);
+let bugTrace = createBugTrace("page reload");
 const history = [];
 let hi = 0;
 let lastCmd = "";
@@ -165,9 +171,29 @@ function updateHud() {
   hud.update({ game, world });
 }
 
-function openBugReport(description = "") {
+function inventoryForBugReport() {
+  return game.inventory().map((item) => {
+    const name = [...(item.adjectives || []).slice(0, 1), item.names[0]].join(" ").toUpperCase();
+    return item.worn ? `${name} (WORN${item.wearSlot ? `: ${item.wearSlot.toUpperCase()}` : ""})` : name;
+  });
+}
+
+function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
+  const hudState = [
+    `Version: ${VERSION}`,
+    `SFX: ${sfxMuted ? "off" : "on"}`,
+    hudStateSummary({ game, world }),
+  ].join("; ");
+  const body = bugReportBody({
+    description,
+    turns: bugTrace.turns,
+    origin: bugTrace.origin,
+    commands: bugTrace.commands,
+    hud: hudState,
+    inventory: inventoryForBugReport(),
+  });
   window.open(
-    bugReportUrl(game.room().name, description),
+    bugReportUrl(game.room().name, body),
     "_blank",
     "noopener,noreferrer",
   );
@@ -473,9 +499,24 @@ window.__appUpdateNotice = (from, to) => {
   print("New version found: " + (to || "unknown"), "sys");
   print("Running the latest from GitHub.\n", "sys");
 };
+function printContentStatus(message) {
+  if (game.state.flags.onCall) printToPhone(message, "sys");
+  else print(message, "sys");
+}
+window.__contentVersions = (current, remote) => {
+  printContentStatus(
+    `Cached version: ${current || "unknown"}\nGitHub.io version: ${remote || "unavailable"}`);
+};
+window.__contentRefreshFailed = (message) => {
+  printContentStatus(message || "GitHub.io refresh failed. The current cache was left unchanged.");
+};
 
-function newGame() {
+function newGame(origin = "restart") {
   game = createGame(world);
+  bugTrace = createBugTrace(origin);
+  history.length = 0;
+  hi = 0;
+  lastCmd = "";
   print("\n" + game.describeRoom(true));
   updateHud();
 }
@@ -507,6 +548,7 @@ function finishPhoneCall(message) {
 function handle(raw) {
   let cmd = raw.trim();
   if (!cmd || endingCall) return;
+  const submitted = cmd;
   const onCall = !!game.state.flags.onCall;
 
   // Echo to whichever screen is active.
@@ -517,14 +559,19 @@ function handle(raw) {
   hi = history.length;
 
   if (/^(again|g)$/i.test(cmd)) {
-    if (!lastCmd) { onCall ? printToPhone("(nothing to repeat)", "sys") : print("Nothing to repeat."); return; }
+    if (!lastCmd) {
+      recordBugCommand(bugTrace, submitted);
+      onCall ? printToPhone("(nothing to repeat)", "sys") : print("Nothing to repeat.");
+      return;
+    }
     cmd = lastCmd;
   }
   const low = cmd.toLowerCase();
 
   const bugDescription = bugReportDescription(cmd);
   if (bugDescription !== null) {
-    openBugReport(bugDescription);
+    recordBugCommand(bugTrace, submitted);
+    openBugReport(bugDescription || DEFAULT_ISSUE_DESCRIPTION);
     const message = bugDescription
       ? "Opening a GitHub issue with your description."
       : "Opening a GitHub issue.";
@@ -536,6 +583,24 @@ function handle(raw) {
   // call screen. Otherwise a game that ends mid-call strands you on the phone,
   // where the engine refuses every command. Tear down the phone overlay first.
   if (low === "restart") { if (onCall) endCallUI(); print("Restarting..."); newGame(); return; }
+  const traceCommands = onCall ? [submitted] : splitCommands(submitted);
+  for (const command of traceCommands) recordBugCommand(bugTrace, command);
+  if (low === "ver" || low === "version") {
+    const message = nativeContent
+      ? "Checking cached and GitHub.io versions..."
+      : `Cached version: ${VERSION}\nGitHub.io version: unavailable outside the iOS app`;
+    onCall ? printToPhone(message, "sys") : print(message, "sys");
+    if (nativeContent) nativeContent.postMessage({ action: "version" });
+    return;
+  }
+  if (low === "refresh") {
+    const message = nativeContent
+      ? "Forcing a fresh download from GitHub.io..."
+      : "Forced GitHub.io cache refresh is available only in the iOS app.";
+    onCall ? printToPhone(message, "sys") : print(message, "sys");
+    if (nativeContent) nativeContent.postMessage({ action: "refresh" });
+    return;
+  }
   if (low === "quit") { if (onCall) endCallUI(); print("Thanks for playing. Refresh to return to Blackwood Manor."); input.disabled = true; return; }
   // AI status is a meta-verb too, and must work mid-call — "is Gary actually
   // using the model?" is precisely the question you ask while talking to him.
@@ -568,7 +633,9 @@ function handle(raw) {
 
   lastCmd = cmd;
   const prevFlags = { ...game.state.flags };
+  const turnsBefore = game.state.turns;
   const out = game.send(cmd);
+  bugTrace.turns += Math.max(0, game.state.turns - turnsBefore);
   const nowOnCall = !!game.state.flags.onCall;
 
   if (nowOnCall) {
@@ -627,6 +694,7 @@ function applyCheatPrompt(raw) {
   const command = String(raw || "").trim();
   const action = magicMenuAction(command, magicMenuUnlocked);
   if (!action.handled) return false;
+  recordBugCommand(bugTrace, command);
   if (action.unlocked && !magicMenuUnlocked) {
     try {
       localStorage.setItem(MAGIC_MENU_UNLOCK_KEY, "true");

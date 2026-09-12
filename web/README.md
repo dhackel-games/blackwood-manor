@@ -50,7 +50,9 @@ auto-saves to your browser.
   repository's new-issue form in a separate browser window and prefills its
   title with the current room and its body with `Describe issue here`. Typing
   `bug <description>` instead puts that text into the issue body without
-  advancing the game turn.
+  advancing the game turn. Both paths append turns and commands since the latest
+  page reload or restart, every HUD value, and `Inv: ...`. Newlines are URL-encoded;
+  exceptionally long histories retain both ends and mark the omitted middle.
 - **Gary's voice:** tap the speaker circle or voice-status line to unmute him.
   The adjacent icon selector offers robot male/female and Australian
   male/female presets and remembers your choice. MIC stays active across pauses
@@ -91,7 +93,9 @@ auto-saves to your browser.
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
-- **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
+- **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`, `refresh`,
+  `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION compares the
+  active cached content with GitHub.io; REFRESH forces a complete redownload.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
   MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
