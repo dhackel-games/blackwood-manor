@@ -8,7 +8,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
   Background:
     Given a fresh manor game
 
-  Scenario: The mining headlamp lights the deep shaft for forty turns
+  Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set
     And the player is in room "dragonCaveMouth"
     When I play this command sequence:
@@ -20,16 +20,16 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then the current room is "mineGallery"
     And item "headlamp" is worn in slot "head"
     And the inventory load is 0
-    And headlamp status has 40 turns
+    And headlamp status has 200 turns
     When I send "down"
     Then the current room is "deepShaft"
     And the output does not contain "pitch black"
-    And headlamp status has 39 turns
+    And headlamp status has 199 turns
 
-  Scenario: The headlamp battery expires after forty illuminated turns
+  Scenario: The headlamp battery expires after two hundred illuminated turns
     Given item "headlamp" is carried
     When I send "wear headlamp"
-    And I wait 39 turns
+    And I wait 199 turns
     Then headlamp status has 1 turn
     When I send "wait"
     Then the output contains "battery dies"

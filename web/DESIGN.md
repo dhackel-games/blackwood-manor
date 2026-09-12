@@ -659,7 +659,7 @@ inside the cave, SAY/ANSWER/RECITE supplies the TROLL's rhyme answer.
 Only offering the kitchen APPLE wakes DREADMAW pleasantly and moves her aside.
 `OFFER`/`GIVE`/`FEED`/`PUT APPLE TO`/`WITH`/`ON DRAGON` all use the same handler.
 She awards a GOLD DOUBLOON and allows passage. The outer ANTECHAMBER leads through
-a MINING GALLERY, where a 40-turn HEADLAMP hangs, and down a dark DEEP MINING SHAFT
+a MINING GALLERY, where a 200-turn HEADLAMP hangs, and down a dark DEEP MINING SHAFT
 to the TROLL GATE. A male cave TROLL blocks the inner VAULT DOOR there.
 `TALK TO TROLL` makes him recite a poem whose final word is missing.
 He accepts many valid rhymes through `SAY <word>` or `ANSWER <word>`, including MORE,
@@ -682,13 +682,14 @@ or put into a container until removed, and contributes zero to `inventoryLoad()`
 The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
-The HEADLAMP activates when worn, has 40 turns of battery life, lights every room,
+The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
 the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
 that provide permanent mushroom-style clue vision and darkness sight while worn,
 shown as `👁️ ∞`. WINGED SHOES similarly show permanent flight as `🪽 ∞`.
 The OBSIDIAN EYE must be worn on the FOREHEAD, where it can coexist with EYES-slot
-goggles; its permanent dark-sight displays as `💡 ∞`.
+goggles. It permanently reveals hidden details (`👁️ ∞`) but does not illuminate
+dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light source.
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,

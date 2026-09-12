@@ -858,7 +858,7 @@ function capabilityStatus(ctx, equipmentFlag) {
 }
 function visionStatus(ctx) {
   if (ctx.inventory().some((item) =>
-    item.worn && (item.grantsMushroomVision || item.grantsDarkSight))) {
+    item.worn && (item.grantsMushroomVision || item.grantsHiddenSight))) {
     return { permanent: true };
   }
   const remaining = ctx.getFlag("high") || 0;
@@ -872,17 +872,19 @@ function canFly(ctx) {
 }
 function hasMushroomVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
-    || ctx.inventory().some((item) => item.worn && item.grantsMushroomVision);
+    || ctx.inventory().some((item) =>
+      item.worn && (item.grantsMushroomVision || item.grantsHiddenSight));
 }
 function hasDarkVision(ctx) {
-  return ctx.inventory().some((item) => item.worn && item.grantsDarkSight);
+  return (ctx.getFlag("high") || 0) > 0
+    || ctx.inventory().some((item) => item.worn && item.grantsDarkVision);
 }
 function headlampStatus(ctx) {
   const lamp = ctx.item("headlamp");
   return lamp?.worn && lamp.lit && lamp.fuel > 0 ? { remaining: lamp.fuel } : null;
 }
 function lightStatus(ctx) {
-  return hasDarkVision(ctx) ? { permanent: true } : headlampStatus(ctx);
+  return headlampStatus(ctx);
 }
 function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
@@ -938,7 +940,7 @@ function takeObsidianEye(ctx) {
   ctx.setFlag("obsidianEyeClaimed");
   ctx.addScore(15);
   return "You lift the OBSIDIAN EYE off its plinth. It clings coldly to your palm, eager to adhere somewhere " +
-    "more useful. WEAR EYE on your FOREHEAD if you want its sight. (+15)";
+    "more useful. WEAR EYE on your FOREHEAD if you want to see what the MANOR keeps hidden. (+15)";
 }
 
 // --- The ceremonial brazier: only YOUR fire is big enough to light it --------
@@ -972,7 +974,7 @@ function afflictionTick(ctx) {
       ctx.setFlag("high", left);
       if (left <= 0) {
         out.push(hasDarkVision(ctx)
-          ? "The trip loosens its grip and the grey fades — but the OBSIDIAN EYE keeps your dark-sight."
+          ? "The trip loosens its grip and the grey fades — but the XRAY GOGGLES keep the dark legible."
           : "The trip loosens its grip. The grey light fades and the dark closes back in; your third eye shuts.");
       } else {
         out.push(HIGH_LINES[(hi - 1) % HIGH_LINES.length]);
@@ -1693,12 +1695,12 @@ export const world = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
-  lightStatus,       // HEADLAMP duration or permanent worn OBSIDIAN EYE
+  lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
   flightStatus,      // temporary mushroom flight or permanent worn WINGED SHOES
   canFly,            // temporary mushroom flight or worn WINGED SHOES
-  hasMushroomVision, // temporary mushroom sight or worn XRAY GOGGLES
-  hasDarkVision,     // permanent darkness sight from the worn OBSIDIAN EYE
+  hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
+  hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
@@ -2490,10 +2492,11 @@ export const world = {
     obsidianEye: {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
       loc: "hiddenVault", takeable: true, wearable: true, worn: false,
-      wearSlot: "forehead", grantsDarkSight: true,
+      wearSlot: "forehead", grantsHiddenSight: true,
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
       desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
-        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to make the dark stop being an enemy.",
+        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
+        "It does not produce light.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {
@@ -2564,11 +2567,11 @@ export const world = {
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
       loc: "mineGallery", takeable: true, wearable: true, wearSlot: "head",
-      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 40,
+      lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
       roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
-      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises forty turns of light.",
+      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
     goldBar: {
       names: ["bar", "ingot"], adjectives: ["gold", "heavy"],
@@ -2626,7 +2629,8 @@ export const world = {
     },
     xrayGoggles: {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
-      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes", grantsMushroomVision: true,
+      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
+      grantsMushroomVision: true, grantsDarkVision: true,
       desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {

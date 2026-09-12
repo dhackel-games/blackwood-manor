@@ -55,22 +55,26 @@ Feature: The mushroom trip's third eye
     When I send "north"
     Then the output contains "HIDDEN VAULT"
 
-  Scenario: The Obsidian Eye grants dark-sight only while worn
+  Scenario: The Obsidian Eye grants permanent hidden sight but not dark-sight
     Given flag "vaultFound" is set
+    And item "headlamp" is carried
     And the player is in room "hiddenVault"
-    When I send "take eye"
+    When I send "wear headlamp"
+    And I send "take eye"
     Then item "obsidianEye" is in "inventory"
     And the output contains "WEAR EYE"
-    And flag "darkSight" is unset
     When I send "wear eye"
     Then item "obsidianEye" is worn in slot "forehead"
-    And light status is permanent
     And vision status is permanent
-    Given the player is in room "crypt"
+    And light status has 38 turns
+    Given the player is in room "garden"
     When I send "look"
-    Then the output does not contain "pitch black"
-    When I send "remove eye"
+    Then the output contains "THIRD EYE (👁️ ∞)"
+    And the output contains "IRON KEY"
+    Given the player is in room "crypt"
+    When I send "remove headlamp"
     Then the output contains "pitch black"
+    And light status is inactive
 
   Scenario: The Obsidian Eye and XRAY GOGGLES can be worn together
     Given item "obsidianEye" is carried

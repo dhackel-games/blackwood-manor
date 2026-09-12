@@ -319,6 +319,14 @@ Then("light status is permanent", function () {
   assert.deepEqual(world.lightStatus(this.game), { permanent: true });
 });
 
+Then("light status has {int} turn(s)", function (remaining) {
+  assert.deepEqual(world.lightStatus(this.game), { remaining });
+});
+
+Then("light status is inactive", function () {
+  assert.equal(world.lightStatus(this.game), null);
+});
+
 Then("vision status has {int} turn(s)", function (remaining) {
   assert.deepEqual(world.visionStatus(this.game), { permanent: false, remaining });
 });
