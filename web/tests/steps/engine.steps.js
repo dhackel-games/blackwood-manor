@@ -502,7 +502,7 @@ Then("overlong bug histories preserve both ends and mark the omission", function
   const formatted = formatCommandHistory(commands);
   assert.ok(formatted.length <= MAX_BUG_HISTORY_CHARS);
   assert.match(formatted, /^command-0;/);
-  assert.match(formatted, /history characters omitted for URL length/);
+  assert.match(formatted, /middle history omitted for URL length/);
   assert.match(formatted, /command-999$/);
 });
 
@@ -597,9 +597,11 @@ Then("Version reports cached and GitHub.io content through the native bridge", f
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
   assert.match(ui, /low === "ver" \|\| low === "version"/);
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
-  assert.match(ui, /Cached version:.*GitHub\.io version:/s);
+  assert.match(ui, /versionText\(\).*Cached content:.*GitHub\.io content:/s);
+  assert.match(ui, /window\.__activeBuildLabel/);
   assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
   assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
+  assert.match(app, /window\.__activeBuildLabel =/);
   assert.match(updater, /func versionLabels\(completion:/);
 });
 

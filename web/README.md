@@ -93,7 +93,7 @@ auto-saves to your browser.
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
-- **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`, `refresh`,
+- **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`, `refresh`,
   `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION compares the
   active cached content with GitHub.io; REFRESH forces a complete redownload.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.

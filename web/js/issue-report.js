@@ -17,7 +17,7 @@ export function formatCommandHistory(commands, maxLength = MAX_BUG_HISTORY_CHARS
   const full = commands.join("; ");
   if (full.length <= maxLength) return full || "(no commands yet)";
   const headLength = Math.floor(maxLength * 0.3);
-  const marker = ` … [${full.length - maxLength} history characters omitted for URL length] … `;
+  const marker = " … [middle history omitted for URL length] … ";
   const tailLength = Math.max(0, maxLength - headLength - marker.length);
   return full.slice(0, headLength) + marker + full.slice(-tailLength);
 }
