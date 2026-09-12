@@ -448,16 +448,16 @@ export function createGame(world) {
       return "The line goes dead.";
     }
 
-    // Hidden super-user/debug console. Handled on the RAW line (before comma
-    // splitting) so `su goto crypt` etc. arrive intact, and it never passes a
-    // world turn (no lightning/burn/affliction ticks while you poke around).
-    if (/^\s*su(do)?\b/i.test(input) && typeof world.superUser === "function") {
-      return world.superUser(game, input.replace(/^\s*su(do)?\b\s*/i, ""));
-    }
-
     const parts = splitCommands(input);
     if (!parts.length) return "I beg your pardon?";
-    if (parts.length === 1) return runOne(parts[0]).text;
+    const runPart = (part) => {
+      if (/^\s*su(do)?\b/i.test(part) && typeof world.superUser === "function") {
+        const text = world.superUser(game, part.replace(/^\s*su(do)?\b\s*/i, ""));
+        return { text, stop: state.dead || state.won || !!state.flags.onCall };
+      }
+      return runOne(part);
+    };
+    if (parts.length === 1) return runPart(parts[0]).text;
 
     const run = parts.slice(0, MAX_CHAIN);
     const out = [];
@@ -469,7 +469,7 @@ export function createGame(world) {
         if (!prev) { out.push(`> ${part}\nNothing to repeat.`); stopped = true; break; }
         part = prev;
       }
-      const { text, stop } = runOne(part);
+      const { text, stop } = runPart(part);
       out.push(`> ${part}\n${text}`);
       prev = part;
       if (stop) { stopped = true; break; }

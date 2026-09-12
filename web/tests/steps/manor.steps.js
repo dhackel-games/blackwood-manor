@@ -1,8 +1,10 @@
 // manor.steps.js Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
 import assert from "node:assert";
+import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
+import { CHEAT_PROMPTS, cheatMenu, cheatPrompt } from "../../js/cheat-prompts.js";
 import { REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
 const realMathRandom = Math.random;
@@ -110,6 +112,12 @@ When("I play this command sequence:", function (docString) {
   playSequence(this, docString, false);
 });
 
+When("I execute hidden cheat {string}", function (command) {
+  const shortcut = cheatPrompt(command);
+  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
+  this.output = this.game.send(shortcut.compoundPrompt);
+});
+
 When("I play until death:", function (docString) {
   playSequence(this, docString, true);
 });
@@ -207,6 +215,51 @@ Then("the inventory load is {int}", function (load) {
 
 Then("the inventory capacity is {int}", function (capacity) {
   assert.equal(this.game.inventoryCapacity(), capacity);
+});
+
+Then("the hidden cheat menu command is {string}", function (command) {
+  assert.equal(command, ":?");
+  assert.match(cheatMenu(), /== HIDDEN COMMANDS ==/);
+});
+
+Then("the hidden cheat catalog defines {string}", function (commands) {
+  assert.deepEqual(CHEAT_PROMPTS.map((entry) => entry.cmd), commands.split(","));
+  for (const entry of CHEAT_PROMPTS) {
+    assert.equal(typeof entry.name, "string");
+    assert.equal(typeof entry.description, "string");
+    assert.equal(typeof entry.compoundPrompt, "string");
+    assert.ok(entry.compoundPrompt.includes(";"), `${entry.cmd} must prepare a compound prompt`);
+  }
+});
+
+Then("hidden shortcuts replace the editable command prompt without executing", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /if \(command === ":\?"\)/);
+  assert.match(ui, /input\.value = shortcut\.compoundPrompt/);
+  assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
+  assert.equal(cheatPrompt("::"), null);
+});
+
+Then("public HELP does not reveal hidden cheat commands", function () {
+  const help = this.game.send("help");
+  for (const entry of CHEAT_PROMPTS) assert.ok(!help.includes(entry.cmd));
+  assert.ok(!help.includes(":?"));
+});
+
+Then("every portable item is in the inventory", function () {
+  for (const [id, definition] of Object.entries(world.items)) {
+    if (definition.takeable) assert.equal(this.game.roomOf(id), "inventory", id);
+  }
+});
+
+Then("every required family item is in the reliquary", function () {
+  for (const [id, definition] of Object.entries(world.items)) {
+    if (definition.treasure) assert.equal(this.game.roomOf(id), "reliquary", id);
+  }
+});
+
+Then("the game score equals the computed maximum", function () {
+  assert.equal(this.game.state.score, world.maximumScore(this.game));
 });
 
 Then("the required family item count is {int}", function (count) {
