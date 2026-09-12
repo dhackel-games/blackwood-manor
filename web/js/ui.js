@@ -19,7 +19,7 @@ import {
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js";
-import { cheatMenu, cheatPrompt } from "./cheat-prompts.js";
+import { cheatMenu, cheatPrompt, expandCheatPrompt } from "./cheat-prompts.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
@@ -606,7 +606,12 @@ function applyCheatPrompt(raw) {
   }
   const shortcut = cheatPrompt(command);
   if (!shortcut) return false;
-  input.value = shortcut.compoundPrompt;
+  try {
+    input.value = expandCheatPrompt(shortcut, game);
+  } catch (error) {
+    print(error.message, "sys");
+    return true;
+  }
   input.focus();
   input.setSelectionRange(input.value.length, input.value.length);
   return true;
