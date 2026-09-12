@@ -54,6 +54,9 @@ auto-saves to your browser.
   male/female presets and remembers your choice. MIC stays active across pauses
   until tapped again to submit.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
+- **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
+  DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
+  and changes that indicator to `🎒 used/20`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived
   sequence. TOILET mushrooms also derive the missing `look in toilet` step.
@@ -141,8 +144,9 @@ items: {
 ```
 
 Useful item flags: `takeable, fixed, scenery, treasure, points, container,
-openable, open, locked, keyId, capacity, lightSource, selfPowered, lit, fuel,
-wearable, wearSlot, worn, readable, text, edible, drinkable, roomDesc`.
+openable, open, locked, keyId, capacity, carryCapacity, lightSource, selfPowered,
+lit, fuel, wearable, wearSlot, autoWearOnTake, worn, readable, text, edible,
+drinkable, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
 part of the win condition. `REQUIRED_FAMILY_ITEM_COUNT` records how many required
@@ -168,9 +172,9 @@ lever: {
 ```
 
 Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
-`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `inventoryLoad()`, `equipped(slot)`,
-`find(phrase)`, `moveItem(id,to)`, `destroy(id)`, `addScore(n)`, `kill(msg)`,
-`win(msg)`, `describeRoom()`.
+`roomOf(id)`, `itemsIn(loc)`, `inventory()`, `inventoryLoad()`,
+`inventoryCapacity()`, `equipped(slot)`, `find(phrase)`, `moveItem(id,to)`,
+`destroy(id)`, `addScore(n)`, `kill(msg)`, `win(msg)`, `describeRoom()`.
 
 After any change, **run `npm test`** — and update the gameplay feature and steps
 if you changed the solution path.

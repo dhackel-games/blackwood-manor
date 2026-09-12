@@ -181,6 +181,10 @@ Then("the inventory load is {int}", function (load) {
   assert.equal(this.game.inventoryLoad(), load);
 });
 
+Then("the inventory capacity is {int}", function (capacity) {
+  assert.equal(this.game.inventoryCapacity(), capacity);
+});
+
 Then("the required family item count is {int}", function (count) {
   assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
   assert.equal(this.game.world.config.requiredFamilyItemCount, count);

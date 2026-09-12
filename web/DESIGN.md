@@ -17,7 +17,6 @@ house and the catacombs beneath it. Your goal: **recover the family heirlooms, d
 them in the reliquary in the Grand Hall, and lift the curse to escape alive.** Linger in
 the dark too long, and something finds you.
 
-This is the haunted analog of Zork's "collect treasures into the trophy case."
 **Win condition:** all heirlooms deposited in the reliquary + the final ritual performed.
 
 Difficulty: **classic / cruel** — sudden death, darkness kills, limited light, inventory
@@ -82,8 +81,8 @@ items: {
 ```
 
 Item flags: `takeable, container, openable, open, locked, keyId, lightSource,
-selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, worn, edible,
-points, capacity, roomDesc`.
+selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, autoWearOnTake,
+carryCapacity, worn, edible, points, capacity, roomDesc`.
 
 Room fields: `name, desc, exits, dark, flags`. Exits are either a room id string or an
 object `{ to, via (flag required), locked, lockedMsg }`.
@@ -178,9 +177,10 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**9 required family heirlooms**, each worth points: silver candlestick, gold locket,
+**10 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
-decanter (wine cellar), ancestral portrait, and the Blackwood family crest.
+decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
+Blackwood family ring marked BM.
 
 ---
 
@@ -682,6 +682,11 @@ or put into a container until removed, and contributes zero to `inventoryLoad()`
 The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
+The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
+automatically equips it on the BACK and raises carrying capacity from 6 to 20.
+The HUD displays used slots as `👤 used/6` before acquisition and `🎒 used/20`
+afterward; worn equipment does not contribute to the used count.
+
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
 the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
@@ -707,7 +712,8 @@ family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
 optional content pay into the score economy without making it mandatory or
 breaking the canonical winning walkthrough.
 
-- **West-wing payoff.** DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
+- **West-wing payoff.** An ore cart in the CAVE ANTECHAMBER holds the required
+  BLACKWOOD FAMILY RING (+20). DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
   (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
   `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
   source for the win threshold and RELIQUARY recess count.

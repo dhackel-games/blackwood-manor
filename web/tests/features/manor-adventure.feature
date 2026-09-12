@@ -40,6 +40,7 @@ Feature: Blackwood Manor adventure
       south
       offer apple to dragon
       east
+      take family ring
       east
       wear headlamp
       down
@@ -58,6 +59,7 @@ Feature: Blackwood Manor adventure
       north
       north
       put family crest in reliquary
+      put family ring in reliquary
       drop doubloon
       south
       south
@@ -131,7 +133,7 @@ Feature: Blackwood Manor adventure
       north
       """
     Then the game is won
-    And the game score is 180
+    And the game score is 200
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

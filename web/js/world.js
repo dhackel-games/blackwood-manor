@@ -6,7 +6,8 @@
 //   ctx.print via return value      ctx.getFlag(f) / ctx.setFlag(f,[v])
 //   ctx.has(id) (in inventory)      ctx.here(id) (in current room)
 //   ctx.item(id) -> live item       ctx.roomOf(id) -> location
-//   ctx.itemsIn(loc) / ctx.inventory() / ctx.find(phrase[,scope])
+//   ctx.itemsIn(loc) / ctx.inventory() / ctx.inventoryLoad()
+//   ctx.inventoryCapacity() / ctx.find(phrase[,scope])
 //   ctx.moveItem(id,to) / ctx.destroy(id)
 //   ctx.addScore(n) / ctx.kill(msg) / ctx.win(msg) / ctx.describeRoom()
 // A handler that returns a string intercepts the default verb; returning null/
@@ -15,7 +16,7 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 9;
+export const REQUIRED_FAMILY_ITEM_COUNT = 10;
 
 function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
@@ -74,12 +75,15 @@ function nextHint(ctx) {
   if (!dep("goldLocket")) {
     return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
   }
+  if (!dep("familyRing")) {
+    return "You missed the dusty BLACKWOOD FAMILY RING marked BM in an abandoned ore cart in the DRAGON CAVE ANTECHAMBER. TAKE it and PUT it in the RELIQUARY.";
+  }
   if (!dep("familyCrest")) {
     if (!ctx.getFlag("dragonMoved")) {
       return "The last family heirloom is the BLACKWOOD FAMILY CREST in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON.";
     }
     if (!ctx.getFlag("dragonVaultOpen")) {
-      return "Follow DREADMAW'S cave through the MINING GALLERY and DEEP SHAFT. TALK TO TROLL at the TROLL GATE, then finish his rhyme.";
+      return "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE.";
     }
     return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   }
@@ -1291,7 +1295,7 @@ function takeToiletMushrooms(ctx) {
   const mushrooms = ctx.item("outhouseMushrooms");
   if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just shit and piss.";
   if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
-  if (ctx.inventoryLoad() >= (ctx.world.config.maxCarry ?? 99))
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
     return "Your hands are full. You'll have to drop something before reaching into that.";
   ctx.moveItem("outhouseMushrooms", "inventory");
   return "You reach into the TOILET HOLE and pull the MUSHROOMS free. Your hand comes back coated in literal " +
@@ -1702,7 +1706,7 @@ export const world = {
     maxCarry: 6,
     title: "Blackwood Manor",
     requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
-    equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck"],
+    equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck", "back"],
   },
   hotline,     // dial-in greeting for the 1-900 hint line (see below)
   hotlineTalk, // conversation handler while you're on the line
@@ -1850,10 +1854,10 @@ export const world = {
           "  |___\\______/___|",
         ].join("\n"),
         desc:
-          "The outer CAVE widens around rusted mine rails and abandoned ore carts. DREADMAW'S CAVE MOUTH " +
-          "is WEST; the tunnel continues EAST into a MINING GALLERY.",
+          "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
+          "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
         searchDesc:
-          "The rails vanish EAST beneath old timber braces. Pick marks in the basalt suggest someone mined here before DREADMAW arrived.",
+          "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
         exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
 
@@ -1883,9 +1887,10 @@ export const world = {
       ].join("\n"),
       desc:
         "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
-        "abandoned seams. The MINING GALLERY is UP; a worked tunnel runs EAST to the TROLL GATE.",
+        "abandoned seams. A discarded miner's BACKPACK rests on a dry ledge. The MINING GALLERY is UP; " +
+        "a worked tunnel runs EAST to the TROLL GATE.",
       searchDesc:
-        "Heavy bare footprints lead EAST. Without a reliable light, every ledge here would be a wager with the dark.",
+        "The BACKPACK still looks sturdy despite its years underground. Heavy bare footprints lead EAST.",
       dark: true,
       exits: { up: "mineGallery", east: "trollGate" },
     },
@@ -2581,6 +2586,20 @@ export const world = {
       names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
       loc: "dreadmawVault", fixed: true, scenery: true,
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
+    },
+    familyRing: {
+      names: ["ring", "signet"], adjectives: ["dusty", "family", "blackwood", "bm"],
+      loc: "dragonAntechamber", takeable: true, treasure: true, points: 20,
+      wearable: true, worn: false, wearSlot: "finger",
+      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
+      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
+    },
+    backpack: {
+      names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
+      loc: "deepShaft", takeable: true, wearable: true, worn: false,
+      wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
+      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
+      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
     },
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],

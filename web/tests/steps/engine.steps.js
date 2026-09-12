@@ -301,8 +301,9 @@ Then("the controls remain pinned inside the viewport", function () {
   assert.match(css, /#controls\s*\{[^}]*flex:\s*0 0 auto/s);
 });
 
-Then("the HUD has bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators", function () {
+Then("the HUD has inventory, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators", function () {
   const slots = new Map(HUD_SLOT_DEFINITIONS.map((slot) => [slot.id, slot]));
+  assert.equal(typeof slots.get("inventory").emoji, "function");
   assert.equal(slots.get("bm").emoji, "💩");
   assert.equal(slots.get("sick").emoji, "🤮");
   assert.equal(slots.get("high").emoji, "🍄");
@@ -319,6 +320,13 @@ Then("every HUD status is a HudSlot with an emoji and calculation", function () 
     assert.equal(slot.emoji, definition.emoji || "");
     assert.equal(typeof slot.calculate, "function");
   }
+});
+
+Then("the inventory HUD shows {string} with {string}", function (emoji, value) {
+  const definition = HUD_SLOT_DEFINITIONS.find((slot) => slot.id === "inventory");
+  assert.ok(definition, "Missing inventory HUD slot");
+  assert.equal(definition.emoji({ game: this.game, world: this.game.world }), emoji);
+  assert.equal(definition.calculate({ game: this.game, world: this.game.world }), value);
 });
 
 Then("the page has a {string} touch command", function (direction) {
