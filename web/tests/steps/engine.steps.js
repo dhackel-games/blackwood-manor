@@ -257,7 +257,7 @@ Then("the turn count is {int}", function (turns) {
 Then("HELP is one alphabetized command-per-line data block", function () {
   const source = readFileSync(new URL("../../js/commands.js", import.meta.url), "utf8");
   assert.match(source, /export const HELP_TEXT = `COMMANDS[\s\S]+`;/);
-  assert.match(source, /help\(\) \{ return HELP_TEXT; \}/);
+  assert.match(source, /help\(ctx\)\s*\{[\s\S]*?return HELP_TEXT;\s*\}/);
   const commandLines = HELP_TEXT.split("\n").slice(1, HELP_TEXT.indexOf("\n\n") > -1
     ? HELP_TEXT.slice(0, HELP_TEXT.indexOf("\n\n")).split("\n").length
     : undefined);
