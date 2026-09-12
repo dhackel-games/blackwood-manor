@@ -81,6 +81,201 @@ function garyEnding(ctx) {
     "(Your final score has been saved. In BM2, Gary profits when you fail. Sleep on that.)");
 }
 
+// ---- Super-user / debug console ---------------------------------------------
+// A hidden playtesting aid, entered as a normal command: `su`, or `su <cmd>`.
+// It does NOT advance a game turn, so poking around never trips lightning,
+// burn-up, or affliction ticks. Purely for humans checking the game out —
+// jump anywhere, reveal the map, dump state, fill the reliquary, or fast-forward
+// to either ending to inspect it in isolation. See DESIGN.md §12.31.
+const SU_HELP = [
+  "== BLACKWOOD MANOR : SUPER-USER CONSOLE ==",
+  "  (debug only - does not pass a turn)",
+  "",
+  "  su                  this menu",
+  "  su rooms            list every room id + name",
+  "  su goto <room>      teleport to a room (id or name)",
+  "  su where            dump this room's exits + items",
+  "  su map              reveal and print the whole map",
+  "  su items            list every item and where it is",
+  "  su give <item>      put an item in your hands",
+  "  su fill             deposit EVERY treasure in the reliquary",
+  "                      (opens BOTH the bell and floor endings)",
+  "  su win              jump to the dawn ending",
+  "  su gary             jump to the secret Gary ending",
+  "  su light            toggle seeing in the dark",
+  "  su god              toggle invincibility (survive death)",
+  "  su heal             clear fire / sickness / trip",
+  "  su score <n>        set your score",
+  "  su flags            dump the live game flags",
+].join("\n");
+
+function suWrap(text) { return MAP_MARK + text + MAP_MARK; }
+
+function suResolveRoom(ctx, phrase) {
+  const raw = (phrase || "").trim();
+  if (!raw) return null;
+  if (ctx.world.rooms[raw]) return raw; // exact id
+  const want = raw.toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (!want) return null;
+  let partial = null;
+  for (const [id, room] of Object.entries(ctx.world.rooms)) {
+    const names = [id, room.name, ...(room.aliases || [])]
+      .map((n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, ""));
+    if (names.some((n) => n === want)) return id;
+    if (!partial && names.some((n) => n.includes(want))) partial = id;
+  }
+  return partial;
+}
+
+function suResolveItem(ctx, phrase) {
+  const raw = (phrase || "").trim().toLowerCase();
+  if (!raw) return null;
+  if (ctx.item(raw)) return raw; // exact id
+  const norm = raw.replace(/[^a-z0-9]/g, "");
+  for (const [id, def] of Object.entries(ctx.world.items)) {
+    const names = (def.names || []).map((n) => String(n).toLowerCase());
+    if (id.toLowerCase() === raw || names.includes(raw)) return id;
+  }
+  let partial = null;
+  for (const [id, def] of Object.entries(ctx.world.items)) {
+    const names = (def.names || []).map((n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, ""));
+    if (id.toLowerCase().replace(/[^a-z0-9]/g, "").includes(norm) || names.some((n) => n.includes(norm))) {
+      partial = partial || id;
+    }
+  }
+  return partial;
+}
+
+function superUser(ctx, argString) {
+  const trimmed = (argString || "").trim();
+  const [subRaw, ...restParts] = trimmed.split(/\s+/);
+  const sub = (subRaw || "").toLowerCase();
+  const rest = restParts.join(" ");
+
+  if (!sub || sub === "help" || sub === "?") return suWrap(SU_HELP);
+
+  switch (sub) {
+    case "rooms": {
+      const ids = Object.keys(ctx.world.rooms);
+      const lines = ids.map((id) => `  ${id.padEnd(20)}${ctx.world.rooms[id].name}`);
+      return suWrap(`[su] ${ids.length} rooms:\n` + lines.join("\n"));
+    }
+    case "goto": case "go": case "tp": case "jump": case "room": case "warp": {
+      const id = suResolveRoom(ctx, rest);
+      if (!id) return suWrap(`[su] no room matches "${rest}". Try: su rooms`);
+      ctx.state.room = id;
+      ctx.setFlag("seen:" + id, true);
+      const view = ctx.isLit()
+        ? ctx.describeRoom(true)
+        : `${ctx.world.rooms[id].name.toUpperCase()}\n(It's pitch dark here — type 'su light' to see it.)`;
+      return `[su] teleported to ${id}.\n\n${view}`;
+    }
+    case "where": case "here": {
+      const id = ctx.state.room;
+      const room = ctx.world.rooms[id];
+      const exitLines = Object.entries(room.exits || {}).map(([dir, ex]) => {
+        if (typeof ex === "string") return `    ${dir} -> ${ex}`;
+        const bits = [];
+        if (ex.via) bits.push(`via ${ex.via}`);
+        if (ex.revealedBy) bits.push(`revealedBy ${ex.revealedBy}`);
+        if (ex.locked) bits.push("locked");
+        return `    ${dir} -> ${ex.to}${bits.length ? "  (" + bits.join(", ") + ")" : ""}`;
+      });
+      const extra = typeof room.extraDirections === "function"
+        ? room.extraDirections(ctx) : (room.extraDirections || []);
+      const items = ctx.itemsIn(id).map((i) => `    ${i.id}${i.scenery ? " (scenery)" : ""}`);
+      return suWrap(
+        `[su] room: ${id} — ${room.name}\n` +
+        `  dark: ${!!room.dark}   lit now: ${ctx.isLit()}\n` +
+        `  exits:\n${exitLines.join("\n") || "    (none)"}\n` +
+        (extra.length ? `  extraDirections: ${extra.join(", ")}\n` : "") +
+        `  items here:\n${items.join("\n") || "    (none)"}`);
+    }
+    case "map": case "fullmap": case "reveal": {
+      for (const id of Object.keys(ctx.world.rooms)) ctx.setFlag("seen:" + id, true);
+      ctx.setFlag("usedMap", true);
+      return renderMap(ctx);
+    }
+    case "items": case "loot": {
+      const lines = Object.keys(ctx.world.items).map((id) => {
+        const def = ctx.world.items[id];
+        const loc = ctx.roomOf(id);
+        const tags = [def.treasure && "treasure", def.bonusTreasure && "bonus", def.worn && "worn"]
+          .filter(Boolean).join(",");
+        return `  ${id.padEnd(18)}@ ${String(loc)}${tags ? "  [" + tags + "]" : ""}`;
+      });
+      return suWrap(`[su] ${lines.length} items:\n` + lines.join("\n"));
+    }
+    case "give": case "get": case "spawn": {
+      const id = suResolveItem(ctx, rest);
+      if (!id) return suWrap(`[su] no item matches "${rest}". Try: su items`);
+      ctx.moveItem(id, "inventory");
+      if (ctx.item(id)) ctx.item(id).worn = false;
+      return `[su] ${id} is now in your inventory.`;
+    }
+    case "fill": case "reliquary": case "deposit": {
+      let n = 0, pts = 0;
+      for (const id of Object.keys(ctx.world.items)) {
+        const def = ctx.world.items[id];
+        if ((def.treasure || def.bonusTreasure) && ctx.roomOf(id) !== "reliquary") {
+          ctx.moveItem(id, "reliquary");
+          ctx.addScore(def.points || 0);
+          pts += def.points || 0;
+          n++;
+        }
+      }
+      ctx.setFlag("curseLiftable");
+      ctx.setFlag("floorDoorOpen");
+      return `[su] deposited ${n} treasure(s) (+${pts}). The BELL is ready and the floor STAIRCASE is open.\n` +
+        "Go to the GRAND HALL, then RING BELL (dawn ending) or go DOWN (Gary ending).";
+    }
+    case "win": case "dawn": {
+      ctx.setFlag("seen:hollowSanctum", true);
+      ctx.state.room = "hollowSanctum";
+      return ctx.win("[su] Fast-forwarded to the dawn ending.");
+    }
+    case "gary": case "end": case "badending": case "cliffhanger": {
+      ctx.setFlag("floorDoorOpen");
+      ctx.state.room = "garysLair";
+      return garyEnding(ctx);
+    }
+    case "light": case "sight": {
+      const on = !ctx.getFlag("__suSight");
+      ctx.setFlag("__suSight", on);
+      return `[su] see-in-the-dark ${on ? "ON" : "OFF"}.`;
+    }
+    case "god": case "invincible": case "noclip": {
+      const on = !ctx.getFlag("__godmode");
+      ctx.setFlag("__godmode", on);
+      return `[su] god mode ${on ? "ON — you'll survive things that would kill you" : "OFF"}.`;
+    }
+    case "heal": case "cure": case "sober": {
+      ctx.setFlag("onFire", false);
+      ctx.setFlag("burnTurns", 0);
+      ctx.setFlag("sick", 0);
+      ctx.setFlag("high", 0);
+      ctx.setFlag("digestivePhase", null);
+      return "[su] cleared fire, sickness, and the trip.";
+    }
+    case "score": {
+      const n = parseInt(rest, 10);
+      if (Number.isNaN(n)) return suWrap("[su] usage: su score <number>");
+      ctx.state.score = n;
+      return `[su] score set to ${n}.`;
+    }
+    case "flags": case "state": {
+      const flags = ctx.state.flags;
+      const lines = Object.keys(flags)
+        .filter((k) => !k.startsWith("seen:"))
+        .sort()
+        .map((k) => `  ${k} = ${JSON.stringify(flags[k])}`);
+      return suWrap("[su] flags (seen:* hidden):\n" + (lines.join("\n") || "  (none)"));
+    }
+    default:
+      return suWrap(`[su] unknown command "${sub}".\n\n` + SU_HELP);
+  }
+}
+
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
 // Gary: underpaid, starving, furious — but his hints are genuinely useful.
 // Returns the single most relevant next-step hint for the current game state.
@@ -949,6 +1144,7 @@ function hasMushroomVision(ctx) {
 }
 function hasDarkVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
+    || !!ctx.getFlag("__suSight")
     || ctx.inventory().some((item) => item.worn && item.grantsDarkVision);
 }
 function headlampStatus(ctx) {
@@ -1859,6 +2055,7 @@ export const world = {
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
+  superUser,         // hidden `su` debug console for human playtesting (§12.31)
 
   rooms: {
     gate: {

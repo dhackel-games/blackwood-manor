@@ -117,6 +117,10 @@ export function createGame(world) {
       badges + phoneBillLine();
   };
   game.kill = (msg) => {
+    // Super-user god mode: report what would have happened, but don't die.
+    if (state.flags.__godmode) {
+      return `[su] GOD MODE — this would have killed you:\n${msg}`;
+    }
     state.dead = true;
     return `${msg}\n\n    ****  You have died.  ****\n\n` +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
@@ -433,6 +437,13 @@ export function createGame(world) {
       if (typeof world.hotlineTalk === "function") return world.hotlineTalk(game, input);
       state.flags.onCall = false;
       return "The line goes dead.";
+    }
+
+    // Hidden super-user/debug console. Handled on the RAW line (before comma
+    // splitting) so `su goto crypt` etc. arrive intact, and it never passes a
+    // world turn (no lightning/burn/affliction ticks while you poke around).
+    if (/^\s*su(do)?\b/i.test(input) && typeof world.superUser === "function") {
+      return world.superUser(game, input.replace(/^\s*su(do)?\b\s*/i, ""));
     }
 
     const parts = splitCommands(input);
