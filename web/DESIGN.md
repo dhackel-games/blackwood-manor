@@ -684,7 +684,7 @@ XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
 automatically equips it on the BACK and raises carrying capacity from 6 to 20.
-The HUD displays used slots as `👤 used/6` before acquisition and `🎒 used/20`
+The HUD displays used slots as `👤 used/6` before acquisition and `👜 used/20`
 afterward; worn equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,

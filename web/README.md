@@ -56,7 +56,7 @@ auto-saves to your browser.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `inventory` (`i`)
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
-  and changes that indicator to `🎒 used/20`.
+  and changes that indicator to `👜 used/20`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, or `wear` it, the game automatically gets it and prints the derived
   sequence. TOILET mushrooms also derive the missing `look in toilet` step.

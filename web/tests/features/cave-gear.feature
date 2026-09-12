@@ -20,7 +20,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "backpack" is worn in slot "back"
     And the inventory capacity is 20
     And the inventory load is 0
-    And the inventory HUD shows "🎒" with "0/20"
+    And the inventory HUD shows "👜" with "0/20"
 
   Scenario: A dusty Blackwood family ring waits in an ore cart
     Given the player is in room "dragonAntechamber"
