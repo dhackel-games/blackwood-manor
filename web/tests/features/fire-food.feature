@@ -104,7 +104,12 @@ Feature: Fire and food consequences
     And item "emberStone" is in "garden"
     When I send "take ember stone"
     Then item "emberStone" is in "inventory"
-    And the output contains "+8"
+    And the output contains "Taken"
+    When the player moves directly to room "grandHall"
+    And I send "put ember stone in reliquary"
+    Then item "emberStone" is in "reliquary"
+    And the game score is 17
+    And the output contains "Family heirlooms: 1/11"
 
   Scenario: Kitchen foods intoxicate, infect, or cure
     Given the player is in room "kitchen"
