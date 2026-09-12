@@ -178,6 +178,10 @@ Then("item {string} is in {string}", function (item, location) {
   assert.equal(this.game.roomOf(item), location);
 });
 
+Then("item {string} is unlocked", function (item) {
+  assert.equal(this.game.item(item).locked, false);
+});
+
 Then("room {string} contains exactly {string}", function (room, items) {
   assert.deepEqual(
     this.game.itemsIn(room).map((item) => item.id).sort(),

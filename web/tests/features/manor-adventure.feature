@@ -93,10 +93,8 @@ Feature: Blackwood Manor adventure
       take ring
       west
       pull cord
-      drop tiny key
       drop music box
       drop ring
-      drop iron key
       drop wrapper
       up
       take miniature
@@ -189,6 +187,7 @@ Feature: Blackwood Manor adventure
       take candlestick
       south
       take rope
+      take apple
       north
       east
       up
@@ -231,7 +230,16 @@ Feature: Blackwood Manor adventure
     When I send "open door with key"
     Then the output contains "(unlock door with key, open door)"
     And item "frontDoor" is open
+    And item "frontKey" is destroyed
     And the current room is "porch"
+
+  Scenario: The tiny key is consumed by the jewelry-box lock
+    Given the player is in room "masterBedroom"
+    And item "tinyKey" is carried
+    When I send "unlock jewelry box with tiny key"
+    Then item "jewelryBox" is unlocked
+    And item "tinyKey" is destroyed
+    And the output contains "disappears into the jewelry box"
 
   Scenario: GO DOOR infers ENTER and derives the required door actions
     Given the player is in room "porch"
@@ -318,6 +326,10 @@ Feature: Blackwood Manor adventure
     Then the output matches "BONE KEY|SECRET DOOR"
     And the game is not won
     And item "boneKey" is in "grandHall"
+    When I send "take bone key"
+    And I send "unlock secret door with bone key"
+    Then item "boneKey" is destroyed
+    And item "secretDoor" is unlocked
 
   Scenario: Reading a nearby diary implicitly gets it first
     Given the player is in room "study"

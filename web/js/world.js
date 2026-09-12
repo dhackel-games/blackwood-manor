@@ -2881,7 +2881,8 @@ export const world = {
     },
     frontKey: {
       names: ["key"], adjectives: ["iron", "front", "door", "heavy"], loc: null, takeable: true,
-      desc: "A heavy iron door-key, cold and gritty with earth.",
+      consumedOnUnlock: "The old iron key snaps off inside the lock and is spent.",
+      desc: "A heavy iron door-key, cold and gritty with earth. Age has left a deep crack along its shaft.",
     },
     mailbox: {
       names: ["mailbox"], adjectives: ["brass"], loc: "porch", fixed: true, container: true,
@@ -3239,7 +3240,8 @@ export const world = {
     },
     tinyKey: {
       names: ["key"], adjectives: ["tiny", "small", "brass"], loc: "musicBox", takeable: true,
-      desc: "A tiny brass key, no longer than your thumbnail.",
+      consumedOnUnlock: "The tiny key disappears into the jewelry box's spring mechanism.",
+      desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
     },
 
     // --- master bedroom jewelry box -> ruby ring ---
@@ -3298,7 +3300,8 @@ export const world = {
     // --- Post-game (appear only after the bell is rung) ---
     boneKey: {
       names: ["key"], adjectives: ["bone", "pale", "slender"], loc: null, takeable: true,
-      desc: "A slender key carved from old bone, still faintly warm to the touch.",
+      consumedOnUnlock: "The BONE KEY crumbles into pale dust inside the lock.",
+      desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
     },
     secretDoor: {
       names: ["door", "seam"], adjectives: ["secret", "hidden", "north"], loc: null, fixed: true, scenery: true,
