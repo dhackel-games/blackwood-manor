@@ -232,7 +232,12 @@ export const commands = {
     if (!key) return "Unlock it with what?";
     if (it.keyId !== key.id) return "That doesn't fit the lock.";
     it.locked = false;
-    return `You unlock the ${it.names[0]}.`;
+    let result = `You unlock the ${it.names[0]}.`;
+    if (key.consumedOnUnlock) {
+      ctx.destroy(key.id);
+      result += ` ${key.consumedOnUnlock}`;
+    }
+    return result;
   },
 
   lock(ctx, cmd) {
