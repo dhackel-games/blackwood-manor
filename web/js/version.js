@@ -15,7 +15,7 @@
 // script mirrors it here and into project.yml, and bumps BUILD.
 
 export const APP_VERSION = "2026.9.11"; // == package.json version == App Store marketing version
-export const BUILD = "63"; // == iOS CFBundleVersion (stamped by release-testflight.sh)
+export const BUILD = "64"; // == iOS CFBundleVersion (stamped by release-testflight.sh)
 export const COPYRIGHT = "Copyright (c) dhackel-games. All Rights Reserved.";
 
 // Apple-style "version (build)" so the badge matches App Store Connect exactly.
