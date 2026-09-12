@@ -16,7 +16,7 @@
 import { MAP_MARK, renderMap } from "./map.js";
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 10;
+export const REQUIRED_FAMILY_ITEM_COUNT = 11;
 
 function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
@@ -28,6 +28,16 @@ function allTreasuresDeposited(ctx) {
   const requiredItems = Object.values(ctx.world.items).filter((definition) => definition.treasure);
   return requiredItems.length === REQUIRED_FAMILY_ITEM_COUNT
     && depositedFamilyItemCount(ctx) === REQUIRED_FAMILY_ITEM_COUNT;
+}
+function reliquaryStatus(ctx) {
+  const contents = ctx.itemsIn("reliquary");
+  if (!contents.length) return null;
+  const contributing = contents.filter((item) => ctx.world.items[item.id]?.treasure).length;
+  return {
+    contributing,
+    required: REQUIRED_FAMILY_ITEM_COUNT,
+    nonContributing: contents.length - contributing,
+  };
 }
 
 // "Everything" — every core heirloom AND every bonus treasure resting in the
@@ -332,6 +342,12 @@ function nextHint(ctx) {
       return "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE.";
     }
     return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
+  }
+  if (!dep("emberStone")) {
+    if (!ctx.getFlag("brazierLit")) {
+      return "The EMBER STONE is a Blackwood heirloom hidden in the GARDEN BRAZIER. A match is too small — LIGHT YOURSELF ON FIRE, then LIGHT BRAZIER.";
+    }
+    return "The BRAZIER yielded the EMBER STONE. TAKE it and PUT it in the RELIQUARY.";
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
@@ -2044,6 +2060,7 @@ export const world = {
   statusBanner,      // ASCII fire / sickness art stamped onto room descriptions
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
+  reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -2331,11 +2348,18 @@ export const world = {
           const it = ctx.find(cmd.dobj, ctx.inventory());
           if (!it) return "You aren't carrying that.";
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
-          if (!it.treasure && !it.bonusTreasure) return `The reliquary is meant for treasure and heirlooms; it will not accept the ${it.names[0]}.`;
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
-          ctx.addScore(it.points || 0);
+          if (it.treasure || it.bonusTreasure) ctx.addScore(it.points || 0);
+          const status = reliquaryStatus(ctx);
           let msg = `You lay the ${it.names[0]} in the reliquary. It settles with a low, resonant hum.`;
+          msg += `\n\nFamily heirlooms: ${status.contributing}/${status.required}.`;
+          if (!it.treasure) {
+            msg += ` The ${it.names[0]} does not contribute to that total.`;
+          }
+          if (status.nonContributing > 0) {
+            msg += ` Non-contributing items currently inside: ${status.nonContributing}.`;
+          }
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
             msg += "\n\nAs the last family heirloom touches stone, every heirloom begins to glow. The air " +
@@ -2829,18 +2853,10 @@ export const world = {
       on: { light: lightBrazier, burn: lightBrazier },
     },
     emberStone: {
-      names: ["ember", "emberstone", "stone"], adjectives: ["ember", "warm", "glowing"],
-      loc: null, takeable: true, treasure: false,
-      desc: "A smooth grey stone that holds a live coal's warmth and a faint inner glow. It never quite cools.",
-      on: {
-        take(ctx) {
-          if (ctx.has("emberStone")) return "You already carry the EMBER STONE.";
-          ctx.moveItem("emberStone", "inventory");
-          ctx.addScore(8);
-          return "You pocket the EMBER STONE. Its live-coal warmth settles against you like a small, patient " +
-            "heartbeat — a keepsake of the fire you gave away, and proof you walked back out of it. (+8)";
-        },
-      },
+      names: ["stone", "emberstone", "ember"], adjectives: ["ember", "warm", "glowing"],
+      loc: null, takeable: true, treasure: true, points: 8,
+      desc: "An EMBER STONE that holds a live coal's warmth and a faint inner glow. A Blackwood raven is " +
+        "etched beneath the soot, marking it as one of the family's required heirlooms.",
     },
 
     // --- kitchen edibles: high / sick / help ---

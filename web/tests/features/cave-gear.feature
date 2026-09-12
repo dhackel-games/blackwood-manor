@@ -202,8 +202,8 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is in "reliquary"
     And the game score is 60
 
-  Scenario: Ten family heirlooms are required to lift the curse
-    Then the required family item count is 10
+  Scenario: Eleven family heirlooms are required to lift the curse
+    Then the required family item count is 11
 
   Scenario: Vault bonus treasures do not by themselves trigger the curse-lifting
     Given item "silverChalice" is carried
@@ -211,6 +211,16 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "put chalice in reliquary"
     Then flag "curseLiftable" is unset
     And the output does not contain "longs to be RUNG"
+
+  Scenario: The reliquary accepts junk but marks it as non-contributing
+    Then the reliquary HUD is hidden
+    Given item "rope" is carried
+    And the player is in room "grandHall"
+    When I send "put rope in reliquary"
+    Then item "rope" is in "reliquary"
+    And the output contains "does not contribute"
+    And the output contains "Non-contributing items currently inside: 1"
+    And the reliquary HUD shows "0/11 +1"
 
   Scenario: Winged shoes float up through the shut attic trap-door
     Given item "wingedShoes" is carried

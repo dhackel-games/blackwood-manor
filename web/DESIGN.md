@@ -177,10 +177,10 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**10 required family heirlooms**, each worth points: silver candlestick, gold locket,
+**11 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
 decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
-Blackwood family ring marked BM.
+Blackwood family ring marked BM, plus the ember stone released by the garden brazier.
 
 ---
 
@@ -621,8 +621,9 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
 `js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
 `emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
 updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
-pressure, digestive phase, mushroom high, vision, flight, fire countdown, and HEADLAMP
-battery are data entries in one registry rather than separate DOM mutations in `ui.js`.
+pressure, digestive phase, mushroom high, vision, flight, RELIQUARY progress, fire
+countdown, and HEADLAMP battery are data entries in one registry rather than separate
+DOM mutations in `ui.js`.
 
 ## 12.25 Derived actions and player-known codes
 
@@ -720,8 +721,8 @@ breaking the canonical winning walkthrough.
   (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
   `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
   source for the win threshold and RELIQUARY recess count.
-- **Ember stone.** The garden brazier's EMBER STONE keepsake now scores +8 on
-  pickup (previously a dead item), so the self-immolation puzzle pays off.
+- **Ember stone.** The garden brazier's EMBER STONE is a required family heirloom
+  worth +8 on RELIQUARY deposit, so the self-immolation puzzle is part of the core mystery.
 - **Consistency fixes.** The RELIQUARY reads its heirloom-recess count from the
   shared required-item constant. WINGED SHOES flight
   now floats up through the *shut* attic trap-door exactly like a mushroom high
@@ -730,6 +731,10 @@ breaking the canonical winning walkthrough.
   just harvest its tiny key. The RELIQUARY no longer re-prints its "longs to be
   RUNG" completion line when a bonus treasure is deposited after the core set is
   already complete.
+- **Open deposits.** Any unworn carried item can be put into the RELIQUARY. Required
+  heirlooms advance the shared total; bonus treasures score without advancing it; ordinary
+  objects are accepted but explicitly reported as non-contributing. The HUD appears after
+  the first deposit in terse `💎 required/11 +extra` form.
 
 Duplication across the game's several see-in-the-dark and flight mechanisms is a
 known, deliberately-deferred design topic (to be revisited later), not addressed here.

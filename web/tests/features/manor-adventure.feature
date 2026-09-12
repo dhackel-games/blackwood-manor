@@ -26,6 +26,8 @@ Feature: Blackwood Manor adventure
       take rope
       take apple
       light candle
+      eat burrito
+      drink milk
       open cellar
       down
       take decanter
@@ -44,6 +46,7 @@ Feature: Blackwood Manor adventure
       east
       wear headlamp
       down
+      take backpack
       east
       say lore to troll
       east
@@ -64,12 +67,16 @@ Feature: Blackwood Manor adventure
       south
       south
       east
+      light self on fire
+      light brazier
+      take ember stone
       enter well
       take ancient coin
       west
       north
       north
       put ancient coin in reliquary
+      put ember stone in reliquary
       drop rope
       up
       south
@@ -90,6 +97,7 @@ Feature: Blackwood Manor adventure
       drop music box
       drop ring
       drop iron key
+      drop wrapper
       up
       take miniature
       down
@@ -133,7 +141,7 @@ Feature: Blackwood Manor adventure
       north
       """
     Then the game is won
-    And the game score is 200
+    And the game score is 222
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

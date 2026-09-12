@@ -50,8 +50,8 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   },
   {
     id: "turns",
-    calculate: ({ game }) =>
-      `${game.state.turns} ${game.state.turns === 1 ? "turn" : "turns"}`,
+    emoji: "⏱️",
+    calculate: ({ game }) => game.state.turns,
   },
   {
     id: "inventory",
@@ -62,6 +62,15 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     id: "bill",
     emoji: "☎",
     calculate: ({ game }) => `$${((game.state.flags.phoneBill || 0) / 100).toFixed(2)}`,
+  },
+  {
+    id: "reliquary",
+    emoji: "💎",
+    calculate: ({ game, world }) => {
+      const status = world.reliquaryStatus?.(game);
+      if (!status) return null;
+      return `${status.contributing}/${status.required} +${status.nonContributing}`;
+    },
   },
   {
     id: "bm",
@@ -80,7 +89,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     calculate: ({ game, world }) => {
       const status = world.digestiveStatus?.(game);
       return status
-        ? `${status.remaining} turns · ${status.name} ${status.emoji} (${status.phaseIndex + 1}/4)`
+        ? `${status.remaining} · ${status.name} ${status.emoji} (${status.phaseIndex + 1}/4)`
         : null;
     },
   },
@@ -89,7 +98,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     emoji: "🍄",
     calculate: ({ game }) => {
       const turns = game.state.flags.high || 0;
-      return turns > 0 ? `${turns} turns` : null;
+      return turns > 0 ? turns : null;
     },
   },
   {
@@ -98,7 +107,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     calculate: ({ game, world }) => {
       const status = world.visionStatus?.(game);
       if (!status) return null;
-      return status.permanent ? "∞" : `${status.remaining} turns`;
+      return status.permanent ? "∞" : status.remaining;
     },
   },
   {
@@ -107,7 +116,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     calculate: ({ game, world }) => {
       const status = world.flightStatus?.(game);
       if (!status) return null;
-      return status.permanent ? "∞" : `${status.remaining} turns`;
+      return status.permanent ? "∞" : status.remaining;
     },
   },
   {
@@ -115,7 +124,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     emoji: "🔥",
     calculate: ({ game, world }) => {
       const status = world.fireStatus?.(game);
-      return status ? `${status.remaining} turns` : null;
+      return status ? status.remaining : null;
     },
   },
   {
@@ -124,7 +133,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     calculate: ({ game, world }) => {
       const status = world.lightStatus?.(game);
       if (!status) return null;
-      return status.permanent ? "∞" : `${status.remaining} turns`;
+      return status.permanent ? "∞" : status.remaining;
     },
   },
 ]);

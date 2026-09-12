@@ -59,6 +59,9 @@ auto-saves to your browser.
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
   `inventory` (`i`). DROP ALL leaves worn equipment equipped.
+- **Reliquary:** any unworn item can be deposited. The `💎` HUD appears after the
+  first deposit as `required/11 +extra`. The EMBER STONE from the GARDEN BRAZIER
+  is a required heirloom.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
