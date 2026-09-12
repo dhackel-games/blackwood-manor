@@ -38,6 +38,13 @@ Feature: Copilot's mystery package and lightning jumps
     Then the output contains "FLAMING. DIARRHEA."
     And flag "onFire" is true
     And flag "sick" is positive
+    And fire status has 5 turns
+
+  Scenario: Mystery-package combustion exposes a fire countdown
+    Given the random number generator always returns 0.60
+    When I send "open package"
+    Then flag "onFire" is true
+    And fire status has 5 turns
 
   Scenario: Opening the package can teleport you into the space between the walls
     Given the random number generator returns 0.30 then 0.99

@@ -92,6 +92,16 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then the output contains "head slot is already occupied"
     And item "xrayGoggles" is not worn
 
+  Scenario: DROP ALL leaves worn equipment equipped
+    Given item "backpack" is carried
+    And item "apple" is carried
+    When I send "wear backpack"
+    And I send "drop all"
+    Then item "backpack" is worn in slot "back"
+    And item "apple" is in "gate"
+    And the output contains "Still worn"
+    And the output contains "BACKPACK"
+
   Scenario: XRAY GOGGLES are hidden in the hall bedroom drawer
     Given the player is in room "landing"
     When I send "north"

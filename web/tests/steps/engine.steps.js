@@ -322,6 +322,36 @@ Then("every HUD status is a HudSlot with an emoji and calculation", function () 
   }
 });
 
+Then("the sound-effects toggle is leftmost in the HUD slots and explains its state", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(html, /id=["']hud-slots["']>\s*<button[^>]+id=["']sound-toggle["']/);
+  assert.match(ui, /Sound effects off — click to turn on/);
+  assert.match(ui, /Sound effects on — click to mute/);
+  assert.match(ui, /setAttribute\("aria-pressed", String\(!sfxMuted\)\)/);
+});
+
+Then("the bowel meter has no trailing solid cap", function () {
+  const definition = HUD_SLOT_DEFINITIONS.find((slot) => slot.id === "bm");
+  const value = definition.calculate({
+    game: this.game,
+    world: { digestiveStatus: () => ({ percent: 50 }) },
+  });
+  assert.doesNotMatch(value, /▌/);
+});
+
+Then("the static control boxes are half size with readable text", function () {
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(css, /#controls button\s*\{[^}]*min-width:\s*1\.6rem[^}]*min-height:\s*1\.25rem/s);
+  assert.match(css, /#controls button\s*\{[^}]*font-size:\s*0\.8rem/s);
+});
+
+Then("a successful restore updates the HUD before returning", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui,
+    /if \(low === "restore"\)[\s\S]*?const restored = loadGame\(game\)[\s\S]*?if \(restored\) updateHud\(\)/);
+});
+
 Then("the inventory HUD shows {string} with {string}", function (emoji, value) {
   const definition = HUD_SLOT_DEFINITIONS.find((slot) => slot.id === "inventory");
   assert.ok(definition, "Missing inventory HUD slot");
