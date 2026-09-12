@@ -8,6 +8,20 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
   Background:
     Given a fresh manor game
 
+  Scenario: The abandoned mining backpack expands carrying capacity
+    Then the inventory HUD shows "👤" with "0/6"
+    Given flag "dragonMoved" is set
+    And the player is in room "mineGallery"
+    When I send "wear headlamp"
+    And I send "down"
+    Then the output contains "BACKPACK"
+    When I send "take backpack"
+    Then the output contains "Taken and worn"
+    And item "backpack" is worn in slot "back"
+    And the inventory capacity is 20
+    And the inventory load is 0
+    And the inventory HUD shows "🎒" with "0/20"
+
   Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set
     And the player is in room "dragonCaveMouth"

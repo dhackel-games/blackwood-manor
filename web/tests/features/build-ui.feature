@@ -14,8 +14,8 @@ Feature: Build metadata and touch-control contract
     And the transcript shrinks and scrolls inside the viewport
     And the controls remain pinned inside the viewport
 
-  Scenario: The HUD exposes digestive, mushroom, vision, flight, fire, and light countdowns
-    Then the HUD has bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators
+  Scenario: The HUD exposes inventory, digestive, mushroom, vision, flight, fire, and light status
+    Then the HUD has inventory, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators
 
   Scenario: HUD statuses use declarative slots
     Then every HUD status is a HudSlot with an emoji and calculation

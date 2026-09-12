@@ -82,8 +82,8 @@ items: {
 ```
 
 Item flags: `takeable, container, openable, open, locked, keyId, lightSource,
-selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, worn, edible,
-points, capacity, roomDesc`.
+selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, autoWearOnTake,
+carryCapacity, worn, edible, points, capacity, roomDesc`.
 
 Room fields: `name, desc, exits, dark, flags`. Exits are either a room id string or an
 object `{ to, via (flag required), locked, lockedMsg }`.
@@ -681,6 +681,11 @@ Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `e
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
 The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
+
+The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
+automatically equips it on the BACK and raises carrying capacity from 6 to 20.
+The HUD displays used slots as `👤 used/6` before acquisition and `🎒 used/20`
+afterward; worn equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
