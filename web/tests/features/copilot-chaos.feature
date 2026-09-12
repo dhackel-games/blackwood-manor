@@ -47,12 +47,9 @@ Feature: Copilot's mystery package and lightning jumps
     And the game score is 20
 
   Scenario: The between-the-walls bonus only pays out the first time you land there
-    Given chaos events (lightning jumps) are enabled
-    And flag "frontDoorOpen" is set
-    And flag "seen:betweenWalls" is set
-    And the random number generator returns 0.0 then 0.99
-    When I send "wait"
-    And I send "touch bolt"
+    Given flag "seen:betweenWalls" is set
+    And the random number generator returns 0.30 then 0.99
+    When I send "open package"
     Then the current room is "betweenWalls"
     And the game score is 0
 
@@ -133,17 +130,30 @@ Feature: Copilot's mystery package and lightning jumps
     And the current room is "grandHall"
     And item "lightningBolt" is destroyed
 
-  Scenario: An untouched lightning bolt fizzles out on its own after a few turns
+  Scenario: An untouched lightning bolt is use-it-or-lose-it and fizzles the very next turn
     Given chaos events (lightning jumps) are enabled
     And flag "frontDoorOpen" is set
     And the random number generator always returns 0.0
     When I send "wait"
     Then item "lightningBolt" is in "grandHall"
     When I send "wait"
-    And I send "wait"
-    And I send "wait"
-    And I send "wait"
     Then the output contains "sputters out"
     And item "lightningBolt" is destroyed
+
+  Scenario: Lightning never strands you in a guarded, secret, or treasure room
+    Given chaos events (lightning jumps) are enabled
+    And flag "frontDoorOpen" is set
+    And the lightning bolt teleport would select room "dreadmawVault"
+    When I send "wait"
+    Then item "lightningBolt" is in "grandHall"
+    When I send "touch bolt"
+    Then the output contains "WHITES OUT"
+    And the current room is not "dreadmawVault"
+    And the current room is not "crypt"
+    And the current room is not "betweenWalls"
+    And the current room is not "hiddenVault"
+    And the current room is not "hollowSanctum"
+    And the current room is not "hollowPassage"
+    And the current room is not "secretChamber"
 
 # end copilot-chaos.feature

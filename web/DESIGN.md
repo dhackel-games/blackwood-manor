@@ -718,3 +718,22 @@ breaking the canonical winning walkthrough.
 
 Duplication across the game's several see-in-the-dark and flight mechanisms is a
 known, deliberately-deferred design topic (to be revisited later), not addressed here.
+
+### 12.29 Lightning bolt cleanup: use-it-or-lose-it, no jumping into special rooms
+
+The random LIGHTNING BOLT (the manor's own doorless teleport) was tuned to stop it
+feeling like a free skeleton key:
+
+- **Use it or lose it.** `LIGHTNING_FUSE` is now `1` (was `4`): the bolt fizzles on
+  the very next turn, so you must TOUCH it immediately or miss the window.
+- **No special/guarded destinations.** Touching the bolt now teleports only to an
+  *ordinary* room. A `LIGHTNING_NO_JUMP` set excludes the secret room
+  (BETWEEN THE WALLS), the hidden vaults (HIDDEN VAULT), the win-critical hollow
+  wing (HOLLOW PASSAGE / HOLLOW SANCTUM), the hidden grimoire chamber
+  (SECRET CHAMBER), the wraith CRYPT, and the dragon's treasure vault
+  (DREADMAW'S VAULT). The bolt relocates you; it never skips a puzzle or hands you
+  an endgame/secret. A side effect: lightning can no longer randomly kill you via
+  the crypt wraith.
+- **Mystery package unchanged.** COPILOT'S MYSTERY PACKAGE keeps its full-chaos
+  teleport (including the +20 BETWEEN THE WALLS jackpot and the crypt risk) — that
+  unpredictability is its whole point; the exclusion applies to lightning only.

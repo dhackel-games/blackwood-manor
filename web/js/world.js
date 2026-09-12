@@ -1066,8 +1066,10 @@ function statusBanner(ctx) {
 // which has no ordinary door — this random draw and the package below are the
 // only ways in). Reuses the crypt/wraith safeguard so an unlucky draw can
 // genuinely kill you, same as walking in on purpose without the talisman.
-function teleportRandom(ctx, flavor) {
-  const ids = Object.keys(ctx.world.rooms).filter((id) => id !== ctx.state.room);
+function teleportRandom(ctx, flavor, exclude) {
+  const ids = Object.keys(ctx.world.rooms).filter(
+    (id) => id !== ctx.state.room && !(exclude && exclude.has(id))
+  );
   const roomId = ids[Math.floor(Math.random() * ids.length)];
   ctx.state.room = roomId;
   if (roomId === "crypt") {
@@ -1164,14 +1166,30 @@ function openMysteryPackage(ctx) {
 // bolt of lightning spearing into the floor of whatever room you're standing
 // in. It does NOT grab you — it just sits there, crackling, same as the
 // mystery package sits in the grand hall: you have to choose to TOUCH it. If
-// you do, it teleports you to a random room, the same doorless BETWEEN THE
-// WALLS included, the same crypt-wraith risk included. Left alone, it
-// fizzles out on its own after a few turns. While you're high on the
-// mushrooms, it still can't grab hold of you at all — touching it does
-// nothing, since you keep your own steering (FLY TO / FLOAT TO any room by
+// you do, it teleports you to a random ORDINARY room. Unlike the mystery
+// package, the bolt refuses to drop you into the manor's special or guarded
+// spaces (LIGHTNING_NO_JUMP below) — no free jumps into secret rooms, hidden
+// vaults, the crypt wraith, the endgame sanctum, or the dragon's gold. It is a
+// nuisance that relocates you, not a shortcut past a puzzle. Left alone, the
+// bolt is USE-IT-OR-LOSE-IT: it fizzles on the very next turn. While you're
+// high on the mushrooms, it still can't grab hold of you at all — touching it
+// does nothing, since you keep your own steering (FLY TO / FLOAT TO any room by
 // name) instead.
 const LIGHTNING_CHANCE = 1 / 11; // ~1 in 11 turns (was 0.15, ~1 in 6.7 — too frequent)
-const LIGHTNING_FUSE = 4; // turns the bolt lingers, untouched, before it fizzles out
+const LIGHTNING_FUSE = 1; // use it or lose it: the bolt is gone on the very next turn
+// Rooms the lightning bolt will never dump you into: secret/hidden spaces, the
+// win-critical hollow wing, the wraith crypt, and guarded treasure vaults.
+// Reaching these is meant to be earned, not handed to you by a lucky bolt. (The
+// mystery package is exempt — its whole gag is that anything can happen.)
+const LIGHTNING_NO_JUMP = new Set([
+  "betweenWalls",  // the secret room (+20) — earn it via the wall gap
+  "hiddenVault",   // hidden obsidian-eye vault
+  "hollowPassage", // hidden endgame wing
+  "hollowSanctum", // hidden endgame wing — you can WIN from here
+  "secretChamber", // hidden grimoire chamber
+  "crypt",         // the wraith death-room + gold locket
+  "dreadmawVault", // the dragon's treasure vault (gold, chalice, crown)
+]);
 const LIGHTNING_FLAVOR =
   "LIGHTNING CRACKS somewhere far too close, and the air suddenly tastes like a dropped fork on a battery.";
 const LIGHTNING_ART = [
@@ -1215,7 +1233,7 @@ function touchLightningBolt(ctx) {
       "through the crackling light. It sputters out a moment later. (You're high enough to FLY TO or FLOAT " +
       "TO any room you like, any time you like — you don't need the bolt's help.)";
   }
-  return teleportRandom(ctx, "You touch the bolt. The world WHITES OUT.");
+  return teleportRandom(ctx, "You touch the bolt. The world WHITES OUT.", LIGHTNING_NO_JUMP);
 }
 
 // --- The privy: use the outhouse hole to end the vomiting & diarrhea ----------

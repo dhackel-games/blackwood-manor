@@ -59,6 +59,18 @@ Given("the mystery package teleport selects room {string}", function (room) {
   Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
 });
 
+Given("the lightning bolt teleport would select room {string}", function (room) {
+  const destinations = Object.keys(this.game.world.rooms).filter((id) => id !== this.game.state.room);
+  const index = destinations.indexOf(room);
+  assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
+  // 0.0 makes the bolt spawn (below LIGHTNING_CHANCE); the second value aims the
+  // teleport at `room`'s slot in the FULL room list. If the bolt honours its
+  // no-jump list, `room` is filtered out and you land somewhere else entirely.
+  const seq = [0.0, (index + 0.5) / destinations.length];
+  let i = 0;
+  Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
+});
+
 Given("the player is in room {string}", function (room) {
   this.game.state.room = room;
 });
