@@ -1057,6 +1057,16 @@ const SICK_ART = [
   "      |    ~ ~ ~",
   "     / \\   . : . : .",
 ].join("\n");
+// Stamped into the WEAR response when you lace on the golden WINGED SHOES — a
+// pair of Hermes-style sandals with feathered wings beating at the ankles.
+const WINGED_SHOES_ART = [
+  "      __/\\__                  __/\\__",
+  "   \\-'      '-/            \\-'      '-/",
+  "    '-.____.-'              '-.____.-'",
+  "     /______\\                /______\\",
+  "    [________]              [________]",
+  "  ~ ~ ~  THE WINGED SHOES LIFT YOUR HEELS OFF THE FLOOR  ~ ~ ~",
+].join("\n");
 // The digestive doomsday clock: a nasty bowel-pressure gauge that FILLS as the
 // burrito marches you toward fatal explosive diarrhea. `sick` counts down from
 // SICK_DURATION (freshly eaten) to 0 (detonation), so pressure = how much has
@@ -2654,6 +2664,8 @@ export const world = {
       loc: "dreadmawVault", takeable: true, wearable: true, wearSlot: "feet", grantsFlight: true,
       roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
       desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
+      wearMsg: "You lace the WINGED SHOES onto your feet. The little feathers snap taut, beat once — and your heels rise off the floor.",
+      wearArt: MAP_MARK + WINGED_SHOES_ART + MAP_MARK,
     },
     hallBed: {
       names: ["bed"], adjectives: ["hall", "narrow", "made"],

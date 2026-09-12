@@ -296,9 +296,10 @@ export const commands = {
       it.lit = true;
       it.lightGrace = true;
     }
-    return it.wearSlot
+    const base = it.wearMsg || (it.wearSlot
       ? `You put the ${it.names[0]} on your ${it.wearSlot}.`
-      : `You put on the ${it.names[0]}.`;
+      : `You put on the ${it.names[0]}.`);
+    return it.wearArt ? `${base}\n\n${it.wearArt}` : base;
   },
   remove(ctx, cmd) {
     const it = ctx.find(cmd.dobj, ctx.inventory());

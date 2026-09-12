@@ -108,6 +108,14 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then the output contains "THIRD EYE (👁️ ∞)"
     And the output contains "IRON KEY"
 
+  Scenario: Wearing the WINGED SHOES shows the flying-shoe art and lift-off flavor
+    Given item "wingedShoes" is carried
+    And the player is in room "garden"
+    When I send "wear shoes"
+    Then the output contains "feathers snap taut"
+    And the output contains "LIFT YOUR HEELS OFF THE FLOOR"
+    And item "wingedShoes" is worn in slot "feet"
+
   Scenario: WINGED SHOES open the physical roof and belfry route
     Given item "wingedShoes" is carried
     And the player is in room "attic"
