@@ -122,6 +122,18 @@ export function createGame(world) {
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
       phoneBillLine() + `\n\nType RESTART, RESTORE, or QUIT.`;
   };
+  // A THIRD terminal state: not "escaped alive", not "you have died" — a bespoke
+  // ending with fully custom framing (used by the secret Gary cliffhanger). It
+  // stops the game via `won` so input halts and the score/rank still show, but
+  // without the escape/death boilerplate. `banner` is the headline line.
+  game.finish = (msg, banner) => {
+    state.won = true;
+    const badges = typeof world.endBadges === "function" ? (world.endBadges(game) || "") : "";
+    return (msg ? msg + "\n\n" : "") +
+      (banner ? banner + "\n\n" : "") +
+      `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
+      badges + phoneBillLine();
+  };
   game.rank = () => {
     const s = state.score;
     if (s >= 100) return "Master of Blackwood Manor";

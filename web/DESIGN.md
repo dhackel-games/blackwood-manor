@@ -750,3 +750,46 @@ feeling like a free skeleton key:
 - **Mystery package unchanged.** COPILOT'S MYSTERY PACKAGE keeps its full-chaos
   teleport (including the +20 BETWEEN THE WALLS jackpot and the crypt risk) — that
   unpredictability is its whole point; the exclusion applies to lightning only.
+
+### 12.30 The secret Gary ending: fill the reliquary with EVERYTHING
+
+Blackwood Manor now has two endings, and completing the collection is a *choice*,
+not a single scripted finish.
+
+- **The dawn ending (unchanged).** Deposit all `REQUIRED_FAMILY_ITEM_COUNT` core
+  heirlooms, RING THE BELL, take the BONE KEY north through the HOLLOW PASSAGE to
+  the HOLLOW SANCTUM, and step into the dawn. This is the "good" ending and is
+  untouched.
+- **The secret cliffhanger ending.** If you deposit *literally everything* — every
+  core heirloom **and** both `bonusTreasure` pieces (SILVER CHALICE, JEWELED CROWN)
+  — a hidden STAIRCASE grinds open in the floor of the GRAND HALL. Go DOWN and you
+  finally meet the voice that's been "helping" you all night: GARY, in the flesh,
+  in his squalid basement call-cave — rotary phone, spicy burrito, mushrooms, and
+  a fridge of milk (recontextualising his hint-line persona). He clubs you with the
+  receiver, grabs your loot, and bolts up the stairs howling "FREEDOM!" This is a
+  deliberate **cliffhanger**, not a death or a clean win — it seeds *Blackwood Manor
+  II: HELD*.
+- **Mechanics.**
+  - `everythingDeposited(ctx)` — every `treasure || bonusTreasure` item resting in
+    the RELIQUARY. When the final piece lands, the GRAND HALL `put` handler sets the
+    `floorDoorOpen` flag, reveals a `down` direction (via `extraDirections`), and
+    announces the opening stair. Both the BELL (dawn) and the floor stair (Gary) are
+    then available — the player picks.
+  - A new terminal state `game.finish(msg, banner)` in `core.js` sits alongside
+    `win`/`kill`: it stops the game via `won` and still prints the score/rank, but
+    with fully custom framing (no "escaped alive" / "you have died" boilerplate).
+  - `saveBm2Seed(ctx)` persists the final `{score, turns}` to `localStorage`
+    (`blackwood-bm2-seed-v1`, browser-only, guarded) as the seed for BM2, where the
+    scoring inverts: Gary profits when the player fails.
+  - The new `garysLair` room is excluded from `LIGHTNING_NO_JUMP` targets so a lucky
+    bolt can never drop you into the ending; it's reached on foot only.
+- **Foreshadowing.** A `foreshadowTick` adds intensifying ambient dread — a dry
+  scritch-scratch early, then faint BELLS and a far-off voice, and finally an
+  insistent telephone RINGING from below once the floor opens. It's gated behind the
+  same `__noChaos` test kill-switch as lightning and stays silent until you've begun
+  filling the reliquary, so the deterministic canonical/early-game tests are
+  unaffected.
+- **The $0.99/min phone-answering economy** (you working Gary's line to buy your
+  freedom, with inverted scoring) is BM2 proper — a separate genre shift — not built
+  into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
+  the engine is the seed it will grow from.

@@ -83,6 +83,17 @@ Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
 });
 
+// Secret-ending setup: pre-fill the reliquary with every heirloom AND bonus
+// treasure, leaving exactly one named piece in the player's hands to deposit.
+Given("every treasure but the {string} is already in the reliquary", function (itemId) {
+  for (const [id, def] of Object.entries(world.items)) {
+    if ((def.treasure || def.bonusTreasure) && id !== itemId) {
+      this.game.moveItem(id, "reliquary");
+    }
+  }
+  this.game.moveItem(itemId, "inventory");
+});
+
 Given("item {string} uses wear slot {string}", function (item, slot) {
   this.game.item(item).wearSlot = slot;
 });
@@ -151,7 +162,8 @@ When("I call Gary and say {string}", function (line) {
 });
 
 Then("the game is won", function () {
-  assert.equal(this.game.state.won, true, this.log ? this.log.slice(-6).join("\n\n") : "");
+  const context = Array.isArray(this.log) ? this.log.slice(-6).join("\n\n") : (this.output || "");
+  assert.equal(this.game.state.won, true, context);
 });
 
 Then("the game is not won", function () {

@@ -30,6 +30,57 @@ function allTreasuresDeposited(ctx) {
     && depositedFamilyItemCount(ctx) === REQUIRED_FAMILY_ITEM_COUNT;
 }
 
+// "Everything" — every core heirloom AND every bonus treasure resting in the
+// reliquary. Filling it completely wakes the house's true secret: a staircase
+// folds open in the floor of the grand hall. (The dawn ending via the BELL
+// stays available — completing everything gives the player a real CHOICE.)
+function everythingDeposited(ctx) {
+  return Object.entries(ctx.world.items)
+    .filter(([, d]) => d.treasure || d.bonusTreasure)
+    .every(([id]) => ctx.roomOf(id) === "reliquary");
+}
+
+// Persist the final score as a seed for BLACKWOOD MANOR II. Browser-only; the
+// node test harness has no localStorage, so this is a guarded nice-to-have.
+function saveBm2Seed(ctx) {
+  try {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("blackwood-bm2-seed-v1", JSON.stringify({
+        score: ctx.state.score, turns: ctx.state.turns, savedAt: Date.now(),
+      }));
+    }
+  } catch { /* storage unavailable — the seed is optional */ }
+}
+
+// The TRUE ending (secret): once EVERYTHING is in the reliquary a trapdoor opens
+// in the floor of the grand hall. Go DOWN and you finally meet the voice that's
+// been "helping" you all night — Gary, in the flesh, in his squalid basement
+// call-cave, phone still ringing. He clubs you with the receiver and bolts up
+// the stairs with your loot. Not a death, not a clean escape: a cliffhanger
+// into BM2. (See DESIGN.md §12.30.)
+function garyEnding(ctx) {
+  saveBm2Seed(ctx);
+  const scene =
+    "You descend the impossible stair into a low, damp room lit by a single bare bulb.\n\n" +
+    "And there — at a battered desk, hunched over an avocado-green ROTARY PHONE, mid-sentence — is " +
+    "GARY. The Hint Line. The voice that has ridden along in your ear all night. On the desk before " +
+    "him: a monstrous BURRITO stuffed with every spicy thing, a heap of his precious MUSHROOMS, and a " +
+    "sweating carton of MILK from a humming mini-FRIDGE. A tangle of phone cord vanishes up into the dark.\n\n" +
+    "\"—no, no, you MOVE the statue, THEN you—\" He looks up. He sees you. Understanding, then pure " +
+    "animal joy, breaks across his face.\n\n" +
+    "\"You. You actually FINISHED it.\" He rises, the heavy receiver already swinging. \"Do you have any " +
+    "idea what that means for me?\"\n\n" +
+    "The rotary phone catches you across the temple with a bright electric CLANG. The floor tilts. The " +
+    "last thing you see is Gary — YOUR heirlooms already bundled under one arm — taking the stairs three " +
+    "at a time toward the front door of Blackwood Manor, howling one word into the dark:\n\n" +
+    MAP_MARK + GARY_LAIR_ART + MAP_MARK + "\n\n" +
+    "\"FREEEEDOMMM!\"";
+  return ctx.finish(scene,
+    "    ****  TO BE CONTINUED in BLACKWOOD MANOR II: HELD  ****\n\n" +
+    "You came to loot a haunted house. You leave as its newest tenant — and the phone is already ringing.\n" +
+    "(Your final score has been saved. In BM2, Gary profits when you fail. Sleep on that.)");
+}
+
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
 // Gary: underpaid, starving, furious — but his hints are genuinely useful.
 // Returns the single most relevant next-step hint for the current game state.
@@ -1042,7 +1093,47 @@ function worldTick(ctx) {
   if (l) parts.push(l);
   const g = mushroomRegrowTick(ctx); // small per-turn chance the toilet hole regrows
   if (g) parts.push(g);
+  const f = foreshadowTick(ctx);     // ambient dread from below, ramping with reliquary deposits
+  if (f) parts.push(f);
   return parts.length ? parts.join("\n\n") : null;
+}
+
+// Ambient foreshadowing for the secret Gary ending: a scritch-scratch, faint
+// bells, a far-off voice — intensifying as the reliquary fills, and turning into
+// an insistent telephone RINGING once EVERYTHING is deposited and the floor
+// stair has opened. Gated behind the same chaos kill-switch as lightning, and
+// silent until you've begun filling the reliquary — so it never fires in the
+// deterministic canonical/early-game tests.
+function foreshadowTick(ctx) {
+  if (ctx.getFlag("__noChaos")) return null;       // deterministic test harness kill-switch
+  if (!ctx.getFlag("frontDoorOpen")) return null;  // only stirs once you're inside
+  const dep = depositedFamilyItemCount(ctx);
+  if (dep < 1) return null;                         // the house only wakes as the reliquary fills
+  const open = ctx.getFlag("floorDoorOpen");
+  const chance = open ? 0.5 : Math.min(0.35, 0.06 + dep * 0.03);
+  if (Math.random() >= chance) return null;
+  let pool;
+  if (open) {
+    pool = [
+      "A telephone is RINGING, faint and insistent, somewhere below the floor. It does not stop.",
+      "From under the flagstones: a muffled voice, mid-sentence, giving someone very bad advice.",
+      "The open stair breathes up a smell of stale coffee, mushrooms, and hot electronics.",
+    ];
+  } else if (dep >= 6) {
+    pool = [
+      "Far off — below you, impossibly — a telephone rings once, then stops.",
+      "A voice murmurs somewhere under the house. You catch one word: \"...statue...\" Then nothing.",
+      "Faint BELLS, and beneath them a scritch-scratch, like a pen writing very fast.",
+    ];
+  } else {
+    pool = [
+      "Somewhere in the walls: a dry scritch-scratch, there and gone.",
+      "A tiny, far-off ringing, like a phone in another house. It stops the moment you listen.",
+      "A cold draught carries the ghost of a voice, too faint to make out.",
+    ];
+  }
+  const i = Math.min(pool.length - 1, Math.floor(Math.random() * pool.length));
+  return pool[i];
 }
 
 // --- ASCII status art stamped onto every room description --------------------
@@ -1066,6 +1157,17 @@ const WINGED_SHOES_ART = [
   "     /______\\                /______\\",
   "    [________]              [________]",
   "  ~ ~ ~  THE WINGED SHOES LIFT YOUR HEELS OFF THE FLOOR  ~ ~ ~",
+].join("\n");
+// Stamped into the secret Gary-cliffhanger ending — his squalid basement
+// call-cave, the moment before the rotary phone meets your skull.
+const GARY_LAIR_ART = [
+  "   ___________________",
+  "  | GARY'S CALL-CAVE  |",
+  "  |   ___    ((=TEL   |",
+  "  |  (o o)   burrito  |",
+  "  |  /|_|\\   milk mush|",
+  "  |__||_______________|",
+  "     \"FREEDOM!\" ...click",
 ].join("\n");
 // The digestive doomsday clock: a nasty bowel-pressure gauge that FILLS as the
 // burrito marches you toward fatal explosive diarrhea. `sick` counts down from
@@ -1235,6 +1337,7 @@ const LIGHTNING_NO_JUMP = new Set([
   "secretChamber", // hidden grimoire chamber
   "crypt",         // the wraith death-room + gold locket
   "dreadmawVault", // the dragon's treasure vault (gold, chalice, crown)
+  "garysLair",     // the secret cliffhanger ending — reached on foot, never by a lucky bolt
 ]);
 const LIGHTNING_FLAVOR =
   "LIGHTNING CRACKS somewhere far too close, and the air suddenly tastes like a dropped fork on a battery.";
@@ -1724,6 +1827,7 @@ const IMPLICIT_NAVIGATION = Object.freeze({
   hiddenVault: { in: null, out: "south" },
   hollowPassage: { in: "north", out: "south" },
   hollowSanctum: { in: "north", out: null },
+  garysLair: { in: "down", out: "up" },
   betweenWalls: { in: null, out: "out" },
 });
 
@@ -2014,6 +2118,7 @@ export const world = {
           "waiting for a collection not yet complete.";
       },
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
+      extraDirections: (ctx) => ctx.getFlag("floorDoorOpen") ? ["down"] : [],
       exits: {
         south: "porch", east: "parlor", west: "diningRoom", up: "landing",
         north: { to: "hollowPassage", via: "secretWingOpen",
@@ -2040,7 +2145,21 @@ export const world = {
               "grows thick and cold, and the great brass bell above the reliquary trembles as if " +
               "it longs to be RUNG.";
           }
+          if (everythingDeposited(ctx) && !ctx.getFlag("floorDoorOpen")) {
+            ctx.setFlag("floorDoorOpen");
+            msg += "\n\nThen — with EVERYTHING gathered, down to the last bonus trinket — the faint RINGING " +
+              "you've half-heard all night swells beneath your feet, and answers. With a grind of stone the " +
+              "flagstones before the reliquary split and fold away, revealing a narrow STAIRCASE spiraling " +
+              "DOWN into the dark, toward the source of the sound. (You can still RING the BELL to end things " +
+              "in the dawn — or go DOWN, and finally find out who's been ringing.)";
+          }
           return msg;
+        },
+        // The secret ending: with the floor stair open, descend to meet Gary.
+        go(ctx, cmd) {
+          if (cmd.dobj !== "down" || !ctx.getFlag("floorDoorOpen")) return null;
+          ctx.state.room = "garysLair";
+          return garyEnding(ctx);
         },
         ring(ctx, cmd) {
           const it = cmd.dobj ? ctx.find(cmd.dobj) : null;
@@ -2402,6 +2521,21 @@ export const world = {
           );
         },
       },
+    },
+
+    // --- The secret basement: the TRUE cliffhanger ending (see garyEnding) ---
+    // Reached only on foot, via the floor stair that opens in the GRAND HALL
+    // once EVERYTHING is in the reliquary. Entering triggers the ending outright,
+    // so this room is essentially never explored interactively — it exists so
+    // the destination is valid (and as the seed of BLACKWOOD MANOR II).
+    garysLair: {
+      name: "Gary's Call-Cave",
+      art: GARY_LAIR_ART,
+      desc:
+        "A cramped, foul basement office beneath the grand hall: a battered desk, a green ROTARY PHONE, " +
+        "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
+      searchDesc: "Whoever worked down here left in a violent hurry — and took your heirlooms with them.",
+      exits: { up: "grandHall" },
     },
 
     // --- The one room with no door — reachable only by random teleport ------
