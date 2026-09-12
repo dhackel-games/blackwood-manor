@@ -92,7 +92,7 @@ Feature: Mushroom vision and flight
       | go to attic                | attic         |
       | float to nursery           | nursery       |
       | fly to front gate          | gate          |
-      | go master bedroom          | masterBedroom |
+      | go grand bedroom           | masterBedroom |
 
   Scenario: Players cannot fly to named rooms when sober
     Given a fresh manor game

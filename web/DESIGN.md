@@ -14,7 +14,7 @@ Section 12 is the living record of everything built since — read it for curren
 You arrive at dusk at **Blackwood Manor**, a decaying Victorian estate you've just
 inherited. The family was cursed; the heirlooms are scattered and guarded through the
 house and the catacombs beneath it. Your goal: **recover the family heirlooms, deposit
-them in the reliquary in the Grand Hall, and lift the curse to escape alive.** Linger in
+them in the reliquary in the Royal Hall, and lift the curse to escape alive.** Linger in
 the dark too long, and something finds you.
 
 **Win condition:** all heirlooms deposited in the reliquary + the final ritual performed.
@@ -142,12 +142,12 @@ Classic Infocom style, richer than strict two-word.
 ```
              [Attic]
                 | (ladder)
-[Nursery]—[Landing]—[Master Bedroom]
+[Nursery]—[Landing]—[Grand Bedroom]
              |          |
           [Study]    (stairs)
                 |
  EXTERIOR      GROUND FLOOR
- [Gate]     [Grand Hall / Reliquary]—[Parlor]
+ [Gate]     [Royal Hall / Reliquary]—[Parlor]
    |          |          |
  [Garden]—[Porch]    [Library]—(secret)—[Secret Chamber]
    |(well)     |
@@ -156,8 +156,8 @@ Classic Infocom style, richer than strict two-word.
                           [Wine Cellar]—[Crypt]
 ```
 
-16 rooms: exterior (Gate, Garden, Porch), ground floor (Grand Hall, Parlor, Library,
-Secret Chamber, Dining Room, Kitchen), upstairs (Landing, Nursery, Study, Master Bedroom,
+16 rooms: exterior (Gate, Garden, Porch), ground floor (Royal Hall, Parlor, Library,
+Secret Chamber, Dining Room, Kitchen), upstairs (Landing, Nursery, Study, Grand Bedroom,
 Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 
 ---
@@ -170,17 +170,18 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
   cellar & crypt.
 - **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
   holds a treasure.
-- **Music box** (nursery) yields a tiny key → opens the **jewelry box** (master bedroom) →
+- **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
   ruby ring.
 - **Library lever** opens the **secret chamber** → the curse's focus.
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**11 required family heirlooms**, each worth points: silver candlestick, gold locket,
+**12 required family heirlooms**, each worth points: silver candlestick, gold locket,
 first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
 decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
-Blackwood family ring marked BM, plus the ember stone released by the garden brazier.
+Blackwood family ring marked BM, the BM spyglass recovered from the tree fort, and
+the BM-crested protective talisman after it has served against the crypt wraith.
 
 ---
 
@@ -303,10 +304,10 @@ the mansion.
 
 ## 12.5 Hidden wing / true ending
 - Ringing the bell (once all heirlooms are deposited) no longer ends the game — it lifts the
-  curse, drops a **BONE KEY**, and opens a **secret door** in the Grand Hall → Hollow Passage
-  → Hollow Sanctum, where a **SILVER MIRROR** and the matriarch's spirit wait. Take the mirror
-  and step into the dawn for the true ending (+30). **Full win score 155** (125 heirlooms + 30
-  mirror).
+  curse, drops a **BONE KEY**, and opens a **secret door** in the Royal Hall → Hollow Passage
+  → Hollow Sanctum, where a **SILVER MIRROR** and the matriarch's spirit wait. The mirror is
+  an optional +30-point trophy: it unlocks no route or ending, and stepping into the dawn
+  without it still wins.
 
 ## 12.6 The fire subsystem (Andy's idea, expanded)
 - **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` requires
@@ -333,7 +334,8 @@ the mansion.
 - A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
   **lit candlestick** can ignite it by patiently lighting several points, or the player
   can be **on fire** and `light brazier` to transfer the whole blaze. Either route yields
-  the required **EMBER STONE** and awards +10 for solving the fire puzzle.
+  the red **EMBER STONE** needed by the GREAT OAK'S RGB mechanism and awards +10
+  for solving the fire puzzle.
 
 ## 12.8 Gary while you're on fire
 - Dialing in ablaze: Gary smells smoke, quotes a **$1.99** premium (`fireTab`, tracked
@@ -371,6 +373,10 @@ the mansion.
 - 🕯️ **"The Old Ways"** — lit the brazier with your own body.
 - 🥵 **"Slow Burn"** — stayed ablaze 4+ turns and lived.
 - 🥛 **"Got Milk?"** — drank the curative milk.
+- 🆘 **"Helpless"** (+15) — finished without MAP, HELP, or Gary's CALL/HINT line.
+- 🙈 **"Extra Super Duper Helpless"** (+20 beyond HELPLESS) — also never issued
+  LOOK, EXAMINE, or SEARCH. Automatic prerequisite actions do not count.
+- ⏩ **"No Takebacks"** (+10) — finished without explicitly using SAVE or RESTORE.
 
 ## 12.11 Testing
 `npm test` runs all executable Gherkin. `npm run test:unit` selects engine state, parsing,
@@ -471,14 +477,14 @@ of tractor-feed sprocket holes aligned even though the page border itself is jag
 - Rooms you haven't entered render as `?????`, so you get the *shape* of the house — how many
   rooms, how they connect — without being handed the contents.
 - The secret wing (`hollowPassage`, `hollowSanctum`), hidden chamber (`secretChamber`),
-  HIDDEN VAULT, and DREADMAW'S inner vault are discoveries, so they aren't drawn at all
+  ASTRAL CHAMBER, and DREADMAW'S inner vault are discoveries, so they aren't drawn at all
   until you stand in one.
   Hiding them leaves gaps in the grid, and a conspicuous gap is itself a spoiler — hence the
   row compaction in `drawFloor()`.
 - Landmarks like `(Porch)` repeat a room on another floor's panel for orientation. An anchor
   whose only partner is hidden is dropped: a lone `(Library)` floating in the BELOW panel
   announces the secret chamber as loudly as drawing it would.
-- Footnotes name rooms ("Grand Hall goes UP to the Landing"), so they're gated behind
+- Footnotes name rooms ("Royal Hall goes UP to the Landing"), so they're gated behind
   `footIf` — a floor's note stays hidden until you've seen the room it's about.
 - The room you're standing in always counts as seen, which also covers turn one.
 
@@ -621,7 +627,8 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
 
 `js/hud.js` owns the HUD architecture. Each `HudSlot` definition provides an `id`, optional
 `emoji`, and a `calculate({ game, world })` function. The shared renderer mounts slots,
-updates their text, and hides inactive values uniformly. Score, turns, phone bill, bowel
+updates their text, and hides inactive values uniformly. Score and turns share a compact
+`🏆 score/turns` slot; phone bill, bowel
 pressure, digestive phase, mushroom high, vision, flight, RELIQUARY progress, fire
 countdown, and HEADLAMP battery are data entries in one registry rather than separate
 DOM mutations in `ui.js`.
@@ -703,39 +710,32 @@ dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light sou
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,
-whose ladder descends into the HIDDEN VAULT. Both flight sources can also target
-ROOF, BELFRY, HIDDEN VAULT, and every other named room directly. MAP renders the
+whose ladder descends into the ASTRAL CHAMBER. Both flight sources can also target
+ROOF, BELFRY, ASTRAL CHAMBER, and every other named room directly. MAP renders the
 HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
-preserving spoiler hiding for both vaults.
+preserving spoiler hiding for both secret destinations.
 
-## 12.28 Bonus treasures, west-wing payoff, and consistency fixes
-
-Introduced a second treasure tier, `bonusTreasure`, alongside the required
-family heirlooms. Bonus treasures are accepted by the RELIQUARY and score their
-`points` on deposit, but `allTreasuresDeposited()` still counts only core
-`treasure` items, so they never gate the bell / curse-lifting / win. This lets
-optional content pay into the score economy without making it mandatory or
-breaking the canonical winning walkthrough.
+## 12.28 West-wing payoff and open reliquary deposits
 
 - **West-wing payoff.** An ore cart in the CAVE ANTECHAMBER holds the required
   BLACKWOOD FAMILY RING (+20). DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
-  (+15), plus a SILVER CHALICE (+20) and JEWELED CROWN (+25) as optional
-  `bonusTreasure` items. The exported `REQUIRED_FAMILY_ITEM_COUNT` is the single
-  source for the win threshold and RELIQUARY recess count.
-- **Ember stone.** The garden brazier's EMBER STONE is a required family heirloom
-  worth +8 on RELIQUARY deposit, so the self-immolation puzzle is part of the core mystery.
+  (+15) and the wearable WINGED SHOES. The exported `REQUIRED_FAMILY_ITEM_COUNT`
+  is the single source for the win threshold and RELIQUARY recess count.
+- **Oak route.** The garden brazier's EMBER STONE is the red component for the
+  GREAT OAK mechanism. Completing RED · GREEN · BLUE opens the route to the
+  required BM SPYGLASS (+8) in the TREE FORT.
 - **Consistency fixes.** The RELIQUARY reads its heirloom-recess count from the
   shared required-item constant. WINGED SHOES flight
   now floats up through the *shut* attic trap-door exactly like a mushroom high
   (previously the shoes still required the ladder to be lowered). Gary's hint line
   now explicitly reminds the player to deposit the JEWELED MUSIC BOX itself, not
-  just harvest its tiny key. The RELIQUARY no longer re-prints its "longs to be
-  RUNG" completion line when a bonus treasure is deposited after the core set is
-  already complete.
+  just harvest its tiny key.
 - **Open deposits.** Any unworn carried item can be put into the RELIQUARY. Required
-  heirlooms advance the shared total; bonus treasures score without advancing it; ordinary
-  objects are accepted but explicitly reported as non-contributing. The HUD appears after
-  the first deposit in terse `💎 required/11 +extra` form.
+  heirlooms advance the shared total and score; ordinary objects are accepted but
+  explicitly reported as non-contributing. The HUD appears after the first deposit
+  in terse `💎 required/12 +extra` form. The RELIQUARY is a glass-fronted cabinet:
+  PUT (and explicit retrieval) derives OPEN when needed, but the player must
+  explicitly CLOSE the completed cabinet before RING BELL can finish the ritual.
 
 Duplication across the game's several see-in-the-dark and flight mechanisms is a
 known, deliberately-deferred design topic (to be revisited later), not addressed here.
@@ -749,7 +749,7 @@ feeling like a free skeleton key:
   the very next turn, so you must TOUCH it immediately or miss the window.
 - **No special/guarded destinations.** Touching the bolt now teleports only to an
   *ordinary* room. A `LIGHTNING_NO_JUMP` set excludes the secret room
-  (BETWEEN THE WALLS), the hidden vaults (HIDDEN VAULT), the win-critical hollow
+  (BETWEEN THE WALLS), the hidden vaults (ASTRAL CHAMBER), the win-critical hollow
   wing (HOLLOW PASSAGE / HOLLOW SANCTUM), the hidden grimoire chamber
   (SECRET CHAMBER), the wraith CRYPT, and the dragon's treasure vault
   (DREADMAW'S VAULT). The bolt relocates you; it never skips a puzzle or hands you
@@ -759,7 +759,7 @@ feeling like a free skeleton key:
   teleport (including the +20 BETWEEN THE WALLS jackpot and the crypt risk) — that
   unpredictability is its whole point; the exclusion applies to lightning only.
 
-### 12.30 The secret Gary ending: fill the reliquary with EVERYTHING
+### 12.30 The secret Gary ending: complete the family collection
 
 Blackwood Manor now has two endings, and completing the collection is a *choice*,
 not a single scripted finish.
@@ -768,9 +768,8 @@ not a single scripted finish.
   heirlooms, RING THE BELL, take the BONE KEY north through the HOLLOW PASSAGE to
   the HOLLOW SANCTUM, and step into the dawn. This is the "good" ending and is
   untouched.
-- **The secret cliffhanger ending.** If you deposit *literally everything* — every
-  core heirloom **and** both `bonusTreasure` pieces (SILVER CHALICE, JEWELED CROWN)
-  — a hidden STAIRCASE grinds open in the floor of the GRAND HALL. Go DOWN and you
+- **The secret cliffhanger ending.** When every required heirloom is deposited,
+  a hidden STAIRCASE grinds open in the floor of the ROYAL HALL. Go DOWN and you
   finally meet the voice that's been "helping" you all night: GARY, in the flesh,
   in his squalid basement call-cave — rotary phone, spicy burrito, mushrooms, and
   a fridge of milk (recontextualising his hint-line persona). He clubs you with the
@@ -778,8 +777,8 @@ not a single scripted finish.
   deliberate **cliffhanger**, not a death or a clean win — it seeds *Blackwood Manor
   II: HELD*.
 - **Mechanics.**
-  - `everythingDeposited(ctx)` — every `treasure || bonusTreasure` item resting in
-    the RELIQUARY. When the final piece lands, the GRAND HALL `put` handler sets the
+  - `everythingDeposited(ctx)` — every required `treasure` item resting in the
+    RELIQUARY. When the final piece lands, the ROYAL HALL `put` handler sets the
     `floorDoorOpen` flag, reveals a `down` direction (via `extraDirections`), and
     announces the opening stair. Both the BELL (dawn) and the floor stair (Gary) are
     then available — the player picks.
@@ -801,3 +800,29 @@ not a single scripted finish.
   freedom, with inverted scoring) is BM2 proper — a separate genre shift — not built
   into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
   the engine is the seed it will grow from.
+
+### 12.31 The GREAT OAK RGB lift and TREE FORT
+
+The path EAST of the PRIVY reaches a GREAT OAK with three sun-facing glass
+sockets. BLUE and GREEN begin installed; the BRAZIER'S EMBER STONE supplies RED.
+The player can remove and reinsert the stones, but only RED · GREEN · BLUE
+focuses a white beam into the overhead pulley. Its PLATFORM then alternates
+between the roots and the TREE FORT every turn. Boarding holds it for one turn,
+then carries the player on the next.
+
+The fort contains old signal flags, a blanket hideout, a nailed-up slingshot,
+and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
+through it reveals the maintenance hatch inside the roofline and hints that the
+ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
+EMBER STONE as a +8 required heirloom; the newly BM-crested TALISMAN adds a
+twelfth required heirloom after protecting the player from the WRAITH.
+
+### 12.32 Twelve-line flavor cycles
+
+`CYCLING_FLAVOR_POOLS` centralizes all 23 recurring randomized or rotating
+player-facing text categories in `world.js`. Each pool has exactly 12 distinct
+entries. `cycleFlavor()` stores a separate `flavorCycle:<pool>` counter in game
+flags, so all twelve entries appear before any repeats and SAVE/RESTORE preserves
+the next position. Random rolls still decide whether ambient events occur;
+one-use mechanical outcomes such as the mystery package remain random rather
+than being mistaken for repeatable flavor.

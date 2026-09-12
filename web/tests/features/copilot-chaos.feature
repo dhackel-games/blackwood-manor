@@ -11,7 +11,7 @@ Feature: Copilot's mystery package and lightning jumps
     Given a fresh manor game
     And the player is in room "grandHall"
 
-  Scenario: The package sits in the grand hall with an ominous card
+  Scenario: The package sits in the royal hall with an ominous card
     When I send "look"
     Then the output contains "PACKAGE"
     When I send "read package"
@@ -76,6 +76,11 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "open package"
     Then the game is dead
     And the output contains "WRAITH"
+
+  Scenario: The mystery package cannot strand you in the unsolved tree fort
+    Given the mystery package teleport would select room "treeFort"
+    When I send "open package"
+    Then the current room is not "treeFort"
 
   Scenario: Peeling the nursery wallpaper opens a deliberate way between the walls
     Given the player is in room "nursery"
@@ -162,5 +167,14 @@ Feature: Copilot's mystery package and lightning jumps
     And the current room is not "hollowSanctum"
     And the current room is not "hollowPassage"
     And the current room is not "secretChamber"
+    And the current room is not "treeFort"
+
+  Scenario: Lightning cannot bypass the RGB lift into the tree fort
+    Given chaos events (lightning jumps) are enabled
+    And flag "frontDoorOpen" is set
+    And the lightning bolt teleport would select room "treeFort"
+    When I send "wait"
+    And I send "touch bolt"
+    Then the current room is not "treeFort"
 
 # end copilot-chaos.feature

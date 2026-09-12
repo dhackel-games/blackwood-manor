@@ -46,12 +46,8 @@ export class HudSlot {
 export const HUD_SLOT_DEFINITIONS = Object.freeze([
   {
     id: "score",
-    calculate: ({ game }) => `Score ${game.state.score}`,
-  },
-  {
-    id: "turns",
-    emoji: "⏱️",
-    calculate: ({ game }) => game.state.turns,
+    emoji: "🏆",
+    calculate: ({ game }) => `${game.state.score}/${game.state.turns}`,
   },
   {
     id: "inventory",

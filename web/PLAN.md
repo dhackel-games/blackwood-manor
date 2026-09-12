@@ -921,7 +921,7 @@ export const world = {
     garden:    { name:"Overgrown Garden", desc:"...", exits:{ west:"gate" } }, // + well
     porch:     { name:"Front Porch", desc:"...", exits:{ south:"gate",
                  north:{ to:"grandHall", via:"frontDoorOpen", lockedMsg:"The front door is locked." } } },
-    grandHall: { name:"Grand Hall", desc:"...", exits:{ south:"porch", east:"parlor",
+    grandHall: { name:"Royal Hall", desc:"...", exits:{ south:"porch", east:"parlor",
                  west:"diningRoom", up:"landing" } },
     parlor:    { name:"Parlor", desc:"...", exits:{ west:"grandHall", south:"library" } },
     library:   { name:"Library", desc:"...", exits:{ north:"parlor",
@@ -936,7 +936,7 @@ export const world = {
                  east:"masterBedroom", south:"study", up:{ to:"attic", via:"ladderDown",
                  lockedMsg:"There's no way up without the ladder." } } },
     nursery:   { name:"Nursery", desc:"...", exits:{ east:"landing" } },
-    masterBedroom:{ name:"Master Bedroom", desc:"...", exits:{ west:"landing" } },
+    masterBedroom:{ name:"Grand Bedroom", desc:"...", exits:{ west:"landing" } },
     study:     { name:"Study", desc:"...", exits:{ north:"landing" } },
     attic:     { name:"Attic", desc:"...", exits:{ down:"landing" } },
   },

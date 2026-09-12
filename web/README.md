@@ -2,7 +2,7 @@
 
 A haunted-mansion text adventure in the classic Zork style — pure static files,
 no build step, no server, no dependencies. You've inherited a cursed Victorian
-estate; recover the family heirlooms, deposit them in the reliquary in the Grand
+estate; recover the family heirlooms, deposit them in the reliquary in the Royal
 Hall, and ring the bell to lift the curse and escape alive. Linger in the dark,
 and something finds you.
 
@@ -57,11 +57,18 @@ auto-saves to your browser.
   until tapped again to submit.
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
+- **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
+  one compact slot.
+- **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
+  pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
   `inventory` (`i`). DROP ALL leaves worn equipment equipped.
-- **Reliquary:** any unworn item can be deposited. The `💎` HUD appears after the
-  first deposit as `required/11 +extra`. The EMBER STONE from the GARDEN BRAZIER
-  is a required heirloom.
+- **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
+  unworn item can be deposited. PUT auto-opens it; the completed cabinet must
+  be explicitly CLOSED before the BELL will answer. The `💎` HUD appears after
+  the first deposit as `required/12 +extra`. The BM SPYGLASS in the TREE FORT
+  and the BM-crested protective TALISMAN are required heirlooms; the EMBER STONE
+  from the GARDEN BRAZIER unlocks the SPYGLASS route.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -86,6 +93,9 @@ auto-saves to your browser.
   DREADMAW'S VAULT.
 - **Meta:** `score`, `save`, `restore`, `restart`, `verbose`, `brief`, `help`, `quit`
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
+- **Self-reliance awards:** successful runs earn HELPLESS (+15) without
+  MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
+  LOOK/EXAMINE/SEARCH, and NO TAKEBACKS (+10) without explicit SAVE/RESTORE.
 
 ### Survival tips (it is a *cruel* game)
 

@@ -16,17 +16,18 @@ const W = 14;   // label cell width — every label is padded to this, so the ar
 const GAP = 6;  // stays aligned no matter which names are masked
 const ROWH = 3; // lines between one row of rooms and the next
 
-// Short names, because a sketch has no room for "Master Bedroom".
+// Short names, because a sketch has no room for "Grand Bedroom".
 const LABELS = {
   hedgeMazeGate: "Hedge Maze", dragonCaveMouth: "Dragon Cave",
   dragonAntechamber: "Antechamber", mineGallery: "Mine Gallery",
   deepShaft: "Deep Shaft", trollGate: "Troll Gate", dreadmawVault: "Dreadmaw Vault",
-  gate: "Front Gate", garden: "Garden", privy: "Privy", porch: "Porch",
-  grandHall: "Grand Hall", parlor: "Parlor", library: "Library",
+  gate: "Front Gate", garden: "Garden", privy: "Privy", greatOak: "Great Oak", porch: "Porch",
+  grandHall: "Royal Hall", parlor: "Parlor", library: "Library",
   diningRoom: "Dining Rm", kitchen: "Kitchen", landing: "Landing",
-  nursery: "Nursery", masterBedroom: "Master Bed", hallBedroom: "Hall Bedroom", study: "Study",
+  nursery: "Nursery", masterBedroom: "Grand Bedroom", hallBedroom: "Hall Bedroom", study: "Study",
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
-  roof: "Roof", belfry: "Belfry", hiddenVault: "Hidden Vault",
+  roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
+  treeFort: "Tree Fort",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
 };
 
@@ -53,7 +54,7 @@ const FLOORS = [
       { a: "landing", b: "study" },
       { a: "landing", b: "hallBedroom" },
     ],
-    foot: "Landing goes DOWN to the Grand Hall.",
+    foot: "Landing goes DOWN to the Royal Hall.",
     footIf: "landing",
   },
   {
@@ -91,7 +92,7 @@ const FLOORS = [
       { a: "grandHall", b: "porch" },
       { a: "parlor", b: "library" },
     ],
-    foot: "Grand Hall goes UP to the Landing.",
+    foot: "Royal Hall goes UP to the Landing.",
     footIf: "grandHall",  // naming rooms you've never seen is a spoiler
   },
   {
@@ -102,6 +103,7 @@ const FLOORS = [
       { id: "gate", col: 1, row: 1 },
       { id: "garden", col: 2, row: 1 },
       { id: "privy", col: 3, row: 1 },
+      { id: "greatOak", col: 4, row: 1 },
       { id: "dragonCaveMouth", col: 0, row: 2 },
     ],
     links: [
@@ -110,11 +112,22 @@ const FLOORS = [
       { a: "hedgeMazeGate", b: "dragonCaveMouth", note: "maze" },
       { a: "gate", b: "garden" },
       { a: "garden", b: "privy" },
+      { a: "privy", b: "greatOak" },
     ],
     foot: (ctx, seen) => seen("garden")
       ? "Gate: WEST to Hedge Maze; EAST to Garden. Garden well goes DOWN."
       : "Front Gate: WEST to Hedge Maze; EAST to Garden.",
     footIf: "gate",
+  },
+  {
+    title: "TREE CANOPY",
+    rooms: [
+      { id: "treeFort", col: 0, row: 0 },
+      { id: "greatOak", col: 0, row: 1, anchor: true },
+    ],
+    links: [
+      { a: "treeFort", b: "greatOak", note: "lift" },
+    ],
   },
   {
     title: "BELOW",

@@ -111,8 +111,9 @@ Feature: Fire and food consequences
     When the player moves directly to room "grandHall"
     And I send "put ember stone in reliquary"
     Then item "emberStone" is in "reliquary"
-    And the game score is 17
-    And the output contains "Family heirlooms: 1/11"
+    And the game score is 9
+    And the output contains "Family heirlooms: 0/12"
+    And the output contains "does not contribute"
 
   Scenario: A lit candlestick can patiently ignite the garden brazier
     Given the player is in room "garden"
@@ -125,6 +126,21 @@ Feature: Fire and food consequences
     And item "emberStone" is in "garden"
     And the output contains "LIT CANDLESTICK"
     And the output contains "EMBER STONE"
+
+  Scenario: Water-offer flavor advances only when the offer is displayed
+    Given the player is on fire
+    And flag "onCall" is set
+    And the random number generator always returns 0.0
+    When I send "hello"
+    Then the output contains "glass of water"
+    And flag "flavorCycle:waterOffers" equals 1
+    Given a fresh manor game
+    And the player is on fire
+    And flag "onCall" is set
+    And flag "fireStage" is 3
+    And the random number generator always returns 0.0
+    When I send "pizza"
+    Then flag "flavorCycle:waterOffers" is unset
 
   Scenario: Kitchen foods intoxicate, infect, or cure
     Given the player is in room "kitchen"
@@ -280,10 +296,7 @@ Feature: Fire and food consequences
     Given the player is in room "kitchen"
     When I send "eat burrito"
     And I wait through the full burrito course
-    Then the accumulated output contains "stomach acid climbs" 10 times
-    And the accumulated output contains "BARF with" 10 times
-    And the accumulated output contains "FLAMING FART cracks" 10 times
-    And the accumulated output contains "spicy, sparking diarrhea" 10 times
+    Then the accumulated output contains "~ B U R P ~" 10 times
     And the accumulated output contains "B L E A R G H" 10 times
     And the accumulated output contains "F O O M P" 10 times
     And the accumulated output contains "S P L U R T" 10 times

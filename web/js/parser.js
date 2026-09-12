@@ -17,7 +17,7 @@ const VERBS = {
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
   extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],
-  throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in"],
+  throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in", "board", "ride", "step"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
   talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],

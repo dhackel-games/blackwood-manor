@@ -19,11 +19,18 @@ import {
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js";
-import { cheatMenu, cheatPrompt, expandCheatPrompt } from "./cheat-prompts.js";
+import { cheatMenu, expandCheatPrompt, magicMenuAction } from "./cheat-prompts.js";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
 const bugReport = document.getElementById("bug-report");
+const MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
+let magicMenuUnlocked = false;
+try {
+  magicMenuUnlocked = localStorage.getItem(MAGIC_MENU_UNLOCK_KEY) === "true";
+} catch (error) {
+  console.warn("[magic-menu] could not read unlock state", error);
+}
 
 // phone-call screen elements
 const phone = document.getElementById("phone");
@@ -530,10 +537,19 @@ function handle(raw) {
   }
   // save/restore stay terminal-only.
   if (!onCall) {
-    if (low === "save") { print(saveGame(game) ? "Game saved to this browser." : "Save failed."); return; }
+    if (low === "save") {
+      game.setFlag("usedSaveRestore", true);
+      print(saveGame(game) ? "Game saved to this browser." : "Save failed.");
+      return;
+    }
     if (low === "restore") {
+      game.setFlag("usedSaveRestore", true);
       if (!hasSave()) { print("There is no saved game."); return; }
       const restored = loadGame(game);
+      if (restored) {
+        game.setFlag("usedSaveRestore", true);
+        saveGame(game);
+      }
       print(restored ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
       if (restored) updateHud();
       return;
@@ -599,15 +615,28 @@ function handle(raw) {
 
 function applyCheatPrompt(raw) {
   const command = String(raw || "").trim();
-  if (command === ":?") {
+  const action = magicMenuAction(command, magicMenuUnlocked);
+  if (!action.handled) return false;
+  if (action.unlocked && !magicMenuUnlocked) {
+    try {
+      localStorage.setItem(MAGIC_MENU_UNLOCK_KEY, "true");
+    } catch (error) {
+      console.warn("[magic-menu] could not save unlock state", error);
+    }
+  }
+  magicMenuUnlocked = action.unlocked;
+  if (action.showMenu) {
     print(cheatMenu(), "sys");
     input.value = "";
     return true;
   }
-  const shortcut = cheatPrompt(command);
-  if (!shortcut) return false;
+  if (action.message) {
+    print(action.message, "sys");
+    input.value = "";
+    return true;
+  }
   try {
-    input.value = expandCheatPrompt(shortcut, game);
+    input.value = expandCheatPrompt(action.shortcut, game);
   } catch (error) {
     print(error.message, "sys");
     return true;
@@ -736,7 +765,7 @@ document.querySelectorAll("#controls [data-cmd]").forEach((b) =>
     scrollBottom();
     if (canType) input.focus();
   }));
-// Prefill buttons (Examine/Take) need an object typed, so they DO open the keyboard.
+// Prefill buttons (Take/Say) need more text, so they DO open the keyboard.
 document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
   b.addEventListener("click", () => { input.value = b.dataset.prefill; input.focus(); }));
 

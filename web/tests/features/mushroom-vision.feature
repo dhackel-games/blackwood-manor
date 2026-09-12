@@ -53,7 +53,7 @@ Feature: The mushroom trip's third eye
     And flag "high" is set
     And the player is in room "attic"
     When I send "north"
-    Then the output contains "HIDDEN VAULT"
+    Then the output contains "ASTRAL CHAMBER"
 
   Scenario: The Obsidian Eye grants permanent hidden sight but not dark-sight
     Given flag "vaultFound" is set

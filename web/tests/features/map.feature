@@ -16,7 +16,7 @@ Feature: Spoiler-safe map mode
     And the output contains regex "X [A-Z]" exactly 1 time
     And the output contains "Front Gate: WEST to Hedge Maze; EAST to Garden."
     And the output contains none of:
-      | Grand Hall |
+      | Royal Hall |
       | Landing    |
       | well       |
       | Passage    |
@@ -68,7 +68,7 @@ Feature: Spoiler-safe map mode
     And the output contains "Front Gate"
     And the output contains "Overgrown Garden"
     And the output contains "Ivy-Choked Privy"
-    And the output does not contain "Grand Hall"
+    And the output does not contain "Royal Hall"
 
   Scenario: The map's ticker-tape holes stay in straight columns
     When I send "map"
@@ -84,5 +84,24 @@ Feature: Spoiler-safe map mode
     And I send "east"
     And I send "map"
     Then the output contains "X Garden"
+
+  Scenario: The oak and tree fort appear on their own connected map levels
+    Given the player is in room "greatOak"
+    When I send "look"
+    And I send "map"
+    Then the output contains "X Great Oak"
+    And the output does not contain "TREE CANOPY"
+    Given the player is in room "treeFort"
+    When I send "map"
+    Then the output contains "X Tree Fort"
+    And the output contains "(Great Oak)"
+
+  Scenario: The renamed astral chamber remains hidden until visited
+    Given the player is in room "belfry"
+    When I send "map"
+    Then the output does not contain "Astral Chamber"
+    Given the player is in room "hiddenVault"
+    When I send "map"
+    Then the output contains "X Astral Chamber"
 
 # end map.feature

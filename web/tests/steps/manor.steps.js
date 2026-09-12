@@ -6,12 +6,17 @@ import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
 import {
   CHEAT_PROMPTS,
+  MAGIC_MENU_COMMAND,
+  MAGIC_MENU_DISCOVERY_MESSAGE,
+  MAGIC_MENU_PASSWORDS,
   cheatMenu,
   cheatPrompt,
   expandCheatPrompt,
+  isMagicMenuPassword,
+  magicMenuAction,
   pathToRoom,
 } from "../../js/cheat-prompts.js";
-import { REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
+import { CYCLING_FLAVOR_POOLS, REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
 const realMathRandom = Math.random;
 
@@ -59,6 +64,17 @@ Given("the random number generator returns {float} then {float}", function (firs
 });
 
 Given("the mystery package teleport selects room {string}", function (room) {
+  const destinations = Object.keys(this.game.world.rooms).filter((id) =>
+    id !== this.game.state.room
+    && (this.game.getFlag("oakLightAligned") || id !== "treeFort"));
+  const index = destinations.indexOf(room);
+  assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
+  const seq = [0.3, (index + 0.5) / destinations.length];
+  let i = 0;
+  Math.random = () => (i < seq.length ? seq[i++] : seq[seq.length - 1]);
+});
+
+Given("the mystery package teleport would select room {string}", function (room) {
   const destinations = Object.keys(this.game.world.rooms).filter((id) => id !== this.game.state.room);
   const index = destinations.indexOf(room);
   assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
@@ -91,11 +107,33 @@ Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
 });
 
-// Secret-ending setup: pre-fill the reliquary with every heirloom AND bonus
-// treasure, leaving exactly one named piece in the player's hands to deposit.
+Given("a legacy pre-oak save with the ember deposited is restored", function () {
+  const snapshot = this.game.snapshot();
+  const addedForOak = [
+    "oakMechanism", "greenGlassStone", "blueGlassStone", "oakPlatform",
+    "signalFlags", "blanketHideout", "woodenSlingshot", "spyglassCradle", "spyglass",
+  ];
+  for (const id of addedForOak) delete snapshot.state.items[id];
+  snapshot.state.items.emberStone.loc = "reliquary";
+  snapshot.state.items.emberStone.treasure = true;
+  delete snapshot.state.items.talisman.treasure;
+  delete snapshot.state.items.talisman.points;
+  snapshot.state.items.silverChalice = {
+    id: "silverChalice", names: ["chalice"], loc: "dreadmawVault",
+    takeable: true, bonusTreasure: true, points: 20,
+  };
+  snapshot.state.items.jeweledCrown = {
+    id: "jeweledCrown", names: ["crown"], loc: "dreadmawVault",
+    takeable: true, bonusTreasure: true, points: 25,
+  };
+  this.game.restore(snapshot);
+});
+
+// Secret-ending setup: pre-fill the reliquary with every required heirloom,
+// leaving exactly one named piece in the player's hands to deposit.
 Given("every treasure but the {string} is already in the reliquary", function (itemId) {
   for (const [id, def] of Object.entries(world.items)) {
-    if ((def.treasure || def.bonusTreasure) && id !== itemId) {
+    if (def.treasure && id !== itemId) {
       this.game.moveItem(id, "reliquary");
     }
   }
@@ -224,8 +262,30 @@ Then("the inventory capacity is {int}", function (capacity) {
 });
 
 Then("the hidden cheat menu command is {string}", function (command) {
-  assert.equal(command, ":?");
-  assert.match(cheatMenu(), /== HIDDEN COMMANDS ==/);
+  assert.equal(command, MAGIC_MENU_COMMAND);
+  assert.match(cheatMenu(), /== MAGIC MENU ==/);
+});
+
+Then("the magic menu unlock passwords are {string}", function (passwords) {
+  assert.deepEqual(MAGIC_MENU_PASSWORDS, passwords.split(","));
+  for (const password of MAGIC_MENU_PASSWORDS) assert.equal(isMagicMenuPassword(`::${password}`), true);
+  assert.equal(isMagicMenuPassword("::wrong"), false);
+  assert.equal(MAGIC_MENU_DISCOVERY_MESSAGE,
+    "You've discovered the magic menu. Please invoke it the first time with your password via ::<password>");
+  assert.deepEqual(magicMenuAction("::", false), {
+    handled: true, unlocked: false, message: MAGIC_MENU_DISCOVERY_MESSAGE,
+  });
+  assert.deepEqual(magicMenuAction("::powerup", false), {
+    handled: true, unlocked: false, message: MAGIC_MENU_DISCOVERY_MESSAGE,
+  });
+  assert.deepEqual(magicMenuAction("::werdna", false), {
+    handled: true, unlocked: true, showMenu: true,
+  });
+  assert.deepEqual(magicMenuAction("::", true), {
+    handled: true, unlocked: true, showMenu: true,
+  });
+  assert.equal(magicMenuAction("::powerup", true).shortcut?.cmd, "::powerup");
+  assert.deepEqual(magicMenuAction(":powerup", true), { handled: false, unlocked: true });
 });
 
 Then("the hidden cheat catalog defines {string}", function (commands) {
@@ -240,10 +300,13 @@ Then("the hidden cheat catalog defines {string}", function (commands) {
 
 Then("hidden shortcuts replace the editable command prompt without executing", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /if \(command === ":\?"\)/);
-  assert.match(ui, /input\.value = expandCheatPrompt\(shortcut, game\)/);
+  assert.match(ui, /magicMenuAction\(command, magicMenuUnlocked\)/);
+  assert.match(ui, /localStorage\.setItem\(MAGIC_MENU_UNLOCK_KEY, "true"\)/);
+  assert.match(ui, /if \(action\.showMenu\)/);
+  assert.match(ui, /input\.value = expandCheatPrompt\(action\.shortcut, game\)/);
   assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
   assert.equal(cheatPrompt("::"), null);
+  assert.equal(cheatPrompt(":powerup"), null);
 });
 
 Then("no hidden cheat prompt uses the removed su command", function () {
@@ -255,10 +318,26 @@ Then("the path from the current room to {string} is {string}", function (room, p
   assert.equal(pathToRoom(this.game, room).join("; "), path);
 });
 
+Then("hidden cheat {string} omits {string}", function (command, omitted) {
+  const shortcut = cheatPrompt(command);
+  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
+  assert.ok(!expandCheatPrompt(shortcut, this.game).split("; ").includes(omitted));
+});
+
+Then("hidden cheat {string} includes {string}", function (command, included) {
+  const shortcut = cheatPrompt(command);
+  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
+  assert.ok(expandCheatPrompt(shortcut, this.game).split("; ").includes(included));
+});
+
+Then("item {string} is absent from game state", function (item) {
+  assert.equal(this.game.item(item), null);
+});
+
 Then("public HELP does not reveal hidden cheat commands", function () {
   const help = this.game.send("help");
   for (const entry of CHEAT_PROMPTS) assert.ok(!help.includes(entry.cmd));
-  assert.ok(!help.includes(":?"));
+  assert.ok(!help.includes(MAGIC_MENU_COMMAND));
 });
 
 Then("every required family item is in the reliquary", function () {
@@ -271,6 +350,34 @@ Then("the required family item count is {int}", function (count) {
   assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
   assert.equal(this.game.world.config.requiredFamilyItemCount, count);
   assert.equal(Object.values(this.game.world.items).filter((item) => item.treasure).length, count);
+});
+
+Then("every recurring flavor pool has twelve distinct entries and cycles without repetition", function () {
+  assert.deepEqual(Object.keys(CYCLING_FLAVOR_POOLS), [
+    "hunger", "deflect",
+    "stageIntros0", "stageIntros1", "stageIntros2", "stageIntros3",
+    "therapyAsides",
+    "signoffs0", "signoffs1", "signoffs2", "signoffs3",
+    "waterOffers", "mushroomHigh",
+    "sickBurp", "sickBarf", "sickFart", "sickPoop",
+    "foreshadowEarly", "foreshadowMid", "foreshadowOpen",
+    "lightning", "mushroomRegrowth", "dragonRebukes",
+  ]);
+  for (const [name, pool] of Object.entries(CYCLING_FLAVOR_POOLS)) {
+    assert.equal(pool.length, 12, `${name} must have exactly twelve entries`);
+    assert.equal(new Set(pool.map((entry) => JSON.stringify(entry))).size, 12,
+      `${name} entries must be distinct`);
+    const sequence = Array.from({ length: 13 }, () => world.nextFlavor(this.game, name));
+    assert.equal(new Set(sequence.slice(0, 12).map((entry) => JSON.stringify(entry))).size, 12,
+      `${name} repeated before completing its cycle`);
+    assert.deepEqual(sequence[12], sequence[0], `${name} did not restart after twelve entries`);
+  }
+  const restored = createGame(world);
+  restored.restore(this.game.snapshot());
+  for (const [name, pool] of Object.entries(CYCLING_FLAVOR_POOLS)) {
+    assert.deepEqual(world.nextFlavor(restored, name), pool[1],
+      `${name} did not preserve its cycle counter across restore`);
+  }
 });
 
 Then("flag {string} is false", function (flag) {
