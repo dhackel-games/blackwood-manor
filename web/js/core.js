@@ -429,7 +429,7 @@ export function createGame(world) {
     };
   }
 
-  const MAX_CHAIN = 20;
+  const MAX_CHAIN = 128;
 
   game.send = (input) => {
     if (state.dead || state.won) {
@@ -450,14 +450,7 @@ export function createGame(world) {
 
     const parts = splitCommands(input);
     if (!parts.length) return "I beg your pardon?";
-    const runPart = (part) => {
-      if (/^\s*su(do)?\b/i.test(part) && typeof world.superUser === "function") {
-        const text = world.superUser(game, part.replace(/^\s*su(do)?\b\s*/i, ""));
-        return { text, stop: state.dead || state.won || !!state.flags.onCall };
-      }
-      return runOne(part);
-    };
-    if (parts.length === 1) return runPart(parts[0]).text;
+    if (parts.length === 1) return runOne(parts[0]).text;
 
     const run = parts.slice(0, MAX_CHAIN);
     const out = [];
@@ -469,7 +462,7 @@ export function createGame(world) {
         if (!prev) { out.push(`> ${part}\nNothing to repeat.`); stopped = true; break; }
         part = prev;
       }
-      const { text, stop } = runPart(part);
+      const { text, stop } = runOne(part);
       out.push(`> ${part}\n${text}`);
       prev = part;
       if (stop) { stopped = true; break; }

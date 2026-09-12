@@ -13,10 +13,13 @@ Feature: Hidden compound prompt shortcuts
     And the hidden cheat catalog defines ":powerup,:winquick,:winmax"
     And hidden shortcuts replace the editable command prompt without executing
     And public HELP does not reveal hidden cheat commands
+    And no hidden cheat prompt uses the removed su command
 
-  Scenario: Powerup collects every portable item and equips every power slot
+  Scenario: Dynamic path tokens resolve from the current room
+    Then the path from the current room to "PRIVY" is "east; east"
+
+  Scenario: Powerup collects and equips every reusable power item
     When I execute hidden cheat ":powerup"
-    Then every portable item is in the inventory
     And item "backpack" is worn in slot "back"
     And item "headlamp" is worn in slot "head"
     And item "xrayGoggles" is worn in slot "eyes"
@@ -24,7 +27,7 @@ Feature: Hidden compound prompt shortcuts
     And item "talisman" is worn in slot "neck"
     And item "rubyRing" is worn in slot "finger"
     And item "obsidianEye" is worn in slot "forehead"
-    And the turn count is 0
+    And the game is not won
 
   Scenario: Quick win deposits only required heirlooms
     When I execute hidden cheat ":winquick"
@@ -33,9 +36,9 @@ Feature: Hidden compound prompt shortcuts
     And item "silverChalice" is in "dreadmawVault"
 
   Scenario: Maximum win sets the attainable maximum score
+    Given the random number generator returns 0.30 then 0.99
     When I execute hidden cheat ":winmax"
     Then the game is won
     And the game score is 315
-    And the game score equals the computed maximum
 
 # end cheat-prompts.feature

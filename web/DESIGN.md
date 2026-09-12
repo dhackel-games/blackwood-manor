@@ -801,35 +801,3 @@ not a single scripted finish.
   freedom, with inverted scoring) is BM2 proper — a separate genre shift — not built
   into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
   the engine is the seed it will grow from.
-
-### 12.31 The `su` super-user debug console
-
-A hidden testing console, reachable by typing `su` (or `sudo`) as the first word
-of any line. It exists purely to let a human tester exercise late-game and branch
-content quickly instead of replaying the whole manor each time.
-
-- **Routing.** `core.js` `game.send()` intercepts a line matching `/^\s*su(do)?\b/i`
-  *after* the game-over and `onCall` checks but *before* command splitting/parsing,
-  and hands the remainder to `world.superUser(game, rest)`. The `\b` boundary means
-  ordinary words like `surface` or `sup` are **not** captured. Super-user commands
-  **do not pass a turn** — no world tick runs — so time-based state (fire, burrito
-  digestion, foreshadowing) never advances while you debug.
-- **Subcommands.** `su` alone prints the menu. `rooms` / `items` / `flags` dump
-  state; `goto <room>` teleports (resolving by id, name, or alias) and re-describes;
-  `where` dumps the current room's exits + items; `map` reveals and prints the whole
-  map; `give <item>` spawns an item into your hands; `fill` deposits every treasure
-  and opens **both** endings (sets `curseLiftable` + `floorDoorOpen`); `win` and
-  `gary` jump straight to the dawn and cliffhanger endings; `light` toggles
-  see-in-the-dark (`__suSight`, which `hasDarkVision` now honors); `god` toggles
-  invincibility (`__godmode`); `heal` clears fire/sickness/trip; `score <n>` sets the
-  score.
-- **God mode.** `game.kill()` checks `__godmode` first: instead of dying it returns
-  `"[su] GOD MODE — this would have killed you: …"` and leaves the player alive.
-  Note it does **not** clear the underlying affliction, so a persistent hazard (fire)
-  will keep reporting each tick — pair it with `su heal`.
-- **Rendering.** Tabular dumps are wrapped in `MAP_MARK` (`suWrap`) so they render in
-  the monospace map style and are skipped by text-to-speech, exactly like the map.
-- **Known caveat (intentional, flagged).** The console currently ships in the
-  production/Pages build, so any player who discovers `su` can cheat and spoil both
-  endings. If we want to keep it tester-only, gate it behind a build flag, a URL
-  param, or an unlock — tracked as an open decision, not yet done.

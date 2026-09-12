@@ -1284,10 +1284,12 @@ function lightBrazier(ctx) {
   ctx.addScore(10);
   ctx.moveItem("emberStone", "garden");
   if (hasLitCandle && !ctx.getFlag("onFire")) {
+    ctx.setFlag("brazierMethod", "candle");
     return "You press the LIT CANDLESTICK to one sodden knot of moss after another, patiently building heat " +
       "until the scattered flames join. The BRAZIER roars up in gold-and-green fire.\n\n" +
       "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)";
   }
+  ctx.setFlag("brazierMethod", "body");
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
   return "You fling your burning self against the brazier — and the fire LEAPS off you into the moss with a WHUMP. " +
     "You stagger back, smoking but no longer ablaze, as the bowl roars up in gold-and-green flame.\n\n" +
@@ -1906,8 +1908,10 @@ function endBadges(ctx) {
   const b = [];
   if (ctx.getFlag("onFire"))
     b.push("🔥 BADGE: \"Out Of The Frying Pan\" — you escaped Blackwood Manor WHILE STILL ON FIRE. Gary is, for once, speechless.");
-  if (ctx.getFlag("brazierLit"))
+  if (ctx.getFlag("brazierMethod") === "body")
     b.push("🕯️ BADGE: \"The Old Ways\" — you lit the ceremonial brazier with your own burning body.");
+  else if (ctx.getFlag("brazierMethod") === "candle")
+    b.push("🕯️ BADGE: \"Patient Flame\" — you coaxed the ceremonial brazier alight with the candlestick.");
   if ((ctx.getFlag("maxBurnTurns") || 0) >= 4)
     b.push("🥵 BADGE: \"Slow Burn\" — you stayed ablaze for " + ctx.getFlag("maxBurnTurns") + " turns and lived to tell it.");
   if (ctx.getFlag("drankMilk"))
@@ -2124,8 +2128,6 @@ export const world = {
   implicitNavigation: IMPLICIT_NAVIGATION,
   endBadges,         // win-screen achievement badges
   floatTo: floatToRoom,
-  superUser,         // hidden `su` debug console for human playtesting (§12.31)
-  maximumScore,      // computed ceiling used by hidden playtesting shortcuts
 
   rooms: {
     gate: {
