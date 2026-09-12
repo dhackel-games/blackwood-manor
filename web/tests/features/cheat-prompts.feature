@@ -25,8 +25,8 @@ Feature: Hidden compound prompt shortcuts
     And item "xrayGoggles" is worn in slot "eyes"
     And item "wingedShoes" is worn in slot "feet"
     And item "talisman" is worn in slot "neck"
-    And item "rubyRing" is worn in slot "finger"
     And item "obsidianEye" is worn in slot "forehead"
+    And item "rubyRing" is in "jewelryBox"
     And the game is not won
 
   Scenario: Quick win deposits only required heirlooms

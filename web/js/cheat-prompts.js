@@ -20,13 +20,6 @@ const POWERUP = [
   "wear talisman",
   "fly hidden vault",
   "wear obsidian eye",
-  "fly nursery",
-  "open music box",
-  "take tiny key",
-  "fly master bedroom",
-  "unlock jewelry box with tiny key",
-  "open jewelry box",
-  "wear ruby ring",
 ];
 
 const QUICK_COLLECTION = [

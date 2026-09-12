@@ -3252,7 +3252,8 @@ export const world = {
     rubyRing: {
       names: ["ring"], adjectives: ["ruby", "red"], loc: "jewelryBox", takeable: true,
       treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
-      desc: "A heavy gold ring set with a ruby like a drop of blood.",
+      desc: "A heavy gold ring set with a ruby like a drop of blood. The initials BM are embossed inside the " +
+        "band, marking it as a Blackwood family heirloom.",
     },
 
     // --- crypt ---
