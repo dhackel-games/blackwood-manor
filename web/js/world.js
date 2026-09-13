@@ -15,6 +15,8 @@
 // undefined lets the default behaviour run.
 
 import { MAP_MARK, renderMap } from "./map.js?v=source";
+import { composeWorld } from "./compose.js?v=source";
+import { content } from "./world.content.js?v=source";
 
 // ---- helpers used by handlers ------------------------------------------------
 export const REQUIRED_FAMILY_ITEM_COUNT = 13;
@@ -2855,7 +2857,7 @@ const IMPLICIT_NAVIGATION = Object.freeze({
 });
 
 // ---- the world ---------------------------------------------------------------
-export const world = {
+const logicWorld = {
   config: {
     start: "gate",
     maxCarry: 6,
@@ -2973,26 +2975,12 @@ export const world = {
 
   rooms: {
     gate: {
-      name: "Front Gate",
       art: ROOM_ART.gate,
-      desc:
-        "You stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains " +
-        "from the sky. The MANOR looms beyond a dead lawn, its windows like sockets. A " +
-        "gravel path leads NORTH to the PORCH. A low wall gives way EAST to the OVERGROWN " +
-        "GARDEN, while a black yew opening enters the HEDGE MAZE to the WEST.",
-      searchDesc:
-        "Fresh scuffs disturb the gravel toward the EASTERN GARDEN. WEST, scorched leaves disappear into the HEDGE MAZE.",
       exits: { north: "porch", east: "garden", west: "hedgeMazeGate" },
     },
 
     garden: {
-      name: "Overgrown Garden",
       art: ROOM_ART.garden,
-      desc:
-        "Brambles have swallowed what was once a formal GARDEN. A weathered stone STATUE " +
-        "of a robed woman leans amid the weeds, and a crumbling WELL shaft plunges into " +
-        "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick OUTHOUSE squats to " +
-        "the EAST; the FRONT GATE lies back to the WEST.",
       searchDesc(ctx) {
         if (!ctx.getFlag("statueMoved")) {
           return "The weeds around the leaning STATUE are crushed, and its base has scraped a shallow arc through " +
@@ -3004,9 +2992,6 @@ export const world = {
         }
         return "The STATUE and WELL have yielded what they hid. Only the grave-damp BRAZIER still looks expectant.";
       },
-      highDesc:
-        "Stone and soil turn translucent. An IRON KEY glints beneath the STATUE, an ANCIENT COIN waits at the " +
-        "bottom of the WELL, and old fire sleeps inside the BRAZIER.",
       extraDirections: ["down"],
       exits: { west: "gate", east: "privy" },
       on: {
@@ -3019,48 +3004,32 @@ export const world = {
     },
 
     hedgeMazeGate: {
-        name: "Hedge Maze: Yew Gate",
         art: [
           "  ||||||     ||||||",
           "  ||  \\       /  ||",
           "  ||   \\_____/   ||",
           "  ||             ||",
         ].join("\n"),
-        desc:
-          "Black yew walls swallow the sky. The FRONT GATE is EAST; passages run WEST and SOUTH, both " +
-          "already looking suspiciously familiar.",
-        searchDesc:
-          "Freshly snapped twigs and one enormous scale lie toward the WESTERN PASSAGE.",
         exits: { east: "gate", west: "hedgeMazeKnot", south: "hedgeMazeLoop" },
       },
 
     hedgeMazeKnot: {
-        name: "Hedge Maze: Thorn Knot",
         art: [
           "  >>>>\\     /<<<<",
           "  >>>> \\___/ <<<<",
           "       /   \\",
           "  <<<< /     \\ >>>>",
         ].join("\n"),
-        desc:
-          "Three thorn corridors knot together beneath clawed branches. The air to the SOUTH smells faintly of apples and smoke.",
-        searchDesc:
-          "A trail of scorched leaves continues SOUTH. The WESTERN corridor circles toward your own footprints.",
         exits: { east: "hedgeMazeGate", west: "hedgeMazeLoop", south: "dragonCaveMouth" },
       },
 
     hedgeMazeLoop: {
-        name: "Hedge Maze: Crooked Loop",
         art: [
           "  /\\/\\/\\/\\/\\/\\",
           "  \\          /",
           "   \\  LOOP  /",
           "    \\/\\/\\/\\/",
         ].join("\n"),
-        desc:
-          "The hedge bends back on itself with malicious precision. Every opening resembles the one you just used.",
-        searchDesc:
-          "Your overlapping footprints prove the NORTHERN opening is a loop; broken thorns point EAST toward the warmer air.",
         exits: { north: "hedgeMazeLoop", east: "hedgeMazeKnot", west: "hedgeMazeGate" },
       },
 
@@ -4405,6 +4374,8 @@ export const world = {
     },
   },
 };
+
+export const world = composeWorld(logicWorld, content);
 
 // ---- handler function definitions referenced above --------------------------
 function inspectWoodblackWatch(ctx) {

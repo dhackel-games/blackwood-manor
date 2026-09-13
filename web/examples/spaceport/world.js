@@ -10,23 +10,7 @@
 // used to carry — the logic is now the whole story.
 
 import content from "./world.content.json" with { type: "json" };
-
-// --- tiny content/logic merger (would live in a shared engine util for real) --
-function composeWorld(logic, text) {
-  const mergeById = (structure = {}, prose = {}) => {
-    const out = {};
-    for (const id of new Set([...Object.keys(structure), ...Object.keys(prose)])) {
-      out[id] = { ...structure[id], ...prose[id] };
-    }
-    return out;
-  };
-  return {
-    config: { ...logic.config, ...text.config },
-    rooms: mergeById(logic.rooms, text.rooms),
-    items: mergeById(logic.items, text.items),
-    achievements: (logic.achievements || []).map((a) => ({ ...a, ...(text.achievements?.[a.id] || {}) })),
-  };
-}
+import { composeWorld } from "../../js/compose.js";
 
 const T = content.messages;
 
