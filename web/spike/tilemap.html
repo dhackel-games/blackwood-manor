@@ -26,8 +26,16 @@
   /* middle band: map scrolls, inspector pinned on the right */
   .main { flex:1 1 auto; display:flex; min-height:0; }
   .stage { flex:1 1 auto; padding:16px; overflow:auto; }
+  .canvas-wrap { position:relative; display:inline-block; line-height:0; }
   canvas { background:#000; border:1px solid var(--line); border-radius:8px;
     image-rendering: pixelated; display:block; cursor:pointer; }
+  /* crisp vector room labels, overlaid on the pixelated canvas */
+  .labels-ov { position:absolute; inset:0; pointer-events:none; }
+  .labels-ov span { position:absolute; transform:translate(-50%,-50%); white-space:nowrap;
+    font:600 13px "Courier New", monospace; letter-spacing:.5px; color:var(--ink);
+    text-shadow:0 0 3px #000, 0 0 3px #000, 0 1px 2px #000; }
+  .labels-ov span.anchor { opacity:.5; font-style:italic; }
+  .labels-ov span.fog { color:var(--dim); }
   .side { flex:0 0 300px; border-left:1px solid var(--line); padding:12px 14px;
     overflow:auto; background:var(--panel); }
   .side h2 { margin:0 0 2px; font-size:14px; color:var(--ink); letter-spacing:.5px; }
@@ -48,6 +56,12 @@
   .exits button { border-color:#3a5; }
   .textbar { padding:10px 16px; border-top:1px solid var(--line); background:var(--panel);
     color:#ffd479; font-size:13px; line-height:1.4; flex:0 0 auto; min-height:2.4em; }
+  .cmdbar { display:flex; align-items:center; gap:8px; padding:8px 16px;
+    border-top:1px solid var(--line); background:#070b10; flex:0 0 auto; }
+  .cmdbar .prompt { color:#49ff7a; font-size:14px; }
+  .cmdbar input { flex:1 1 auto; font-family:inherit; font-size:13px; color:var(--ink);
+    background:transparent; border:none; outline:none; padding:2px 0; }
+  .cmdbar input::placeholder { color:#4d6656; }
   .legend { display:flex; flex-wrap:wrap; gap:12px; padding:6px 16px; font-size:11px;
     color:var(--dim); border-top:1px solid var(--line); flex:0 0 auto; }
   .legend span { display:inline-flex; align-items:center; gap:6px; }
@@ -62,12 +76,14 @@
     <summary>what is this?</summary>
     <p>You are Gary the ghost. Drift room to room — the manor you once explored in
     text now <b>develops in 8-bit as you enter each room</b>, while places you
-    haven't visited stay fogged. Arrow keys / WASD or click a lit room to move;
-    click a room you've seen to <b>inspect</b> it (description + items appear on
-    the right); take the green <b>stairs</b> buttons to change floors; press
-    <b>B</b> to drop bait and lure the guest. Turn on <b>reveal all</b> for a
-    pure map view of how the whole manor connects. Fully isolated under
-    <code>web/spike/</code> — the shipped game and its tests are untouched.</p>
+    haven't visited stay fogged. Move with arrow keys / WASD, <b>click any
+    connected room to walk there</b>, or <b>type commands</b> in the bar below
+    ("go library", "n", "drop bait", "look", "help"). <b>Hover</b> a room you've
+    seen to read its description + items on the right. Press <b>B</b> to drop
+    bait and lure the guest. Switch labels between <b>vector</b> (crisp) and
+    <b>8-bit</b>, or turn on <b>reveal all</b> for a pure map view of how the
+    whole manor connects. Fully isolated under <code>web/spike/</code> — the
+    shipped game and its tests are untouched.</p>
   </details>
 </header>
 
@@ -76,7 +92,13 @@
     <select id="floor"></select>
   </label>
   <label><input type="checkbox" id="reveal" /> reveal all (map view)</label>
-  <label><input type="checkbox" id="labels" checked /> room labels</label>
+  <label>Labels
+    <select id="labelMode">
+      <option value="vector" selected>vector</option>
+      <option value="8bit">8-bit</option>
+      <option value="off">off</option>
+    </select>
+  </label>
   <label>Zoom
     <select id="zoom">
       <option value="2">2×</option>
@@ -91,13 +113,22 @@
 </div>
 
 <div class="main">
-  <div class="stage"><canvas id="c" tabindex="0"></canvas></div>
+  <div class="stage">
+    <div class="canvas-wrap" id="wrap">
+      <canvas id="c" tabindex="0"></canvas>
+      <div class="labels-ov" id="labelsOv"></div>
+    </div>
+  </div>
   <aside class="side" id="side"></aside>
 </div>
 
 <div class="exits" id="exits"></div>
 <div class="hud" id="hud"></div>
 <div class="textbar" id="textbar"></div>
+<form class="cmdbar" id="cmdForm" autocomplete="off">
+  <span class="prompt">&gt;</span>
+  <input type="text" id="cmd" placeholder="type what Gary does — e.g. 'go library', 'n', 'drop bait', 'look', 'help'" />
+</form>
 <div class="legend" id="legend"></div>
 
 <script type="module">
@@ -109,10 +140,12 @@
 
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
-  const stage = canvas.parentElement;
+  const stage = canvas.parentElement.parentElement;
+  const wrap = document.getElementById("wrap");
+  const labelsOv = document.getElementById("labelsOv");
   const floorSel = document.getElementById("floor");
   const revealChk = document.getElementById("reveal");
-  const labelsChk = document.getElementById("labels");
+  const labelMode = document.getElementById("labelMode");
   const zoom = document.getElementById("zoom");
   const atlasBtn = document.getElementById("atlasBtn");
   const atlasFile = document.getElementById("atlasFile");
@@ -123,6 +156,8 @@
   const exitsEl = document.getElementById("exits");
   const sideEl = document.getElementById("side");
   const textbar = document.getElementById("textbar");
+  const cmdForm = document.getElementById("cmdForm");
+  const cmdInput = document.getElementById("cmd");
 
   const TILEPX = 16;
   const graph = buildManorGraph();
@@ -181,13 +216,14 @@
     lastLayout = layout; lastFloor = fi;
     drawToCanvas(canvas, layout, {
       tile: TILEPX, scale: Number(zoom.value),
-      showLabels: labelsChk.checked,
+      showLabels: labelMode.value === "8bit",
       atlas, atlasMap: atlas ? atlasMap : null, atlasTile: 32,
     });
     drawReachable(layout);
     drawItemIcons(layout);
     drawTokens(layout, fi);
     drawFocusRing(layout);
+    updateVectorLabels(layout);
     floorSel.value = String(fi);
     if (recenter) { centerCamera(layout); recenter = false; }
     renderHud();
@@ -272,6 +308,23 @@
     ctx.strokeRect(box.x*TILEPX-1, box.y*TILEPX-1, box.w*TILEPX+2, box.h*TILEPX+2);
   }
 
+  // Crisp DOM labels overlaid on the pixelated canvas (the "vector" label mode).
+  // The canvas is drawn low-res and CSS-upscaled, so on-canvas text is blocky;
+  // these live in an overlay sized to match the scaled canvas.
+  function updateVectorLabels(layout) {
+    if (labelMode.value !== "vector") { labelsOv.innerHTML = ""; return; }
+    const s = Number(zoom.value);
+    let html = "";
+    for (const box of layout.boxes) {
+      const left = (box.x + box.w / 2) * TILEPX * s;
+      const top = (box.y + box.h / 2) * TILEPX * s;
+      const cls = box.anchor ? "anchor" : (box.seen ? "" : "fog");
+      const text = box.seen ? box.label : "?????";
+      html += `<span class="${cls}" style="left:${left}px;top:${top}px">${text}</span>`;
+    }
+    labelsOv.innerHTML = html;
+  }
+
   function renderHud() {
     const here = graph.home.get(gary).label;
     const guestLabel = graph.home.get(guest).label;
@@ -283,10 +336,11 @@
       `<span>👣 steps <b>${steps}</b></span>`;
   }
 
-  // Right-hand inspector: name + real description + item list of the focused
-  // room (only if it's been seen — fog still hides the unknown).
-  function renderInspector() {
-    const id = focusId || gary;
+  // Right-hand inspector: name + real description + item list of a room (only if
+  // it's been seen — fog still hides the unknown). Pass an id to "peek" (hover)
+  // without changing the persistent focus.
+  function renderInspector(peekId) {
+    const id = peekId || focusId || gary;
     const label = graph.home.get(id) ? graph.home.get(id).label : id;
     if (!isSeen(id)) {
       sideEl.innerHTML = `<h2>?????</h2><div class="sub">unexplored</div>` +
@@ -356,12 +410,112 @@
     render();
   }
 
+  // Shortest path (list of room ids after `from`) to `target` across the whole
+  // connected manor graph, or null if unreachable. Lets you click/type any
+  // connected room and have Gary walk the route.
+  function pathTo(target, from = gary) {
+    if (target === from) return [];
+    const prev = new Map([[from, null]]);
+    const q = [from];
+    while (q.length) {
+      const cur = q.shift();
+      for (const n of graph.adj.get(cur) || []) {
+        if (prev.has(n.id)) continue;
+        prev.set(n.id, cur);
+        if (n.id === target) {
+          const path = [];
+          for (let c = target; c !== from; c = prev.get(c)) path.unshift(c);
+          return path;
+        }
+        q.push(n.id);
+      }
+    }
+    return null;
+  }
+
+  // Walk a path one room per beat so you see each room reveal in turn. Each hop
+  // is a real move (advances the guest); input is ignored mid-walk.
+  let walking = false;
+  function walkPath(path) {
+    if (!path || !path.length || walking) return;
+    walking = true;
+    let i = 0;
+    const step = () => {
+      moveTo(path[i]);
+      i++;
+      if (i < path.length) setTimeout(step, 140);
+      else walking = false;
+    };
+    step();
+  }
+
+  // Resolve a typed room name to an id: exact label, then id, then prefix match.
+  function resolveRoom(name) {
+    const q = name.trim().toLowerCase();
+    if (!q) return null;
+    const entries = [...graph.home.entries()]; // [id, {label,...}]
+    let hit = entries.find(([id, h]) => h.label.toLowerCase() === q || id.toLowerCase() === q);
+    if (!hit) hit = entries.find(([id, h]) => h.label.toLowerCase().startsWith(q) || id.toLowerCase().startsWith(q));
+    if (!hit) hit = entries.find(([id, h]) => h.label.toLowerCase().includes(q));
+    return hit ? hit[0] : null;
+  }
+
+  const WORD_DIRS = {
+    n:[0,-1], north:[0,-1], s:[0,1], south:[0,1],
+    e:[1,0], east:[1,0], w:[-1,0], west:[-1,0],
+  };
+
+  // Tiny command parser — the seed of a real prompt. Movement, luring, looking,
+  // and view toggles for now; a full verb set is Chapter-2 design work.
+  function runCommand(raw) {
+    const line = (raw || "").trim().toLowerCase();
+    if (!line) return;
+    const [verb, ...rest] = line.split(/\s+/);
+    const arg = rest.join(" ");
+
+    if (verb === "help" || verb === "?") {
+      msg = "commands: (n/s/e/w) move · up/down stairs · go <room> · look · " +
+        "bait (drop/pick up here) · reveal · reset. Or click/hover rooms.";
+      render(); return;
+    }
+    if (WORD_DIRS[verb]) {
+      const [dx, dy] = WORD_DIRS[verb];
+      const id = neighborInDirection(graph, floorOf(gary), gary, dx, dy);
+      if (id) moveTo(id); else { msg = `No room ${verb.toUpperCase()} of here.`; render(); }
+      return;
+    }
+    if (verb === "up" || verb === "down") {
+      const exits = crossFloorExits(graph, floorOf(gary), gary);
+      const want = verb === "up" ? ["up", "ladder", "climb", "fly"] : ["down"];
+      const ex = exits.find((x) => x.note && want.some((w) => x.note.toLowerCase().includes(w))) || exits[0];
+      if (ex) moveTo(ex.id, ex.label); else { msg = `No stairs ${verb} from here.`; render(); }
+      return;
+    }
+    if (verb === "bait" || verb === "drop" || verb === "lure") { toggleBait(); return; }
+    if (verb === "look" || verb === "l" || verb === "examine") {
+      focusId = gary; const rd = ROOMDATA[gary];
+      msg = rd && rd.desc ? rd.desc : `You are in ${graph.home.get(gary).label}.`;
+      render(); return;
+    }
+    if (verb === "reveal" || verb === "map") { revealChk.checked = !revealChk.checked; render(); return; }
+    if (verb === "reset") { reset(); return; }
+
+    // "go/move/walk/enter <room>" or a bare room name.
+    const target = ["go", "move", "walk", "enter", "to"].includes(verb) ? resolveRoom(arg) : resolveRoom(line);
+    if (!target) { msg = `You don't know how to "${raw.trim()}".`; render(); return; }
+    if (target === gary) { msg = "You're already there."; render(); return; }
+    const path = pathTo(target);
+    if (path && path.length) walkPath(path);
+    else { msg = `You can't see a way to ${graph.home.get(target).label} from here.`; render(); }
+  }
+
   // Keyboard: arrows / WASD move to the best-matching room on this floor.
   const DIRS = {
     ArrowUp:[0,-1], KeyW:[0,-1], ArrowDown:[0,1], KeyS:[0,1],
     ArrowLeft:[-1,0], KeyA:[-1,0], ArrowRight:[1,0], KeyD:[1,0],
   };
   window.addEventListener("keydown", (e) => {
+    if (e.target === cmdInput) return; // let the command bar capture typing
     if (e.code === "KeyB") { e.preventDefault(); toggleBait(); return; }
     const d = DIRS[e.code];
     if (!d) return;
@@ -370,29 +524,47 @@
     if (id) moveTo(id);
   });
 
-  // Click a reachable room to move there; click any other SEEN room to inspect
-  // it (read its description + items on the right) without moving.
-  canvas.addEventListener("click", (e) => {
+  // Map a mouse event to the room box under the cursor (or null).
+  function roomAt(e) {
     const rect = canvas.getBoundingClientRect();
     const scale = Number(zoom.value);
     const tx = (e.clientX - rect.left) / scale / TILEPX;
     const ty = (e.clientY - rect.top) / scale / TILEPX;
     const boxes = (lastLayout && lastLayout.boxes) || [];
-    const hit = boxes.find((b) => tx >= b.x && tx < b.x+b.w && ty >= b.y && ty < b.y+b.h);
+    return boxes.find((b) => tx >= b.x && tx < b.x+b.w && ty >= b.y && ty < b.y+b.h) || null;
+  }
+
+  // Click any connected room to have Gary walk there (Andy's ask); clicking an
+  // unreachable-but-seen room just inspects it.
+  canvas.addEventListener("click", (e) => {
+    if (walking) return;
+    const hit = roomAt(e);
     if (!hit) return;
-    const reachable = (graph.adj.get(gary) || []).some((n) => n.id === hit.id);
-    if (reachable) moveTo(hit.id);
+    const path = pathTo(hit.id);
+    if (path && path.length) walkPath(path);
     else if (hit.seen) inspect(hit.id);
   });
 
+  // Hover a seen room to peek its description/items on the right without moving.
+  canvas.addEventListener("mousemove", (e) => {
+    if (walking) return;
+    const hit = roomAt(e);
+    renderInspector(hit && hit.seen ? hit.id : undefined);
+  });
+  canvas.addEventListener("mouseleave", () => { if (!walking) renderInspector(); });
+
   floorSel.addEventListener("change", () => {
     const start = FLOORS[Number(floorSel.value)].start;
-    moveTo(start);
+    const path = pathTo(start);
+    if (path && path.length) walkPath(path); else moveTo(start);
   });
-  [revealChk, labelsChk].forEach((el) => el.addEventListener("input", render));
+  [revealChk, labelMode].forEach((el) => el.addEventListener("input", render));
   zoom.addEventListener("input", () => { recenter = true; render(); });
   resetBtn.addEventListener("click", reset);
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
+
+  // --- command bar: type what Gary does ------------------------------------
+  cmdForm.addEventListener("submit", (e) => { e.preventDefault(); runCommand(cmdInput.value); cmdInput.value = ""; });
 
   atlasBtn.addEventListener("click", () => atlasFile.click());
   atlasFile.addEventListener("change", () => {
