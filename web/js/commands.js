@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -124,7 +124,7 @@ CHAINING
 Separate commands with ".", ";", ",", or THEN.
 Example: n; open mailbox; read letter
 A chain stops at the first unknown word.
-WITH may be shortened to w/ with no following space: unlock frontd w/iron.
+WITH may be shortened to w/ with or without a following space: unlock frontd w/iron.
 In object names, d means DOOR and br means BEDROOM: open front d; fly grand br.
 
 GARY'S HINT LINE

@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
 
 @unit
 Feature: Player command parsing
@@ -19,6 +19,7 @@ Feature: Player command parsing
       | grab brass key                      | take    | brass key | [none]      | [none]    |
       | unlock the oak door with the brass key | unlock | oak door | with      | brass key |
       | unlock front d w/iron               | unlock | front door | with       | iron       |
+      | unlock front d w/ iron              | unlock | front door | with       | iron       |
       | fly grand br                        | go      | grand bedroom | [none]   | [none]     |
       | look                                | look    | [none]    | [none]      | [none]    |
       | look at brass key                   | examine | brass key | [none]      | [none]    |
