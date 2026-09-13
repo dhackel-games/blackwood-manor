@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -102,6 +102,7 @@ Feature: Build metadata and touch-control contract
     Then the TestFlight release refreshes the web bundle before generating the Xcode project
     And the iOS app version matches the date-only package version
     And the TestFlight release synchronizes the app version from the package
+    And successful TestFlight releases publish verified app availability
     And iOS and Pages derive their deploy identity from CONTENT_VERSION
     And the TestFlight release replaces its repository-local build folder
 
@@ -109,7 +110,7 @@ Feature: Build metadata and touch-control contract
     Then Version reports local and source content through the native bridge
     And the iOS launch banner reports the live content source without a transcript echo
     And Reload seeds the local cache and refreshes differing GitHub.io content
-    And Apple services decide whether a native iOS update is available
+    And release-channel metadata decides whether a native iOS update is available
 
   Scenario: Local Gary model status is visible in-page instead of logged
     Then local daemon status is announced in the transcript without console noise

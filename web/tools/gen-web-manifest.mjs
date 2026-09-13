@@ -1,9 +1,10 @@
-// gen-web-manifest.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// gen-web-manifest.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 //
 // Stamp one cache key across the ES-module graph, then emit <root>/manifest.json
-// with the runtime file list. The complete manifest is the iOS-app package
-// identity; CONTENT_VERSION and CONTENT_FILES in js/version.js govern web
-// content selection and downloads. Run for BOTH the bundled copy
+// with the runtime file list. This describes downloadable web content only;
+// latest_app_build_available.json separately identifies a distributed native
+// build. CONTENT_VERSION and CONTENT_FILES in js/version.js govern web content
+// selection and downloads. Run for BOTH the bundled copy
 // (ios/copy-web.sh) and Pages deploy (.github/workflows/pages.yml).
 //
 //   node gen-web-manifest.mjs <rootDir> [version] [cacheKey]

@@ -1,3 +1,5 @@
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven. -->
+
 # Blackwood Manor
 
 A classic-style haunted-mansion **text adventure** (Zork-like), built as pure static
@@ -69,8 +71,8 @@ open BlackwoodManor.xcodeproj
 
 Requires `xcodegen` (`brew install xcodegen`) and Xcode.
 
-To make a TestFlight archive, refresh the bundled web game, increment the iOS
-build number, archive, export, and optionally upload:
+To make a TestFlight archive, refresh the bundled web game, select the next
+unpublished iOS build number, archive, export, and optionally upload:
 
 ```bash
 cd ios
@@ -79,6 +81,12 @@ cd ios
 ```
 
 The release script runs `copy-web.sh` before generating the Xcode project, so the
-archive always contains the current canonical files from `web/`. It also reads
-the date-only `YYYY.M.D` version from `web/package.json` for TestFlight's app
-version, then increments the separate integer build number.
+archive always contains the current canonical files from `web/`. It reads the
+date-only `YYYY.M.D` version from `web/package.json` and uses the checked-in build
+when it is newer than the published TestFlight marker, otherwise incrementing it.
+After upload, it waits for App Store Connect processing, assigns the build to an
+internal beta group, verifies that testers can receive it, writes
+`web/latest_app_build_available.json`, and commits and pushes that marker. Set
+`ASC_BETA_GROUP_ID` or `ASC_BETA_GROUP_NAME` when the app has multiple internal
+groups. A temporary remote Git release lock serializes publishers without
+changing the public marker before a build is actually available.

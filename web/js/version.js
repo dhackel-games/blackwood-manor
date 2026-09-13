@@ -1,10 +1,10 @@
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 export const APP_VERSION = "2026.9.11";
-export const BUILD = "84";
+export const BUILD = "85";
 export const COPYRIGHT = "Copyright (c) Dave and Andy Games. All Rights Reserved.";
 export const VERSION = `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`;
-export const CONTENT_VERSION = 20260911084;
+export const CONTENT_VERSION = 20260911085;
 export const CONTENT_FILES = [
   "css/style.css",
   "index.html",

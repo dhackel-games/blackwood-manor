@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 ```
 
 ---
@@ -664,10 +664,16 @@ current room and lists worn equipment that remains equipped.
 generating the Xcode project, so an archive cannot silently contain stale game files.
 TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
 `web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
-integer build number. The script archives and exports locally with `--no-upload`, or also
-validates and uploads when App Store Connect credentials are available. Each run removes
-the previous repository-local `ios/build/`, places DerivedData under that same directory,
-and leaves only the current run's artifacts; global/shared Xcode DerivedData is untouched.
+integer build number. The script reuses a checked-in build only when it is newer than both
+the published marker and every build already uploaded to App Store Connect; otherwise it
+increments beyond them. A temporary remote Git release-lock branch serializes publishers
+without changing public version metadata before availability. With upload enabled it validates and uploads,
+polls App Store Connect until the exact build is valid, assigns it to a configured internal
+beta group, verifies the group has testers and the build reaches `IN_BETA_TESTING`, then
+atomically writes `web/latest_app_build_available.json` and commits and pushes the release
+metadata. Each run removes the previous repository-local `ios/build/`, places DerivedData
+under that same directory, and leaves only the current run's artifacts; global/shared Xcode
+DerivedData is untouched.
 
 ## 12.23 Mushroom vision and flight
 
@@ -925,11 +931,13 @@ web view always serves `app://local/` from that cache. Thus an older cache canno
 hide newer content delivered in a new app, while a newer downloaded cache
 survives an app update. Offline startup chooses between bundle and cache only.
 
-`manifest.json` is independent of native-app availability. TestFlight builds
-delegate update discovery and installation to TestFlight itself. App Store
-installs query Apple's public lookup service by bundle identifier and offer an
-update only when the published marketing version is newer than the installed
-`CFBundleShortVersionString`; each published version is prompted at most once.
+`manifest.json` is independent of native-app availability. TestFlight installs
+fetch `latest_app_build_available.json`, which release automation publishes only
+after App Store Connect confirms that the exact version/build is available to an
+internal beta group. The app compares both values against its installed Info.plist
+identity, rejects expired markers, and prompts once per available build. App Store
+installs query Apple's public lookup service by bundle identifier and compare
+marketing versions.
 If remote content wins, `CONTENT_FILES` supplies the individual static paths to
 download. Native content checks use one-time query keys, and every winning
 release file uses its `CONTENT_VERSION` query key so CDN cache ages cannot mix
