@@ -1,4 +1,4 @@
-// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
 
 import SwiftUI
 import WebKit
@@ -200,6 +200,8 @@ final class GameViewController: UIViewController, WKUIDelegate {
         evaluateContentCallback(
             "window.__contentVersions",
             values: [
+                appInstalledVersion,
+                appInstalledBuild,
                 labels.contentLocal,
                 labels.contentSource ?? NSNull(),
             ])
@@ -209,6 +211,8 @@ final class GameViewController: UIViewController, WKUIDelegate {
         evaluateContentCallback(
             "window.__contentBanner",
             values: [
+                appInstalledVersion,
+                appInstalledBuild,
                 labels.contentLocal,
                 labels.contentSource ?? NSNull(),
             ])

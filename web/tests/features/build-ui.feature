@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.077:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -75,6 +75,7 @@ Feature: Build metadata and touch-control contract
   Scenario: Movement controls form a compact arrow rose beside two action rows
     Then the movement controls form an eight-arrow compass around a center star
     And Up, Down, In, and Out use compact directional glyphs
+    And phone movement controls are twenty-five percent larger without widening actions
     And action shortcuts occupy two equally wide rows beside movement
 
   Scenario Outline: Every movement direction has a touch button
