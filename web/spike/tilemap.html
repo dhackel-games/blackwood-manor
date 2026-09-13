@@ -197,14 +197,19 @@
     baitBtn.classList.toggle("on", bait.has(gary));
   }
 
-  // Scroll the map so Gary's room sits in the middle of the viewport.
-  function centerCamera(layout) {
+  // Scroll the map so Gary's room sits in the middle of the viewport. Deferred a
+  // frame so it runs after the canvas has been laid out (otherwise the stage has
+  // no scroll range yet and the target clamps to the top-left).
+  function centerCamera(layout, smooth = true) {
     const box = layout.boxes.find((b) => b.id === gary);
     if (!box) return;
     const s = Number(zoom.value);
     const cx = (box.x + box.w / 2) * TILEPX * s;
     const cy = (box.y + box.h / 2) * TILEPX * s;
-    stage.scrollTo({ left: cx - stage.clientWidth / 2, top: cy - stage.clientHeight / 2, behavior: "smooth" });
+    requestAnimationFrame(() => {
+      stage.scrollTo({ left: cx - stage.clientWidth / 2, top: cy - stage.clientHeight / 2,
+        behavior: smooth ? "smooth" : "auto" });
+    });
   }
 
   // Dashed green outline on rooms you can step to on this floor.
@@ -400,10 +405,12 @@
 
   reset();
 
-  // Auto-load the bundled NanoBanana atlas so real art shows by default.
+  // Auto-load the bundled NanoBanana atlas so real art shows by default. Re-center
+  // on Gary once it lands, since the art arriving is the last thing that settles
+  // the initial layout — this guarantees we open on the Royal Hall view.
   (() => {
     const img = new Image();
-    img.onload = () => { atlas = img; render(); };
+    img.onload = () => { atlas = img; recenter = true; render(); };
     img.onerror = () => {};
     img.src = "./atlas.png";
   })();
