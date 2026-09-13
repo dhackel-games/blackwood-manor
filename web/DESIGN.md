@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 ```
 
 ---
@@ -925,6 +925,9 @@ release file uses its `CONTENT_VERSION` query key so CDN cache ages cannot mix
 generations. No manifest field selects or downloads web content.
 
 The native `content` bridge exposes `VER` / `VERSION` / `BUILD` to print the
-loaded build plus cached and remote content versions. `RELOAD` / `REFRESH`
+installed app version/build from the native Info.plist, the locally selected
+bundle-or-cache content version, and the remote source content version. These
+three identities are intentionally independent: downloaded content never
+changes the displayed installed-app version. `RELOAD` / `REFRESH`
 repeats that check. In an ordinary browser, RELOAD performs a cache-busted page
 navigation instead.

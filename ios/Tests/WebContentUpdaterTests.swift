@@ -1,4 +1,4 @@
-// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 
 import XCTest
 
@@ -121,9 +121,31 @@ final class WebContentUpdaterTests: XCTestCase {
         let updater = makeUpdater()
         updater.versionLabels { labels in
             XCTAssertEqual(labels, .init(
-                current: "20260911010",
-                remote: "20260911020"))
+                contentLocal: "20260911010",
+                contentSource: "20260911020"))
             XCTAssertFalse(FileManager.default.fileExists(atPath: self.cache.path))
+            exp.fulfill()
+        }
+        wait(for: [exp], timeout: 5)
+    }
+
+    func testVersionLabelsReportNewerDownloadedCache() throws {
+        try FileManager.default.createDirectory(
+            at: cache.appendingPathComponent("js"), withIntermediateDirectories: true)
+        try versionJS(build: 30).write(
+            to: cache.appendingPathComponent("js/version.js"))
+        try Data("<html>cached</html>".utf8)
+            .write(to: cache.appendingPathComponent("index.html"))
+        StubURLProtocol.handler = { req in
+            guard req.url!.lastPathComponent == "version.js" else { return nil }
+            return (200, self.versionJS(build: 40))
+        }
+
+        let exp = expectation(description: "content versions")
+        makeUpdater().versionLabels { labels in
+            XCTAssertEqual(labels, .init(
+                contentLocal: "20260911030",
+                contentSource: "20260911040"))
             exp.fulfill()
         }
         wait(for: [exp], timeout: 5)

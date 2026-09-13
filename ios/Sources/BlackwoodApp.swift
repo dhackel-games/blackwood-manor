@@ -1,4 +1,4 @@
-// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 
 import SwiftUI
 import WebKit
@@ -36,6 +36,23 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private var pendingContentUpdateNotice: (from: String, to: String)?
     private var pendingContentStatus: String?
     private var appUpdatePresented = false
+    // INSTALLED APP IDENTITY — always read from this installed binary. Never
+    // derive either value from downloaded/cached web content. See the three-way
+    // version contract beside WebContentUpdater.VersionLabels.
+    private var appInstalledVersion: String {
+        Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+            ?? "Unavailable"
+    }
+    private var appInstalledBuild: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+            ?? "Unavailable"
+    }
+
+    private static func javaScriptString(_ value: String) -> String {
+        (try? JSONEncoder().encode(value))
+            .flatMap { String(data: $0, encoding: .utf8) } ?? "\"unknown\""
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +75,12 @@ final class GameViewController: UIViewController, WKUIDelegate {
         updaterBridge.controller = self
         ucc.add(updaterBridge, name: "content")
         contentBridge = updaterBridge
+        let installedIdentity =
+            "window.__appInstalledVersion = \(Self.javaScriptString(appInstalledVersion));" +
+            "window.__appInstalledBuild = \(Self.javaScriptString(appInstalledBuild));"
+        ucc.addUserScript(WKUserScript(
+            source: installedIdentity, injectionTime: .atDocumentStart,
+            forMainFrameOnly: true))
 
         // Gary's on-device brain (Apple Foundation Models). Registered ONLY when the
         // model is actually usable, because js/gary-brain.js decides whether to use
@@ -176,13 +199,19 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private func sendVersionLabels(_ labels: WebContentUpdater.VersionLabels) {
         evaluateContentCallback(
             "window.__contentVersions",
-            values: [labels.current, labels.remote ?? NSNull()])
+            values: [
+                labels.contentLocal,
+                labels.contentSource ?? NSNull(),
+            ])
     }
 
     private func sendVersionBanner(_ labels: WebContentUpdater.VersionLabels) {
         evaluateContentCallback(
             "window.__contentBanner",
-            values: [labels.current, labels.remote ?? NSNull()])
+            values: [
+                labels.contentLocal,
+                labels.contentSource ?? NSNull(),
+            ])
     }
 
     private func evaluateContentCallback(_ function: String, values: [Any]) {
