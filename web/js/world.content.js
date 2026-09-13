@@ -129,6 +129,234 @@ export const content = {
         "source of the faint purple glimmer is somewhere DOWN inside it. You would have to LOOK IN. Sunlight " +
         "flashes strangely through the leaves along the EASTERN path.",
     },
+
+    greatOak: {
+      name: "The Great Oak",
+      desc:
+        "An immense GREAT OAK towers over a sunlit clearing EAST of the PRIVY. On the trunk's sunward backside, " +
+        "a dark iron PANEL is inset beneath a high PULLEY. Tiny mirrors glint among the branches overhead. " +
+        "The PRIVY path returns WEST.",
+    },
+
+    treeFort: {
+      name: "Blackwood Tree Fort",
+      desc:
+        "A weathered TREE FORT fills the GREAT OAK'S crown. Faded SIGNAL FLAGS, a blanket HIDEOUT, a wooden " +
+        "SLINGSHOT, and a crate-table surround a brass SPYGLASS in a rusted swivel cradle. The pulley PLATFORM " +
+        "visits the railing every other turn.",
+      searchDesc:
+        "Child-sized chalk plans cover the planks. The SPYGLASS is unmistakably valuable, and its frozen cradle " +
+        "aims directly toward BLACKWOOD MANOR'S distant BELFRY.",
+    },
+
+    porch: {
+      name: "Front Porch",
+      desc:
+        "The PORCH boards sag underfoot. A brass MAILBOX is bolted beside a great oak " +
+        "FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
+    },
+
+    grandHall: {
+      name: "Royal Hall",
+      desc:
+        "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal " +
+        "staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and " +
+        "above it hangs a great brass BELL on a frayed rope. Doorways lead EAST to the " +
+        "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
+      highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
+    },
+
+    parlor: {
+      name: "Parlor",
+      desc:
+        "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
+        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
+        "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
+      highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
+    },
+
+    library: {
+      name: "Library",
+      desc:
+        "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
+        "LEVER where a book should be. The PARLOR lies NORTH.",
+    },
+
+    secretChamber: {
+      name: "Hidden Chamber",
+      desc:
+        "A cramped HIDDEN CHAMBER that has not seen daylight in a century. A single lectern " +
+        "stands at its centre. The only way out is the stair UP to the LIBRARY.",
+      searchDesc:
+        "The lectern's silver clasp-marks fit the GRIMOIRE exactly. Nothing else here has survived except the warning chill.",
+    },
+
+    diningRoom: {
+      name: "Dining Room",
+      desc:
+        "A long banquet table lies buried under dust and fallen plaster. Upon it, " +
+        "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The ROYAL HALL " +
+        "is EAST; a swinging door leads SOUTH to the KITCHEN.",
+      searchDesc:
+        "Everything is dust-choked except the CANDLESTICK's wick. It is dry and usable, but it will need the MANOR'S " +
+        "single precious MATCH.",
+    },
+
+    kitchen: {
+      name: "Kitchen",
+      desc:
+        "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
+        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR DOOR is set in " +
+        "the floor. The DINING ROOM lies NORTH.",
+      searchDesc:
+        "The MATCHBOX contains exactly one MATCH. The ROPE remains sound, the CELLAR DOOR has a lift-ring, and the " +
+        "sweating super BURRITO appears to violate several eras of food-safety law.",
+    },
+
+    wineCellar: {
+      name: "Wine Cellar",
+      desc:
+        "Racks of burst and blackened bottles line the dripping WINE CELLAR. One survivor gleams: " +
+        "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb UP " +
+        "to the KITCHEN; an arch leads SOUTH, deeper, into a cold that raises the hairs on your neck.",
+      searchDesc:
+        "The DECANTER is the only intact valuable. Frost rims the SOUTHERN arch in the shape of grasping fingers; " +
+        "crossing it without the TALISMAN feels terminal.",
+    },
+
+    crypt: {
+      name: "Crypt",
+      desc:
+        "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
+        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
+        "LOCKET. The only way out is NORTH to the WINE CELLAR.",
+      searchDesc:
+        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
+    },
+
+    landing: {
+      name: "Upstairs Landing",
+      desc:
+        "A long UPSTAIRS LANDING overlooks the ROYAL HALL below. Doors open WEST to the NURSERY, " +
+        "EAST to the GRAND BEDROOM, NORTH to the HALL BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
+        "trap-door in the ceiling. The stairs go DOWN.",
+    },
+
+    nursery: {
+      name: "Nursery",
+      desc:
+        "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
+        "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
+      searchDesc:
+        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
+        "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
+      highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
+    },
+
+    masterBedroom: {
+      name: "Grand Bedroom",
+      desc:
+        "A great canopied bed rots beneath a collapsed tester in the GRAND BEDROOM. On the vanity stands a locked " +
+        "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
+      searchDesc:
+        "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
+      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD SIGNET inside the locked JEWELRY BOX.",
+    },
+
+    study: {
+      name: "Study",
+      desc:
+        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
+        "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
+      searchDesc:
+        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
+    },
+
+    hallBedroom: {
+      name: "Hall Bedroom",
+      desc:
+        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. " +
+        "Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
+      searchDesc:
+        "The BED is untouched, the MIRROR is clouded, and the NIGHT TABLE'S DRAWER has a cheap plastic handle.",
+    },
+
+    attic: {
+      name: "Attic",
+      desc:
+        "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
+        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
+      searchDesc:
+        "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
+    },
+
+    roof: {
+      name: "Manor Roof",
+      desc:
+        "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
+        "a narrow ridge runs EAST to the BELFRY.",
+      searchDesc:
+        "Only someone able to fly could cross the missing slates safely. The BELFRY'S louvers stand open.",
+    },
+
+    belfry: {
+      name: "Belfry",
+      desc:
+        "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. " +
+        "A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
+      searchDesc:
+        "The hatch bypasses the sealed ATTIC gable entirely. Its iron ladder drops directly beside the OBSIDIAN EYE.",
+    },
+
+    hiddenVault: {
+      name: "Astral Chamber",
+      desc:
+        "A windowless ASTRAL CHAMBER the living were never meant to find, mortared behind the ATTIC'S NORTH " +
+        "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
+        "seems to watch you back. The ATTIC lies SOUTH; a BELFRY ladder climbs UP.",
+      searchDesc:
+        "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
+    },
+
+    hollowPassage: {
+      name: "Hollow Passage",
+      desc:
+        "A narrow HOLLOW PASSAGE of pale stone the MANOR kept hidden all this time. It is oddly warm, " +
+        "and lit by no lamp you can find — as if the walls themselves remember daylight. The ROYAL HALL " +
+        "lies back to the SOUTH; the PASSAGE runs NORTH.",
+      searchDesc:
+        "No mechanism or side PASSAGE interrupts the pale stone. The warmth and faint light both strengthen toward the NORTH.",
+    },
+
+    hollowSanctum: {
+      name: "The Hollow Sanctum",
+      desc:
+        "A round, domed HOLLOW SANCTUM at the MANOR'S secret heart, filled with a soft grey light. The pale " +
+        "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
+        "Beyond her, an archway opens NORTH onto a growing dawn.",
+      searchDesc:
+        "The SPIRIT guards nothing now. The SILVER MIRROR lifts freely from its pedestal, and the NORTHERN dawn feels like an ending.",
+    },
+
+    garysLair: {
+      name: "Gary's Call-Cave",
+      desc:
+        "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
+        "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
+      searchDesc: "Whoever worked down here left in a violent hurry — and took your heirlooms with them.",
+    },
+
+    betweenWalls: {
+      name: "The Space Between the Walls",
+      desc:
+        "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
+        "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
+        "and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — " +
+        "only the cramped gap OUT.",
+      searchDesc:
+        "Whoever built this space built it to be forgotten. The WOODBLACK WATCH is the only thing in it that " +
+        "isn't dust.",
+    },
   },
 
   items: {},

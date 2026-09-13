@@ -3117,7 +3117,6 @@ const logicWorld = {
     },
 
     greatOak: {
-      name: "The Great Oak",
       aliases: ["great oak", "oak tree", "oak"],
       art: [
         "       /\\  /\\",
@@ -3126,10 +3125,6 @@ const logicWorld = {
         "      ||     ||",
         "     /_______\\",
       ].join("\n"),
-      desc:
-        "An immense GREAT OAK towers over a sunlit clearing EAST of the PRIVY. On the trunk's sunward backside, " +
-        "a dark iron PANEL is inset beneath a high PULLEY. Tiny mirrors glint among the branches overhead. " +
-        "The PRIVY path returns WEST.",
       searchDesc(ctx) {
         const platform = ctx.roomOf("oakPlatform") === "greatOak"
           ? " A wooden PLATFORM is waiting among the roots."
@@ -3152,7 +3147,6 @@ const logicWorld = {
     },
 
     treeFort: {
-      name: "Blackwood Tree Fort",
       aliases: ["tree fort", "treehouse", "tree house"],
       art: [
         "      __________",
@@ -3161,13 +3155,6 @@ const logicWorld = {
         "    | [___]  |  |",
         "    |___||___|__|",
       ].join("\n"),
-      desc:
-        "A weathered TREE FORT fills the GREAT OAK'S crown. Faded SIGNAL FLAGS, a blanket HIDEOUT, a wooden " +
-        "SLINGSHOT, and a crate-table surround a brass SPYGLASS in a rusted swivel cradle. The pulley PLATFORM " +
-        "visits the railing every other turn.",
-      searchDesc:
-        "Child-sized chalk plans cover the planks. The SPYGLASS is unmistakably valuable, and its frozen cradle " +
-        "aims directly toward BLACKWOOD MANOR'S distant BELFRY.",
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "treeFort" ? ["out"] : [],
       exits: {},
       on: {
@@ -3181,11 +3168,7 @@ const logicWorld = {
     },
 
     porch: {
-      name: "Front Porch",
       art: ROOM_ART.porch,
-      desc:
-        "The PORCH boards sag underfoot. A brass MAILBOX is bolted beside a great oak " +
-        "FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
       searchDesc(ctx) {
         const mailbox = ctx.item("mailbox");
         return mailbox && mailbox.open
@@ -3199,13 +3182,7 @@ const logicWorld = {
     },
 
     grandHall: {
-      name: "Royal Hall",
       art: ROOM_ART.grandHall,
-      desc:
-        "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal " +
-        "staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and " +
-        "above it hangs a great brass BELL on a frayed rope. Doorways lead EAST to the " +
-        "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
       searchDesc(ctx) {
         if (ctx.getFlag("bellRung")) {
           return "The BELL is spent. Fresh stone dust outlines the impossible SECRET DOOR in the NORTH wall, and the BONE " +
@@ -3218,7 +3195,6 @@ const logicWorld = {
         return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. The BELL rope hangs directly above them, ` +
           "waiting for a collection not yet complete.";
       },
-      highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
       extraDirections: (ctx) =>
         ctx.getFlag("floorDoorOpen") && ctx.getFlag("reliquarySealed")
           && !ctx.item("reliquary").open ? ["down"] : [],
@@ -3330,28 +3306,18 @@ const logicWorld = {
     },
 
     parlor: {
-      name: "Parlor",
       art: ROOM_ART.parlor,
-      desc:
-        "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
-        "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
       searchDesc(ctx) {
         return ctx.getFlag("safeRevealed")
           ? "Behind the swung-aside PROFILE PAINTING, the iron SAFE's combination dial shows recent fingerprints."
           : "The PROFILE PAINTING frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
       },
-      highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
       exits: { west: "grandHall", south: "library" },
       on: { code: enterSafeCode },
     },
 
     library: {
-      name: "Library",
       art: ROOM_ART.library,
-      desc:
-        "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
-        "LEVER where a book should be. The PARLOR lies NORTH.",
       searchDesc(ctx) {
         return ctx.getFlag("leverPulled")
           ? "Scrape marks confirm the open bookcase is a counterweighted door. The concealed stair descends DOWN into darkness."
@@ -3365,40 +3331,18 @@ const logicWorld = {
     },
 
     secretChamber: {
-      name: "Hidden Chamber",
       art: ROOM_ART.secretChamber,
-      desc:
-        "A cramped HIDDEN CHAMBER that has not seen daylight in a century. A single lectern " +
-        "stands at its centre. The only way out is the stair UP to the LIBRARY.",
-      searchDesc:
-        "The lectern's silver clasp-marks fit the GRIMOIRE exactly. Nothing else here has survived except the warning chill.",
       dark: true,
       exits: { up: "library" },
     },
 
     diningRoom: {
-      name: "Dining Room",
       art: ROOM_ART.diningRoom,
-      desc:
-        "A long banquet table lies buried under dust and fallen plaster. Upon it, " +
-        "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The ROYAL HALL " +
-        "is EAST; a swinging door leads SOUTH to the KITCHEN.",
-      searchDesc:
-        "Everything is dust-choked except the CANDLESTICK's wick. It is dry and usable, but it will need the MANOR'S " +
-        "single precious MATCH.",
       exits: { east: "grandHall", south: "kitchen" },
     },
 
     kitchen: {
-      name: "Kitchen",
       art: ROOM_ART.kitchen,
-      desc:
-        "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
-        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR DOOR is set in " +
-        "the floor. The DINING ROOM lies NORTH.",
-      searchDesc:
-        "The MATCHBOX contains exactly one MATCH. The ROPE remains sound, the CELLAR DOOR has a lift-ring, and the " +
-        "sweating super BURRITO appears to violate several eras of food-safety law.",
       exits: {
         north: "diningRoom",
         down: { to: "wineCellar", via: "cellarOpen", lockedMsg: "The cellar door is shut." },
@@ -3406,15 +3350,7 @@ const logicWorld = {
     },
 
     wineCellar: {
-      name: "Wine Cellar",
       art: ROOM_ART.wineCellar,
-      desc:
-        "Racks of burst and blackened bottles line the dripping WINE CELLAR. One survivor gleams: " +
-        "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb UP " +
-        "to the KITCHEN; an arch leads SOUTH, deeper, into a cold that raises the hairs on your neck.",
-      searchDesc:
-        "The DECANTER is the only intact valuable. Frost rims the SOUTHERN arch in the shape of grasping fingers; " +
-        "crossing it without the TALISMAN feels terminal.",
       dark: true,
       exits: { up: "kitchen", south: "crypt" },
       on: {
@@ -3437,25 +3373,13 @@ const logicWorld = {
     },
 
     crypt: {
-      name: "Crypt",
       art: ROOM_ART.crypt,
-      desc:
-        "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
-        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
-        "LOCKET. The only way out is NORTH to the WINE CELLAR.",
-      searchDesc:
-        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
       dark: true,
       exits: { north: "wineCellar" },
     },
 
     landing: {
-      name: "Upstairs Landing",
       art: ROOM_ART.landing,
-      desc:
-        "A long UPSTAIRS LANDING overlooks the ROYAL HALL below. Doors open WEST to the NURSERY, " +
-        "EAST to the GRAND BEDROOM, NORTH to the HALL BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
-        "trap-door in the ceiling. The stairs go DOWN.",
       searchDesc(ctx) {
         return ctx.getFlag("ladderDown")
           ? "The lowered ATTIC ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
@@ -3492,15 +3416,7 @@ const logicWorld = {
     },
 
     nursery: {
-      name: "Nursery",
       art: ROOM_ART.nursery,
-      desc:
-        "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
-        "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
-      searchDesc:
-        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
-        "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
-      highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
       exits: {
         east: "landing",
         // A crawl-gap into the space between the walls — the one deliberate,
@@ -3520,52 +3436,27 @@ const logicWorld = {
     },
 
     masterBedroom: {
-      name: "Grand Bedroom",
       art: ROOM_ART.masterBedroom,
-      desc:
-        "A great canopied bed rots beneath a collapsed tester in the GRAND BEDROOM. On the vanity stands a locked " +
-        "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
-      searchDesc:
-        "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD SIGNET inside the locked JEWELRY BOX.",
       exits: { west: "landing" },
     },
 
     study: {
-      name: "Study",
       art: ROOM_ART.study,
-      desc:
-        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
-        "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
-      searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
       exits: { north: "landing" },
     },
 
     hallBedroom: {
-      name: "Hall Bedroom",
       art: [
         "  .--------------.",
         "  | BED    ( O ) |",
         "  |        [_]   |",
         "  '----DOOR------'",
       ].join("\n"),
-      desc:
-        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. " +
-        "Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
-      searchDesc:
-        "The BED is untouched, the MIRROR is clouded, and the NIGHT TABLE'S DRAWER has a cheap plastic handle.",
       exits: { south: "landing" },
     },
 
     attic: {
-      name: "Attic",
       art: ROOM_ART.attic,
-      desc:
-        "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
-        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
-      searchDesc:
-        "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
       extraDirections: (ctx) => canFly(ctx) ? ["up"] : [],
       exits: {
         down: "landing",
@@ -3586,7 +3477,6 @@ const logicWorld = {
     },
 
     roof: {
-      name: "Manor Roof",
       aliases: ["roof"],
       art: [
         "       /\\       |^|",
@@ -3594,33 +3484,21 @@ const logicWorld = {
         " /_______________\\|",
         "      ROOFLINE",
       ].join("\n"),
-      desc:
-        "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
-        "a narrow ridge runs EAST to the BELFRY.",
-      searchDesc:
-        "Only someone able to fly could cross the missing slates safely. The BELFRY'S louvers stand open.",
       exits: { down: "attic", east: "belfry" },
     },
 
     belfry: {
-      name: "Belfry",
       art: [
         "      ______",
         "     / BELL \\",
         "    |   ()   |",
         "    |___||___|",
       ].join("\n"),
-      desc:
-        "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. " +
-        "A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
-      searchDesc:
-        "The hatch bypasses the sealed ATTIC gable entirely. Its iron ladder drops directly beside the OBSIDIAN EYE.",
       exits: { west: "roof", down: "hiddenVault" },
     },
 
     // --- The astral treasure vault, reached by altered sight, flight, or belfry --
     hiddenVault: {
-      name: "Astral Chamber",
       aliases: ["astral chamber", "obsidian chamber"],
       art: [
         "  .==============.",
@@ -3629,37 +3507,17 @@ const logicWorld = {
         "  |  '--------'  |",
         "  '=============='",
       ].join("\n"),
-      desc:
-        "A windowless ASTRAL CHAMBER the living were never meant to find, mortared behind the ATTIC'S NORTH " +
-        "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
-        "seems to watch you back. The ATTIC lies SOUTH; a BELFRY ladder climbs UP.",
-      searchDesc:
-        "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
       dark: true,
       exits: { south: "attic", up: "belfry" },
     },
 
     // --- The hidden wing, revealed only after the curse is lifted (bell rung) ---
     hollowPassage: {
-      name: "Hollow Passage",
       art: ROOM_ART.hollowPassage,
-      desc:
-        "A narrow HOLLOW PASSAGE of pale stone the MANOR kept hidden all this time. It is oddly warm, " +
-        "and lit by no lamp you can find — as if the walls themselves remember daylight. The ROYAL HALL " +
-        "lies back to the SOUTH; the PASSAGE runs NORTH.",
-      searchDesc:
-        "No mechanism or side PASSAGE interrupts the pale stone. The warmth and faint light both strengthen toward the NORTH.",
       exits: { south: "grandHall", north: "hollowSanctum" },
     },
     hollowSanctum: {
-      name: "The Hollow Sanctum",
       art: ROOM_ART.hollowSanctum,
-      desc:
-        "A round, domed HOLLOW SANCTUM at the MANOR'S secret heart, filled with a soft grey light. The pale " +
-        "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
-        "Beyond her, an archway opens NORTH onto a growing dawn.",
-      searchDesc:
-        "The SPIRIT guards nothing now. The SILVER MIRROR lifts freely from its pedestal, and the NORTHERN dawn feels like an ending.",
       extraDirections: ["north"],
       exits: { south: "hollowPassage" },
       on: {
@@ -3687,27 +3545,13 @@ const logicWorld = {
     // so this room is essentially never explored interactively — it exists so
     // the destination is valid (and as the seed of BLACKWOOD MANOR II).
     garysLair: {
-      name: "Gary's Call-Cave",
       art: GARY_LAIR_ART,
-      desc:
-        "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
-        "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
-      searchDesc: "Whoever worked down here left in a violent hurry — and took your heirlooms with them.",
       exits: { up: "grandHall" },
     },
 
     // --- The hidden space reached through the nursery wall or random teleport ---
     betweenWalls: {
-      name: "The Space Between the Walls",
       art: ROOM_ART.betweenWalls,
-      desc:
-        "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
-        "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
-        "and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — " +
-        "only the cramped gap OUT.",
-      searchDesc:
-        "Whoever built this space built it to be forgotten. The WOODBLACK WATCH is the only thing in it that " +
-        "isn't dust.",
       exits: { out: "grandHall" },
     },
   },
