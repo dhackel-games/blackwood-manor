@@ -7,46 +7,68 @@
 <style>
   :root { --bg:#05070a; --panel:#0c1016; --ink:#c9f5d4; --dim:#7c9a86; --line:#1c2733; }
   * { box-sizing: border-box; }
-  html, body { margin:0; background:var(--bg); color:var(--ink);
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:"Courier New", monospace; }
-  header { padding:14px 16px; border-bottom:1px solid var(--line); }
-  header h1 { margin:0 0 4px; font-size:16px; letter-spacing:1px; }
-  header p { margin:0; color:var(--dim); font-size:12px; max-width:70ch; }
+  body { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  header { padding:10px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
+  header h1 { margin:0; font-size:15px; letter-spacing:1px; }
+  header details { color:var(--dim); font-size:12px; margin-top:4px; }
+  header summary { cursor:pointer; }
+  header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
   .bar { display:flex; flex-wrap:wrap; gap:14px; align-items:center;
-    padding:12px 16px; border-bottom:1px solid var(--line); }
+    padding:8px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
   label { font-size:12px; color:var(--dim); }
   select, button { font-family:inherit; font-size:13px; background:var(--panel);
     color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
   button { cursor:pointer; }
-  .stage { padding:16px; overflow:auto; }
+  button.on { border-color:#ffd479; color:#ffd479; }
+
+  /* middle band: map scrolls, inspector pinned on the right */
+  .main { flex:1 1 auto; display:flex; min-height:0; }
+  .stage { flex:1 1 auto; padding:16px; overflow:auto; }
   canvas { background:#000; border:1px solid var(--line); border-radius:8px;
-    image-rendering: pixelated; display:block; }
-  .legend { display:flex; flex-wrap:wrap; gap:12px; padding:10px 16px 4px;
-    font-size:12px; color:var(--dim); }
-  .legend span { display:inline-flex; align-items:center; gap:6px; }
-  .sw { width:14px; height:14px; border:1px solid #0008; display:inline-block; }
-  .note { margin:8px 16px 20px; padding:12px 14px; background:var(--panel);
-    border:1px solid var(--line); border-radius:8px; color:var(--dim);
-    font-size:12px; line-height:1.5; max-width:78ch; }
-  .note b { color:var(--ink); }
-  code { color:#8fd3ff; }
-  .hud { display:flex; flex-wrap:wrap; gap:18px; padding:8px 16px; font-size:13px; }
+    image-rendering: pixelated; display:block; cursor:pointer; }
+  .side { flex:0 0 300px; border-left:1px solid var(--line); padding:12px 14px;
+    overflow:auto; background:var(--panel); }
+  .side h2 { margin:0 0 2px; font-size:14px; color:var(--ink); letter-spacing:.5px; }
+  .side .sub { color:var(--dim); font-size:11px; margin-bottom:8px; }
+  .side .desc { font-size:12px; line-height:1.55; color:#b7d8c2; margin-bottom:12px; }
+  .side .items { list-style:none; margin:0; padding:0; font-size:12px; }
+  .side .items li { display:flex; gap:8px; align-items:baseline; padding:3px 0; }
+  .side .items .k { width:1.4em; text-align:center; }
+  .side .items .kind { color:var(--dim); font-size:10px; margin-left:auto; }
+  .side .empty { color:var(--dim); font-size:12px; }
+
+  /* pinned bottom: stats row + message line that never scroll away */
+  .hud { display:flex; flex-wrap:wrap; gap:16px; padding:8px 16px; font-size:13px;
+    border-top:1px solid var(--line); flex:0 0 auto; }
   .hud b { color:var(--ink); }
-  .msg { color:#ffd479; }
-  .exits { display:flex; flex-wrap:wrap; gap:8px; padding:2px 16px 8px; }
+  .exits { display:flex; flex-wrap:wrap; gap:8px; padding:6px 16px 0; flex:0 0 auto; }
   .exits:empty { display:none; }
   .exits button { border-color:#3a5; }
-  canvas { cursor:pointer; }
+  .textbar { padding:10px 16px; border-top:1px solid var(--line); background:var(--panel);
+    color:#ffd479; font-size:13px; line-height:1.4; flex:0 0 auto; min-height:2.4em; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; padding:6px 16px; font-size:11px;
+    color:var(--dim); border-top:1px solid var(--line); flex:0 0 auto; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .sw { width:12px; height:12px; border:1px solid #0008; display:inline-block; }
+  code { color:#8fd3ff; }
 </style>
 </head>
 <body>
 <header>
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (Phase 1 · playable spike)</h1>
-  <p>You are Gary the ghost. Drift room to room — the manor you once explored in
-  text now <b>develops in 8-bit as you enter each room</b>, while places you
-  haven't visited stay fogged. Arrow keys / WASD or click a lit room to move;
-  take the green <b>stairs</b> buttons to change floors. Still fully isolated
-  under <code>web/spike/</code> — the shipped game and its tests are untouched.</p>
+  <details>
+    <summary>what is this?</summary>
+    <p>You are Gary the ghost. Drift room to room — the manor you once explored in
+    text now <b>develops in 8-bit as you enter each room</b>, while places you
+    haven't visited stay fogged. Arrow keys / WASD or click a lit room to move;
+    click a room you've seen to <b>inspect</b> it (description + items appear on
+    the right); take the green <b>stairs</b> buttons to change floors; press
+    <b>B</b> to drop bait and lure the guest. Turn on <b>reveal all</b> for a
+    pure map view of how the whole manor connects. Fully isolated under
+    <code>web/spike/</code> — the shipped game and its tests are untouched.</p>
+  </details>
 </header>
 
 <div class="bar">
@@ -62,37 +84,32 @@
       <option value="4">4×</option>
     </select>
   </label>
+  <button id="baitBtn">drop bait (B)</button>
   <button id="resetBtn">reset</button>
   <button id="atlasBtn">load atlas…</button>
   <input type="file" id="atlasFile" accept="image/png,image/*" hidden />
 </div>
 
-<div class="hud" id="hud"></div>
-<div class="exits" id="exits"></div>
-<div class="legend" id="legend"></div>
-<div class="stage"><canvas id="c" tabindex="0"></canvas></div>
-
-<div class="note">
-  <b>The fun kernel we're testing:</b> re-experiencing familiar rooms in a new
-  form. You saw the Royal Hall, the Cellar, Dreadmaw's cave as ASCII in Chapter
-  1; here they redraw in 8-bit the moment you step in — a fresh view of ground
-  you already know.<br /><br />
-  <b>Next layer (already wired in <code>tilemap.js</code>, not turned on yet):</b>
-  a wandering Guest you manipulate — drop bait and they path toward it
-  (<code>guestStep</code>). We'll switch that on once moving around already feels
-  good on its own.<br /><br />
-  <b>Art:</b> click <b>load atlas…</b> to swap a different Firefly/NanoBanana
-  tileset live (the bundled one loads by default).
+<div class="main">
+  <div class="stage"><canvas id="c" tabindex="0"></canvas></div>
+  <aside class="side" id="side"></aside>
 </div>
+
+<div class="exits" id="exits"></div>
+<div class="hud" id="hud"></div>
+<div class="textbar" id="textbar"></div>
+<div class="legend" id="legend"></div>
 
 <script type="module">
   import {
     FLOORS, LABELS, TILE, PALETTE, buildTileGrid, drawToCanvas,
     buildManorGraph, coordsOnFloor, neighborInDirection, crossFloorExits,
+    guestStep,
   } from "./tilemap.js";
 
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
+  const stage = canvas.parentElement;
   const floorSel = document.getElementById("floor");
   const revealChk = document.getElementById("reveal");
   const labelsChk = document.getElementById("labels");
@@ -100,22 +117,35 @@
   const atlasBtn = document.getElementById("atlasBtn");
   const atlasFile = document.getElementById("atlasFile");
   const resetBtn = document.getElementById("resetBtn");
+  const baitBtn = document.getElementById("baitBtn");
   const legend = document.getElementById("legend");
   const hud = document.getElementById("hud");
   const exitsEl = document.getElementById("exits");
+  const sideEl = document.getElementById("side");
+  const textbar = document.getElementById("textbar");
 
   const TILEPX = 16;
   const graph = buildManorGraph();
   let atlas = null;
+  // Real room descriptions + item placements, frozen from the shipped world by
+  // gen-roomdata.mjs. Loaded async; the page works even before it arrives.
+  let ROOMDATA = {};
+  fetch("./roomdata.json").then((r) => r.json()).then((d) => { ROOMDATA = d; render(); }).catch(() => {});
   const atlasMap = { [TILE.VOID]:0, [TILE.FLOOR]:1, [TILE.WALL]:2, [TILE.DOOR]:3,
     [TILE.CORRIDOR]:4, [TILE.FOG]:5, [TILE.STAIR]:6, [TILE.PLAYER]:7 };
 
+  const KIND_ICON = { takeable:"💎", container:"📦", scenery:"🗿", fixture:"⚙️" };
+
   // --- play state -----------------------------------------------------------
   const START = "grandHall";
-  let gary, seen, steps, msg;
+  const GUEST_START = "greatOak";
+  let gary, seen, steps, msg, guest, bait, lured, focusId, recenter;
+  let lastLayout = null, lastFloor = 0;
   function reset() {
     gary = START; seen = new Set([START]); steps = 0;
-    msg = "You are Gary. Drift through the manor — each room you enter redraws in 8-bit.";
+    guest = GUEST_START; bait = new Set(); lured = 0;
+    focusId = START; recenter = true;
+    msg = "You are Gary. Move around; drop bait (B) and lure the guest to it.";
     render(); canvas.focus();
   }
   const floorOf = (id) => graph.home.get(id).floorIndex;
@@ -136,6 +166,11 @@
     el.innerHTML = `<i class="sw" style="background:${PALETTE[t]}"></i>${name}`;
     legend.appendChild(el);
   }
+  for (const [color, name] of [["#ffe08a","has loot"],["#7fd0ff","has items"],["#ff8a3d","guest"],["#ffd479","bait"]]) {
+    const el = document.createElement("span");
+    el.innerHTML = `<i class="sw" style="background:${color}"></i>${name}`;
+    legend.appendChild(el);
+  }
 
   const isSeen = (id) => revealChk.checked || seen.has(id);
 
@@ -143,15 +178,33 @@
     const fi = floorOf(gary);
     const floor = FLOORS[fi];
     const layout = buildTileGrid(floor, { isSeen, playerRoom: gary });
+    lastLayout = layout; lastFloor = fi;
     drawToCanvas(canvas, layout, {
       tile: TILEPX, scale: Number(zoom.value),
       showLabels: labelsChk.checked,
       atlas, atlasMap: atlas ? atlasMap : null, atlasTile: 32,
     });
     drawReachable(layout);
+    drawItemIcons(layout);
+    drawTokens(layout, fi);
+    drawFocusRing(layout);
     floorSel.value = String(fi);
+    if (recenter) { centerCamera(layout); recenter = false; }
     renderHud();
     renderExits(fi);
+    renderInspector();
+    textbar.textContent = msg;
+    baitBtn.classList.toggle("on", bait.has(gary));
+  }
+
+  // Scroll the map so Gary's room sits in the middle of the viewport.
+  function centerCamera(layout) {
+    const box = layout.boxes.find((b) => b.id === gary);
+    if (!box) return;
+    const s = Number(zoom.value);
+    const cx = (box.x + box.w / 2) * TILEPX * s;
+    const cy = (box.y + box.h / 2) * TILEPX * s;
+    stage.scrollTo({ left: cx - stage.clientWidth / 2, top: cy - stage.clientHeight / 2, behavior: "smooth" });
   }
 
   // Dashed green outline on rooms you can step to on this floor.
@@ -166,13 +219,92 @@
     ctx.setLineDash([]);
   }
 
+  // Bait markers and the Guest token, for rooms present on this floor.
+  function drawTokens(layout, fi) {
+    for (const id of bait) {
+      const box = layout.boxes.find((b) => b.id === id);
+      if (!box) continue;
+      const x = (box.x + 1) * TILEPX, y = (box.y + 1) * TILEPX;
+      ctx.fillStyle = "#ffd479";
+      ctx.fillRect(x, y, TILEPX * 0.6, TILEPX * 0.6);
+    }
+    const gbox = layout.boxes.find((b) => b.id === guest);
+    if (gbox) {
+      const cx = (gbox.x + gbox.w - 1.5) * TILEPX, cy = (gbox.y + gbox.h / 2) * TILEPX;
+      ctx.fillStyle = "#ff8a3d";
+      ctx.beginPath(); ctx.arc(cx, cy, TILEPX * 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#1a0e04"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = `bold ${Math.round(TILEPX * 0.5)}px monospace`;
+      ctx.fillText("G", cx, cy + 0.5);
+    }
+  }
+
+  // A small diamond in each seen room that holds items — a hint that there's
+  // "stuff" here; click the room to read what it is on the right.
+  function drawItemIcons(layout) {
+    for (const box of layout.boxes) {
+      if (!box.seen) continue;
+      const rd = ROOMDATA[box.id];
+      if (!rd || !rd.items.length) continue;
+      const hasLoot = rd.items.some((i) => i.kind === "takeable");
+      const x = (box.x + box.w - 1.2) * TILEPX, y = (box.y + 0.3) * TILEPX;
+      ctx.fillStyle = hasLoot ? "#ffe08a" : "#7fd0ff";
+      ctx.strokeStyle = "#0009"; ctx.lineWidth = 1;
+      const r = TILEPX * 0.32;
+      ctx.beginPath();
+      ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+  }
+
+  // Highlight the room currently shown in the inspector.
+  function drawFocusRing(layout) {
+    if (!focusId) return;
+    const box = layout.boxes.find((b) => b.id === focusId);
+    if (!box || !box.seen) return;
+    ctx.lineWidth = 2; ctx.setLineDash([]);
+    ctx.strokeStyle = "rgba(143,211,255,0.95)";
+    ctx.strokeRect(box.x*TILEPX-1, box.y*TILEPX-1, box.w*TILEPX+2, box.h*TILEPX+2);
+  }
+
   function renderHud() {
     const here = graph.home.get(gary).label;
+    const guestLabel = graph.home.get(guest).label;
     hud.innerHTML =
-      `<span>📍 <b>${here}</b></span>` +
-      `<span>🗺️ explored <b>${seen.size}</b>/${graph.home.size}</span>` +
-      `<span>👣 steps <b>${steps}</b></span>` +
-      `<span class="msg">${msg}</span>`;
+      `<span>📍 Gary in <b>${here}</b></span>` +
+      `<span>👤 guest in <b>${guestLabel}</b></span>` +
+      `<span>🧀 bait <b>${bait.size}</b></span>` +
+      `<span>✨ lured <b>${lured}</b></span>` +
+      `<span>👣 steps <b>${steps}</b></span>`;
+  }
+
+  // Right-hand inspector: name + real description + item list of the focused
+  // room (only if it's been seen — fog still hides the unknown).
+  function renderInspector() {
+    const id = focusId || gary;
+    const label = graph.home.get(id) ? graph.home.get(id).label : id;
+    if (!isSeen(id)) {
+      sideEl.innerHTML = `<h2>?????</h2><div class="sub">unexplored</div>` +
+        `<div class="empty">You haven't drifted through here yet.</div>`;
+      return;
+    }
+    const rd = ROOMDATA[id];
+    const desc = rd && rd.desc ? rd.desc : "(no description on record)";
+    const items = (rd && rd.items) || [];
+    const tag = id === gary ? " · you are here" : (id === guest ? " · the guest" : "");
+    let html = `<h2>${label}</h2><div class="sub">${id}${tag}</div>`;
+    html += `<div class="desc">${desc}</div>`;
+    if (items.length) {
+      html += `<ul class="items">`;
+      for (const it of items) {
+        html += `<li><span class="k">${KIND_ICON[it.kind] || "•"}</span>` +
+          `<span>${it.label}</span><span class="kind">${it.kind}</span></li>`;
+      }
+      html += `</ul>`;
+    } else {
+      html += `<div class="empty">Nothing of note here.</div>`;
+    }
+    sideEl.innerHTML = html;
   }
 
   function renderExits(fi) {
@@ -186,12 +318,37 @@
     }
   }
 
+  // Free action: leave/retract bait in Gary's current room (doesn't take a turn).
+  function toggleBait() {
+    if (bait.has(gary)) { bait.delete(gary); msg = "You take the bait back."; }
+    else { bait.add(gary); msg = `You leave bait in ${graph.home.get(gary).label}. Now lure someone in…`; }
+    render();
+  }
+
+  // The guest takes one step whenever Gary acts (moves). It drifts toward the
+  // nearest bait, otherwise wanders — the seed of the manipulation loop.
+  function guestTurn() {
+    guest = guestStep(graph, guest, bait);
+    if (bait.has(guest)) {
+      bait.delete(guest); lured++;
+      msg = `👤 The guest takes the bait in ${graph.home.get(guest).label}! (lured ${lured})`;
+    }
+  }
+
   function moveTo(id, label) {
     const first = !seen.has(id);
     gary = id; seen.add(id); steps++;
+    focusId = id; recenter = true;
     const name = label || graph.home.get(id).label;
     msg = first ? `You seep into ${name} for the first time…` : `You drift into ${name}.`;
+    guestTurn();
     render(); canvas.focus();
+  }
+
+  // Inspect a seen room without moving Gary (updates the right-hand panel).
+  function inspect(id) {
+    focusId = id;
+    render();
   }
 
   // Keyboard: arrows / WASD move to the best-matching room on this floor.
@@ -200,6 +357,7 @@
     ArrowLeft:[-1,0], KeyA:[-1,0], ArrowRight:[1,0], KeyD:[1,0],
   };
   window.addEventListener("keydown", (e) => {
+    if (e.code === "KeyB") { e.preventDefault(); toggleBait(); return; }
     const d = DIRS[e.code];
     if (!d) return;
     e.preventDefault();
@@ -207,30 +365,29 @@
     if (id) moveTo(id);
   });
 
-  // Click a lit, reachable room to move there.
+  // Click a reachable room to move there; click any other SEEN room to inspect
+  // it (read its description + items on the right) without moving.
   canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     const scale = Number(zoom.value);
     const tx = (e.clientX - rect.left) / scale / TILEPX;
     const ty = (e.clientY - rect.top) / scale / TILEPX;
-    const fi = floorOf(gary);
-    for (const n of graph.adj.get(gary) || []) {
-      const c = coordsOnFloor(fi, n.id);
-      if (!c) continue;
-      const box = buildTileGrid(FLOORS[fi], { isSeen, playerRoom: gary })
-        .boxes.find((b) => b.id === n.id);
-      if (box && tx >= box.x && tx < box.x+box.w && ty >= box.y && ty < box.y+box.h) {
-        moveTo(n.id); return;
-      }
-    }
+    const boxes = (lastLayout && lastLayout.boxes) || [];
+    const hit = boxes.find((b) => tx >= b.x && tx < b.x+b.w && ty >= b.y && ty < b.y+b.h);
+    if (!hit) return;
+    const reachable = (graph.adj.get(gary) || []).some((n) => n.id === hit.id);
+    if (reachable) moveTo(hit.id);
+    else if (hit.seen) inspect(hit.id);
   });
 
   floorSel.addEventListener("change", () => {
     const start = FLOORS[Number(floorSel.value)].start;
     moveTo(start);
   });
-  [revealChk, labelsChk, zoom].forEach((el) => el.addEventListener("input", render));
+  [revealChk, labelsChk].forEach((el) => el.addEventListener("input", render));
+  zoom.addEventListener("input", () => { recenter = true; render(); });
   resetBtn.addEventListener("click", reset);
+  baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
 
   atlasBtn.addEventListener("click", () => atlasFile.click());
   atlasFile.addEventListener("change", () => {

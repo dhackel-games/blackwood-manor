@@ -35,7 +35,39 @@ node web/spike/preview.mjs          # all floors
 node web/spike/preview.mjs 2 --fog  # ground floor, demo fog-of-war
 ```
 
-## The art seam
+## Phase 1 — what's playable now
+
+The page is now interactive, not just a render test:
+
+- **Move Gary** with arrow keys / WASD, or click an adjacent lit room. Each room
+  redraws in 8-bit the moment you enter; unvisited rooms stay fogged.
+- **Fixed viewport layout:** the map scrolls (and auto-centers on Gary) while the
+  stats row and the amber **text panel** stay pinned at the bottom — they never
+  scroll away. Classic "screen up top, text that stays put" arrangement.
+- **Room inspector (right panel):** click any room you've already seen to read its
+  **real description and item list** (pulled from the shipped world data). A small
+  diamond marks seen rooms that contain items — gold = has takeable loot,
+  blue = has other stuff.
+- **Reveal all (map view):** a pure connectivity view of the whole manor — useful
+  on its own for seeing how everything links, independent of gameplay.
+- **Lure loop (early):** press **B** (or the button) to drop bait in Gary's room.
+  A wandering guest paths toward the nearest bait (`guestStep`); reaching it
+  counts as "lured". This is the seed of the Chapter-2 manipulation mechanic.
+
+### roomdata.json (generated, do not hand-edit)
+
+Descriptions + item placements come from the shipped game, frozen at author time
+so the browser page never imports any engine *logic*:
+
+```bash
+node web/spike/gen-roomdata.mjs   # regenerate after world.js / world.content.js edits
+```
+
+It copies the pure-data engine modules to a temp dir (stripping the browser-only
+`?v=source` cache-buster), imports the composed `world`, and writes
+`web/spike/roomdata.json` (room name, description, `[{label, kind}]` items).
+
+
 
 `drawToCanvas` paints flat placeholder blocks today, but takes an optional
 `{ atlas, atlasMap }`. Drop a Firefly tileset in and click **load Firefly
@@ -92,8 +124,10 @@ NanoBanana is the recommended generator for future tiles.
 
 ## What this is NOT
 
-No movement, no gameplay, no Chapter-2 rules, no lure/escape systems. Purely a
-rendering + data-reuse validation. Gameplay design is Phase 1+.
+Still a spike: no win/lose/escape rules, no scoring economy, no Chapter-2 story
+beats yet — the lure loop is a bare feel-test, not a designed game. It proves the
+data, rendering, layout, and core interactions; the actual Chapter-2 design is
+the next step.
 
 ## Architecture principle
 
