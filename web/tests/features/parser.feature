@@ -1,4 +1,4 @@
-# parser.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @unit
 Feature: Player command parsing
@@ -9,7 +9,12 @@ Feature: Player command parsing
     Then the following commands parse as:
       | input                               | verb    | direct    | preposition | indirect  |
       | n                                   | go      | north     | [none]      | [none]    |
+      | northeast                           | go      | ne        | [none]      | [none]    |
+      | northwest                           | go      | nw        | [none]      | [none]    |
+      | southeast                           | go      | se        | [none]      | [none]    |
+      | southwest                           | go      | sw        | [none]      | [none]    |
       | take the brass key                  | take    | brass key | [none]      | [none]    |
+      | grab brass key                      | take    | brass key | [none]      | [none]    |
       | unlock the oak door with the brass key | unlock | oak door | with      | brass key |
       | look                                | look    | [none]    | [none]      | [none]    |
       | look at brass key                   | examine | brass key | [none]      | [none]    |
@@ -18,7 +23,9 @@ Feature: Player command parsing
       | ex brass key                        | examine | brass key | [none]      | [none]    |
       | look at                             | look    | [none]    | [none]      | [none]    |
       | turn on lamp                        | on      | lamp      | [none]      | [none]    |
+      | o box                               | open    | box       | [none]      | [none]    |
       | yes                                 | yes     | [none]    | [none]      | [none]    |
+      | use talisman                        | use     | talisman  | [none]      | [none]    |
       | no                                  | no      | [none]    | [none]      | [none]    |
       | 7 3 9                               | code    | 7 3 9     | [none]      | [none]    |
       | talk to dragon                      | talk    | dragon    | [none]      | [none]    |

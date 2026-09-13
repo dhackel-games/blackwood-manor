@@ -1,9 +1,11 @@
-// parser.js — turns raw input into { verb, dobj, prep, iobj } (or { error }).
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
 const DIRECTIONS = {
   north: "north", n: "north", south: "south", s: "south", east: "east", e: "east",
   west: "west", w: "west", ne: "ne", nw: "nw", se: "se", sw: "sw",
+  northeast: "ne", northwest: "nw", southeast: "se", southwest: "sw",
   up: "up", u: "up", down: "down", d: "down", in: "in", out: "out",
 };
 
@@ -11,7 +13,7 @@ const DIRECTIONS = {
 const VERBS = {
   go: ["go", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
-  open: ["open", "pry", "force"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
+  open: ["open", "o", "pry", "force"], close: ["close", "shut"], lock: ["lock"], unlock: ["unlock"],
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
   pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],

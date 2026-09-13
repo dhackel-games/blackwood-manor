@@ -1,7 +1,9 @@
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. -->
+
 # Blackwood Manor
 
 A haunted-mansion text adventure in the classic Zork style — pure static files,
-no build step, no server, no dependencies. You've inherited a cursed Victorian
+with no framework, backend, or runtime dependencies. You've inherited a cursed Victorian
 estate; recover the family heirlooms, deposit them in the reliquary in the Royal
 Hall, and ring the bell to lift the curse and escape alive. Linger in the dark,
 and something finds you.
@@ -10,7 +12,8 @@ and something finds you.
 
 Double-click **`Play Blackwood Manor.command`** (the file with the manor icon).
 It starts a tiny local web server and opens the game in your browser. Progress
-auto-saves to your browser.
+auto-saves to your browser. The launcher sends `no-store` headers so a changed
+`ui.js` can never be combined with stale dependency modules.
 
 > Don't open `index.html` directly — Chrome blocks the game's JavaScript modules
 > over `file://`, so it must be served over `http://` (which the launcher does).
@@ -19,9 +22,11 @@ auto-saves to your browser.
 
 ### Commands
 
-- **Move:** `north` / `n`, `s`, `e`, `w`, `ne`, `nw`, `se`, `sw`, `up` / `u`,
-  `down` / `d`, `in`, `out` — or just type the direction. The **In** and **Out**
-  buttons use each room's tracked entrance/exit. `leave` and `exit` mean `out`.
+- **Move:** `north` / `n`, `south` / `s`, `east` / `e`, `west` / `w`,
+  `northeast` / `ne`, `northwest` / `nw`, `southeast` / `se`,
+  `southwest` / `sw`, `up` / `u`, `down` / `d`, `in`, `out`. The touch
+  controls use an eight-arrow compass plus `⇧`/`⇩` and `→□`/`□→` for vertical
+  and portal movement. `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.
   `go <visible door/object>` infers `enter <object>`, including obvious unlock
@@ -75,12 +80,13 @@ auto-saves to your browser.
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
-  `drink`, or `wear` it, the game automatically gets it and prints the derived
+  `drink`, `wear`, or `use` it, the game automatically gets it and prints the derived
   sequence. TOILET mushrooms also derive the missing `look in toilet` step.
   `talk` infers `talk to <character>` when exactly one talkable character is present.
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
-  `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,
+  `use <x>` (contextually WEARs equipment or EATs/DRINKs food), `wear`/`remove <x>`,
+  `ring <x>`, `enter <x>` (including doors, the house,
   cellar, well, and toilet)
   `say <words>` and `yell <words>` repeat the utterance; the **Say** shortcut
   prefills the command. Speech near sleeping DREADMAW wakes her violently.
@@ -93,9 +99,13 @@ auto-saves to your browser.
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
-- **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`, `refresh`,
+- **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
+  `reload`/`refresh`,
   `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION compares the
-  active cached content with GitHub.io; REFRESH forces a complete redownload.
+  bundled, cached, and GitHub.io `CONTENT_VERSION` values from `version.js`;
+  RELOAD puts the greatest version into persistent cache. A changed
+  `manifest.json` independently offers an iOS app update through TestFlight.
+  In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
   MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid

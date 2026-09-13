@@ -1,6 +1,36 @@
-// cheat-prompts.js Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+// cheat-prompts.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
-const join = (commands) => commands.join("; ");
+const DIRECTION_SHORTCUTS = Object.freeze({
+  north: "n",
+  northeast: "ne",
+  east: "e",
+  southeast: "se",
+  south: "s",
+  southwest: "sw",
+  west: "w",
+  northwest: "nw",
+  up: "u",
+  down: "d",
+  in: "in",
+  out: "out",
+});
+
+export function shortestCommand(command) {
+  const text = String(command || "").trim();
+  const direction = DIRECTION_SHORTCUTS[text.toLowerCase()];
+  if (direction) return direction;
+  return text
+    .replace(/^open\b/i, "o")
+    .replace(/^close\b/i, "shut")
+    .replace(/^take\b/i, "get")
+    .replace(/^wear\b/i, "don")
+    .replace(/^remove\b/i, "doff")
+    .replace(/^offer\b/i, "give")
+    .replace(/^enter\b/i, "in")
+    .replace(/^wait$/i, "z");
+}
+
+const join = (commands) => commands.map(shortestCommand).join("; ");
 
 export const MAGIC_MENU_COMMAND = "::";
 export const MAGIC_MENU_DISCOVERY_MESSAGE =
@@ -269,7 +299,7 @@ export function pathToRoom(game, target) {
       prefix.push("wait", "out", "wait");
     }
     start = "greatOak";
-    if (start === destination) return prefix;
+    if (start === destination) return prefix.map(shortestCommand);
   }
 
   const queue = [{ room: start, directions: [] }];
@@ -281,7 +311,7 @@ export function pathToRoom(game, target) {
       const next = typeof exit === "object" ? exit.to : exit;
       if (!next || visited.has(next)) continue;
       const directions = [...current.directions, direction];
-      if (next === destination) return [...prefix, ...directions];
+      if (next === destination) return [...prefix, ...directions].map(shortestCommand);
       visited.add(next);
       queue.push({ room: next, directions });
     }
@@ -307,11 +337,11 @@ export function expandCheatPrompt(shortcut, game) {
     .replace(/\{\{pathto:([^}]+)\}\}/gi, (_, target) => pathToRoom(game, target).join("; "))
     .replace(/\{\{oakspyglass\}\}/gi, join(oakRoute))
     .replace(/\{\{cryptloot\}\}/gi, join(cryptRoute));
-  return expanded.split(";").map((command) => command.trim()).filter((command) => {
+  return expanded.split(";").map(shortestCommand).filter((command) => {
     if (!command) return false;
     const take = /^(?:take|get)\s+(.+)$/i.exec(command);
     if (take && game.find(take[1], game.inventory())) return false;
-    const wear = /^wear\s+(.+)$/i.exec(command);
+    const wear = /^(?:wear|don)\s+(.+)$/i.exec(command);
     if (wear) {
       const item = game.find(wear[1], game.inventory());
       if (item?.worn) return false;
@@ -328,8 +358,9 @@ export function cheatPrompt(command) {
 export function cheatMenu() {
   return [
     "== MAGIC MENU ==",
+    "COMMAND | TITLE / DESCRIPTION",
     ...CHEAT_PROMPTS.map((entry) =>
-      `${entry.cmd.padEnd(12)} ${entry.name} — ${entry.description}`),
+      `${entry.cmd.padEnd(14)} | ${entry.name} / ${entry.description}`),
   ].join("\n");
 }
 

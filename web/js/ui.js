@@ -1,13 +1,14 @@
-// ui.js — browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
-import { createGame } from "./core.js";
-import { world } from "./world.js";
-import { saveGame, loadGame, hasSave } from "./save.js";
-import { VERSION } from "./version.js";
-import { createHud, hudStateSummary } from "./hud.js";
-import * as garyBrain from "./gary-brain.js";
-import { MAP_MARK } from "./map.js";
+import { createGame } from "./core.js?v=source";
+import { world } from "./world.js?v=source";
+import { saveGame, loadGame, hasSave } from "./save.js?v=source";
+import { VERSION } from "./version.js?v=source";
+import { createHud, hudStateSummary } from "./hud.js?v=source";
+import * as garyBrain from "./gary-brain.js?v=source";
+import { MAP_MARK } from "./map.js?v=source";
 import {
   bugReportBody,
   bugReportDescription,
@@ -15,18 +16,19 @@ import {
   createBugTrace,
   DEFAULT_ISSUE_DESCRIPTION,
   recordBugCommand,
-} from "./issue-report.js";
+} from "./issue-report.js?v=source";
 import {
   DEFAULT_GARY_VOICE_PRESET,
   estimatedSpeechDurationMs,
   garyVoiceProfile,
   pickGaryVoice,
-} from "./gary-voice.js";
-import { cheatMenu, expandCheatPrompt, magicMenuAction } from "./cheat-prompts.js";
-import { splitCommands } from "./parser.js";
+} from "./gary-voice.js?v=source";
+import { cheatMenu, expandCheatPrompt, magicMenuAction } from "./cheat-prompts.js?v=source";
+import { splitCommands } from "./parser.js?v=source";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
+const mainGo = document.getElementById("go");
 const bugReport = document.getElementById("bug-report");
 const MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
 let magicMenuUnlocked = false;
@@ -40,9 +42,11 @@ try {
 const phone = document.getElementById("phone");
 const phoneT = document.getElementById("phone-transcript");
 const phoneCmd = document.getElementById("phone-cmd");
+const phoneGo = document.getElementById("phone-go");
 const phoneTimer = document.getElementById("phone-timer");
 const phoneBillEl = document.getElementById("phone-bill");
 const garyVoiceSelect = document.getElementById("gary-voice");
+const garyVolumeInput = document.getElementById("gary-volume");
 const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
@@ -50,6 +54,7 @@ let endingCall = false;
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
 const hud = createHud(document);
+const hudElement = document.getElementById("hud");
 const hudVersion = document.getElementById("hud-version");
 if (hudVersion) hudVersion.textContent = VERSION;
 
@@ -63,6 +68,33 @@ let lastCmd = "";
 // On touch devices, focusing pops the on-screen keyboard, which is jarring when
 // you just tapped a movement/action button — so we don't.
 const canType = !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+
+function createChatEntry({ field, submit, starterText }) {
+  field.placeholder = starterText;
+  const sync = () => submit.classList.toggle("has-text", field.value.trim().length > 0);
+  const setValue = (value) => {
+    field.value = value;
+    sync();
+  };
+  field.addEventListener("input", sync);
+  sync();
+  return { clear: () => setValue(""), setValue, sync };
+}
+
+const mainEntry = createChatEntry({
+  field: input,
+  submit: mainGo,
+  starterText: "type command / tap button",
+});
+const phoneEntry = createChatEntry({
+  field: phoneCmd,
+  submit: phoneGo,
+  starterText: "say something to Gary…",
+});
+
+function setEntryValue(field, value) {
+  (field === phoneCmd ? phoneEntry : mainEntry).setValue(value);
+}
 
 const BIG_BANNER =
 `  ____  _            _                     _
@@ -132,6 +164,11 @@ function garyLineLabel() {
   if (xp >= 9) return "Crisis Line · 99¢/min";
   return "Hint Line · 99¢/min";
 }
+function syncPhoneHudOffset() {
+  if (!hudElement) return;
+  phone.style.setProperty(
+    "--phone-hud-offset", `${Math.ceil(hudElement.getBoundingClientRect().bottom)}px`);
+}
 function showPhone() {
   endingCall = false;
   phone.removeAttribute("aria-busy");
@@ -145,6 +182,7 @@ function showPhone() {
   const sub = document.getElementById("phone-sub");
   if (sub) sub.textContent = garyLineLabel();
   updatePhoneStatus();
+  syncPhoneHudOffset();
   phone.hidden = false;
   requestAnimationFrame(() => phone.classList.add("show"));
   clearInterval(callTimer);
@@ -169,7 +207,11 @@ function endCallUI() {
 
 function updateHud() {
   hud.update({ game, world });
+  if (!phone.hidden) requestAnimationFrame(syncPhoneHudOffset);
 }
+window.addEventListener("resize", () => {
+  if (!phone.hidden) syncPhoneHudOffset();
+});
 
 function inventoryForBugReport() {
   return game.inventory().map((item) => {
@@ -200,18 +242,31 @@ function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
 }
 
 // ---- Text-to-speech: Gary talks (WKWebView supports speechSynthesis) ----
-// Default MUTED so audio never plays unexpectedly (e.g. at work) — tap 🔇 Gary
-// on the call screen to turn his voice on.
+// Default MUTED so audio never plays unexpectedly (e.g. at work) — tap Gary's
+// large speaker on the call screen to turn his voice on.
 const GARY_VOICE_PRESET_KEY = "blackwood-gary-voice";
+const GARY_VOLUME_KEY = "blackwood-gary-volume";
 let ttsMuted = true;
 let garyVoice = null;
 let garyVoicePreset = DEFAULT_GARY_VOICE_PRESET;
+let garyVolume = 1;
 try {
   garyVoicePreset = garyVoiceProfile(localStorage.getItem(GARY_VOICE_PRESET_KEY)).id;
+  const savedVolume = localStorage.getItem(GARY_VOLUME_KEY);
+  const parsedVolume = savedVolume == null ? NaN : Number(savedVolume);
+  if (Number.isFinite(parsedVolume)) garyVolume = Math.min(1, Math.max(0, parsedVolume));
 } catch (error) {
-  console.warn("[gary] could not read saved voice preset", error);
+  console.warn("[gary] could not read saved voice settings", error);
 }
 if (garyVoiceSelect) garyVoiceSelect.value = garyVoicePreset;
+function refreshGaryVolume() {
+  if (!garyVolumeInput) return;
+  const percent = Math.round(garyVolume * 100);
+  garyVolumeInput.value = String(percent);
+  garyVolumeInput.setAttribute("aria-valuetext", `${percent}%`);
+  garyVolumeInput.title = `Gary volume: ${percent}%`;
+}
+refreshGaryVolume();
 function refreshGaryVoice() {
   if (!("speechSynthesis" in window)) return;
   const profile = garyVoiceProfile(garyVoicePreset);
@@ -228,9 +283,12 @@ if ("speechSynthesis" in window) {
   speechSynthesis.addEventListener("voiceschanged", refreshGaryVoice);
 } else if (garyVoiceSelect) {
   garyVoiceSelect.disabled = true;
+  if (garyVolumeInput) garyVolumeInput.disabled = true;
 }
 function garySpeak(text) {
-  if (ttsMuted || !text || !("speechSynthesis" in window)) return Promise.resolve();
+  if (ttsMuted || garyVolume <= 0 || !text || !("speechSynthesis" in window)) {
+    return Promise.resolve();
+  }
   // strip stage directions like *click* / *chewing* so he doesn't read them aloud
   // Drop MAP_MARK blocks entirely — nobody wants the torn edge read aloud.
   const spoken = text.split(MAP_MARK).filter((_, i) => i % 2 === 0).join(" ")
@@ -243,6 +301,7 @@ function garySpeak(text) {
       const profile = garyVoiceProfile(garyVoicePreset);
       u.pitch = profile.pitch;
       u.rate = profile.rate;
+      u.volume = garyVolume;
       let finished = false;
       const finish = () => {
         if (finished) return;
@@ -420,7 +479,7 @@ function beginWebRecognition() {
       else interim += text;
     }
     webPartial = interim;
-    speechTarget.value = (webTranscript + webPartial).trim();
+    setEntryValue(speechTarget, (webTranscript + webPartial).trim());
   };
   recognition.onerror = (event) => {
     if (!listening || event.error === "no-speech" || event.error === "aborted") return;
@@ -431,7 +490,7 @@ function beginWebRecognition() {
     if (listening && webPartial.trim()) {
       webTranscript += webPartial.trim() + " ";
       webPartial = "";
-      speechTarget.value = webTranscript.trim();
+      setEntryValue(speechTarget, webTranscript.trim());
     }
     if (listening) webRestartTimer = setTimeout(beginWebRecognition, 100);
   };
@@ -450,7 +509,7 @@ function startListening(targetInput, micBtn) {
   webPartial = "";
   stopSpeaking();                 // don't record Gary's own voice
   targetInput.dataset.ph = targetInput.getAttribute("placeholder") || "";
-  targetInput.value = "";         // start clean so nothing stale is appended
+  setEntryValue(targetInput, ""); // start clean so nothing stale is appended
   targetInput.placeholder = "listening… tap mic to send";
   setListening(true);
   if (nativeSpeech) {
@@ -479,13 +538,13 @@ function finishListening(text) {
   const t = (text || "").trim();
   if (!t) return;
   const el = speechTarget;
-  el.value = "";
+  setEntryValue(el, "");
   handle(t);                      // voice command auto-runs
 }
 // Called by the native bridge (evaluateJavaScript).
 window.__speech = (text, isFinal) => {
   if (!listening && !isFinal) return;          // ignore stray callbacks after we've stopped
-  if (text != null) speechTarget.value = text; // live partials
+  if (text != null) setEntryValue(speechTarget, text); // live partials
   if (isFinal) finishListening(text);
 };
 window.__speechEnd = () => { setListening(false); };
@@ -493,23 +552,28 @@ window.__speechEnd = () => { setListening(false); };
 // Called by the native iOS harness after it has downloaded and swapped in a newer
 // web bundle from GitHub Pages (see ios/Sources/BlackwoodApp.swift). Surfaces the
 // self-update to the player so they can see they're now on the latest code.
-window.__appUpdateNotice = (from, to) => {
+window.__contentUpdateNotice = (from, to) => {
   print("\n— UPDATE —", "sys");
   print("Cached version: " + (from || "unknown"), "sys");
   print("New version found: " + (to || "unknown"), "sys");
   print("Running the latest from GitHub.\n", "sys");
 };
+// Compatibility with build 66's native callback while cached web content transitions.
+window.__appUpdateNotice = window.__contentUpdateNotice;
 function printContentStatus(message) {
   if (game.state.flags.onCall) printToPhone(message, "sys");
   else print(message, "sys");
 }
 window.__contentVersions = (current, remote) => {
   printContentStatus(
-    `${versionText()}\n  Cached content: ${current || "unknown"}\n` +
-    `  GitHub.io content: ${remote || "unavailable"}`);
+    `${versionText()}\n  Cached content version: ${current || "unknown"}\n` +
+    `  GitHub.io content version: ${remote || "unavailable"}`);
 };
 window.__contentRefreshFailed = (message) => {
   printContentStatus(message || "GitHub.io refresh failed. The current cache was left unchanged.");
+};
+window.__contentStatus = (message) => {
+  printContentStatus(message || "The iOS web cache was reloaded.");
 };
 
 function newGame(origin = "restart") {
@@ -529,17 +593,18 @@ function finishPhoneCall(message) {
   endingCall = true;
   phone.setAttribute("aria-busy", "true");
   const profile = garyVoiceProfile(garyVoicePreset);
-  const canSpeak = !ttsMuted && "speechSynthesis" in window;
+  const canSpeak = !ttsMuted && garyVolume > 0 && "speechSynthesis" in window;
   const duration = canSpeak ? estimatedSpeechDurationMs(message, profile.rate) : 1400;
+  const closeDelay = Math.round(duration * 1.5);
   phoneEnd.disabled = true;
-  phoneEnd.style.setProperty("--end-call-duration", `${duration}ms`);
+  phoneEnd.style.setProperty("--end-call-duration", `${closeDelay}ms`);
   phoneEnd.classList.add("closing");
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const speechDone = canSpeak
-    ? Promise.race([garySpeak(message), wait(duration + 5000)])
+    ? Promise.race([garySpeak(message), wait(closeDelay + 5000)])
     : Promise.resolve();
-  Promise.all([speechDone, wait(duration)]).then(() => {
+  Promise.all([speechDone, wait(closeDelay)]).then(() => {
     endCallUI();
     print("(You hang up. Phone bill so far: " + billText() + ".)", "echo");
     updateHud();
@@ -594,12 +659,17 @@ function handle(raw) {
     if (nativeContent) nativeContent.postMessage({ action: "version" });
     return;
   }
-  if (low === "refresh") {
-    const message = nativeContent
-      ? "Forcing a fresh download from GitHub.io..."
-      : "Forced GitHub.io cache refresh is available only in the iOS app.";
-    onCall ? printToPhone(message, "sys") : print(message, "sys");
-    if (nativeContent) nativeContent.postMessage({ action: "refresh" });
+  if (low === "reload" || low === "refresh") {
+    if (nativeContent) {
+      const message = "Forcing a fresh download from GitHub.io...";
+      onCall ? printToPhone(message, "sys") : print(message, "sys");
+      nativeContent.postMessage({ action: "refresh" });
+    } else {
+      print("Reloading the latest web files with a fresh cache key...", "sys");
+      const url = new URL(window.location.href);
+      url.searchParams.set("_bmrefresh", Date.now().toString());
+      window.location.replace(url.toString());
+    }
     return;
   }
   if (low === "quit") { if (onCall) endCallUI(); print("Thanks for playing. Refresh to return to Blackwood Manor."); input.disabled = true; return; }
@@ -656,12 +726,9 @@ function handle(raw) {
       updateHud();
       garyBrain.speak(info).then((line) => {
         const spoken = line ? line + (info.tail || "") : out;
-        // `llm` marks a line the model actually wrote. When speak() returns ""
-        // we fell back to the scripted line, and it must NOT claim otherwise —
-        // a badge that lies is worse than no badge. Mark that case explicitly
-        // too: an unlabelled line was exactly what made testers conclude the
-        // model "isn't working" when it was simply a fallback on that turn.
-        if (el) { el.className = line ? "gary llm" : "gary scripted"; el.textContent = spoken; }
+        // Only model-written lines get a marker. Scripted fallbacks remain
+        // unmarked rather than adding a second status label to every response.
+        if (el) { el.className = line ? "gary llm" : "gary"; el.textContent = spoken; }
         phoneT.scrollTop = phoneT.scrollHeight;
         garySpeak(spoken);
       });
@@ -706,16 +773,16 @@ function applyCheatPrompt(raw) {
   magicMenuUnlocked = action.unlocked;
   if (action.showMenu) {
     print(cheatMenu(), "sys");
-    input.value = "";
+    mainEntry.clear();
     return true;
   }
   if (action.message) {
     print(action.message, "sys");
-    input.value = "";
+    mainEntry.clear();
     return true;
   }
   try {
-    input.value = expandCheatPrompt(action.shortcut, game);
+    mainEntry.setValue(expandCheatPrompt(action.shortcut, game));
   } catch (error) {
     print(error.message, "sys");
     return true;
@@ -729,13 +796,13 @@ function applyCheatPrompt(raw) {
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    if (!applyCheatPrompt(input.value)) { handle(input.value); input.value = ""; }
+    if (!applyCheatPrompt(input.value)) { handle(input.value); mainEntry.clear(); }
   }
-  else if (e.key === "ArrowUp") { if (hi > 0) { hi--; input.value = history[hi] || ""; } e.preventDefault(); }
-  else if (e.key === "ArrowDown") { if (hi < history.length) { hi++; input.value = history[hi] || ""; } e.preventDefault(); }
+  else if (e.key === "ArrowUp") { if (hi > 0) { hi--; mainEntry.setValue(history[hi] || ""); } e.preventDefault(); }
+  else if (e.key === "ArrowDown") { if (hi < history.length) { hi++; mainEntry.setValue(history[hi] || ""); } e.preventDefault(); }
 });
-document.getElementById("go").addEventListener("click", () => {
-  if (!applyCheatPrompt(input.value)) { handle(input.value); input.value = ""; }
+mainGo.addEventListener("click", () => {
+  if (!applyCheatPrompt(input.value)) { handle(input.value); mainEntry.clear(); }
   if (canType) input.focus();
 });
 
@@ -757,7 +824,7 @@ if (!canType) {
 
 // --- input wiring (phone screen) ---
 phoneCmd.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") { handle(phoneCmd.value); phoneCmd.value = ""; }
+  if (e.key === "Enter") { handle(phoneCmd.value); phoneEntry.clear(); }
 });
 // iOS: tapping a control while the keyboard is up blurs the field first, and the
 // blur handler below drops the "compact" class — which un-hides the avatar, the
@@ -769,12 +836,15 @@ function keepFocus(el) {
   if (el) el.addEventListener("mousedown", (e) => e.preventDefault());
 }
 
-const phoneGo = document.getElementById("phone-go");
 const phoneEnd = document.getElementById("phone-end");
-phoneGo.addEventListener("click", () => { handle(phoneCmd.value); phoneCmd.value = ""; if (canType) phoneCmd.focus(); });
+phoneGo.addEventListener("click", () => {
+  handle(phoneCmd.value);
+  phoneEntry.clear();
+  if (canType) phoneCmd.focus();
+});
 phoneEnd.addEventListener("click", () => { phoneCmd.blur(); handle("hang up"); });
 [phoneGo, phoneEnd, document.getElementById("phone-mic"), document.getElementById("phone-ai"),
- document.getElementById("phone-avatar"), document.getElementById("phone-mute")].forEach(keepFocus);
+ document.getElementById("phone-avatar")].forEach(keepFocus);
 
 const scrollPhoneBottom = () => { phoneT.scrollTop = phoneT.scrollHeight; };
 // While typing on the call screen (touch), collapse Gary's big header so the
@@ -791,18 +861,20 @@ if (!canType) {
   });
 }
 
-// Voice toggle — tap the speaker avatar (or the hint under it). Muted by default.
-const muteBtn = document.getElementById("phone-mute");     // the hint text under the name
+// The large speaker avatar is Gary's only mute control. Muted by default.
 const phoneAvatar = document.getElementById("phone-avatar");
-function setMuteLabel() {
-  muteBtn.textContent = ttsMuted ? "🔊 Tap Gary to hear him" : "🔊 Voice on — tap to mute";
-  muteBtn.classList.toggle("on", !ttsMuted);
-  if (phoneAvatar) phoneAvatar.classList.toggle("muted", ttsMuted);
+function setVoiceToggleState() {
+  if (!phoneAvatar) return;
+  phoneAvatar.classList.toggle("muted", ttsMuted);
+  phoneAvatar.setAttribute("aria-pressed", String(!ttsMuted));
+  const label = ttsMuted ? "turn Gary's voice on" : "mute Gary's voice";
+  phoneAvatar.setAttribute("aria-label", label);
+  phoneAvatar.title = label;
 }
-setMuteLabel();   // reflect the default (muted)
+setVoiceToggleState();
 function toggleVoice() {
   ttsMuted = !ttsMuted;
-  setMuteLabel();
+  setVoiceToggleState();
   if (ttsMuted) {
     stopSpeaking();
   } else {
@@ -811,7 +883,6 @@ function toggleVoice() {
     garySpeak("Fine. The voice is on. Don't make it weird.");
   }
 }
-muteBtn.addEventListener("click", toggleVoice);
 if (phoneAvatar) phoneAvatar.addEventListener("click", toggleVoice);
 if (garyVoiceSelect) {
   garyVoiceSelect.addEventListener("change", () => {
@@ -823,6 +894,17 @@ if (garyVoiceSelect) {
     }
     refreshGaryVoice();
     if (!ttsMuted) garySpeak("Fine. New voice. Still Gary.");
+  });
+}
+if (garyVolumeInput) {
+  garyVolumeInput.addEventListener("input", () => {
+    garyVolume = Math.min(1, Math.max(0, Number(garyVolumeInput.value) / 100));
+    refreshGaryVolume();
+    try {
+      localStorage.setItem(GARY_VOLUME_KEY, String(garyVolume));
+    } catch (error) {
+      console.warn("[gary] could not save voice volume", error);
+    }
   });
 }
 
@@ -846,7 +928,7 @@ document.querySelectorAll("#controls [data-cmd]").forEach((b) =>
   }));
 // Prefill buttons (Take/Say) need more text, so they DO open the keyboard.
 document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
-  b.addEventListener("click", () => { input.value = b.dataset.prefill; input.focus(); }));
+  b.addEventListener("click", () => { mainEntry.setValue(b.dataset.prefill); input.focus(); }));
 
 // Show the mic buttons only if speech input is actually available.
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
@@ -880,23 +962,21 @@ if (aiBadge) {
   });
 }
 
-garyBrain.detect().then((p) => {
+garyBrain.detect().then(() => {
   refreshAiBadge();
   announceModelCheck();
-  console.log(p
-    ? `[gary] on-device voice active via "${p}" provider`
-    : `[gary] scripted — ${garyBrain.status().reason}`);
 });
 
 // Launch-time model check.
 //
 // Testers kept reporting "Gary isn't using the LLM" with no way to tell whether
 // the model was missing, switched off, or simply not being reached — the badge
-// alone was too quiet and only lives on the call screen. So on the app, say it
-// out loud once at launch, in the main transcript, before anyone calls Gary.
+// alone was too quiet and only lives on the call screen. Surface the report in
+// the native app and in a local browser whose daemon is active; keep the public
+// scripted site quiet.
 function announceModelCheck() {
   const s = garyBrain.status();
-  if (!s.nativeApp) return;          // browser: the badge is enough, no launch noise
+  if (!s.nativeApp && s.provider !== "daemon") return;
   print(modelStatusText(), garyBrain.isAvailable() ? "sys ok" : "sys");
 }
 
@@ -905,7 +985,7 @@ export function modelStatusText() {
   const s = garyBrain.status();
   if (s.available) {
     return "[AI check] On-device model READY — Gary's phone replies are written live on this device.\n" +
-           "  Lines he actually generates are marked ◆ AI; anything marked '· scripted' came from the script.";
+           "  Lines he actually generates are marked ◆ AI.";
   }
   const why = s.native ? s.native.detail : s.reason;
   const fix = s.fix || (s.native ? "" : "");

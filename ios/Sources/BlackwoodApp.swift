@@ -1,3 +1,5 @@
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+
 import SwiftUI
 import WebKit
 import Speech
@@ -31,7 +33,9 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private var schemeHandler: AppSchemeHandler!
     private let contentStore = WebContentStore()
     private lazy var contentUpdater = WebContentUpdater(store: contentStore)
-    private var pendingUpdateNotice: (from: String, to: String)?
+    private var pendingContentUpdateNotice: (from: String, to: String)?
+    private var pendingContentStatus: String?
+    private var appUpdatePresented = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +43,9 @@ final class GameViewController: UIViewController, WKUIDelegate {
         view.backgroundColor = bg
 
         let config = WKWebViewConfiguration()
-        schemeHandler = AppSchemeHandler(baseURL: contentStore.activeRoot())
+        let cacheReady = contentStore.ensureCacheFromBundle()
+        schemeHandler = AppSchemeHandler(
+            baseURL: cacheReady ? contentStore.cacheRoot : contentStore.bundleRoot)
         config.setURLSchemeHandler(schemeHandler, forURLScheme: "app")
         config.websiteDataStore = .default()
 
@@ -116,13 +122,17 @@ final class GameViewController: UIViewController, WKUIDelegate {
             webView.load(URLRequest(url: url))
         }
 
-        // Non-blocking self-update: the game is already on screen from the bundle
-        // (or last cache); if GitHub Pages has something newer, fetch it into the
-        // cache and reload into it. Offline or no-update => this quietly no-ops.
+        // Non-blocking content sync: the game is already running from cache,
+        // seeded with the greatest bundled/cached web tree. If GitHub Pages'
+        // CONTENT_VERSION is greater, replace the cache and reload.
         let fromLabel = contentStore.activeLabel()
         contentUpdater.checkForUpdate { [weak self] result in
             guard let self, case .updated(let toLabel) = result else { return }
             self.activateDownloadedContent(from: fromLabel, to: toLabel)
+        }
+        contentUpdater.checkForAppManifestChange { [weak self] changed in
+            guard changed else { return }
+            self?.presentAppUpdate()
         }
     }
 
@@ -130,19 +140,28 @@ final class GameViewController: UIViewController, WKUIDelegate {
         switch action {
         case "version":
             contentUpdater.versionLabels { [weak self] labels in
-                self?.sendContentVersions(labels)
+                self?.sendVersionLabels(labels)
             }
         case "refresh":
             let fromLabel = contentStore.activeLabel()
-            contentUpdater.checkForUpdate(force: true) { [weak self] result in
+            guard contentStore.ensureCacheFromBundle() else {
+                evaluateContentCallback(
+                    "window.__contentRefreshFailed",
+                    values: ["Could not copy bundled web content into the iOS cache."])
+                return
+            }
+            schemeHandler.baseURL = contentStore.cacheRoot
+            contentUpdater.checkForUpdate { [weak self] result in
                 guard let self else { return }
                 switch result {
                 case .updated(let toLabel):
                     self.activateDownloadedContent(from: fromLabel, to: toLabel)
-                case .failed, .upToDate:
-                    self.evaluateContentCallback(
-                        "window.__contentRefreshFailed",
-                        values: ["GitHub.io refresh failed. The current cache was left unchanged."])
+                case .upToDate:
+                    self.reloadCachedContent(
+                        message: "Cached content matches GitHub.io and has been reloaded.")
+                case .failed:
+                    self.reloadCachedContent(
+                        message: "GitHub.io is unavailable; running the persistent local cache.")
                 }
             }
         default:
@@ -150,7 +169,7 @@ final class GameViewController: UIViewController, WKUIDelegate {
         }
     }
 
-    private func sendContentVersions(_ labels: WebContentUpdater.VersionLabels) {
+    private func sendVersionLabels(_ labels: WebContentUpdater.VersionLabels) {
         evaluateContentCallback(
             "window.__contentVersions",
             values: [labels.current, labels.remote ?? NSNull()])
@@ -168,13 +187,42 @@ final class GameViewController: UIViewController, WKUIDelegate {
 
     private func activateDownloadedContent(from: String, to: String) {
         DispatchQueue.main.async {
-            self.pendingUpdateNotice = (from: from, to: to)
+            self.pendingContentUpdateNotice = (from: from, to: to)
             self.schemeHandler.baseURL = self.contentStore.activeRoot()
             if let url = URL(string: "app://local/index.html") {
                 self.webView.load(URLRequest(url: url,
                                              cachePolicy: .reloadIgnoringLocalCacheData,
                                              timeoutInterval: 30))
             }
+        }
+    }
+
+    private func reloadCachedContent(message: String) {
+        DispatchQueue.main.async {
+            self.pendingContentStatus = message
+            self.schemeHandler.baseURL = self.contentStore.cacheRoot
+            if let url = URL(string: "app://local/index.html") {
+                self.webView.load(URLRequest(url: url,
+                                             cachePolicy: .reloadIgnoringLocalCacheData,
+                                             timeoutInterval: 30))
+            }
+        }
+    }
+
+    private func presentAppUpdate() {
+        DispatchQueue.main.async {
+            guard !self.appUpdatePresented else { return }
+            self.appUpdatePresented = true
+            let alert = UIAlertController(
+                title: "Update Available",
+                message: "A new version of Blackwood Manor is available! Download now?",
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            alert.addAction(UIAlertAction(title: "Okay", style: .default) { _ in
+                guard let testFlight = URL(string: "itms-beta://") else { return }
+                UIApplication.shared.open(testFlight)
+            })
+            self.present(alert, animated: true)
         }
     }
 
@@ -212,19 +260,24 @@ final class WebContentBridge: NSObject, WKScriptMessageHandler {
 extension GameViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Expose the label of the content we're actually serving (bundle or the
-        // self-updated cache, incl. the commit SHA) so the web `version` command
+        // self-updated cache, including its numeric content identity) so VERSION
         // can report exactly which build is loaded on the device.
         let label = contentStore.activeLabel()
         let json = (try? JSONEncoder().encode(label))
             .flatMap { String(data: $0, encoding: .utf8) } ?? "\"\""
         webView.evaluateJavaScript("window.__activeBuildLabel = \(json);", completionHandler: nil)
 
-        guard let notice = pendingUpdateNotice else { return }
-        pendingUpdateNotice = nil
+        if let status = pendingContentStatus {
+            pendingContentStatus = nil
+            evaluateContentCallback("window.__contentStatus", values: [status])
+        }
+
+        guard let notice = pendingContentUpdateNotice else { return }
+        pendingContentUpdateNotice = nil
         let payload = (try? JSONSerialization.data(withJSONObject: [notice.from, notice.to]))
             .flatMap { String(data: $0, encoding: .utf8) } ?? "[\"\",\"\"]"
         webView.evaluateJavaScript(
-            "window.__appUpdateNotice && window.__appUpdateNotice.apply(null, \(payload));",
+            "window.__contentUpdateNotice && window.__contentUpdateNotice.apply(null, \(payload));",
             completionHandler: nil)
     }
 }

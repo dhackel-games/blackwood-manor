@@ -1,3 +1,5 @@
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. -->
+
 # Blackwood Manor — Design
 
 *A haunted-mansion text adventure in the classic Zork style. Personal project for David Hackel (with Andy Coven).*
@@ -51,8 +53,25 @@ haunted-mansion-adventure/
 The engine never changes. Core logic is DOM-free so a Node script can play a full winning
 walkthrough and assert victory (regression safety as the world grows).
 
-Pure static files — open `index.html` in a browser directly from iCloud. No server, no
-build step, no dependencies.
+Pure static files with no application backend or framework. The local launcher
+serves them over loopback because browser ES modules cannot run reliably from `file://`.
+
+### Source-file identity header
+
+Every maintained text source or test file that supports comments begins with:
+
+```text
+{comment} {filename}. Copyright (c) dhackel-games. All Rights Reserved. 2026...YYYY-MM-DD.BBB:{last editor}.
+```
+
+`BBB` is the zero-padded app build number and the final token names the last
+editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
+`<!-- ... -->`); a required shebang remains line one and the identity header is
+line two. Example for this build:
+
+```js
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+```
 
 ---
 
@@ -231,11 +250,14 @@ the mansion.
 ## 12.1 Distribution & how to play
 - **Web (canonical):** pure static files in `web/`. Play locally by double-clicking
   `web/Play Blackwood Manor.command` (serves on a free port over http so Chrome's `file://`
-  module block doesn't bite). A LaunchAgent (`com.dhackel.blackwood-manor`) also serves it
+  module block doesn't bite). Its custom Python handler sends `no-store` headers,
+  preventing mixed-version ES-module caches. A LaunchAgent (`com.dhackel.blackwood-manor`) also serves it
   on `127.0.0.1:8137` from `web/`.
 - **Live website:** pushing to `main` auto-deploys the `web/` folder to GitHub Pages via
   `.github/workflows/pages.yml` → **https://dhackel-games.github.io/blackwood-manor/**
-  (`web/.nojekyll` keeps Pages from mangling the JS modules). Repo is public.
+  (`web/.nojekyll` keeps Pages from mangling the JS modules). The deployment
+  manifest tool stamps every module URL with the same `CONTENT_VERSION` cache key, so a
+  browser cannot mix modules from different builds. Repo is public.
 - **Push flow:** the game repo is on David's personal `dhackel-games` GitHub, so pushes need
   `gh auth switch --user dhackel-games` first, then switch back to `dhackel_adobe` (work repos
   use SSH and are unaffected). (Alternative that avoids switching accounts:
@@ -568,12 +590,14 @@ transcript. Every art line is capped at 32 characters for the mobile layout.
 
 ## 12.19 Persistent touch controls
 
-The direction and action controls are fixed flex children and never enter a hidden state.
-The transcript carries `min-height: 0` so additional room art and inspection text scroll
-inside its allotted space rather than pushing the controls below the viewport. Button taps
-prevent their default focus behavior, dispatch the associated command synchronously, keep the
-latest transcript output visible, and only return focus to the command field on pointer-fine
-desktop devices.
+The control tray is a fixed layout child and never enters a hidden state. A 3×3
+eight-arrow compass sits beside a 2×2 level/portal block (`⇧`, `⇩`, and
+center-anchored In/Out SVG arrows). To its right, two equal-width action rows
+hold four regular-width units apiece; `?` and 🪲 each occupy half a regular slot.
+The transcript carries `min-height: 0` so additional room art and inspection
+text scroll inside its allotted space rather than pushing controls below the
+viewport. Button taps dispatch synchronously, keep the latest output visible,
+and only return focus to the command field on pointer-fine desktop devices.
 
 ## 12.20 Available-direction summaries
 
@@ -600,7 +624,9 @@ generating the Xcode project, so an archive cannot silently contain stale game f
 TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
 `web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
 integer build number. The script archives and exports locally with `--no-upload`, or also
-validates and uploads when App Store Connect credentials are available.
+validates and uploads when App Store Connect credentials are available. Each run removes
+the previous repository-local `ios/build/`, places DerivedData under that same directory,
+and leaves only the current run's artifacts; global/shared Xcode DerivedData is untouched.
 
 ## 12.23 Mushroom vision and flight
 
@@ -839,15 +865,26 @@ line breaks. The full trail remains in memory; only exceptionally long issue
 URLs compact command history to a 6,000-character budget while retaining both
 ends and an explicit omission marker.
 
-### 12.34 iOS web-content checks and forced refresh
+### 12.34 Persistent iOS web-content updates
 
-The native wrapper serves the bundled or cached game immediately, then checks
-the GitHub Pages `manifest.json` once from `GameViewController.viewDidLoad`.
-Normal startup updates download only when the remote commit-timestamp version is
-newer. The native `content` message bridge adds two terminal meta-commands:
+`version.js` owns content updates. Its `CONTENT_VERSION` is the numeric
+`YYYYMMDDBBB` composition of `APP_VERSION` and zero-padded `BUILD`, followed by
+`CONTENT_FILES` as the final declaration. iOS parses that stable data and chooses
+the greatest `CONTENT_VERSION` among the bundled copy, persistent cache, and
+GitHub.io copy. The winner is atomically written to Application Support and the
+web view always serves `app://local/` from that cache. Thus an older cache cannot
+hide newer content delivered in a new app, while a newer downloaded cache
+survives an app update. Offline startup chooses between bundle and cache only.
 
-- `VER` / `VERSION` fetches the live manifest and prints the active
-  cached-or-bundled label beside the current GitHub.io label.
-- `REFRESH` downloads and atomically swaps every manifest file even when the
-  versions are equal, reloads from the store-selected cache, and preserves the
-  old cache on failure. It refuses an older remote manifest to prevent downgrade.
+`manifest.json` is independent of that comparison. A byte-for-byte difference
+between the bundled and GitHub.io manifests prompts: “A new version of Blackwood
+Manor is available! Download now?” with Okay/Cancel; Okay opens TestFlight. If
+remote content wins, `CONTENT_FILES` supplies the individual static paths to
+download. Native metadata checks use one-time query keys, and every winning
+release file uses its `CONTENT_VERSION` query key so CDN cache ages cannot mix
+generations. No manifest field selects or downloads web content.
+
+The native `content` bridge exposes `VER` / `VERSION` / `BUILD` to print the
+loaded build plus cached and remote content versions. `RELOAD` / `REFRESH`
+repeats that check. In an ordinary browser, RELOAD performs a cache-busted page
+navigation instead.

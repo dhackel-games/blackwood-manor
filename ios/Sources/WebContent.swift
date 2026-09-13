@@ -1,31 +1,16 @@
-// WebContent.swift Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
-//
-// The self-updating web-content layer for the iOS harness, kept in its own file
-// (no SwiftUI / Speech / FoundationModels dependencies) so it can be unit-tested
-// as plain logic. See BlackwoodManorTests.
+// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 import Foundation
 import WebKit
-
-// MARK: - App:// scheme handler (serves web content from a swappable directory)
-//
-// baseURL is the directory the game is served from: normally the copy baked into
-// the app bundle (offline fallback), but swapped at runtime to a locally-cached
-// copy downloaded from GitHub Pages when a newer version is published. See
-// WebContentStore / WebContentUpdater below.
 
 final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
     var baseURL: URL
     init(baseURL: URL) { self.baseURL = baseURL }
 
-    /// Pure request → file resolution, separated from WebKit so it can be tested
-    /// directly. Returns nil for anything that shouldn't be served (traversal,
-    /// missing file), which the scheme handler maps to a load failure.
     func resolve(requestPath: String) -> (data: Data, mime: String)? {
         var path = requestPath
         if path.hasPrefix("/") { path.removeFirst() }
         if path.isEmpty { path = "index.html" }
-        // Refuse any traversal out of the served directory.
         guard !path.contains("..") else { return nil }
         let fileURL = baseURL.appendingPathComponent(path)
         guard let data = try? Data(contentsOf: fileURL) else { return nil }
@@ -34,15 +19,19 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
 
     func webView(_ webView: WKWebView, start task: WKURLSchemeTask) {
         guard let url = task.request.url else {
-            task.didFailWithError(URLError(.badURL)); return
+            task.didFailWithError(URLError(.badURL))
+            return
         }
         guard let resolved = resolve(requestPath: url.path) else {
-            task.didFailWithError(URLError(.fileDoesNotExist)); return
+            task.didFailWithError(URLError(.fileDoesNotExist))
+            return
         }
         let response = HTTPURLResponse(
             url: url, statusCode: 200, httpVersion: "HTTP/1.1",
-            headerFields: ["Content-Type": resolved.mime,
-                           "Content-Length": String(resolved.data.count)])!
+            headerFields: [
+                "Content-Type": resolved.mime,
+                "Content-Length": String(resolved.data.count),
+            ])!
         task.didReceive(response)
         task.didReceive(resolved.data)
         task.didFinish()
@@ -64,28 +53,86 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 }
 
-// MARK: - Self-updating web content (offline-first: bundle is fallback, Pages is latest)
-//
-// The iOS app is a thin native harness around the web game, so it can pick up new
-// gameplay without a fresh TestFlight build: on launch it version-checks the copy
-// published to GitHub Pages and, if that's newer than what's baked in (or last
-// cached), downloads it into a local cache and serves from there. Everything is
-// non-blocking — the game shows instantly from bundle/cache and only reloads if a
-// newer version actually finishes downloading — so it works fully offline.
+struct WebContentRelease: Equatable {
+    let appVersion: String
+    let build: Int
+    let contentVersion: Int64
+    let files: [String]
 
-struct WebManifest: Decodable {
-    let version: Int      // commit timestamp; monotonic, so higher == newer
-    let label: String     // human-readable, e.g. "2026.9.11 build 62 · abc1234"
-    let files: [String]   // runtime files, relative to the web root
+    var label: String { "\(appVersion) build \(build)" }
+    var sortKey: Int64 { contentVersion }
+
+    static func isSafeRelativePath(_ path: String) -> Bool {
+        guard !path.isEmpty,
+              !path.hasPrefix("/"),
+              !path.contains("\\"),
+              !path.contains("?"),
+              !path.contains("#") else {
+            return false
+        }
+        let parts = path.split(separator: "/", omittingEmptySubsequences: false)
+        return parts.allSatisfy { !$0.isEmpty && $0 != "." && $0 != ".." }
+    }
+
+    static func contentVersion(appVersion: String, build: Int) -> Int64? {
+        let parts = appVersion.split(separator: ".").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        return Int64(String(format: "%04d%02d%02d%03d",
+                            parts[0], parts[1], parts[2], build))
+    }
+
+    static func parse(_ data: Data) -> WebContentRelease? {
+        guard let source = String(data: data, encoding: .utf8) else { return nil }
+        func capture(_ name: String) -> String? {
+            let pattern = "export const \(name)\\s*=\\s*\"([^\"]+)\""
+            guard let regex = try? NSRegularExpression(pattern: pattern),
+                  let match = regex.firstMatch(
+                    in: source, range: NSRange(source.startIndex..., in: source)),
+                  let range = Range(match.range(at: 1), in: source) else {
+                return nil
+            }
+            return String(source[range])
+        }
+        let filesPattern = "export const CONTENT_FILES\\s*=\\s*(\\[[\\s\\S]*?\\])\\s*;"
+        guard let appVersion = capture("APP_VERSION"),
+              let buildText = capture("BUILD"),
+              let build = Int(buildText),
+              let contentVersionText = { () -> String? in
+                  let pattern = "export const CONTENT_VERSION\\s*=\\s*(\\d+)"
+                  guard let regex = try? NSRegularExpression(pattern: pattern),
+                        let match = regex.firstMatch(
+                            in: source, range: NSRange(source.startIndex..., in: source)),
+                        let range = Range(match.range(at: 1), in: source) else {
+                      return nil
+                  }
+                  return String(source[range])
+              }(),
+              let contentVersion = Int64(contentVersionText),
+              contentVersion == Self.contentVersion(appVersion: appVersion, build: build),
+              let filesRegex = try? NSRegularExpression(pattern: filesPattern),
+              let filesMatch = filesRegex.firstMatch(
+                in: source, range: NSRange(source.startIndex..., in: source)),
+              let filesRange = Range(filesMatch.range(at: 1), in: source),
+              let filesData = String(source[filesRange]).data(using: .utf8),
+              let files = try? JSONDecoder().decode([String].self, from: filesData),
+              files.contains("index.html"),
+              files.contains("js/version.js"),
+              files.allSatisfy(Self.isSafeRelativePath),
+              Set(files).count == files.count else {
+            return nil
+        }
+        return WebContentRelease(
+            appVersion: appVersion, build: build,
+            contentVersion: contentVersion, files: files)
+    }
 }
 
 final class WebContentStore {
     static let remoteBase = URL(string: "https://dhackel-games.github.io/blackwood-manor/")!
 
-    let bundleRoot: URL   // .../www baked into the app bundle
-    let cacheRoot: URL    // Application Support/webcache
+    let bundleRoot: URL
+    let cacheRoot: URL
 
-    // Roots are injectable so tests can point them at scratch directories.
     init(bundleRoot: URL? = nil, cacheRoot: URL? = nil) {
         self.bundleRoot = bundleRoot ?? (Bundle.main.resourceURL ?? Bundle.main.bundleURL)
             .appendingPathComponent("www", isDirectory: true)
@@ -99,26 +146,95 @@ final class WebContentStore {
         }
     }
 
-    func manifest(at root: URL) -> WebManifest? {
-        guard let data = try? Data(contentsOf: root.appendingPathComponent("manifest.json")) else { return nil }
-        return try? JSONDecoder().decode(WebManifest.self, from: data)
+    func contentRelease(at root: URL) -> WebContentRelease? {
+        let file = root.appendingPathComponent("js/version.js")
+        guard let data = try? Data(contentsOf: file),
+              let release = WebContentRelease.parse(data) else {
+            return nil
+        }
+        let fileManager = FileManager.default
+        for relativePath in release.files {
+            let resource = root.appendingPathComponent(relativePath)
+            var isDirectory: ObjCBool = false
+            guard fileManager.fileExists(atPath: resource.path, isDirectory: &isDirectory),
+                  !isDirectory.boolValue,
+                  fileManager.isReadableFile(atPath: resource.path) else {
+                return nil
+            }
+        }
+        return release
     }
 
-    var bundleVersion: Int { manifest(at: bundleRoot)?.version ?? -1 }
-    var cacheVersion: Int { manifest(at: cacheRoot)?.version ?? -1 }
-    var currentVersion: Int { max(bundleVersion, cacheVersion) }
+    var bundleRelease: WebContentRelease? { contentRelease(at: bundleRoot) }
+    var cacheRelease: WebContentRelease? { contentRelease(at: cacheRoot) }
 
-    /// The directory to serve right now: the cache if it's at least as new as the bundle,
-    /// otherwise the bundle. If the bundle is newer (a fresh TestFlight build that
-    /// shipped newer web code than we last cached), drop the stale cache.
     func activeRoot() -> URL {
-        if cacheVersion >= bundleVersion && cacheVersion >= 0 { return cacheRoot }
-        if cacheVersion >= 0 { try? FileManager.default.removeItem(at: cacheRoot) }
-        return bundleRoot
+        cacheRelease == nil ? bundleRoot : cacheRoot
     }
 
-    /// Human label of whatever we're actually about to serve.
-    func activeLabel() -> String { manifest(at: activeRoot())?.label ?? "unknown" }
+    func activeLabel() -> String {
+        contentRelease(at: activeRoot())?.label ?? "unknown"
+    }
+
+    func bundledManifestData() -> Data? {
+        try? Data(contentsOf: bundleRoot.appendingPathComponent("manifest.json"))
+    }
+
+    @discardableResult
+    func ensureCacheFromBundle() -> Bool {
+        guard let bundled = bundleRelease else {
+            return cacheRelease != nil
+        }
+        if let cached = cacheRelease, cached.sortKey >= bundled.sortKey {
+            return true
+        }
+        return seedCacheFromBundle()
+    }
+
+    @discardableResult
+    func seedCacheFromBundle() -> Bool {
+        let fm = FileManager.default
+        let staging = fm.temporaryDirectory
+            .appendingPathComponent("webcache-bundle-\(UUID().uuidString)", isDirectory: true)
+        do {
+            try fm.copyItem(at: bundleRoot, to: staging)
+            return replaceCache(with: staging)
+        } catch {
+            try? fm.removeItem(at: staging)
+            return false
+        }
+    }
+
+    @discardableResult
+    func replaceCache(with staging: URL) -> Bool {
+        let fm = FileManager.default
+        guard contentRelease(at: staging) != nil else {
+            try? fm.removeItem(at: staging)
+            return false
+        }
+        let parent = cacheRoot.deletingLastPathComponent()
+        let backup = parent.appendingPathComponent(
+            "webcache-backup-\(UUID().uuidString)", isDirectory: true)
+        var movedExistingCache = false
+        do {
+            try fm.createDirectory(at: parent, withIntermediateDirectories: true)
+            if fm.fileExists(atPath: cacheRoot.path) {
+                try fm.moveItem(at: cacheRoot, to: backup)
+                movedExistingCache = true
+            }
+            try fm.moveItem(at: staging, to: cacheRoot)
+            try? fm.removeItem(at: backup)
+            return true
+        } catch {
+            if movedExistingCache
+                && !fm.fileExists(atPath: cacheRoot.path)
+                && fm.fileExists(atPath: backup.path) {
+                try? fm.moveItem(at: backup, to: cacheRoot)
+            }
+            try? fm.removeItem(at: staging)
+            return false
+        }
+    }
 }
 
 final class WebContentUpdater {
@@ -132,68 +248,93 @@ final class WebContentUpdater {
     private let session: URLSession
     private let updateLock = NSLock()
     private var updateInFlight = false
-    private var pendingUpdates: [(force: Bool, completion: (UpdateResult) -> Void)] = []
+    private var pendingUpdates: [(UpdateResult) -> Void] = []
 
-    // Session is injectable so tests can stub the network with a URLProtocol.
     init(store: WebContentStore, session: URLSession? = nil) {
         self.store = store
         if let session {
             self.session = session
         } else {
-            let cfg = URLSessionConfiguration.ephemeral   // don't let HTTP caching hide a fresh deploy
-            cfg.requestCachePolicy = .reloadIgnoringLocalCacheData
-            cfg.timeoutIntervalForRequest = 15
-            self.session = URLSession(configuration: cfg)
+            let config = URLSessionConfiguration.ephemeral
+            config.requestCachePolicy = .reloadIgnoringLocalCacheData
+            config.timeoutIntervalForRequest = 15
+            self.session = URLSession(configuration: config)
         }
     }
 
-    private func fetchRemoteManifest(completion: @escaping (WebManifest?, Data?) -> Void) {
-        let manifestURL = WebContentStore.remoteBase.appendingPathComponent("manifest.json")
-        session.dataTask(with: manifestURL) { data, resp, _ in
-            guard let data,
-                  (resp as? HTTPURLResponse)?.statusCode == 200,
-                  let remote = try? JSONDecoder().decode(WebManifest.self, from: data) else {
-                completion(nil, nil); return
+    private func fetchRemoteFile(_ relativePath: String, cacheKey: String,
+                                 completion: @escaping (Data?) -> Void) {
+        let baseURL = WebContentStore.remoteBase.appendingPathComponent(relativePath)
+        guard var components = URLComponents(
+            url: baseURL, resolvingAgainstBaseURL: false) else {
+            completion(nil)
+            return
+        }
+        components.queryItems = [URLQueryItem(name: "v", value: cacheKey)]
+        guard let url = components.url else {
+            completion(nil)
+            return
+        }
+        session.dataTask(with: url) { data, response, _ in
+            guard let data, (response as? HTTPURLResponse)?.statusCode == 200 else {
+                completion(nil)
+                return
             }
-            completion(remote, data)
+            completion(data)
         }.resume()
     }
 
+    private func fetchRemoteRelease(
+        completion: @escaping (WebContentRelease?, Data?) -> Void
+    ) {
+        fetchRemoteFile("js/version.js", cacheKey: UUID().uuidString) { data in
+            guard let data else {
+                completion(nil, nil)
+                return
+            }
+            completion(WebContentRelease.parse(data), data)
+        }
+    }
+
     func versionLabels(completion: @escaping (VersionLabels) -> Void) {
-        let current = store.activeLabel()
-        fetchRemoteManifest { remote, _ in
+        let current = store.cacheRelease?.label ?? store.bundleRelease?.label ?? "unknown"
+        fetchRemoteRelease { remote, _ in
             completion(VersionLabels(current: current, remote: remote?.label))
         }
     }
 
-    func checkForUpdate(force: Bool = false, completion: @escaping (UpdateResult) -> Void) {
+    func checkForAppManifestChange(completion: @escaping (Bool) -> Void) {
+        let installed = store.bundledManifestData()
+        fetchRemoteFile("manifest.json", cacheKey: UUID().uuidString) { remote in
+            completion(installed != nil && remote != nil && installed != remote)
+        }
+    }
+
+    func checkForUpdate(completion: @escaping (UpdateResult) -> Void) {
         updateLock.lock()
         if updateInFlight {
-            pendingUpdates.append((force, completion))
+            pendingUpdates.append(completion)
             updateLock.unlock()
             return
         }
         updateInFlight = true
         updateLock.unlock()
-        performUpdate(force: force, completion: completion)
+        performUpdate(completion: completion)
     }
 
-    private func performUpdate(force: Bool, completion: @escaping (UpdateResult) -> Void) {
-        fetchRemoteManifest { [weak self] remote, data in
+    private func performUpdate(completion: @escaping (UpdateResult) -> Void) {
+        fetchRemoteRelease { [weak self] remote, versionData in
             guard let self else { return }
-            guard let remote, let data else {
-                self.finishUpdate(force ? .failed : .upToDate, completion: completion)
+            guard let remote, let versionData else {
+                self.finishUpdate(.failed, completion: completion)
                 return
             }
-            guard remote.version >= self.store.currentVersion else {
-                self.finishUpdate(force ? .failed : .upToDate, completion: completion)
-                return
-            }
-            guard force || remote.version > self.store.currentVersion else {
+            let localKey = (self.store.cacheRelease ?? self.store.bundleRelease)?.sortKey ?? -1
+            guard remote.sortKey > localKey else {
                 self.finishUpdate(.upToDate, completion: completion)
                 return
             }
-            self.downloadBundle(remote, manifestData: data) { ok in
+            self.downloadBundle(remote, versionData: versionData) { ok in
                 self.finishUpdate(ok ? .updated(label: remote.label) : .failed,
                                   completion: completion)
             }
@@ -211,70 +352,69 @@ final class WebContentUpdater {
         }
         let next = pendingUpdates.removeFirst()
         updateLock.unlock()
-        performUpdate(force: next.force, completion: next.completion)
+        performUpdate(completion: next)
     }
 
-    private func downloadBundle(_ manifest: WebManifest, manifestData: Data,
+    private func downloadBundle(_ release: WebContentRelease, versionData: Data,
                                 completion: @escaping (Bool) -> Void) {
-        let fm = FileManager.default
-        let staging = fm.temporaryDirectory
+        let fileManager = FileManager.default
+        let staging = fileManager.temporaryDirectory
             .appendingPathComponent("webcache-\(UUID().uuidString)", isDirectory: true)
-        do { try fm.createDirectory(at: staging, withIntermediateDirectories: true) }
-        catch { completion(false); return }
+        do {
+            try fileManager.createDirectory(at: staging, withIntermediateDirectories: true)
+        } catch {
+            completion(false)
+            return
+        }
 
         let group = DispatchGroup()
         let lock = NSLock()
         var ok = true
-
-        for rel in manifest.files {
-            if rel.contains("..") { ok = false; continue }
-            group.enter()
-            let fileURL = WebContentStore.remoteBase.appendingPathComponent(rel)
-            session.dataTask(with: fileURL) { data, resp, _ in
-                defer { group.leave() }
-                guard let data, (resp as? HTTPURLResponse)?.statusCode == 200 else {
-                    lock.lock(); ok = false; lock.unlock(); return
-                }
-                let dest = staging.appendingPathComponent(rel)
+        for relativePath in release.files {
+            if !WebContentRelease.isSafeRelativePath(relativePath) {
+                ok = false
+                continue
+            }
+            if relativePath == "js/version.js" {
+                let destination = staging.appendingPathComponent(relativePath)
                 do {
-                    try fm.createDirectory(at: dest.deletingLastPathComponent(),
-                                           withIntermediateDirectories: true)
-                    try data.write(to: dest, options: .atomic)
+                    try fileManager.createDirectory(
+                        at: destination.deletingLastPathComponent(),
+                        withIntermediateDirectories: true)
+                    try versionData.write(to: destination, options: .atomic)
+                } catch {
+                    ok = false
+                }
+                continue
+            }
+            group.enter()
+            fetchRemoteFile(
+                relativePath, cacheKey: String(release.contentVersion)
+            ) { data in
+                defer { group.leave() }
+                guard let data else {
+                    lock.lock(); ok = false; lock.unlock()
+                    return
+                }
+                let destination = staging.appendingPathComponent(relativePath)
+                do {
+                    try fileManager.createDirectory(
+                        at: destination.deletingLastPathComponent(),
+                        withIntermediateDirectories: true)
+                    try data.write(to: destination, options: .atomic)
                 } catch {
                     lock.lock(); ok = false; lock.unlock()
                 }
-            }.resume()
+            }
         }
 
         group.notify(queue: .global()) {
-            guard ok else { try? fm.removeItem(at: staging); completion(false); return }
-            // Store the manifest verbatim so cacheVersion/label match the download exactly.
-            do { try manifestData.write(to: staging.appendingPathComponent("manifest.json"), options: .atomic) }
-            catch { try? fm.removeItem(at: staging); completion(false); return }
-            // Swap the freshly-downloaded bundle into place. Only after a fully
-            // successful download, so a dropped connection never corrupts the cache.
-            let parent = self.store.cacheRoot.deletingLastPathComponent()
-            let backup = parent.appendingPathComponent(
-                "webcache-backup-\(UUID().uuidString)", isDirectory: true)
-            var movedExistingCache = false
-            do {
-                try fm.createDirectory(at: parent, withIntermediateDirectories: true)
-                if fm.fileExists(atPath: self.store.cacheRoot.path) {
-                    try fm.moveItem(at: self.store.cacheRoot, to: backup)
-                    movedExistingCache = true
-                }
-                try fm.moveItem(at: staging, to: self.store.cacheRoot)
-                try? fm.removeItem(at: backup)
-                completion(true)
-            } catch {
-                if movedExistingCache
-                    && !fm.fileExists(atPath: self.store.cacheRoot.path)
-                    && fm.fileExists(atPath: backup.path) {
-                    try? fm.moveItem(at: backup, to: self.store.cacheRoot)
-                }
-                try? fm.removeItem(at: staging)
+            guard ok, self.store.contentRelease(at: staging) == release else {
+                try? fileManager.removeItem(at: staging)
                 completion(false)
+                return
             }
+            completion(self.store.replaceCache(with: staging))
         }
     }
 }

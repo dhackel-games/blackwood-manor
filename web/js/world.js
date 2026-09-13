@@ -1,4 +1,5 @@
-// world.js — ALL CONTENT for Blackwood Manor.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
 //
@@ -13,7 +14,7 @@
 // A handler that returns a string intercepts the default verb; returning null/
 // undefined lets the default behaviour run.
 
-import { MAP_MARK, renderMap } from "./map.js";
+import { MAP_MARK, renderMap } from "./map.js?v=source";
 
 // ---- helpers used by handlers ------------------------------------------------
 export const REQUIRED_FAMILY_ITEM_COUNT = 12;
@@ -2051,9 +2052,10 @@ function reachIntoToilet(ctx, cmd) {
 }
 function deriveCommand(ctx, cmd) {
   if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
-  if (!["take", "eat", "reach"].includes(cmd.verb)) return [];
+  if (!["take", "eat", "reach", "use"].includes(cmd.verb)) return [];
   const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
   if (!/\b(mushroom|mushrooms|fungus|toilet|hole)\b/.test(target)) return [];
+  if (cmd.verb === "use" && !/\b(mushroom|mushrooms|fungus)\b/.test(target)) return [];
   inspectToilet(ctx);
   return ["look in toilet"];
 }

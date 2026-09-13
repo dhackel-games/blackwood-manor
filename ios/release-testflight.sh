@@ -1,4 +1,5 @@
 #!/bin/bash
+# release-testflight.sh. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 # release-testflight.sh — build, archive, export, and upload Blackwood Manor to TestFlight.
 #
 # One-time prerequisites (see notes at bottom):
@@ -18,10 +19,16 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 SCHEME="BlackwoodManor"
-ARCHIVE="build/BlackwoodManor.xcarchive"
-EXPORT_DIR="build/export"
+BUILD_ROOT="build"
+DERIVED_DATA="$BUILD_ROOT/DerivedData"
+ARCHIVE="$BUILD_ROOT/BlackwoodManor.xcarchive"
+EXPORT_DIR="$BUILD_ROOT/export"
 UPLOAD=1
 [[ "${1:-}" == "--no-upload" ]] && UPLOAD=0
+
+echo "==> Removing artifacts from prior release"
+rm -rf "$BUILD_ROOT"
+mkdir -p "$BUILD_ROOT"
 
 # Derive the marketing version and next build number FIRST, so we can stamp the
 # same values into the on-screen badge, the bundled web game, and project.yml.
@@ -40,6 +47,11 @@ echo "==> Releasing version ${MARKETING_VERSION} build ${NEXT}"
 echo "==> Stamping build badge (v${MARKETING_VERSION} build ${NEXT})"
 sed -i '' -E "s/(export const APP_VERSION = \")[^\"]*(\";)/\1${MARKETING_VERSION}\2/" ../web/js/version.js
 sed -i '' -E "s/(export const BUILD = \")[^\"]*(\";)/\1${NEXT}\2/" ../web/js/version.js
+CONTENT_VERSION=$(node -e '
+  const [y, m, d] = process.argv[1].split(".").map(Number);
+  console.log(`${String(y).padStart(4, "0")}${String(m).padStart(2, "0")}${String(d).padStart(2, "0")}${String(process.argv[2]).padStart(3, "0")}`);
+' "$MARKETING_VERSION" "$NEXT")
+sed -i '' -E "s/(export const CONTENT_VERSION = )[0-9]+;/\1${CONTENT_VERSION};/" ../web/js/version.js
 
 echo "==> Refreshing bundled web game"
 ./copy-web.sh
@@ -55,6 +67,7 @@ echo "==> Archiving"
 rm -rf "$ARCHIVE"
 xcodebuild -project BlackwoodManor.xcodeproj -scheme "$SCHEME" \
   -configuration Release \
+  -derivedDataPath "$DERIVED_DATA" \
   -archivePath "$ARCHIVE" \
   -destination 'generic/platform=iOS' \
   -allowProvisioningUpdates \

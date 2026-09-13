@@ -1,4 +1,4 @@
-# mushroom-flight.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @walkthrough @mushroom
 Feature: Mushroom vision and flight
@@ -24,6 +24,14 @@ Feature: Mushroom vision and flight
     And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
+
+  Scenario: USE discovers, takes, and eats hidden toilet mushrooms
+    Given a fresh manor game
+    And the player is in room "privy"
+    When I send "use mushrooms"
+    Then the output contains "(look in toilet, get mushrooms, eat mushrooms)"
+    And flag "high" is positive
+    And item "outhouseMushrooms" is destroyed
 
   Scenario: An eaten batch of privy mushrooms can regrow given enough time
     Given a fresh manor game

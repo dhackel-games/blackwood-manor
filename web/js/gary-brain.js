@@ -1,4 +1,5 @@
-// gary-brain.js — optional LLM voice for Gary. Content-free engine glue.
+// gary-brain.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// Optional LLM voice for Gary. Content-free engine glue.
 //
 // DESIGN — the single most important thing in this file:
 //   The model is a VOICE LAYER, never a source of truth. All game mechanics
@@ -24,7 +25,7 @@
 // (Safari blocks the request outright regardless.) So the public site never
 // probes, and stays canned by choice rather than by accident.
 
-import { profileForStage, buildInstructions, EXAMPLE_REPLIES, normaliseLine } from "./gary-profile.js";
+import { profileForStage, buildInstructions, EXAMPLE_REPLIES, normaliseLine } from "./gary-profile.js?v=source";
 
 const DAEMON_URL = "http://127.0.0.1:8138";
 const REPLY_TIMEOUT_MS = 8000;

@@ -1,4 +1,4 @@
-# fire-food.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -164,6 +164,58 @@ Feature: Fire and food consequences
     And flag "drankMilk" is true
     When I win with "You step into the dawn."
     Then the output contains "Got Milk?"
+
+  Scenario: USE contextually eats food and drinks beverages
+    Given the player is in room "kitchen"
+    When I send "use mushrooms"
+    Then flag "high" is positive
+    And the output contains "(get mushrooms, eat mushrooms)"
+    Given a fresh manor game
+    And the player is in room "kitchen"
+    And flag "sick" is 10
+    When I send "use milk"
+    Then flag "sick" equals 0
+    And flag "drankMilk" is true
+    And the output contains "(get milk, drink milk)"
+
+  Scenario: USE prefers inventory and disambiguates two carried mushroom types
+    Given a fresh manor game
+    And item "mushrooms" is carried
+    And item "outhouseMushrooms" is carried
+    When I send "use mushrooms"
+    Then the output contains "(which MUSHROOMS? FRESH or DRIED?)"
+    And the turn count is 0
+    When I send "fresh"
+    Then item "outhouseMushrooms" is destroyed
+    And item "mushrooms" is carried
+    And flag "high" equals 12
+    When I send "use mushrooms"
+    Then item "mushrooms" is destroyed
+    And flag "high" equals 24
+
+  Scenario: A USE clarification stops a command chain
+    Given a fresh manor game
+    And item "mushrooms" is carried
+    And item "outhouseMushrooms" is carried
+    When I send "use mushrooms; north"
+    Then the output contains "(which MUSHROOMS? FRESH or DRIED?)"
+    And the current room is "gate"
+    And the turn count is 0
+    When I send "fresh"
+    Then item "outhouseMushrooms" is destroyed
+    And the current room is "gate"
+    And the turn count is 1
+
+  Scenario: A USE clarification remembers non-mushroom choices
+    Given a fresh manor game
+    And item "familyRing" is carried
+    And item "rubyRing" is carried
+    When I send "use ring"
+    Then the output contains "(which RING? DUSTY or RUBY?)"
+    And the turn count is 0
+    When I send "neither"
+    Then the output contains "(which RING? DUSTY or RUBY?)"
+    And the turn count is 0
 
   Scenario: Carrying match and foil requires an explicit source choice
     Given the player is in room "kitchen"
