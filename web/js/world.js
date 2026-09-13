@@ -3034,16 +3034,12 @@ const logicWorld = {
       },
 
     dragonCaveMouth: {
-        name: "Dreadmaw's Cave Mouth",
         art: [
           "       /\\___/\\",
           "   ___/  -.-  \\___",
           "  /____ DREADMAW ___\\",
           "      \\________/",
         ].join("\n"),
-        desc:
-          "A CAVE yawns in a basalt hill, but DREADMAW THE DRAGON sleeps across its entrance — an ancient female dragon " +
-          "vast enough to serve as the door. The HEDGE MAZE lies NORTH. The CAVE is EAST, entirely blocked by the DRAGON.",
         searchDesc(ctx) {
           return ctx.getFlag("dragonMoved")
             ? "DREADMAW now rests beside the entrance, leaving the PASSAGE EAST open."
@@ -3058,68 +3054,43 @@ const logicWorld = {
       },
 
     dragonAntechamber: {
-        name: "Dragon Cave Antechamber",
         art: [
           "  |\\            /|",
           "  | \\  rails   / |",
           "  |  \\=====>  /  |",
           "  |___\\______/___|",
         ].join("\n"),
-        desc:
-          "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
-          "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
-        searchDesc:
-          "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
         exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
 
     mineGallery: {
-      name: "Mining Gallery",
       art: [
         "  |--|--|--|--|",
         "  |  o==>      |",
         "  |_/|\\________|",
         "    / \\  rails",
       ].join("\n"),
-      desc:
-        "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. " +
-        "The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
-      searchDesc:
-        "The HEADLAMP still has a sealed battery pack. The rails and fresher TROLL footprints both continue DOWN.",
       exits: { west: "dragonAntechamber", down: "deepShaft" },
     },
 
     deepShaft: {
-      name: "Deep Mining Shaft",
       art: [
         "  |\\          /|",
         "  | \\   ||   / |",
         "  |  \\  ||  /  |",
         "  |___\\_||_/___|",
       ].join("\n"),
-      desc:
-        "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
-        "abandoned seams. A discarded miner's BACKPACK rests on a dry ledge. The MINING GALLERY is UP; " +
-        "a worked tunnel runs EAST to the TROLL GATE.",
-      searchDesc:
-        "The BACKPACK still looks sturdy despite its years underground. Heavy bare footprints lead EAST.",
       dark: true,
       exits: { up: "mineGallery", east: "trollGate" },
     },
 
     trollGate: {
-      name: "Troll Gate",
       art: [
         "  |\\    TROLL   /|",
         "  | \\  .-^^-.  / |",
         "  |  \\[ DOOR ]/  |",
         "  |___\\______/___|",
       ].join("\n"),
-      desc:
-        "The tunnel ends at a seamless black VAULT DOOR. A broad, warty TROLL sits directly in front of it. " +
-        "The DEEP MINING SHAFT lies WEST; DREADMAW'S hoard is sealed EAST.",
-      searchDesc:
-        "No keyhole interrupts the VAULT DOOR. The TROLL watches you expectantly, as if waiting to ask something.",
       exits: {
         west: "deepShaft",
         east: { to: "dreadmawVault", via: "dragonVaultOpen",
@@ -3129,7 +3100,6 @@ const logicWorld = {
     },
 
     dreadmawVault: {
-        name: "Dreadmaw's Vault",
         aliases: ["dreadmaw vault", "dragon hoard", "cave of riches", "hoard"],
         art: [
           "   $  *  $  *  $",
@@ -3137,27 +3107,11 @@ const logicWorld = {
           " /_$$_GEMS_$$_*__\\",
           " \\_______________/",
         ].join("\n"),
-        desc:
-          "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
-          "a pair of WINGED SHOES. The TROLL GATE is WEST.",
-        searchDesc:
-          "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
-          "essential heirloom; the WINGED SHOES look made to be worn.",
         exits: { west: "trollGate" },
       },
 
     privy: {
-      name: "Ivy-Choked Privy",
       art: ROOM_ART.privy,
-      desc:
-        "A cramped brick OUTHOUSE strangled in ivy. Its only fixture is a rough wooden seat over a dark " +
-        "TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The GARDEN lies WEST; " +
-        "a narrow path continues EAST toward an enormous OAK.",
-      searchDesc:
-        "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. The fresh " +
-        "source of the faint purple glimmer is somewhere DOWN inside it. You would have to LOOK IN. Sunlight " +
-        "flashes strangely through the leaves along the EASTERN path.",
       exits: { west: "garden", east: "greatOak" },
       on: { reach: reachIntoToilet },
     },
