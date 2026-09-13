@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.077:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -23,6 +23,7 @@ Feature: Build metadata and touch-control contract
 
   Scenario: The compact HUD explains sound state without wasting a row
     Then the sound-effects toggle is leftmost in the HUD slots and explains its state
+    And the HUD remains one non-wrapping row
     And the bowel meter has no trailing solid cap
 
   Scenario: Static game controls use half-size boxes
