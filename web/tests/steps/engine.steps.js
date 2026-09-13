@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -332,6 +332,13 @@ Then("the package version is the release date", function () {
   assert.equal(packageJson.version, "2026.9.11");
 });
 
+Then("the large title art has aligned top strokes", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui,
+    /` ____  _            _                             _\n \| __ \)\| \| __ _  ___\| \| ____      _____   ___   __\| \|/);
+  assert.doesNotMatch(ui, /`  ____  _            _                     _/);
+});
+
 Then("the touch UI has no control-hiding typing state", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
@@ -533,7 +540,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
   assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
   assert.match(ui, /inventoryForBugReport\(\)/);
-  assert.match(ui, /`Version: \$\{versionText\(\)\}`/);
+  assert.match(ui, /`Version: \$\{Native\.version\(\)\}`/);
 });
 
 Then("overlong bug histories preserve both ends and mark the omission", function () {
@@ -687,16 +694,47 @@ Then("Up, Down, In, and Out use compact directional glyphs", function () {
   assert.match(css, /#controls \.portal-icon\s*\{[^}]*max-width:\s*1\.45rem[^}]*stroke-width:\s*1\.3/s);
 });
 
-Then("phone movement controls are twenty-five percent larger without widening actions", function () {
+Then("touch-capable movement controls are twenty-five percent larger without widening actions", function () {
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(css,
-    /@media \(max-width:\s*600px\)[\s\S]*#controls \.dpad\s*\{[^}]*repeat\(3,\s*2\.375rem\)/);
+    /@media \(any-pointer:\s*coarse\)[\s\S]*#controls\s*\{[^}]*--nav-button-size:\s*2\.96875rem[^}]*--action-button-height:\s*2\.96875rem/s);
   assert.match(css,
-    /@media \(max-width:\s*600px\)[\s\S]*#controls \.vertical-directions\s*\{[^}]*repeat\(2,\s*2\.375rem\)/);
+    /#controls \.dpad\s*\{[^}]*repeat\(3,\s*var\(--nav-button-size\)\)/s);
   assert.match(css,
-    /#controls \.verb-row button\s*\{[^}]*height:\s*2\.375rem[^}]*padding:\s*0\.3rem 0\.1rem/s);
+    /#controls \.vertical-directions\s*\{[^}]*repeat\(2,\s*var\(--nav-button-size\)\)/s);
+  assert.match(css,
+    /#controls \.verb-row button\s*\{[^}]*height:\s*var\(--action-button-height\)/s);
   assert.doesNotMatch(css,
-    /#controls \.verb-row button\s*\{[^}]*width:\s*2\.375rem/s);
+    /#controls \.verb-row button\s*\{[^}]*width:\s*2\.96875rem/s);
+});
+
+Then("the navigation size selector controls sizes one through three", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const picker = /id=["']nav-size-picker["'][\s\S]*?<\/div>\s*<\/div>/.exec(html)?.[0] || "";
+  assert.deepEqual(
+    [...picker.matchAll(/data-nav-size=["']([123])["']/g)].map((match) => match[1]),
+    ["3", "2", "1"]);
+  assert.match(picker, /role=["']radiogroup["']/);
+  assert.equal((picker.match(/role=["']radio["']/g) || []).length, 3);
+  assert.match(css, /#controls\[data-nav-size=["']1["']\][^}]*--nav-button-size:\s*1\.7rem/s);
+  assert.match(css, /#controls\[data-nav-size=["']2["']\][^}]*--nav-button-size:\s*2\.375rem/s);
+  assert.match(css, /#controls\[data-nav-size=["']3["']\][^}]*--nav-button-size:\s*2\.96875rem/s);
+  assert.match(css, /\.nav-size-picker\s*\{[^}]*border:\s*1px solid var\(--dim\)[^}]*border-radius:\s*6px/s);
+  assert.match(css, /\.nav-size-picker button\s*\{[^}]*background:\s*transparent[^}]*border:\s*0/s);
+  assert.match(css, /\.nav-size-picker::before\s*\{[^}]*width:\s*1px[^}]*background:\s*var\(--dim\)/s);
+  assert.match(css, /button\[aria-checked=["']true["']\] \.nav-size-swatch\s*\{[^}]*background:\s*currentColor/s);
+  assert.match(ui, /localStorage\.getItem\(NAV_SIZE_KEY\)/);
+  assert.match(ui, /localStorage\.setItem\(NAV_SIZE_KEY, selected\)/);
+  assert.match(ui, /matchMedia\?\.\("\(any-pointer: coarse\)"\)/);
+  assert.match(ui, /const prefersLargeNav = Native\.isMobileApp\(\) \|\| coarsePointer/);
+  assert.match(ui, /prefersLargeNav \? "3" : "1"/);
+  assert.match(ui, /setAttribute\("aria-checked", String\(button\.dataset\.navSize === selected\)\)/);
+  assert.match(css,
+    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*28rem\)/);
+  assert.match(css,
+    /#controls \.movement-controls,[\s\S]*#controls \.action-controls\s*\{[^}]*justify-self:\s*center/s);
 });
 
 Then("action shortcuts occupy two equally wide rows beside movement", function () {
@@ -723,15 +761,24 @@ Then("the iOS wrapper opens new-window web links externally", function () {
 
 Then("Version reports local and source content through the native bridge", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const native = readFileSync(new URL("../../js/native.js", import.meta.url), "utf8");
+  const gary = readFileSync(new URL("../../js/gary-brain.js", import.meta.url), "utf8");
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
   assert.match(ui, /low === "ver" \|\| low === "version"/);
-  assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
-  assert.match(ui, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
-  assert.match(ui, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
-  assert.match(ui, /const message = versionText\(\)/);
-  assert.match(ui, /`\$\{COPYRIGHT\} iOS \$\{appInstalledVersion\} \(Build \$\{appInstalledBuild\}\)\. `/);
-  assert.match(ui, /Content: Local \$\{contentLocalValue \|\| CONTENT_VERSION\}\. Source \$\{contentSourceValue \|\| "Unavailable"\}\./);
+  assert.match(ui, /Native\.post\("content", \{ action: "version" \}\)/);
+  assert.match(ui, /const message = Native\.version\(\)/);
+  assert.match(native, /export class Native/);
+  assert.match(native, /static isMobileApp\(\)/);
+  assert.match(native, /static version\(\)/);
+  assert.match(native, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
+  assert.match(native, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
+  assert.match(native, /`\$\{COPYRIGHT\} iOS \$\{this\.appInstalledVersion\} \(Build \$\{this\.appInstalledBuild\}\)\. `/);
+  assert.match(native, /Content: Local \$\{this\.contentLocal\}\. Source \$\{this\.contentSource \|\| "Unavailable"\}\./);
+  assert.doesNotMatch(ui, /window\.webkit.*messageHandlers/);
+  assert.doesNotMatch(gary, /window\.webkit.*messageHandlers/);
+  assert.match(gary, /Native\.hasBridge\("gary"\)/);
+  assert.match(gary, /Native\.post\("gary"/);
   assert.doesNotMatch(ui, /running in browser \(no self-update layer\)|GitHub\.io version: unavailable/);
   assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
   assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
@@ -750,9 +797,9 @@ Then("the iOS launch banner reports the live content source without a transcript
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   // On boot the web layer asks the native side for the real remote source version.
-  assert.match(ui, /nativeContent\.postMessage\(\{ action: "version-banner" \}\)/);
+  assert.match(ui, /Native\.post\("content", \{ action: "version-banner" \}\)/);
   // The banner-only callback rewrites the existing intro without printing a new line.
-  assert.match(ui, /window\.__contentBanner = \(appVersion, appBuild, contentLocalValue, contentSourceValue\) => \{[\s\S]*setContentVersions\(appVersion, appBuild, contentLocalValue, contentSourceValue\);[\s\S]*refreshIntroBanner\(\);[\s\S]*\};/);
+  assert.match(ui, /window\.__contentBanner = \(appVersion, appBuild, contentLocalValue, contentSourceValue\) => \{[\s\S]*Native\.setContentVersions\(appVersion, appBuild, contentLocalValue, contentSourceValue\);[\s\S]*refreshIntroBanner\(\);[\s\S]*\};/);
   assert.doesNotMatch(ui, /__appUpdateNotice|iOS App Unavailable/);
   assert.match(ui, /introBannerElement = print\(bannerText\(\), "banner"\)/);
   assert.doesNotMatch(html, /id=["']hud-version["']/);
@@ -767,7 +814,7 @@ Then("Reload seeds the local cache and refreshes differing GitHub.io content", f
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
   assert.match(ui, /low === "reload" \|\| low === "refresh"/);
-  assert.match(ui, /nativeContent\.postMessage\(\{ action: "refresh" \}\)/);
+  assert.match(ui, /Native\.post\("content", \{ action: "refresh" \}\)/);
   assert.match(ui, /url\.searchParams\.set\("_bmrefresh", Date\.now\(\)\.toString\(\)\)/);
   assert.match(ui, /window\.location\.replace\(url\.toString\(\)\)/);
   assert.match(app, /case "refresh":[\s\S]*ensureCacheFromBundle\(\)[\s\S]*checkForUpdate/);

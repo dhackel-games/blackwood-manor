@@ -1,4 +1,4 @@
-// gary-brain.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// gary-brain.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
 // Optional LLM voice for Gary. Content-free engine glue.
 //
 // DESIGN — the single most important thing in this file:
@@ -26,6 +26,7 @@
 // probes, and stays canned by choice rather than by accident.
 
 import { profileForStage, buildInstructions, EXAMPLE_REPLIES, normaliseLine } from "./gary-profile.js?v=source";
+import { Native } from "./native.js?v=source";
 
 const DAEMON_URL = "http://127.0.0.1:8138";
 const REPLY_TIMEOUT_MS = 8000;
@@ -60,12 +61,6 @@ export function optedIn() {
   }
 }
 
-// --- native bridge (iOS/macOS app) -----------------------------------------
-function hasNativeBridge() {
-  return typeof window !== "undefined" &&
-    !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.gary);
-}
-
 // The native app injects window.__garyNative at document start — present even
 // (especially) when the gary handler was NOT registered, which is how we learn
 // *why* the model is missing instead of guessing. Absent in a plain browser.
@@ -76,7 +71,7 @@ export function nativeReport() {
 }
 
 /** True when we're inside the iOS/macOS app shell, model or no model. */
-export function isNativeApp() { return nativeReport() !== null; }
+export function isNativeApp() { return Native.isMobileApp() || nativeReport() !== null; }
 
 // Swift calls window.__garyReply(id, text, error).
 if (typeof window !== "undefined") {
@@ -96,7 +91,10 @@ function askNative(instructions, prompt) {
     setTimeout(() => {
       if (pending.has(id)) { pending.delete(id); reject(new Error("native timeout")); }
     }, REPLY_TIMEOUT_MS);
-    window.webkit.messageHandlers.gary.postMessage({ id, instructions, prompt });
+    if (!Native.post("gary", { id, instructions, prompt })) {
+      pending.delete(id);
+      reject(new Error("native bridge unavailable"));
+    }
   });
 }
 
@@ -155,7 +153,7 @@ export async function detect() {
   if (probed) return provider;
   probed = true;
   try {
-    if (hasNativeBridge()) { provider = "native"; reason = "Apple on-device model via the app"; return provider; }
+    if (Native.hasBridge("gary")) { provider = "native"; reason = "Apple on-device model via the app"; return provider; }
     // Inside the app with no bridge, the native side already told us exactly why.
     // Stop here: every remaining branch is browser reasoning, and applying it on a
     // phone is how this used to advise adding "?llm to the URL" in an app that has

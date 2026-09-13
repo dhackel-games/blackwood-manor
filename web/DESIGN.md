@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
 ```
 
 ---
@@ -626,6 +626,11 @@ The control tray is a fixed layout child and never enters a hidden state. A 3×3
 eight-arrow compass sits beside a 2×2 level/portal block (`⇧`, `⇩`, and
 center-anchored In/Out SVG arrows). To its right, two equal-width action rows
 hold four regular-width units apiece; `?` and 🪲 each occupy half a regular slot.
+At the far right, a two-row-height three-square picker selects navigation size
+1, 2, or 3 and persists it. `Native.isMobileApp()` or an `any-pointer: coarse`
+media match defaults to size 3; other browsers default to size 1. On narrow
+touch screens the movement and action groups stack so enlarged navigation
+cannot collapse action-button widths.
 The transcript carries `min-height: 0` so additional room art and inspection
 text scroll inside its allotted space rather than pushing controls below the
 viewport. Button taps dispatch synchronously, keep the latest output visible,
@@ -931,3 +936,9 @@ three identities are intentionally independent: downloaded content never
 changes the displayed installed-app version. `RELOAD` / `REFRESH`
 repeats that check. In an ordinary browser, RELOAD performs a cache-busted page
 navigation instead.
+
+`js/native.js` is the single browser/native boundary. Its static `Native` class
+owns `isMobileApp()`, native message-handler lookup and posting, installed app
+identity, `contentLocal` / `contentSource`, and the complete `version()` display.
+UI and Gary code must use this class rather than reading `window.webkit` or
+reconstructing platform/version strings independently.

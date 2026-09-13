@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
 
 # Blackwood Manor
 
@@ -51,7 +51,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   With an object, `search <thing>`, `ex <thing>`, `examine <thing>`, `look <thing>`,
   and `look at <thing>` all show its deeper details.
 - **Touch controls:** direction and action buttons remain visible and usable at all
-  times, including while the software keyboard is open. **🪲** opens the
+  times, including while the software keyboard is open. The three-square picker
+  selects small, medium, or large navigation buttons and remembers the choice;
+  touch-capable browsers and the native app default to large. **🪲** opens the
   repository's new-issue form in a separate browser window and prefills its
   title with the current room and its body with `Describe issue here`. Typing
   `bug <description>` instead puts that text into the issue body without
@@ -139,6 +141,7 @@ js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
 js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
 js/hud.js             declarative HudSlot definitions and renderer
+js/native.js          native bridge detection, messaging, and version formatting
 js/ui.js              browser terminal adapter
 js/save.js                 localStorage save/restore
 tests/features/*.feature   all executable Gherkin specifications

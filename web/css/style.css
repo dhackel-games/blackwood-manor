@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -124,6 +124,8 @@ body { -webkit-text-size-adjust: 100%; }
 
 /* --- touch controls --- */
 #controls {
+  --nav-button-size: 1.7rem;
+  --action-button-height: 1.7rem;
   position: relative; z-index: 1;
   flex: 0 0 auto;
   display: grid; grid-template-columns: auto minmax(0, 28rem);
@@ -140,14 +142,14 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #controls .dpad {
   display: grid;
-  grid-template-columns: repeat(3, 1.7rem);
-  grid-template-rows: repeat(3, 1.7rem);
+  grid-template-columns: repeat(3, var(--nav-button-size));
+  grid-template-rows: repeat(3, var(--nav-button-size));
   gap: 0.12rem;
 }
 #controls .dpad button {
-  min-width: 1.7rem;
-  width: 1.7rem;
-  height: 1.7rem;
+  min-width: var(--nav-button-size);
+  width: var(--nav-button-size);
+  height: var(--nav-button-size);
   padding: 0;
   font-size: 1.25rem;
   font-weight: 900;
@@ -170,15 +172,15 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #controls .vertical-directions {
   display: grid;
-  grid-template-columns: repeat(2, 1.7rem);
-  grid-template-rows: repeat(2, 1.7rem);
+  grid-template-columns: repeat(2, var(--nav-button-size));
+  grid-template-rows: repeat(2, var(--nav-button-size));
   gap: 0.2rem;
 }
 #controls .vertical-directions button {
-  width: 1.7rem;
-  min-width: 1.7rem;
-  height: 1.7rem;
-  min-height: 1.7rem;
+  width: var(--nav-button-size);
+  min-width: var(--nav-button-size);
+  height: var(--nav-button-size);
+  min-height: var(--nav-button-size);
   padding: 0;
   line-height: 1;
 }
@@ -201,6 +203,14 @@ body { -webkit-text-size-adjust: 100%; }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+#controls .action-controls {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.25rem;
+  gap: 0.2rem;
+  align-items: stretch;
+}
 #controls .verbs {
   width: 100%;
   min-width: 0;
@@ -217,8 +227,55 @@ body { -webkit-text-size-adjust: 100%; }
   grid-column: span 2;
   width: 100%;
   min-width: 0;
+  height: var(--action-button-height);
 }
 #controls .verb-row .compact-action { grid-column: span 1; }
+#controls .nav-size-picker {
+  position: relative;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--dim);
+  border-radius: 6px;
+  background: rgba(67,255,122,0.06);
+}
+#controls .nav-size-picker::before {
+  content: "";
+  position: absolute;
+  top: 16.666%;
+  bottom: 16.666%;
+  left: 50%;
+  width: 1px;
+  background: var(--dim);
+  transform: translateX(-0.5px);
+  pointer-events: none;
+}
+#controls .nav-size-picker button {
+  width: 2.25rem;
+  min-width: 2.25rem;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+#controls .nav-size-picker button:active { background: rgba(67,255,122,0.22); }
+#controls .nav-size-swatch {
+  display: block;
+  border: 1px solid currentColor;
+  background: var(--bg);
+}
+#controls [data-nav-size="1"] .nav-size-swatch { width: 0.35rem; height: 0.35rem; }
+#controls [data-nav-size="2"] .nav-size-swatch { width: 0.55rem; height: 0.55rem; }
+#controls [data-nav-size="3"] .nav-size-swatch { width: 0.75rem; height: 0.75rem; }
+#controls .nav-size-picker button[aria-checked="true"] .nav-size-swatch {
+  background: currentColor;
+}
 #controls button {
   flex: 0 1 auto;             /* natural width, wrap+center (no giant stretched buttons) */
   min-width: 1.6rem;
@@ -288,29 +345,40 @@ body { -webkit-text-size-adjust: 100%; }
 @media (max-width: 600px) {
   #crt { padding: 0.6rem 0.75rem; }
   #transcript { font-size: 14px; }        /* transcript can shrink; input stays 16px */
-  #controls button { font-size: 0.82rem; min-height: 2.375rem; }
+  #controls button { font-size: 0.82rem; }
   #controls { gap: 0.3rem; }
   #controls .movement-controls { gap: 0.2rem; }
-  #controls .dpad {
-    grid-template-columns: repeat(3, 2.375rem);
-    grid-template-rows: repeat(3, 2.375rem);
+  #controls .verb-row { gap: 0.2rem; }
+  #controls .verb-row button { padding: 0.3rem 0.1rem; font-size: 0.8rem; }
+}
+
+@media (any-pointer: coarse) {
+  #controls {
+    --nav-button-size: 2.96875rem;
+    --action-button-height: 2.96875rem;
   }
   #controls .dpad button {
-    min-width: 2.375rem; width: 2.375rem; min-height: 2.375rem; height: 2.375rem;
     font-size: 1.35rem;
   }
-  #controls .vertical-directions {
-    grid-template-columns: repeat(2, 2.375rem);
-    grid-template-rows: repeat(2, 2.375rem);
-    gap: 0.2rem;
+}
+@media (any-pointer: coarse) and (max-width: 600px) {
+  #controls { grid-template-columns: minmax(0, 28rem); }
+  #controls .movement-controls,
+  #controls .action-controls {
+    justify-self: center;
   }
-  #controls .vertical-directions button {
-    min-width: 2.375rem; width: 2.375rem; min-height: 2.375rem; height: 2.375rem;
-  }
-  #controls .verb-row { gap: 0.2rem; }
-  #controls .verb-row button {
-    height: 2.375rem; padding: 0.3rem 0.1rem; font-size: 0.8rem;
-  }
+}
+#controls[data-nav-size="1"] {
+  --nav-button-size: 1.7rem;
+  --action-button-height: 1.7rem;
+}
+#controls[data-nav-size="2"] {
+  --nav-button-size: 2.375rem;
+  --action-button-height: 2.375rem;
+}
+#controls[data-nav-size="3"] {
+  --nav-button-size: 2.96875rem;
+  --action-button-height: 2.96875rem;
 }
 
 /* mic / small icon buttons */

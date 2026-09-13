@@ -1,12 +1,12 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
 import { createGame } from "./core.js?v=source";
 import { world } from "./world.js?v=source";
 import { saveGame, loadGame, hasSave } from "./save.js?v=source";
-import { APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT } from "./version.js?v=source";
 import { createHud, hudStateSummary } from "./hud.js?v=source";
+import { Native } from "./native.js?v=source";
 import * as garyBrain from "./gary-brain.js?v=source";
 import { MAP_MARK } from "./map.js?v=source";
 import {
@@ -49,14 +49,9 @@ const phoneTimer = document.getElementById("phone-timer");
 const phoneBillEl = document.getElementById("phone-bill");
 const garyVoiceSelect = document.getElementById("gary-voice");
 const garyVolumeInput = document.getElementById("gary-volume");
-const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
-let appInstalledVersion = window.__appInstalledVersion;
-let appInstalledBuild = window.__appInstalledBuild;
-let contentLocal = CONTENT_VERSION;
-let contentSource = null;
 let introBannerElement = null;
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
@@ -67,7 +62,7 @@ const hudElement = document.getElementById("hud");
 // Now that this module is live, ask the native layer for the real remote content
 // version so the intro reflects reality. This is silent: unlike the VERSION
 // command it must not echo the version line into the transcript.
-if (nativeContent) nativeContent.postMessage({ action: "version-banner" });
+if (Native.isMobileApp()) Native.post("content", { action: "version-banner" });
 
 let game = createGame(world);
 let bugTrace = createBugTrace("page reload");
@@ -79,6 +74,39 @@ let lastCmd = "";
 // On touch devices, focusing pops the on-screen keyboard, which is jarring when
 // you just tapped a movement/action button — so we don't.
 const canType = !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+const controls = document.getElementById("controls");
+const navSizePicker = document.getElementById("nav-size-picker");
+const navSizeButtons = [...document.querySelectorAll("#nav-size-picker [data-nav-size]")];
+const NAV_SIZE_KEY = "blackwood-nav-size";
+
+function applyNavSize(size, persist = false) {
+  const selected = ["1", "2", "3"].includes(String(size)) ? String(size) : "1";
+  controls.dataset.navSize = selected;
+  navSizePicker.dataset.size = selected;
+  for (const button of navSizeButtons) {
+    button.setAttribute("aria-checked", String(button.dataset.navSize === selected));
+  }
+  if (persist) {
+    try {
+      localStorage.setItem(NAV_SIZE_KEY, selected);
+    } catch (error) {
+      console.warn("[controls] could not save navigation size", error);
+    }
+  }
+}
+
+let savedNavSize = null;
+try {
+  savedNavSize = localStorage.getItem(NAV_SIZE_KEY);
+} catch (error) {
+  console.warn("[controls] could not read navigation size", error);
+}
+const coarsePointer = !!window.matchMedia?.("(any-pointer: coarse)").matches;
+const prefersLargeNav = Native.isMobileApp() || coarsePointer;
+applyNavSize(["1", "2", "3"].includes(savedNavSize) ? savedNavSize : (prefersLargeNav ? "3" : "1"));
+for (const button of navSizeButtons) {
+  button.addEventListener("click", () => applyNavSize(button.dataset.navSize, true));
+}
 
 function createChatEntry({ field, submit, starterText }) {
   field.placeholder = starterText;
@@ -108,7 +136,7 @@ function setEntryValue(field, value) {
 }
 
 const BIG_BANNER = (versionLine) =>
-`  ____  _            _                     _
+` ____  _            _                             _
  | __ )| | __ _  ___| | ____      _____   ___   __| |
  |  _ \\| |/ _\` |/ __| |/ /\\ \\ /\\ / / _ \\ / _ \\ / _\` |
  | |_) | | (_| | (__|   <  \\ V  V / (_) | (_) | (_| |
@@ -132,7 +160,7 @@ ${versionLine}
 Type HELP for commands. Type LOOK
 to look around. Beware the dark.`;
 
-function bannerText(versionLine = versionText()) {
+function bannerText(versionLine = Native.version()) {
   return (window.innerWidth < 640 ? SMALL_BANNER : BIG_BANNER)(versionLine);
 }
 
@@ -240,7 +268,7 @@ function inventoryForBugReport() {
 
 function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
   const hudState = [
-    `Version: ${versionText()}`,
+    `Version: ${Native.version()}`,
     `SFX: ${sfxMuted ? "off" : "on"}`,
     hudStateSummary({ game, world }),
   ].join("; ");
@@ -455,7 +483,7 @@ function garyReacts(prevFlags, flags) {
 }
 
 // ---- Speech-to-text: talk to it (native bridge in the app, web API in browsers) ----
-const nativeSpeech = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.speech;
+const nativeSpeech = Native.hasBridge("speech");
 const WebSR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const speechAvailable = !!(nativeSpeech || WebSR);
 let listening = false;
@@ -531,14 +559,14 @@ function startListening(targetInput, micBtn) {
   targetInput.placeholder = "listening… tap mic to send";
   setListening(true);
   if (nativeSpeech) {
-    nativeSpeech.postMessage({ action: "start" });
+    Native.post("speech", { action: "start" });
   } else if (WebSR) {
     beginWebRecognition();
   }
 }
 function stopListening() {
   if (nativeSpeech) {
-    nativeSpeech.postMessage({ action: "stop" });
+    Native.post("speech", { action: "stop" });
     setListening(false);
     return;
   }
@@ -581,16 +609,15 @@ function printContentStatus(message) {
   else print(message, "sys");
 }
 window.__contentVersions = (appVersion, appBuild, contentLocalValue, contentSourceValue) => {
-  setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
-  const status = iosVersionText(contentLocalValue, contentSourceValue);
+  Native.setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
   refreshIntroBanner();
-  printContentStatus(status);
+  printContentStatus(Native.version());
 };
 // Launch handshake companion to __contentVersions: refresh only the intro's
 // "Source" field to the live remote content version (or leave "Unavailable" when
 // offline) WITHOUT printing the version line into the transcript.
 window.__contentBanner = (appVersion, appBuild, contentLocalValue, contentSourceValue) => {
-  setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
+  Native.setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
   refreshIntroBanner();
 };
 window.__contentRefreshFailed = (message) => {
@@ -676,19 +703,19 @@ function handle(raw) {
   const traceCommands = onCall ? [submitted] : splitCommands(submitted);
   for (const command of traceCommands) recordBugCommand(bugTrace, command);
   if (low === "ver" || low === "version" || low === "build") {
-    if (nativeContent) {
-      nativeContent.postMessage({ action: "version" });
+    if (Native.isMobileApp()) {
+      Native.post("content", { action: "version" });
     } else {
-      const message = versionText();
+      const message = Native.version();
       onCall ? printToPhone(message, "sys") : print(message, "sys");
     }
     return;
   }
   if (low === "reload" || low === "refresh") {
-    if (nativeContent) {
+    if (Native.isMobileApp()) {
       const message = "Forcing a fresh download from the content source...";
       onCall ? printToPhone(message, "sys") : print(message, "sys");
-      nativeContent.postMessage({ action: "refresh" });
+      Native.post("content", { action: "refresh" });
     } else {
       print("Reloading the latest web files with a fresh cache key...", "sys");
       const url = new URL(window.location.href);
@@ -1015,25 +1042,6 @@ export function modelStatusText() {
   const fix = s.fix || (s.native ? "" : "");
   return "[AI check] Model NOT ACTIVE — Gary is using scripted lines.\n" +
          `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
-}
-
-export function versionText() {
-  return nativeContent
-    ? iosVersionText(contentLocal, contentSource)
-    : `${COPYRIGHT} Web ${APP_VERSION} (Build ${BUILD}). ` +
-      `Content: Version ${CONTENT_VERSION}. Continuous updates.`;
-}
-
-function iosVersionText(contentLocalValue, contentSourceValue) {
-  return `${COPYRIGHT} iOS ${appInstalledVersion} (Build ${appInstalledBuild}). ` +
-    `Content: Local ${contentLocalValue || CONTENT_VERSION}. Source ${contentSourceValue || "Unavailable"}.`;
-}
-
-function setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue) {
-  appInstalledVersion = appVersion;
-  appInstalledBuild = appBuild;
-  contentLocal = contentLocalValue || CONTENT_VERSION;
-  contentSource = contentSourceValue || null;
 }
 
 function refreshIntroBanner() {
