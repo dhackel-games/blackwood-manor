@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 ```
 
 ---
@@ -197,18 +197,18 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
   holds a treasure.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
-  Blackwood Bloodsignet.
+  Ravenblood Signet.
 - **Library lever** opens the **secret chamber** → the curse's focus.
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
 **13 required family heirlooms**, each worth points: silver candlestick, gold locket,
-first-edition grimoire, jeweled music box, Blackwood Bloodsignet, ancient coin (well), crystal
+first-edition grimoire, jeweled music box, Ravenblood Signet, ancient coin (well), crystal
 decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
 Blackwood family ring marked BM, the BM spyglass recovered from the tree fort, and
 the BM-crested protective talisman after it has served against the crypt wraith,
-plus the family-inscribed backwards watch hidden inside the nursery wall.
+plus the family-inscribed WOODBLACK WATCH hidden inside the nursery wall.
 
 ---
 
@@ -740,7 +740,7 @@ contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `eyes`,
 `feet`, `finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
-The existing TALISMAN and BLACKWOOD BLOODSIGNET occupy NECK and FINGER; the new HEADLAMP,
+The existing TALISMAN and RAVENBLOOD SIGNET occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
@@ -872,7 +872,7 @@ and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
 through it reveals the maintenance hatch inside the roofline and hints that the
 ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
 EMERALD GEM as a +8 required heirloom; the newly BM-crested TALISMAN and the
-family-inscribed BACKWARDS WATCH bring the collection to thirteen required
+family-inscribed WOODBLACK WATCH bring the collection to thirteen required
 heirlooms.
 
 ### 12.32 Twelve-line flavor cycles

@@ -1,4 +1,4 @@
-# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @chaos
 Feature: Copilot's mystery package and lightning jumps
@@ -60,22 +60,25 @@ Feature: Copilot's mystery package and lightning jumps
     Then the current room is "betweenWalls"
     And the game score is 0
 
-  Scenario: The space between the walls holds the backwards watch
+  Scenario: The space between the walls holds the Woodblack Watch
     When the player moves directly to room "betweenWalls"
     And I send "look"
-    Then the output contains "BACKWARDS WATCH"
-    When I send "examine watch"
+    Then the output contains "WOODBLACK WATCH"
+    When I send "examine woodblack"
+    Then the output contains "13 heirlooms remain"
     Then the output contains "B.W."
     And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
-    When I send "take watch"
+    When I send "take woodblack"
     Then the output contains "Taken"
     And item "backwardsWatch" is in "inventory"
     And the game score is 0
     When I send "out"
     Then the current room is "grandHall"
-    When I send "put backwards watch in reliquary"
+    When I send "put woodblack in reliquary"
     Then the output contains "Family heirlooms: 1/13"
     And the game score is 12
+    When I send "examine woodblack"
+    Then the output contains "12 heirlooms remain"
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
     Given the mystery package teleport selects room "crypt"
@@ -93,7 +96,7 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "pull wallpaper"
     And I send "go in"
     Then the current room is "betweenWalls"
-    And the output contains "BACKWARDS WATCH"
+    And the output contains "WOODBLACK WATCH"
 
   Scenario: Flying between the walls preserves its one-time discovery award
     Given item "wingedShoes" is carried

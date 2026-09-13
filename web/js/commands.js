@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -125,6 +125,15 @@ Say HANG UP to end the call. HELP only prints this reference; it never calls Gar
 
 function pickupAward(ctx, item) {
   return ctx.awardPickup?.(item) || "";
+}
+
+function inventoryName(item) {
+  const primary = item.names[0];
+  const adjective = item.adjectives?.[0];
+  const words = primary.toLowerCase().split(/\s+/);
+  return adjective && !words.includes(adjective.toLowerCase())
+    ? `${adjective} ${primary}`.toUpperCase()
+    : primary.toUpperCase();
 }
 
 function takeAll(ctx, cmd) {
@@ -264,7 +273,7 @@ export const commands = {
     if (!inv.length) return "You are empty-handed.";
     return "You are carrying:\n" +
       inv.map((i) => {
-        const name = [...(i.adjectives || []).slice(0, 1), i.names[0]].join(" ").toUpperCase();
+        const name = inventoryName(i);
         const worn = i.worn ? ` (WORN${i.wearSlot ? `: ${i.wearSlot.toUpperCase()}` : ""})` : "";
         return `  ${name}${worn}`;
       }).join("\n");

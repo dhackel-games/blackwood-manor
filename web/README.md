@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven. -->
 
 # Blackwood Manor
 
@@ -76,7 +76,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   unworn item can be deposited. PUT auto-opens it; the completed cabinet must
   be explicitly CLOSED before the BELL will answer. The `💎` HUD appears after
   the   first deposit as `required/13 +extra`. The BM SPYGLASS in the TREE FORT,
-  the BM-crested protective TALISMAN, and the inscribed BACKWARDS WATCH are
+  the BM-crested protective TALISMAN, and the inscribed WOODBLACK WATCH are
   required heirlooms; the EMERALD GEM from the GARDEN BRAZIER unlocks the
   SPYGLASS route.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
@@ -108,9 +108,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   bundled, cached, and GitHub.io `CONTENT_VERSION` values from `version.js`;
   RELOAD puts the greatest version into persistent cache. A changed
   `manifest.json` independently offers an iOS app update through TestFlight.
+  VERSION prints the numeric content version and browser continuous-update
+  status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
 - **One-word targeting:** every room and item has a globally unique canonical
-  one-word name (for example `grand`, `bloodsignet`, `iron`, and `dreadvault`).
+  one-word name (for example `grand`, `ravenblood`, `iron`, and `dreadvault`).
   Existing full names remain accepted, while generated `::` routes use the
   compact forms so command and bug histories stay readable.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.

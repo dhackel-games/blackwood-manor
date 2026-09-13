@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -698,14 +698,17 @@ Then("the iOS wrapper opens new-window web links externally", function () {
   assert.match(swift, /UIApplication\.shared\.open\(url\)/);
 });
 
-Then("Version reports cached and GitHub.io content through the native bridge", function () {
+Then("Version reports local and source content through the native bridge", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
   assert.match(ui, /low === "ver" \|\| low === "version"/);
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
-  assert.match(ui, /versionText\(\).*Cached content version:.*GitHub\.io content version:/s);
-  assert.match(ui, /window\.__activeBuildLabel/);
+  assert.match(ui, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
+  assert.match(ui, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
+  assert.match(ui, /`\$\{COPYRIGHT\} iOS \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
+  assert.match(ui, /Content: Local \$\{local \|\| CONTENT_VERSION\}\. Source \$\{source \|\| "Unavailable"\}\./);
+  assert.doesNotMatch(ui, /running in browser \(no self-update layer\)|GitHub\.io version: unavailable/);
   assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
   assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
   assert.match(app, /window\.__activeBuildLabel =/);

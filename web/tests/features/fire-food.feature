@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -226,11 +226,13 @@ Feature: Fire and food consequences
     And item "familyRing" is carried
     And item "rubyRing" is carried
     When I send "use ring"
-    Then the output contains "(which RING? DUSTY or RUBY?)"
+    Then the output contains "(which RING? DUSTY or RAVENBLOOD?)"
     And the turn count is 0
     When I send "neither"
-    Then the output contains "(which RING? DUSTY or RUBY?)"
+    Then the output contains "(which RING? DUSTY or RAVENBLOOD?)"
     And the turn count is 0
+    When I send "ravenblood"
+    Then item "rubyRing" is worn in slot "finger"
 
   Scenario: Carrying match and foil requires an explicit source choice
     Given the player is in room "kitchen"

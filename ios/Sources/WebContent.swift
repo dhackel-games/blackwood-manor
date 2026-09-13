@@ -1,4 +1,4 @@
-// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 import Foundation
 import WebKit
@@ -297,9 +297,12 @@ final class WebContentUpdater {
     }
 
     func versionLabels(completion: @escaping (VersionLabels) -> Void) {
-        let current = store.cacheRelease?.label ?? store.bundleRelease?.label ?? "unknown"
+        let currentRelease = store.cacheRelease ?? store.bundleRelease
+        let current = currentRelease.map { String($0.contentVersion) } ?? "unknown"
         fetchRemoteRelease { remote, _ in
-            completion(VersionLabels(current: current, remote: remote?.label))
+            completion(VersionLabels(
+                current: current,
+                remote: remote.map { String($0.contentVersion) }))
         }
     }
 

@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -100,9 +100,9 @@ Feature: Blackwood Manor adventure
       west
       pull wallpaper
       in
-      take backwards watch
+      take woodblack
       out
-      put backwards watch in reliquary
+      put woodblack in reliquary
       up
       west
       open music box
@@ -398,10 +398,10 @@ Feature: Blackwood Manor adventure
     And item "diary" is in "inventory"
     And flag "knowsCombo" is true
 
-  Scenario: The Blackwood Bloodsignet is visibly a family heirloom
+  Scenario: The Ravenblood Signet is visibly a family heirloom
     Given item "rubyRing" is carried
     When I send "examine ruby ring"
-    Then the output contains "BLACKWOOD BLOODSIGNET"
+    Then the output contains "RAVENBLOOD SIGNET"
     Then the output contains "BM"
     And the output contains "Blackwood family heirloom"
 

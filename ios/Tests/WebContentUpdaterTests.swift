@@ -1,4 +1,4 @@
-// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 import XCTest
 
@@ -121,8 +121,8 @@ final class WebContentUpdaterTests: XCTestCase {
         let updater = makeUpdater()
         updater.versionLabels { labels in
             XCTAssertEqual(labels, .init(
-                current: "2026.9.11 build 10",
-                remote: "2026.9.11 build 20"))
+                current: "20260911010",
+                remote: "20260911020"))
             XCTAssertFalse(FileManager.default.fileExists(atPath: self.cache.path))
             exp.fulfill()
         }

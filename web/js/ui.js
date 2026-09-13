@@ -1,11 +1,11 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
 import { createGame } from "./core.js?v=source";
 import { world } from "./world.js?v=source";
 import { saveGame, loadGame, hasSave } from "./save.js?v=source";
-import { VERSION } from "./version.js?v=source";
+import { APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT, VERSION } from "./version.js?v=source";
 import { createHud, hudStateSummary } from "./hud.js?v=source";
 import * as garyBrain from "./gary-brain.js?v=source";
 import { MAP_MARK } from "./map.js?v=source";
@@ -56,7 +56,7 @@ let endingCall = false;
 const hud = createHud(document);
 const hudElement = document.getElementById("hud");
 const hudVersion = document.getElementById("hud-version");
-if (hudVersion) hudVersion.textContent = VERSION;
+if (hudVersion) hudVersion.textContent = versionText();
 
 let game = createGame(world);
 let bugTrace = createBugTrace("page reload");
@@ -215,7 +215,12 @@ window.addEventListener("resize", () => {
 
 function inventoryForBugReport() {
   return game.inventory().map((item) => {
-    const name = [...(item.adjectives || []).slice(0, 1), item.names[0]].join(" ").toUpperCase();
+    const primary = item.names[0];
+    const adjective = item.adjectives?.[0];
+    const words = primary.toLowerCase().split(/\s+/);
+    const name = (adjective && !words.includes(adjective.toLowerCase())
+      ? `${adjective} ${primary}`
+      : primary).toUpperCase();
     return item.worn ? `${name} (WORN${item.wearSlot ? `: ${item.wearSlot.toUpperCase()}` : ""})` : name;
   });
 }
@@ -554,9 +559,9 @@ window.__speechEnd = () => { setListening(false); };
 // self-update to the player so they can see they're now on the latest code.
 window.__contentUpdateNotice = (from, to) => {
   print("\n— UPDATE —", "sys");
-  print("Cached version: " + (from || "unknown"), "sys");
-  print("New version found: " + (to || "unknown"), "sys");
-  print("Running the latest from GitHub.\n", "sys");
+  print("Local content: " + (from || "unknown"), "sys");
+  print("Content source: " + (to || "unknown"), "sys");
+  print("Running the latest available content.\n", "sys");
 };
 // Compatibility with build 66's native callback while cached web content transitions.
 window.__appUpdateNotice = window.__contentUpdateNotice;
@@ -565,12 +570,12 @@ function printContentStatus(message) {
   else print(message, "sys");
 }
 window.__contentVersions = (current, remote) => {
-  printContentStatus(
-    `${versionText()}\n  Cached content version: ${current || "unknown"}\n` +
-    `  GitHub.io content version: ${remote || "unavailable"}`);
+  const status = iosVersionText(current, remote);
+  if (hudVersion) hudVersion.textContent = status;
+  printContentStatus(status);
 };
 window.__contentRefreshFailed = (message) => {
-  printContentStatus(message || "GitHub.io refresh failed. The current cache was left unchanged.");
+  printContentStatus(message || "Content source refresh failed. Local content was left unchanged.");
 };
 window.__contentStatus = (message) => {
   printContentStatus(message || "The iOS web cache was reloaded.");
@@ -652,16 +657,17 @@ function handle(raw) {
   const traceCommands = onCall ? [submitted] : splitCommands(submitted);
   for (const command of traceCommands) recordBugCommand(bugTrace, command);
   if (low === "ver" || low === "version" || low === "build") {
-    const message = nativeContent
-      ? "Checking cached and GitHub.io versions..."
-      : `${versionText()}\n  GitHub.io version: unavailable outside the iOS app`;
-    onCall ? printToPhone(message, "sys") : print(message, "sys");
-    if (nativeContent) nativeContent.postMessage({ action: "version" });
+    if (nativeContent) {
+      nativeContent.postMessage({ action: "version" });
+    } else {
+      const message = `${versionText()} Continuous updates.`;
+      onCall ? printToPhone(message, "sys") : print(message, "sys");
+    }
     return;
   }
   if (low === "reload" || low === "refresh") {
     if (nativeContent) {
-      const message = "Forcing a fresh download from GitHub.io...";
+      const message = "Forcing a fresh download from the content source...";
       onCall ? printToPhone(message, "sys") : print(message, "sys");
       nativeContent.postMessage({ action: "refresh" });
     } else {
@@ -993,16 +999,16 @@ export function modelStatusText() {
          `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
 }
 
-// What's actually loaded right now. VERSION is the stamp baked into this web code;
-// on the iOS app the native layer also exposes window.__activeBuildLabel — the
-// label (incl. commit SHA) of the content actually being served, which is the
-// only thing that distinguishes a self-updated web push from the shipped bundle.
 export function versionText() {
-  const lines = ["[version] " + VERSION];
-  const label = (typeof window !== "undefined" && window.__activeBuildLabel) || "";
-  if (label) lines.push("  Loaded content: " + label);
-  else lines.push("  Loaded content: running in browser (no self-update layer).");
-  return lines.join("\n");
+  return nativeContent
+    ? iosVersionText(CONTENT_VERSION, null)
+    : `${COPYRIGHT} Web ${APP_VERSION} (Build ${BUILD}). ` +
+      `Content: Version ${CONTENT_VERSION}. Continuous updates.`;
+}
+
+function iosVersionText(local, source) {
+  return `${COPYRIGHT} iOS ${APP_VERSION} (Build ${BUILD}). ` +
+    `Content: Local ${local || CONTENT_VERSION}. Source ${source || "Unavailable"}.`;
 }
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.
