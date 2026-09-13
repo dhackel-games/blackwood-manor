@@ -660,7 +660,7 @@ function handle(raw) {
     if (nativeContent) {
       nativeContent.postMessage({ action: "version" });
     } else {
-      const message = `${versionText()} Continuous updates.`;
+      const message = versionText();
       onCall ? printToPhone(message, "sys") : print(message, "sys");
     }
     return;

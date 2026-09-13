@@ -706,6 +706,7 @@ Then("Version reports local and source content through the native bridge", funct
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
   assert.match(ui, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
   assert.match(ui, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
+  assert.match(ui, /const message = versionText\(\)/);
   assert.match(ui, /`\$\{COPYRIGHT\} iOS \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
   assert.match(ui, /Content: Local \$\{local \|\| CONTENT_VERSION\}\. Source \$\{source \|\| "Unavailable"\}\./);
   assert.doesNotMatch(ui, /running in browser \(no self-update layer\)|GitHub\.io version: unavailable/);
