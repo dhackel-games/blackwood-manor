@@ -1,11 +1,11 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
 import { createGame } from "./core.js?v=source";
 import { world } from "./world.js?v=source";
 import { saveGame, loadGame, hasSave } from "./save.js?v=source";
-import { APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT, VERSION } from "./version.js?v=source";
+import { APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT } from "./version.js?v=source";
 import { createHud, hudStateSummary } from "./hud.js?v=source";
 import * as garyBrain from "./gary-brain.js?v=source";
 import { MAP_MARK } from "./map.js?v=source";
@@ -53,16 +53,17 @@ const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
+let localContentVersion = CONTENT_VERSION;
+let sourceContentVersion = null;
+let introBannerElement = null;
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
 const hud = createHud(document);
 const hudElement = document.getElementById("hud");
-const hudVersion = document.getElementById("hud-version");
-if (hudVersion) hudVersion.textContent = versionText();
 // The launch banner can only stamp a placeholder "Source" — no network fetch has
 // run yet — so it reads "Unavailable" even when the content source is reachable.
 // Now that this module is live, ask the native layer for the real remote content
-// version so the header reflects reality. This is silent: unlike the VERSION
+// version so the intro reflects reality. This is silent: unlike the VERSION
 // command it must not echo the version line into the transcript.
 if (nativeContent) nativeContent.postMessage({ action: "version-banner" });
 
@@ -104,7 +105,7 @@ function setEntryValue(field, value) {
   (field === phoneCmd ? phoneEntry : mainEntry).setValue(value);
 }
 
-const BIG_BANNER =
+const BIG_BANNER = (versionLine) =>
 `  ____  _            _                     _
  | __ )| | __ _  ___| | ____      _____   ___   __| |
  |  _ \\| |/ _\` |/ __| |/ /\\ \\ /\\ / / _ \\ / _ \\ / _\` |
@@ -113,23 +114,25 @@ const BIG_BANNER =
 
               M A N O R
 An Adventure in the Classic Style
-${VERSION}
+${versionLine}
 
 Type HELP for commands.  Type LOOK to look around.  Beware the dark.`;
 
 // Compact banner for narrow (phone) screens, where the ASCII art would wrap.
-const SMALL_BANNER =
+const SMALL_BANNER = (versionLine) =>
 `+------------------------------+
 |      B L A C K W O O D       |
 |          M A N O R           |
 +------------------------------+
 An Adventure in the Classic Style
-${VERSION}
+${versionLine}
 
 Type HELP for commands. Type LOOK
 to look around. Beware the dark.`;
 
-const BANNER = window.innerWidth < 640 ? SMALL_BANNER : BIG_BANNER;
+function bannerText(versionLine = versionText()) {
+  return (window.innerWidth < 640 ? SMALL_BANNER : BIG_BANNER)(versionLine);
+}
 
 // --- terminal output ---
 // Text may contain MAP_MARK-delimited ASCII blocks. Those must not word-wrap,
@@ -151,8 +154,8 @@ function emit(container, text, cls, prefix = "") {
 }
 
 function print(text, cls) {
-  if (text == null) return;
-  emit(transcript, text, cls);
+  if (text == null) return null;
+  return emit(transcript, text, cls);
 }
 
 // --- phone-call screen ---
@@ -235,7 +238,7 @@ function inventoryForBugReport() {
 
 function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
   const hudState = [
-    `Version: ${VERSION}`,
+    `Version: ${versionText()}`,
     `SFX: ${sfxMuted ? "off" : "on"}`,
     hudStateSummary({ game, world }),
   ].join("; ");
@@ -578,15 +581,17 @@ function printContentStatus(message) {
   else print(message, "sys");
 }
 window.__contentVersions = (current, remote) => {
+  setContentVersions(current, remote);
   const status = iosVersionText(current, remote);
-  if (hudVersion) hudVersion.textContent = status;
+  refreshIntroBanner();
   printContentStatus(status);
 };
-// Launch handshake companion to __contentVersions: refresh only the header's
+// Launch handshake companion to __contentVersions: refresh only the intro's
 // "Source" field to the live remote content version (or leave "Unavailable" when
 // offline) WITHOUT printing the version line into the transcript.
 window.__contentBanner = (current, remote) => {
-  if (hudVersion) hudVersion.textContent = iosVersionText(current, remote);
+  setContentVersions(current, remote);
+  refreshIntroBanner();
 };
 window.__contentRefreshFailed = (message) => {
   printContentStatus(message || "Content source refresh failed. Local content was left unchanged.");
@@ -954,7 +959,7 @@ document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
 // --- boot ---
-print(BANNER, "banner");
+introBannerElement = print(bannerText(), "banner");
 if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
 print("\n" + game.describeRoom(true));
 updateHud();
@@ -1014,7 +1019,7 @@ export function modelStatusText() {
 
 export function versionText() {
   return nativeContent
-    ? iosVersionText(CONTENT_VERSION, null)
+    ? iosVersionText(localContentVersion, sourceContentVersion)
     : `${COPYRIGHT} Web ${APP_VERSION} (Build ${BUILD}). ` +
       `Content: Version ${CONTENT_VERSION}. Continuous updates.`;
 }
@@ -1022,6 +1027,15 @@ export function versionText() {
 function iosVersionText(local, source) {
   return `${COPYRIGHT} iOS ${APP_VERSION} (Build ${BUILD}). ` +
     `Content: Local ${local || CONTENT_VERSION}. Source ${source || "Unavailable"}.`;
+}
+
+function setContentVersions(local, source) {
+  localContentVersion = local || CONTENT_VERSION;
+  sourceContentVersion = source || null;
+}
+
+function refreshIntroBanner() {
+  if (introBannerElement) introBannerElement.textContent = bannerText();
 }
 
 // Demo/testing helper: index.html?call auto-dials Gary on load.

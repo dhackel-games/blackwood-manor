@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -524,6 +524,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
   assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
   assert.match(ui, /inventoryForBugReport\(\)/);
+  assert.match(ui, /`Version: \$\{versionText\(\)\}`/);
 });
 
 Then("overlong bug histories preserve both ends and mark the omission", function () {
@@ -720,11 +721,16 @@ Then("Version reports local and source content through the native bridge", funct
 
 Then("the iOS launch banner reports the live content source without a transcript echo", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   // On boot the web layer asks the native side for the real remote source version.
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version-banner" \}\)/);
-  // The banner-only callback updates the header but must NOT print to the transcript.
-  assert.match(ui, /window\.__contentBanner = \(current, remote\) => \{\s*if \(hudVersion\) hudVersion\.textContent = iosVersionText\(current, remote\);\s*\};/);
+  // The banner-only callback rewrites the existing intro without printing a new line.
+  assert.match(ui, /window\.__contentBanner = \(current, remote\) => \{[\s\S]*setContentVersions\(current, remote\);[\s\S]*refreshIntroBanner\(\);[\s\S]*\};/);
+  assert.match(ui, /introBannerElement = print\(bannerText\(\), "banner"\)/);
+  assert.doesNotMatch(html, /id=["']hud-version["']/);
+  assert.doesNotMatch(css, /#hud #hud-version/);
   // Native routes version-banner through versionLabels to the banner-only callback.
   assert.match(app, /case "version-banner":[\s\S]*contentUpdater\.versionLabels/);
   assert.match(app, /"window\.__contentBanner"/);
