@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -12,10 +12,14 @@ function resolveRoom(ctx, phrase) {
   const wanted = normalizeRoomName(phrase);
   if (!wanted) return null;
   const exact = Object.entries(ctx.world.rooms).find(([id, room]) =>
-    [id, room.name, ...(room.aliases || [])].some((name) => normalizeRoomName(name) === wanted));
+    [ctx.world.roomShortNames?.[id], id, room.name, ...(room.aliases || [])]
+      .filter(Boolean)
+      .some((name) => normalizeRoomName(name) === wanted));
   if (exact) return exact;
   const suffixMatches = Object.entries(ctx.world.rooms).filter(([id, room]) =>
-    [id, room.name, ...(room.aliases || [])].some((name) => normalizeRoomName(name).endsWith(wanted)));
+    [ctx.world.roomShortNames?.[id], id, room.name, ...(room.aliases || [])]
+      .filter(Boolean)
+      .some((name) => normalizeRoomName(name).endsWith(wanted)));
   return suffixMatches.length === 1 ? suffixMatches[0] : null;
 }
 
@@ -75,7 +79,7 @@ attack <thing> | Attack / Attack a visible target.
 brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
 call/hint | Gary / Call Gary's paid hint line.
-close <thing> | Close / Close an open door or container.
+(c)lose/shut <thing> | Close / Close an open door or container.
 drop <thing>/all | Drop / Drop one carried item or every unworn item.
 extinguish <thing> | Extinguish / Put out a light or flame.
 get/take/grab <thing>/all | Take / Take one visible item or everything portable.
@@ -91,7 +95,7 @@ move <thing> | Move / Shift or jostle something.
 (o)pen <thing> | Open / Open a door or container.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
-put <thing> in <container> | Put / Place a carried item inside.
+put/place <thing> in <container/slot> | Put / Place a carried item inside a container or named slot.
 (q)uit | Quit / End the session.
 reach into <thing> | Reach / Reach into an opening.
 read <thing> | Read / Read visible writing.
@@ -118,6 +122,10 @@ A chain stops at the first unknown word.
 GARY'S HINT LINE
 CALL or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
 Say HANG UP to end the call. HELP only prints this reference; it never calls Gary.`;
+
+function pickupAward(ctx, item) {
+  return ctx.awardPickup?.(item) || "";
+}
 
 function takeAll(ctx, cmd) {
   const candidates = ctx.visibleItems().filter((item) => item.takeable && !ctx.has(item.id));
@@ -148,7 +156,8 @@ function takeAll(ctx, cmd) {
     ctx.moveItem(item.id, "inventory");
     const autoWorn = item.autoWearOnTake && (!item.wearSlot || !ctx.equipped(item.wearSlot));
     if (autoWorn) item.worn = true;
-    results.push(`${item.names[0].toUpperCase()}: ${autoWorn ? "Taken and worn." : "Taken."}`);
+    results.push(`${item.names[0].toUpperCase()}: ${autoWorn ? "Taken and worn." : "Taken."}` +
+      pickupAward(ctx, item));
   }
   if (leftBehind.length) {
     results.push(`Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
@@ -235,9 +244,9 @@ export const commands = {
     ctx.moveItem(it.id, "inventory");
     if (it.autoWearOnTake && (!it.wearSlot || !ctx.equipped(it.wearSlot))) {
       it.worn = true;
-      return "Taken and worn.";
+      return "Taken and worn." + pickupAward(ctx, it);
     }
-    return "Taken.";
+    return "Taken." + pickupAward(ctx, it);
   },
 
   drop(ctx, cmd) {

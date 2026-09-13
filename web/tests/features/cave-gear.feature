@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -80,7 +80,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the inventory load is 0
     When the player moves directly to room "grandHall"
     And I send "put ring in reliquary"
-    Then the output contains "Remove the ring"
+    Then the output contains "Remove the bloodsignet"
     And item "rubyRing" is worn in slot "finger"
 
   Scenario: Only one item can occupy an equipment slot
@@ -187,8 +187,8 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
-  Scenario: Twelve family heirlooms are required to lift the curse
-    Then the required family item count is 12
+  Scenario: Thirteen family heirlooms are required to lift the curse
+    Then the required family item count is 13
 
   Scenario: The reliquary accepts junk but marks it as non-contributing
     Then the reliquary HUD is hidden
@@ -198,7 +198,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "rope" is in "reliquary"
     And the output contains "does not contribute"
     And the output contains "Non-contributing items currently inside: 1"
-    And the reliquary HUD shows "0/12 +1"
+    And the reliquary HUD shows "0/13 +1"
 
   Scenario: The protective talisman becomes an heirloom after its crypt work is done
     Given item "talisman" is carried
@@ -212,7 +212,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Given item "goldLocket" is carried
     When I send "put talisman in reliquary"
     Then item "talisman" is in "reliquary"
-    And the output contains "Family heirlooms: 1/12"
+    And the output contains "Family heirlooms: 1/13"
     And the game score is 15
 
   Scenario: USE wears wearable equipment

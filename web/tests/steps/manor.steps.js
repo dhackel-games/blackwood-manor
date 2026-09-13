@@ -1,9 +1,10 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
 import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
+import { parse } from "../../js/parser.js";
 import {
   CHEAT_PROMPTS,
   MAGIC_MENU_COMMAND,
@@ -127,6 +128,37 @@ Given("a legacy pre-oak save with the ember deposited is restored", function () 
     id: "jeweledCrown", names: ["crown"], loc: "dreadmawVault",
     takeable: true, bonusTreasure: true, points: 25,
   };
+  this.game.restore(snapshot);
+});
+
+Given("a completed pre-watch save is restored", function () {
+  const snapshot = this.game.snapshot();
+  for (const [id, definition] of Object.entries(world.items)) {
+    if (definition.treasure && id !== "backwardsWatch") {
+      snapshot.state.items[id].loc = "reliquary";
+    }
+  }
+  delete snapshot.state.items.backwardsWatch.treasure;
+  snapshot.state.items.backwardsWatch.loc = "betweenWalls";
+  snapshot.state.flags.curseLiftable = true;
+  snapshot.state.flags.floorDoorOpen = true;
+  snapshot.state.score = 0;
+  this.game.restore(snapshot);
+});
+
+Given("an in-progress pre-watch save with the watch already claimed is restored", function () {
+  const snapshot = this.game.snapshot();
+  delete snapshot.state.items.backwardsWatch.treasure;
+  snapshot.state.items.backwardsWatch.loc = "inventory";
+  snapshot.state.score = 12;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy accidental-fire save is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.flags.maxBurnTurns = 2;
+  snapshot.state.flags.onFire = false;
+  snapshot.state.score = 0;
   this.game.restore(snapshot);
 });
 
@@ -309,10 +341,48 @@ Then("the magic menu uses the shared command title description format", function
 });
 
 Then("every hidden compound prompt uses shortest command forms", function () {
-  const longForm = /^(?:north|northeast|east|southeast|south|southwest|west|northwest|up|down|open|close|take|wear|remove|offer|enter|wait)(?:\s|$)/i;
+  const longForm = /^(?:north|northeast|east|southeast|south|southwest|west|northwest|up|down|open|close|take|place|wear|remove|offer|enter|wait)(?:\s|$)/i;
   for (const entry of CHEAT_PROMPTS) {
     for (const command of entry.compoundPrompt.split(";").map((part) => part.trim())) {
       if (!command.startsWith("{{")) assert.doesNotMatch(command, longForm, `${entry.cmd}: ${command}`);
+    }
+  }
+});
+
+Then("every hidden prompt uses globally unique one-word targets", function () {
+  assert.deepEqual(Object.keys(world.itemShortNames).sort(), Object.keys(world.items).sort());
+  assert.deepEqual(Object.keys(world.roomShortNames).sort(), Object.keys(world.rooms).sort());
+  const aliases = [
+    ...Object.values(world.itemShortNames),
+    ...Object.values(world.roomShortNames),
+  ];
+  assert.ok(aliases.every((alias) => /^[a-z0-9]+$/.test(alias)),
+    "every canonical alias must be one lowercase word");
+  assert.equal(new Set(aliases).size, aliases.length, "canonical aliases must be globally unique");
+
+  const itemGame = createGame(world);
+  for (const id of Object.keys(world.items)) itemGame.moveItem(id, "inventory");
+  for (const [id, alias] of Object.entries(world.itemShortNames)) {
+    assert.equal(itemGame.find(alias)?.id, id, `${alias} must resolve uniquely to ${id}`);
+  }
+  for (const [id, alias] of Object.entries(world.roomShortNames)) {
+    const game = createGame(world);
+    game.setFlag("__noChaos");
+    game.setFlag("oakLightAligned");
+    game.moveItem("wingedShoes", "inventory");
+    game.item("wingedShoes").worn = true;
+    game.moveItem("talisman", "inventory");
+    game.item("talisman").worn = true;
+    game.send(`fly ${alias}`);
+    assert.equal(game.state.room, id, `${alias} must resolve to ${id}`);
+  }
+
+  for (const shortcut of CHEAT_PROMPTS) {
+    for (const command of expandCheatPrompt(shortcut, this.game).split(";").map((part) => part.trim())) {
+      const parsed = parse(command);
+      assert.ok(!parsed.dobj || !/\s/.test(parsed.dobj), `${shortcut.cmd}: ${command}`);
+      assert.ok(!parsed.iobj || /^\d+(?:\s+\d+)*$/.test(parsed.iobj) || !/\s/.test(parsed.iobj),
+        `${shortcut.cmd}: ${command}`);
     }
   }
 });

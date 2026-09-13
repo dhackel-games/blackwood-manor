@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @unit
 Feature: Player command parsing
@@ -24,6 +24,8 @@ Feature: Player command parsing
       | look at                             | look    | [none]    | [none]      | [none]    |
       | turn on lamp                        | on      | lamp      | [none]      | [none]    |
       | o box                               | open    | box       | [none]      | [none]    |
+      | c box                               | close   | box       | [none]      | [none]    |
+      | shut box                            | close   | box       | [none]      | [none]    |
       | yes                                 | yes     | [none]    | [none]      | [none]    |
       | use talisman                        | use     | talisman  | [none]      | [none]    |
       | no                                  | no      | [none]    | [none]      | [none]    |
@@ -32,6 +34,7 @@ Feature: Player command parsing
       | wake up dragon                      | wake    | dragon    | [none]      | [none]    |
       | offer apple to dragon               | give    | apple     | to          | dragon    |
       | put apple on dragon                 | put     | apple     | on          | dragon    |
+      | place emerald gem in middle slot    | put     | emerald gem | in        | middle slot |
       | say "foo"                           | say     | "foo"     | [none]      | [none]    |
       | yell foo                            | say     | foo       | [none]      | [none]    |
       | leave                               | go      | out       | [none]      | [none]    |

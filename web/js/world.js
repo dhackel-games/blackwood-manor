@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -17,7 +17,121 @@
 import { MAP_MARK, renderMap } from "./map.js?v=source";
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 12;
+export const REQUIRED_FAMILY_ITEM_COUNT = 13;
+
+export const ITEM_SHORT_NAMES = Object.freeze({
+  reliquary: "reliquary",
+  bell: "bell",
+  mysteryPackage: "package",
+  lightningBolt: "lightning",
+  statue: "statue",
+  well: "well",
+  frontKey: "iron",
+  mailbox: "mailbox",
+  letter: "letter",
+  brazier: "brazier",
+  emberStone: "emerald",
+  greenGlassStone: "ruby",
+  blueGlassStone: "sapphire",
+  oakMechanism: "panel",
+  oakPlatform: "platform",
+  signalFlags: "flags",
+  blanketHideout: "hideout",
+  woodenSlingshot: "slingshot",
+  spyglassCradle: "cradle",
+  spyglass: "spyglass",
+  mushrooms: "dried",
+  outhouseMushrooms: "fresh",
+  burrito: "burrito",
+  obsidianEye: "obsidian",
+  burritoWrapper: "wrapper",
+  milk: "milk",
+  apple: "apple",
+  toilet: "toilet",
+  dreadmaw: "dragon",
+  goldDoubloon: "doubloon",
+  dragonVaultDoor: "vaultdoor",
+  caveTroll: "troll",
+  dragonHoard: "hoard",
+  familyRing: "family",
+  backpack: "backpack",
+  headlamp: "headlamp",
+  wingedShoes: "shoes",
+  familyCrest: "crest",
+  hallBed: "hallbed",
+  hallMirror: "hallmirror",
+  nightTable: "nightstand",
+  nightDrawer: "drawer",
+  bedsideLamp: "bedlamp",
+  xrayGoggles: "goggles",
+  frontDoor: "frontdoor",
+  candlestick: "candlestick",
+  matches: "matches",
+  rope: "coil",
+  cellarDoor: "cellardoor",
+  lever: "lever",
+  grimoire: "grimoire",
+  portrait: "profile",
+  safe: "safe",
+  talisman: "talisman",
+  desk: "desk",
+  diary: "diary",
+  wallpaper: "wallpaper",
+  musicBox: "musicbox",
+  tinyKey: "tiny",
+  jewelryBox: "jewelry",
+  rubyRing: "bloodsignet",
+  wraith: "wraith",
+  goldLocket: "locket",
+  cord: "cord",
+  ancientCoin: "ancient",
+  crystalDecanter: "decanter",
+  ancestralPortrait: "ancestral",
+  boneKey: "bone",
+  secretDoor: "secret",
+  spirit: "matriarch",
+  silverMirror: "silver",
+  backwardsWatch: "watch",
+});
+
+export const ROOM_SHORT_NAMES = Object.freeze({
+  gate: "gate",
+  garden: "garden",
+  hedgeMazeGate: "yewgate",
+  hedgeMazeKnot: "thornknot",
+  hedgeMazeLoop: "loop",
+  dragonCaveMouth: "cavemouth",
+  dragonAntechamber: "antechamber",
+  mineGallery: "gallery",
+  deepShaft: "shaft",
+  trollGate: "trollgate",
+  dreadmawVault: "dreadvault",
+  privy: "privy",
+  greatOak: "oak",
+  treeFort: "fort",
+  porch: "porch",
+  grandHall: "royal",
+  parlor: "parlor",
+  library: "library",
+  secretChamber: "hidden",
+  diningRoom: "dining",
+  kitchen: "kitchen",
+  wineCellar: "wine",
+  crypt: "crypt",
+  landing: "landing",
+  nursery: "nursery",
+  masterBedroom: "grand",
+  hallBedroom: "hallbedroom",
+  study: "study",
+  attic: "attic",
+  roof: "roof",
+  belfry: "belfry",
+  hiddenVault: "astral",
+  hollowPassage: "passage",
+  hollowSanctum: "sanctum",
+  garysLair: "gary",
+  betweenWalls: "between",
+});
 
 function depositedFamilyItemCount(ctx) {
   return Object.entries(ctx.world.items)
@@ -139,7 +253,8 @@ function suResolveRoom(ctx, phrase) {
   if (!want) return null;
   let partial = null;
   for (const [id, room] of Object.entries(ctx.world.rooms)) {
-    const names = [id, room.name, ...(room.aliases || [])]
+    const names = [ctx.world.roomShortNames?.[id], id, room.name, ...(room.aliases || [])]
+      .filter(Boolean)
       .map((n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, ""));
     if (names.some((n) => n === want)) return id;
     if (!partial && names.some((n) => n.includes(want))) partial = id;
@@ -153,12 +268,16 @@ function suResolveItem(ctx, phrase) {
   if (ctx.item(raw)) return raw; // exact id
   const norm = raw.replace(/[^a-z0-9]/g, "");
   for (const [id, def] of Object.entries(ctx.world.items)) {
-    const names = (def.names || []).map((n) => String(n).toLowerCase());
+    const names = [ctx.world.itemShortNames?.[id], ...(def.names || [])]
+      .filter(Boolean)
+      .map((n) => String(n).toLowerCase());
     if (id.toLowerCase() === raw || names.includes(raw)) return id;
   }
   let partial = null;
   for (const [id, def] of Object.entries(ctx.world.items)) {
-    const names = (def.names || []).map((n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, ""));
+    const names = [ctx.world.itemShortNames?.[id], ...(def.names || [])]
+      .filter(Boolean)
+      .map((n) => String(n).toLowerCase().replace(/[^a-z0-9]/g, ""));
     if (id.toLowerCase().replace(/[^a-z0-9]/g, "").includes(norm) || names.some((n) => n.includes(norm))) {
       partial = partial || id;
     }
@@ -166,12 +285,60 @@ function suResolveItem(ctx, phrase) {
   return partial;
 }
 
-const MAX_NON_ITEM_SCORE = 102;
+const PROGRESS_AWARDS = Object.freeze({
+  statueKeyRevealed: 5,
+  frontDoorOpened: 5,
+  wellLooted: 5,
+  cellarOpened: 5,
+  libraryPassageOpened: 5,
+  diaryDecoded: 5,
+  safeRevealed: 5,
+  safeOpened: 5,
+  wallGapFound: 5,
+  betweenWalls: 20,
+  musicBoxOpened: 5,
+  jewelryBoxOpened: 5,
+  wraithPassed: 5,
+  oakPanelAligned: 5,
+  trollRiddleSolved: 5,
+  reliquarySealed: 5,
+  bellRung: 5,
+  secretDoorOpened: 5,
+  burritoSurvived: 25,
+  selfFireSurvived: 10,
+});
+const STANDALONE_MAX_AWARDS = Object.freeze({
+  milk: 5,
+  obsidianEye: 15,
+  brazier: 30,
+  dreadmaw: 10,
+  silverMirror: 30,
+});
+
+function awardProgress(ctx, id) {
+  const points = PROGRESS_AWARDS[id];
+  const flag = `progressAward:${id}`;
+  if (!points || ctx.getFlag(flag)) return 0;
+  ctx.setFlag(flag);
+  ctx.addScore(points);
+  return points;
+}
+
+function awardSuffix(points) {
+  return points ? ` (+${points})` : "";
+}
+
 function maximumScore(ctx) {
   const itemPoints = Object.values(ctx.world.items)
     .filter((item) => item.treasure)
     .reduce((total, item) => total + (item.points || 0), 0);
-  return itemPoints + MAX_NON_ITEM_SCORE;
+  const pickupPoints = Object.values(ctx.world.items)
+    .reduce((total, item) => total + (item.progressPoints || 0), 0);
+  const progressionPoints = Object.values(PROGRESS_AWARDS)
+    .reduce((total, points) => total + points, 0);
+  const standalonePoints = Object.values(STANDALONE_MAX_AWARDS)
+    .reduce((total, points) => total + points, 0);
+  return itemPoints + pickupPoints + progressionPoints + standalonePoints;
 }
 
 function superUser(ctx, argString) {
@@ -323,7 +490,7 @@ function superUser(ctx, argString) {
     case "maxscore": case "max": {
       const score = maximumScore(ctx);
       ctx.state.score = score;
-      return `[su] score set to the attainable maximum: ${score}.`;
+      return `[su] score set to the deterministic pre-ending maximum: ${score}.`;
     }
     case "flags": case "state": {
       const flags = ctx.state.flags;
@@ -361,7 +528,7 @@ function nextHint(ctx) {
     return "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
   }
   if (!dep("rubyRing")) {
-    return "Ruby ring's locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
+    return "The BLACKWOOD BLOODSIGNET is locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
   }
   if (!dep("musicBox")) {
     return "Don't leave the JEWELED MUSIC BOX behind — the box ITSELF is a Blackwood heirloom, not just the tiny key's shell. Once you've got the tiny key out, TAKE the music box and PUT it in the RELIQUARY too.";
@@ -401,10 +568,10 @@ function nextHint(ctx) {
   }
   if (!dep("spyglass")) {
     if (!ctx.getFlag("brazierLit")) {
-      return "The RED stone for the GREAT OAK'S mechanism is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first.";
+      return "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first.";
     }
     if (!ctx.getFlag("oakLightAligned")) {
-      return "TAKE the EMBER STONE, then follow the path EAST through the PRIVY to the GREAT OAK. Remove the GREEN and BLUE stones and PUT the stones into the MECHANISM in RED, GREEN, BLUE order.";
+      return "TAKE the EMERALD GEM, then follow the path EAST through the PRIVY to the GREAT OAK. EXAMINE the PANEL and PLACE the gems into its BOTTOM, MIDDLE, and TOP SLOTS until the mirrored sunlight converges.";
     }
     if (ctx.roomOf("spyglass") === "treeFort") {
       return "The oak's PLATFORM alternates between the roots and TREE FORT. ENTER PLATFORM while it's beside you, WAIT for it to rise, then TAKE the BM SPYGLASS.";
@@ -413,6 +580,17 @@ function nextHint(ctx) {
   }
   if (!dep("candlestick")) {
     return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
+  }
+  if (!dep("backwardsWatch")) {
+    if (!ctx.getFlag("wallGapFound")) {
+      return "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER, go IN, and TAKE the " +
+        "BACKWARDS WATCH bearing a Blackwood family inscription.";
+    }
+    if (ctx.roomOf("backwardsWatch") === "betweenWalls") {
+      return "Go IN through the NURSERY wall-gap and TAKE the BACKWARDS WATCH. The inscription on its back " +
+        "makes it a family heirloom, however badly time behaves around it.";
+    }
+    return "The BACKWARDS WATCH is a Blackwood heirloom now, not pocket clutter. PUT WATCH IN RELIQUARY.";
   }
   if (!allTreasuresDeposited(ctx)) {
     return "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets.";
@@ -923,11 +1101,13 @@ function descendWell(ctx) {
   if (ctx.getFlag("wellLooted")) return "You climb down again, but the well is empty now.";
   ctx.setFlag("wellLooted");
   ctx.moveItem("ancientCoin", "garden");
-  return floating
+  const points = awardProgress(ctx, "wellLooted");
+  return (floating
     ? "You drift down the WELL like a dandelion seed, pluck the ANCIENT COIN from the muddy bottom, " +
       "and float back into the garden without touching the walls."
     : "Bracing against the rope, you descend into the well. At the muddy bottom your " +
-      "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.";
+      "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.") +
+    awardSuffix(points);
 }
 
 // ---------------------- Andy's "light self on fire" gag ----------------------
@@ -967,6 +1147,7 @@ function stepBurn(ctx) {
   if (n > (ctx.getFlag("maxBurnTurns") || 0)) ctx.setFlag("maxBurnTurns", n);
   if (n <= BURN_LINES.length) return { dead: false, text: BURN_LINES[n - 1] };
   ctx.setFlag("onFire", false);
+  ctx.setFlag("selfFireAwaitingSurvival", false);
   return { dead: true, text: ctx.kill(BURN_DEATH) };
 }
 function burnTick(ctx) {
@@ -1003,14 +1184,19 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
   ctx.setFlag("burnTurns", 0);
   ctx.setFlag("burnGrace", grantTickGrace);
   ctx.setFlag("fartIgnitionQueued", false);
-  ctx.addScore(-1);
+  ctx.setFlag("selfFireAwaitingSurvival", true);
+  const repeatPenalty = ctx.getFlag("progressAward:selfFireSurvived") ? -5 : 0;
+  if (repeatPenalty) ctx.addScore(repeatPenalty);
+  const repeatWarning = repeatPenalty
+    ? "\n\nYou already proved you could survive this. Doing it again is just reckless. (-5)"
+    : "";
   if (source === "coldFart") {
     return (
       "No active affliction — but the burrito left a permanent pilot light down there, and the wrapper is still in " +
       "your grip. You bear down, summon a deliberate, sulfurous residual fart on command, and snap the crumpled tin " +
       "foil into the blue-orange jet. Your clothes catch; the rest of you follows.\n\n" +
       "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, so " +
-      "this appalling party trick works anywhere in the house, for as long as you carry it."
+      "this appalling party trick works anywhere in the house, for as long as you carry it." + repeatWarning
     );
   }
   if (source === "fart") {
@@ -1020,7 +1206,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
         "catch a spray of impossible sparks, and redirect them straight into your clothes. There is a flash, " +
         "a deeply regrettable smell, and then your whole body catches.\n\n" +
         "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
-        "ready for another appalling ignition while the burrito keeps cycling."
+        "ready for another appalling ignition while the burrito keeps cycling." + repeatWarning
       );
     }
     return (
@@ -1028,7 +1214,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
       "deranged signal mirror, and catch the blue-orange jet. The foil flashes; your clothes catch; the rest of " +
       "you follows.\n\n" +
       "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
-      "which means this appalling technique remains reusable while the burrito keeps firing."
+      "which means this appalling technique remains reusable while the burrito keeps firing." + repeatWarning
     );
   }
   return (
@@ -1036,8 +1222,17 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
     "AHAHAHAHA — YOU'RE ON FIRE! This is fine. This is, if anything, cozy. The portraits on the walls " +
     "lean in with something like respect.\n\n" +
     "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. Put yourself out, " +
-    "dump the fire into something, or make it COUNT. (Gary lives for this.)"
+    "dump the fire into something, or make it COUNT. (Gary lives for this.)" + repeatWarning
   );
+}
+
+function surviveSelfFire(ctx) {
+  if (!ctx.getFlag("selfFireAwaitingSurvival")) return "";
+  ctx.setFlag("selfFireAwaitingSurvival", false);
+  const points = awardProgress(ctx, "selfFireSurvived");
+  return points
+    ? `\n\nYou deliberately set yourself on fire and survived. Against all reason, that counts. (+${points})`
+    : "";
 }
 
 function queueFartIgnition(ctx) {
@@ -1079,7 +1274,7 @@ function putOutSelf(ctx) {
   if (!ctx.getFlag("onFire")) return null; // nothing to douse — let the generic handler answer
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
   return "You drop and roll like a responsible adult. The flames sputter out, leaving you smoking, singed, " +
-    "and strangely disappointed. You are no longer on fire.";
+    "and strangely disappointed. You are no longer on fire." + surviveSelfFire(ctx);
 }
 function selfLightInterceptor(ctx, cmd) {
   const d = (cmd.dobj || "").toLowerCase();
@@ -1164,6 +1359,7 @@ function garyEatsPizza(ctx) {
   ctx.setFlag("pizzaEaten", true);
   bumpTab(ctx);
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0); // the brigade turns up here too
+  const survival = surviveSelfFire(ctx);
   if (Math.random() < 0.5) {
     ctx.setFlag("garyStricken", true);
     return (
@@ -1173,25 +1369,27 @@ function garyEatsPizza(ctx) {
       "the sounds of a biblical, two-ended gastrointestinal reckoning* \"—I NEED THE OTHER BATHROOM, DENISE, MOVE—\" " +
       "*CLATTER* *distant sprinting*\n\n" +
       "(Meanwhile the Blackwood Volunteer Fire Brigade wanders in and hoses you down almost as an afterthought. " +
-      "You are OUT. " + money$(ctx) + " on the fire tab. Gary is... indisposed. Say HANG UP.)"
+      "You are OUT. " + money$(ctx) + " on the fire tab. Gary is... indisposed. Say HANG UP.)" + survival
     );
   }
   return (
     "Gary: \"...you're a SAINT.\" *frantic unwrapping* *an enormous, joyful bite* \"...oh. OH. That's the best thing " +
     "that's happened to me in YEARS. I could cry. I might cry.\"\n\n" +
     "\"You're a good person. Genuinely. That's " + money$(ctx) + ", and worth every cent — to ME.\"\n\n" +
-    "(The fire brigade shows up and hoses you down. You are OUT, and Gary is, for one shining moment, happy. Say HANG UP.)"
+    "(The fire brigade shows up and hoses you down. You are OUT, and Gary is, for one shining moment, happy. Say HANG UP.)" +
+    survival
   );
 }
 function fireRescue(ctx) {
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
+  const survival = surviveSelfFire(ctx);
   bumpTab(ctx);
   return (
     "Sirens, at last. The Blackwood Volunteer Fire Brigade — one guy, one hose — kicks in the gate and blasts you " +
     "off your feet with a jet of freezing water. You are OUT. Soaked, steaming, singed to a crisp, but OUT.\n\n" +
     "Gary: \"There's the fire-department surcharge — " + money$(ctx) + " now. ...So. About that pizza. You never " +
     "answered. And I am STILL hungry.\"\n\n" +
-    "(You're no longer on fire. " + meter(ctx) + " Say HANG UP whenever you've had your fill of Gary.)"
+    "(You're no longer on fire. " + meter(ctx) + " Say HANG UP whenever you've had your fill of Gary.)" + survival
   );
 }
 // Gary, while you keep talking to him and continue to be on fire.
@@ -1406,10 +1604,12 @@ function floatToRoom(ctx, roomId) {
   const destination = ctx.world.rooms[roomId];
   const destinationName = destination.name.replace(/^The\s+/i, "");
   if (roomId === "treeFort" && !ctx.getFlag("oakLightAligned")) {
-    return "The GREAT OAK'S crown closes into a wall of branches beneath you. Without focusing the RGB sunlight " +
-      "into its PULLEY mechanism first, there is nowhere safe to land.";
+    return "The GREAT OAK'S crown closes into a wall of branches beneath you. Without focusing the mirrored sunlight " +
+      "through its inset PANEL first, there is nowhere safe to land.";
   }
   ctx.state.room = roomId;
+  const betweenWallsPoints = roomId === "betweenWalls" ? discoverBetweenWalls(ctx) : 0;
+  if (roomId === "betweenWalls") ctx.setFlag("seen:betweenWalls", true);
   if (roomId === "crypt") {
     const talisman = ctx.item("talisman");
     if (!(talisman && talisman.loc === "inventory" && talisman.worn)) {
@@ -1418,8 +1618,12 @@ function floatToRoom(ctx, roomId) {
         "it sweeps through you, and your heart simply stops."
       );
     }
+    const points = awardProgress(ctx, "wraithPassed");
+    return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+      awardSuffix(points);
   }
-  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}`;
+  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+    awardSuffix(betweenWallsPoints);
 }
 function eatBurrito(ctx) {
   ctx.destroy("burrito");
@@ -1429,22 +1633,34 @@ function eatBurrito(ctx) {
   ctx.setFlag("digestivePhase", 0);
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
+  ctx.setFlag("ateSuperBurrito", true);
   return "You eat Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
     "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
     "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or drink the MILK before " +
     "this completes ten full digestive laps.)";
 }
+
+function surviveBurrito(ctx, wasSick) {
+  if (!wasSick || !ctx.getFlag("ateSuperBurrito")) return "";
+  const points = awardProgress(ctx, "burritoSurvived");
+  return points
+    ? `\n\nYou survived the super burrito. Your digestive tract will never be the same. (+${points})`
+    : "";
+}
+
 function drinkMilk(ctx) {
   ctx.destroy("milk");
-  const wasAfflicted = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
+  const wasSick = (ctx.getFlag("sick") || 0) > 0;
+  const wasAfflicted = wasSick || (ctx.getFlag("high") || 0) > 0;
   ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
   ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("digestivePhase", null);
   ctx.setFlag("drankMilk", true);
-  ctx.addScore(5);
+  ctx.addScore(STANDALONE_MAX_AWARDS.milk);
   return "You drink the milk. Cold, fresh, and impossibly wholesome.\n\n" +
     (wasAfflicted ? "Your stomach settles and your head clears — whatever was wrong with you passes. " : "") +
-    "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)";
+    "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)" +
+    surviveBurrito(ctx, wasSick);
 }
 
 // --- The obsidian eye: the mushroom trip's astral sight, made permanent -----
@@ -1458,7 +1674,7 @@ function takeObsidianEye(ctx) {
   ctx.moveItem("obsidianEye", "inventory");
   if (!firstClaim) return "You retrieve the OBSIDIAN EYE. It clings coldly to your palm, waiting to be worn.";
   ctx.setFlag("obsidianEyeClaimed");
-  ctx.addScore(15);
+  ctx.addScore(STANDALONE_MAX_AWARDS.obsidianEye);
   return "You lift the OBSIDIAN EYE off its plinth. It clings coldly to your palm, eager to adhere somewhere " +
     "more useful. WEAR EYE on your FOREHEAD if you want to see what the MANOR keeps hidden. (+15)";
 }
@@ -1473,80 +1689,142 @@ function lightBrazier(ctx) {
       "carried LIT CANDLESTICK to work around the whole bowl, or a far bigger, more reckless flame.";
   }
   ctx.setFlag("brazierLit", true);
-  ctx.addScore(10);
+  const usedBodyFire = ctx.getFlag("onFire");
+  const points = usedBodyFire ? STANDALONE_MAX_AWARDS.brazier : 10;
+  ctx.addScore(points);
   ctx.moveItem("emberStone", "garden");
-  if (hasLitCandle && !ctx.getFlag("onFire")) {
+  if (hasLitCandle && !usedBodyFire) {
     ctx.setFlag("brazierMethod", "candle");
     return "You press the LIT CANDLESTICK to one sodden knot of moss after another, patiently building heat " +
       "until the scattered flames join. The BRAZIER roars up in gold-and-green fire.\n\n" +
-      "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)";
+      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})`;
   }
   ctx.setFlag("brazierMethod", "body");
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
+  const survival = surviveSelfFire(ctx);
   return "You fling your burning self against the brazier — and the fire LEAPS off you into the moss with a WHUMP. " +
     "You stagger back, smoking but no longer ablaze, as the bowl roars up in gold-and-green flame.\n\n" +
-    "In the light, something glints in the ash at its foot: an EMBER STONE. (+10)\n\n" +
-    "A fair trade: you gave the fire away, and it gave you this.";
+    `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})\n\n` +
+    "A fair trade: you gave the fire away, and it gave you this." + survival;
 }
 
-const OAK_STONE_COLORS = Object.freeze({
-  emberStone: "red",
-  greenGlassStone: "green",
-  blueGlassStone: "blue",
+const OAK_GEMS = Object.freeze({
+  emberStone: { label: "EMERALD GEM", slot: "middle" },
+  greenGlassStone: { label: "RUBY GEM", slot: "bottom" },
+  blueGlassStone: { label: "SAPPHIRE GEM", slot: "top" },
 });
-const OAK_COLOR_LABELS = Object.freeze({ red: "RED", green: "GREEN", blue: "BLUE" });
+const OAK_SLOT_ORDER = Object.freeze(["bottom", "middle", "top"]);
+const OAK_LEGACY_COLOR_GEMS = Object.freeze({
+  red: "emberStone",
+  green: "greenGlassStone",
+  blue: "blueGlassStone",
+});
 
-function oakStoneOrder(ctx) {
-  const stored = ctx.getFlag("oakStoneOrder");
-  if (Array.isArray(stored)) return stored;
-  const initial = ["blue", "green"];
-  ctx.setFlag("oakStoneOrder", initial);
-  return initial;
-}
-
-function describeOakMechanism(ctx) {
-  const order = oakStoneOrder(ctx);
-  const stones = order.length
-    ? order.map((color) => OAK_COLOR_LABELS[color]).join(" · ")
-    : "(all three sockets are empty)";
-  return "Three glass sockets face the path of the afternoon sun. Their current left-to-right order is " +
-    `${stones}. The scratched letters beneath them read R G B. ` +
-    (ctx.getFlag("oakLightAligned")
-      ? "Pure white light now climbs the trunk into the pulley assembly."
-      : "The stones can be TAKEN and PUT back into the MECHANISM in a different order.");
-}
-
-function takeOakStone(ctx, cmd) {
-  if (ctx.getFlag("oakLightAligned")) return "The focused sunlight has fused all three stones into their sockets.";
-  const stone = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj);
-  const color = stone && OAK_STONE_COLORS[stone.id];
-  if (!stone || !color || stone.loc !== "oakMechanism") return null;
-  if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
-    return "Your hands are full. You'll have to drop something before removing the stone.";
+function oakGemSlots(ctx) {
+  const stored = ctx.getFlag("oakGemSlots");
+  let slots = stored && typeof stored === "object" && !Array.isArray(stored)
+    ? Object.fromEntries(OAK_SLOT_ORDER.map((slot) => [slot, stored[slot] || null]))
+    : null;
+  if (!slots) {
+    const legacyOrder = ctx.getFlag("oakStoneOrder");
+    slots = Object.fromEntries(OAK_SLOT_ORDER.map((slot) => [slot, null]));
+    if (ctx.getFlag("oakLightAligned")) {
+      for (const [id, gem] of Object.entries(OAK_GEMS)) slots[gem.slot] = id;
+    } else if (Array.isArray(legacyOrder)) {
+      legacyOrder.slice(0, OAK_SLOT_ORDER.length).forEach((color, index) => {
+        const id = OAK_LEGACY_COLOR_GEMS[color];
+        if (id && ctx.roomOf(id) === "oakMechanism") slots[OAK_SLOT_ORDER[index]] = id;
+      });
+    } else {
+      for (const [id, gem] of Object.entries(OAK_GEMS)) {
+        if (ctx.roomOf(id) === "oakMechanism") slots[gem.slot] = id;
+      }
+    }
   }
-  ctx.moveItem(stone.id, "inventory");
-  ctx.setFlag("oakStoneOrder", oakStoneOrder(ctx).filter((entry) => entry !== color));
-  return `You lift the ${OAK_COLOR_LABELS[color]} stone from its socket.`;
+  const seated = new Set();
+  for (const slot of OAK_SLOT_ORDER) {
+    const id = slots[slot];
+    if (!OAK_GEMS[id] || ctx.roomOf(id) !== "oakMechanism" || seated.has(id)) slots[slot] = null;
+    else seated.add(id);
+  }
+  for (const [id, gem] of Object.entries(OAK_GEMS)) {
+    if (ctx.roomOf(id) !== "oakMechanism" || seated.has(id)) continue;
+    const slot = slots[gem.slot] == null
+      ? gem.slot
+      : OAK_SLOT_ORDER.find((candidate) => slots[candidate] == null);
+    if (slot) {
+      slots[slot] = id;
+      seated.add(id);
+    }
+  }
+  ctx.setFlag("oakGemSlots", slots);
+  return slots;
 }
 
-function putOakStone(ctx, cmd) {
-  const stone = ctx.find(cmd.dobj, ctx.inventory());
-  const color = stone && OAK_STONE_COLORS[stone.id];
-  if (!stone || !color) return "Only the three coloured glass stones fit these sockets.";
-  const order = oakStoneOrder(ctx);
-  if (order.length >= 3) return "All three sockets are occupied. TAKE a stone out before changing the order.";
-  ctx.moveItem(stone.id, "oakMechanism");
-  const next = [...order, color];
-  ctx.setFlag("oakStoneOrder", next);
-  if (next.join(",") !== "red,green,blue") {
-    return `You set the ${OAK_COLOR_LABELS[color]} stone into the next socket. Sunlight scatters uselessly through ` +
-      `${next.map((entry) => OAK_COLOR_LABELS[entry]).join(" · ")}.`;
+function describeOakPanel(ctx) {
+  const slots = oakGemSlots(ctx);
+  const contents = [...OAK_SLOT_ORDER].reverse().map((slot) => {
+    const id = slots[slot];
+    return `${slot.toUpperCase()} SLOT: ${id ? OAK_GEMS[id].label : "EMPTY"}`;
+  }).join("\n");
+  return "A dark iron PANEL is inset in the trunk with three vertically stacked slots. High in the branches, " +
+    "a complex set of mirrors catches the afternoon sun and shines narrow beams down through holes bored in " +
+    `the tree, one aimed at each slot.\n\n${contents}\n\n` +
+    (ctx.getFlag("oakLightAligned")
+      ? "The three beams pass through the gems and converge into pure white light that climbs toward the pulley."
+      : "The gems can be TAKEN and PLACED into the TOP, MIDDLE, or BOTTOM SLOT.");
+}
+
+function takeOakGem(ctx, cmd) {
+  if (ctx.getFlag("oakLightAligned")) return "The focused sunlight has fused all three gems into their slots.";
+  const gem = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj);
+  if (!gem || !OAK_GEMS[gem.id] || gem.loc !== "oakMechanism") return null;
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
+    return "Your hands are full. You'll have to drop something before removing the gem.";
+  }
+  const slots = oakGemSlots(ctx);
+  const slot = OAK_SLOT_ORDER.find((candidate) => slots[candidate] === gem.id);
+  ctx.moveItem(gem.id, "inventory");
+  ctx.setFlag("oakGemSlots", { ...slots, [slot]: null });
+  return `You lift the ${OAK_GEMS[gem.id].label} from the ${slot.toUpperCase()} SLOT.`;
+}
+
+function putOakGem(ctx, cmd) {
+  const target = String(cmd.iobj || "").toLowerCase();
+  const explicitSlot = /\b(top|middle|bottom)(?:\s+(?:slot|hole))?\b/.exec(target)?.[1];
+  const targetsPanel = /\b(panel|mechanism|slots?|holes?|oak)\b/.test(target);
+  if (!explicitSlot && !targetsPanel) return null;
+  const gem = ctx.find(cmd.dobj, ctx.inventory());
+  if (!gem || !OAK_GEMS[gem.id]) return "Only the RUBY, EMERALD, and SAPPHIRE GEMS fit the PANEL.";
+  const slots = oakGemSlots(ctx);
+  const slot = explicitSlot || OAK_SLOT_ORDER.find((candidate) => slots[candidate] == null);
+  if (!slot) return "All three slots are occupied. TAKE a gem out before changing the arrangement.";
+  if (slots[slot]) {
+    return `The ${slot.toUpperCase()} SLOT already holds the ${OAK_GEMS[slots[slot]].label}. TAKE it out first.`;
+  }
+  ctx.moveItem(gem.id, "oakMechanism");
+  const next = { ...slots, [slot]: gem.id };
+  ctx.setFlag("oakGemSlots", next);
+  const placement = `You place the ${OAK_GEMS[gem.id].label} into the ${slot.toUpperCase()} SLOT.`;
+  const solved = OAK_SLOT_ORDER.every((candidate) =>
+    next[candidate] && OAK_GEMS[next[candidate]].slot === candidate);
+  if (!solved) {
+    if (OAK_SLOT_ORDER.every((candidate) => next[candidate])) {
+      for (const id of Object.values(next)) ctx.moveItem(id, "greatOak");
+      ctx.setFlag("oakGemSlots",
+        Object.fromEntries(OAK_SLOT_ORDER.map((candidate) => [candidate, null])));
+      return `${placement} The three beams collide in a muddy flare. The PANEL bucks against the trunk and ` +
+        "spits every gem onto the ground.";
+    }
+    return `${placement} Sunlight passes through the gem, but the separate beams fail to converge.`;
   }
   ctx.setFlag("oakLightAligned");
   ctx.setFlag("oakLiftGrace");
   ctx.moveItem("oakPlatform", "greatOak");
-  return "You complete RED · GREEN · BLUE. Sunlight passes through the three glassy stones and merges into a " +
-    "brilliant white beam. High above, the pulley mechanism CLUNKS awake and lowers a wooden PLATFORM to the roots.";
+  const points = awardProgress(ctx, "oakPanelAligned");
+  return `${placement}\n\nSunlight passes through all three gems and the mirrored beams converge into a ` +
+    "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots." +
+    awardSuffix(points);
 }
 
 function enterOakPlatform(ctx) {
@@ -1667,7 +1945,7 @@ function worldTick(ctx) {
   if (g) parts.push(g);
   const f = foreshadowTick(ctx);     // ambient dread from below, ramping with reliquary deposits
   if (f) parts.push(f);
-  const o = oakLiftTick(ctx);         // RGB sunlight lift between the oak roots and tree fort
+  const o = oakLiftTick(ctx);         // mirrored-sunlight lift between the oak roots and tree fort
   if (o) parts.push(o);
   return parts.length ? parts.join("\n\n") : null;
 }
@@ -1806,11 +2084,18 @@ function statusBanner(ctx) {
   return parts.length ? parts.join("\n") : "";
 }
 
+function discoverBetweenWalls(ctx) {
+  if (ctx.getFlag("seen:betweenWalls")) {
+    ctx.setFlag("progressAward:betweenWalls");
+    return 0;
+  }
+  return awardProgress(ctx, "betweenWalls");
+}
+
 // --- Random teleport, shared by the mystery package and lightning jumps ------
-// Picks any room but the one you're standing in (including BETWEEN THE WALLS,
-// which has no ordinary door — this random draw and the package below are the
-// only ways in). Reuses the crypt/wraith safeguard so an unlucky draw can
-// genuinely kill you, same as walking in on purpose without the talisman.
+// Picks any room but the one you're standing in. Reuses the crypt/wraith
+// safeguard so an unlucky draw can genuinely kill you, same as walking in on
+// purpose without the talisman.
 function teleportRandom(ctx, flavor, exclude) {
   const ids = Object.keys(ctx.world.rooms).filter(
     (id) => id !== ctx.state.room && !(exclude && exclude.has(id))
@@ -1826,24 +2111,27 @@ function teleportRandom(ctx, flavor, exclude) {
       );
     }
   }
-  const firstTime = roomId === "betweenWalls" && !ctx.getFlag("seen:betweenWalls");
+  const betweenWallsPoints = roomId === "betweenWalls" ? discoverBetweenWalls(ctx) : 0;
   if (roomId === "betweenWalls") ctx.setFlag("seen:betweenWalls", true);
-  if (firstTime) ctx.addScore(20);
   const landing = roomId === "betweenWalls"
     ? "You don't so much land as get FILED somewhere the house forgot to build.\n\n"
     : `You land, with a graceless thump, in ${ctx.world.rooms[roomId].name.toUpperCase()}.\n\n`;
   return `${flavor}\n\n${landing}${ctx.describeRoom()}` +
-    (firstTime ? "\n\n(A place no door leads to. Nobody finds this on purpose. +20.)" : "");
+    (betweenWallsPoints
+      ? `\n\n(A place no proper door leads to. Almost nobody finds this on purpose. +${betweenWallsPoints}.)`
+      : "");
 }
 
 // --- Copilot's Mystery Package: a gift-wrapped box that does NOT want to be
 // opened. Seven possible outcomes, evenly weighted, roughly half good news and
 // half catastrophe — including the two ways to become instantly on fire AND
-// sick at once, and the one in twenty chance of the game's only doorless room.
+// sick at once, and a rare shortcut into the hidden space between the walls.
+// Every effect and destination also has a deterministic route elsewhere.
 const PACKAGE_EFFECTS = [
   // 1. Cure whatever ails you.
   (ctx) => {
-    const was = (ctx.getFlag("sick") || 0) > 0 || (ctx.getFlag("high") || 0) > 0;
+    const wasSick = (ctx.getFlag("sick") || 0) > 0;
+    const was = wasSick || (ctx.getFlag("high") || 0) > 0;
     ctx.setFlag("sick", 0); ctx.setFlag("high", 0);
     ctx.setFlag("sickGrace", false); ctx.setFlag("fartIgnitionQueued", false);
     ctx.setFlag("digestivePhase", null);
@@ -1851,7 +2139,8 @@ const PACKAGE_EFFECTS = [
     return "A warm, golden light spills out of the box and washes over you like your mother checking your " +
       "forehead for a fever." + (was
         ? " Whatever was wrong with you a second ago simply... isn't, anymore. Miraculous. Suspicious. (+3)"
-        : " You feel great, if a little cheated that nothing was wrong with you to begin with. (+3)");
+        : " You feel great, if a little cheated that nothing was wrong with you to begin with. (+3)") +
+      surviveBurrito(ctx, wasSick);
   },
   // 2. Instant burrito-grade sickness, no burrito required.
   (ctx) => {
@@ -1937,7 +2226,7 @@ const LIGHTNING_NO_JUMP = new Set([
   "secretChamber", // hidden grimoire chamber
   "crypt",         // the wraith death-room + gold locket
   "dreadmawVault", // the dragon's treasure vault (family crest and winged shoes)
-  "treeFort",      // required heirloom behind the RGB lift puzzle
+  "treeFort",      // required heirloom behind the GREAT OAK lift puzzle
   "garysLair",     // the secret cliffhanger ending — reached on foot, never by a lucky bolt
 ]);
 const LIGHTNING_FLAVORS = [
@@ -2006,7 +2295,8 @@ function useToilet(ctx) {
     ctx.setFlag("fartIgnitionQueued", false);
     ctx.setFlag("digestivePhase", null);
     return "You reach the TOILET HOLE not one moment too soon. What follows is private, thorough, and — eventually — " +
-      "deeply cathartic. You emerge hollow and trembling, but CURED. The burrito's four-stage assault has passed.";
+      "deeply cathartic. You emerge hollow and trembling, but CURED. The burrito's four-stage assault has passed." +
+      surviveBurrito(ctx, true);
   }
   if ((ctx.getFlag("high") || 0) > 0)
     return "You squat over the hole and contemplate the mushrooms' birthplace for what may be an hour, or an epoch.";
@@ -2099,8 +2389,10 @@ function finishOpeningSafe(ctx, source) {
   safe.open = true;
   ctx.setFlag("safeCodePrompt", false);
   const inside = ctx.itemsIn("safe");
+  const points = awardProgress(ctx, "safeOpened");
   return `${source} The safe clicks open` +
-    (inside.length ? ", revealing " + inside.map((item) => item.names[0].toUpperCase()).join(", ") + "." : ".");
+    (inside.length ? ", revealing " + inside.map((item) => item.names[0].toUpperCase()).join(", ") + "." : ".") +
+    awardSuffix(points);
 }
 function enterSafeCode(ctx, cmd) {
   if (ctx.roomOf("safe") !== "parlor") return null;
@@ -2266,7 +2558,7 @@ function giveDragon(ctx, cmd) {
   ctx.setFlag("dragonMoved");
   ctx.setFlag("dragonFriendly");
   ctx.moveItem("goldDoubloon", "inventory");
-  ctx.addScore(10);
+  ctx.addScore(STANDALONE_MAX_AWARDS.dreadmaw);
   return "You offer the APPLE. One immense golden eye opens. DREADMAW THE DRAGON eats it with exquisite care, " +
     "then rises and coils beside the cave instead of across it.\n\n" +
     "\"At last, a visitor with manners,\" she says. \"Take this GOLD DOUBLOON. You may enter. " +
@@ -2284,14 +2576,15 @@ function openTrollVault(ctx, answer, anticipated = false) {
   ctx.setFlag("trollWrongGuesses", 0);
   ctx.setFlag("trollAskedRiddle");
   ctx.setFlag("dragonVaultOpen");
+  const points = awardProgress(ctx, "trollRiddleSolved");
   if (anticipated) {
     return `You say ${answer.toUpperCase()}. The TROLL's eyebrows climb toward his craggy hairline. ` +
       "\"You answered before I even asked. Nobody does that.\"\n\n" +
       "He laughs, genuinely delighted, and lumbers aside. Deep locks answer one another inside the mountain, " +
-      "and the vault door rolls open.";
+      "and the vault door rolls open." + awardSuffix(points);
   }
   return `You answer ${answer.toUpperCase()}. The TROLL grins, pleased by the rhyme, and lumbers aside. ` +
-    "Deep locks answer one another inside the mountain, and the vault door rolls open.";
+    "Deep locks answer one another inside the mountain, and the vault door rolls open." + awardSuffix(points);
 }
 function answerTrollRiddle(ctx, cmd) {
   if (ctx.getFlag("dragonVaultOpen")) return talkToTroll(ctx);
@@ -2587,6 +2880,8 @@ export const world = {
   hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
   hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   flavorPools: CYCLING_FLAVOR_POOLS,
+  itemShortNames: ITEM_SHORT_NAMES,
+  roomShortNames: ROOM_SHORT_NAMES,
   nextFlavor: cycleFlavor,
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
@@ -2602,12 +2897,75 @@ export const world = {
       state.items.talisman.worn = false;
       state.score += world.items.talisman.points || 0;
     }
+    const completedBeforeWatch = state.flags.curseLiftable
+      || state.flags.floorDoorOpen
+      || state.flags.bellRung
+      || state.won;
+    const legacyWatchWasOptional = !savedItems?.backwardsWatch?.treasure;
+    if (legacyWatchWasOptional) {
+      const oldWatchLocation = savedItems?.backwardsWatch?.loc;
+      const watchScoreFlag = world.items.backwardsWatch.depositScoreFlag;
+      const oldWatchWasClaimed = !!oldWatchLocation && oldWatchLocation !== "betweenWalls";
+      if (oldWatchWasClaimed) state.flags[watchScoreFlag] = true;
+      if (completedBeforeWatch) {
+        state.items.backwardsWatch.loc = "reliquary";
+      }
+      if (completedBeforeWatch && !oldWatchWasClaimed) {
+        state.score = (state.score || 0) + (world.items.backwardsWatch.points || 0);
+        state.flags[watchScoreFlag] = true;
+      }
+    }
     const collectionComplete = Object.entries(world.items)
       .filter(([, definition]) => definition.treasure)
       .every(([id]) => state.items[id]?.loc === "reliquary");
     if (collectionComplete) {
       state.flags.curseLiftable = true;
       state.flags.floorDoorOpen = true;
+    }
+
+    const completedProgress = {
+      statueKeyRevealed: state.flags.statueMoved,
+      frontDoorOpened: state.flags.frontDoorOpen || state.items.frontDoor?.open,
+      wellLooted: state.flags.wellLooted,
+      cellarOpened: state.flags.cellarOpen || state.items.cellarDoor?.open,
+      libraryPassageOpened: state.flags.leverPulled,
+      diaryDecoded: state.flags.knowsCombo,
+      safeRevealed: state.flags.safeRevealed || state.items.safe?.loc === "parlor",
+      safeOpened: state.items.safe?.open,
+      wallGapFound: state.flags.wallGapFound,
+      musicBoxOpened: state.items.musicBox?.open,
+      jewelryBoxOpened: state.items.jewelryBox?.open,
+      wraithPassed: state.flags["seen:crypt"],
+      oakPanelAligned: state.flags.oakLightAligned,
+      trollRiddleSolved: state.flags.dragonVaultOpen,
+      reliquarySealed: state.flags.curseLiftable && state.flags.reliquarySealed,
+      bellRung: state.flags.bellRung,
+      secretDoorOpened: state.flags.secretWingOpen || state.items.secretDoor?.open,
+      burritoSurvived: (state.flags.ateSuperBurrito
+          || (state.flags.ateBurrito && state.items.burrito?.loc == null))
+        && !(state.flags.sick > 0) && !state.dead,
+    };
+    for (const [id, completed] of Object.entries(completedProgress)) {
+      const flag = `progressAward:${id}`;
+      if (!completed || state.flags[flag]) continue;
+      state.flags[flag] = true;
+      state.score = (state.score || 0) + PROGRESS_AWARDS[id];
+    }
+
+    if (state.flags["seen:betweenWalls"]) state.flags["progressAward:betweenWalls"] = true;
+    const claimedKeys = {
+      frontKey: state.items.frontKey?.loc === "inventory"
+        || state.flags.frontDoorOpen || state.items.frontDoor?.locked === false,
+      tinyKey: state.items.tinyKey?.loc === "inventory"
+        || state.items.jewelryBox?.locked === false,
+      boneKey: state.items.boneKey?.loc === "inventory"
+        || state.flags.secretWingOpen || state.items.secretDoor?.locked === false,
+    };
+    for (const [id, claimed] of Object.entries(claimedKeys)) {
+      const item = world.items[id];
+      if (!claimed || !item?.progressPoints || state.flags[item.progressFlag]) continue;
+      state.flags[item.progressFlag] = true;
+      state.score = (state.score || 0) + item.progressPoints;
     }
   },
   endBadges,         // win-screen achievement badges
@@ -2841,20 +3199,21 @@ export const world = {
       art: [
         "       /\\  /\\",
         "    __/  \\/  \\__",
-        "      || RGB ||",
-        "      ||_____||",
+        "      ||     ||",
+        "      ||     ||",
         "     /_______\\",
       ].join("\n"),
       desc:
         "An immense GREAT OAK towers over a sunlit clearing EAST of the PRIVY. On the trunk's sunward backside, " +
-        "an iron-and-glass MECHANISM holds three sockets beneath a high PULLEY. The PRIVY path returns WEST.",
+        "a dark iron PANEL is inset beneath a high PULLEY. Tiny mirrors glint among the branches overhead. " +
+        "The PRIVY path returns WEST.",
       searchDesc(ctx) {
         const platform = ctx.roomOf("oakPlatform") === "greatOak"
           ? " A wooden PLATFORM is waiting among the roots."
           : ctx.getFlag("oakLightAligned")
             ? " The PLATFORM is currently somewhere above the branches."
             : " The overhead PULLEY hangs far beyond reach.";
-        return describeOakMechanism(ctx) + platform;
+        return describeOakPanel(ctx) + platform;
       },
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "greatOak" ? ["in"] : [],
       exits: { west: "privy" },
@@ -2865,6 +3224,7 @@ export const world = {
         climb(ctx, cmd) {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
+        put: putOakGem,
       },
     },
 
@@ -2977,7 +3337,13 @@ export const world = {
           }
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
-          if (it.treasure) ctx.addScore(it.points || 0);
+          if (it.treasure) {
+            const scoreFlag = it.depositScoreFlag;
+            if (!scoreFlag || !ctx.getFlag(scoreFlag)) {
+              ctx.addScore(it.points || 0);
+              if (scoreFlag) ctx.setFlag(scoreFlag);
+            }
+          }
           const status = reliquaryStatus(ctx);
           let msg = `You lay the ${it.names[0]} in the reliquary. It settles with a low, resonant hum.`;
           msg += `\n\nFamily heirlooms: ${status.contributing}/${status.required}.`;
@@ -3028,12 +3394,14 @@ export const world = {
           ctx.setFlag("bellRung");
           ctx.moveItem("boneKey", "grandHall");
           ctx.moveItem("secretDoor", "grandHall");
+          const points = awardProgress(ctx, "bellRung");
           return "You seize the rope and ring the great bell. Its toll swells until the walls shudder; " +
             "the gathered heirlooms blaze with light, the shadows shriek and recoil, and the curse of " +
             "Blackwood shatters like dropped glass.\n\n" +
             "But the house is not finished with you. Among the glowing heirlooms a slender BONE KEY rises, " +
             "turns once in the air, and clatters to the flagstones at your feet. Behind you, with a grinding " +
-            "of hidden stone, a SECRET DOOR opens in the north wall of the hall — onto a passage that should not exist.";
+            "of hidden stone, a SECRET DOOR opens in the north wall of the hall — onto a passage that should not exist." +
+            awardSuffix(points);
         },
       },
     },
@@ -3138,8 +3506,9 @@ export const world = {
               "through you, and your heart simply stops."
             );
           }
+          const points = awardProgress(ctx, "wraithPassed");
           ctx.state.room = "crypt";
-          return ctx.describeRoom();
+          return ctx.describeRoom() + awardSuffix(points);
         },
       },
     },
@@ -3216,6 +3585,15 @@ export const world = {
         in: { to: "betweenWalls", via: "wallGapFound", revealedBy: "wallGapFound",
           lockedMsg: "The wallpaper is just wallpaper, near as you can tell." },
       },
+      on: {
+        go(ctx, cmd) {
+          if (cmd.dobj !== "in" || !ctx.getFlag("wallGapFound")) return null;
+          const points = discoverBetweenWalls(ctx);
+          ctx.setFlag("seen:betweenWalls", true);
+          ctx.state.room = "betweenWalls";
+          return ctx.describeRoom() + awardSuffix(points);
+        },
+      },
     },
 
     masterBedroom: {
@@ -3226,7 +3604,7 @@ export const world = {
         "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
       searchDesc:
         "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a RUBY RING inside the locked JEWELRY BOX.",
+      highDesc: "The dark wood becomes glassy, revealing a BLACKWOOD BLOODSIGNET inside the locked JEWELRY BOX.",
       exits: { west: "landing" },
     },
 
@@ -3366,13 +3744,15 @@ export const world = {
         go(ctx, cmd) {
           if (cmd.dobj !== "north" && cmd.dobj !== "out") return null;
           const bonus = ctx.has("silverMirror") ? 30 : 0;
-          if (bonus) ctx.addScore(bonus);
+          if (bonus) ctx.addScore(STANDALONE_MAX_AWARDS.silverMirror);
+          const fireSurvival = surviveSelfFire(ctx);
           return ctx.win(
             "You step through the archway into the first clean dawn Blackwood Manor has seen in a hundred " +
             "years. Behind you the spirit lifts her head, smiles — truly smiles — and fades, at peace at last." +
             (bonus
               ? "\n\nThe silver mirror is yours: an optional trophy proving you saw this through to the very end. (+30)"
-              : "\n\n(You left the silver mirror on its pedestal — and its optional 30 points with it.)")
+              : "\n\n(You left the silver mirror on its pedestal — and its optional 30 points with it.)") +
+            fireSurvival
           );
         },
       },
@@ -3393,15 +3773,15 @@ export const world = {
       exits: { up: "grandHall" },
     },
 
-    // --- The one room with no door — reachable only by random teleport ------
+    // --- The hidden space reached through the nursery wall or random teleport ---
     betweenWalls: {
       name: "The Space Between the Walls",
       art: ROOM_ART.betweenWalls,
       desc:
         "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
         "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
-        "and a tarnished BACKWARDS WATCH ticks, counter-clockwise, from a bent nail. There is no door here — " +
-        "only an unnatural OUT.",
+        "and a tarnished BACKWARDS WATCH ticks, counter-clockwise, from a bent nail. There is no proper door here — " +
+        "only the cramped gap OUT.",
       searchDesc:
         "Whoever built this space built it to be forgotten. The BACKWARDS WATCH is the only thing in it that " +
         "isn't dust.",
@@ -3415,8 +3795,8 @@ export const world = {
       names: ["reliquary", "cabinet"], adjectives: ["glass", "glass-fronted", "heirloom"],
       loc: "grandHall", fixed: true, container: true, capacity: 20,
       openable: true, open: false, autoOpenOnAccess: true, locksTreasures: true,
-      desc: "A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold twelve " +
-        "heirloom-shaped recesses behind a pair of carved doors.",
+      desc: `A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold ` +
+        `${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses behind a pair of carved doors.`,
       on: {
         open(ctx) {
           const reliquary = ctx.item("reliquary");
@@ -3429,10 +3809,14 @@ export const world = {
           const reliquary = ctx.item("reliquary");
           reliquary.open = false;
           ctx.setFlag("reliquarySealed", true);
+          const points = ctx.getFlag("curseLiftable")
+            ? awardProgress(ctx, "reliquarySealed")
+            : 0;
           return "You close the RELIQUARY'S glass doors and press until the ritual latch clicks." +
             (ctx.getFlag("floorDoorOpen")
               ? " The hidden staircase locks into place; the route DOWN is now open."
-              : "");
+              : "") +
+            awardSuffix(points);
         },
       },
     },
@@ -3481,6 +3865,7 @@ export const world = {
     },
     frontKey: {
       names: ["key"], adjectives: ["iron", "front", "door", "heavy"], loc: null, takeable: true,
+      progressPoints: 5, progressFlag: "progressItem:frontKey",
       consumedOnUnlock: "The old iron key snaps off inside the lock and is spent.",
       desc: "A heavy iron door-key, cold and gritty with earth. Age has left a deep crack along its shaft.",
     },
@@ -3510,29 +3895,30 @@ export const world = {
       on: { light: lightBrazier, burn: lightBrazier },
     },
     emberStone: {
-      names: ["stone", "emberstone", "ember"], adjectives: ["ember", "warm", "glowing", "red", "glassy"],
+      names: ["emerald gem", "gem", "emerald", "stone"], adjectives: ["emerald", "green", "glassy"],
       loc: null, takeable: true,
-      desc: "A glassy dark-red stone shot through with living veins of orange fire. Held to sunlight, it glows " +
-        "a pure ruby RED — exactly the colour suggested by the first socket on the GREAT OAK'S mechanism.",
-      on: { take: takeOakStone },
+      desc: "A deep-green EMERALD GEM, warm from the brazier and faceted so precisely that even weak sunlight " +
+        "passes through it in a narrow green beam.",
+      on: { take: takeOakGem },
     },
     oakMechanism: {
-      names: ["mechanism", "sockets", "socket"], adjectives: ["oak", "rgb", "glass"],
+      names: ["panel", "mechanism", "slots", "slot"], adjectives: ["oak", "iron", "inset"],
       loc: "greatOak", fixed: true, scenery: true, container: true, open: true, capacity: 3,
-      desc: "An iron plate with three glass sockets, positioned to catch the afternoon sun.",
-      on: { examine: describeOakMechanism, search: describeOakMechanism, put: putOakStone },
+      desc: "A dark iron PANEL inset in the GREAT OAK, fitted with three vertically stacked slots beneath " +
+        "a web of small mirrors and sun shafts.",
+      on: { examine: describeOakPanel, search: describeOakPanel, put: putOakGem },
     },
     greenGlassStone: {
-      names: ["stone", "glass", "gem"], adjectives: ["green", "glassy"],
+      names: ["ruby gem", "gem", "ruby", "stone"], adjectives: ["ruby", "red", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent GREEN glass stone cut to fit one of the GREAT OAK'S three sockets.",
-      on: { take: takeOakStone },
+      desc: "A translucent RUBY GEM cut into a deep red prism that fits one of the GREAT OAK'S three slots.",
+      on: { take: takeOakGem },
     },
     blueGlassStone: {
-      names: ["stone", "glass", "gem"], adjectives: ["blue", "glassy"],
+      names: ["sapphire gem", "gem", "sapphire", "stone"], adjectives: ["sapphire", "blue", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent BLUE glass stone cut to fit one of the GREAT OAK'S three sockets.",
-      on: { take: takeOakStone },
+      desc: "A translucent SAPPHIRE GEM cut into a deep blue prism that fits one of the GREAT OAK'S three slots.",
+      on: { take: takeOakGem },
     },
     oakPlatform: {
       names: ["platform", "lift"], adjectives: ["wooden", "oak", "pulley"],
@@ -3754,7 +4140,9 @@ export const world = {
           if (d.open) return "The front door already stands open.";
           d.open = true;
           ctx.setFlag("frontDoorOpen");
-          return "The great door swings inward with a groan, onto a darkness that smells of dust and old smoke.";
+          const points = awardProgress(ctx, "frontDoorOpened");
+          return "The great door swings inward with a groan, onto a darkness that smells of dust and old smoke." +
+            awardSuffix(points);
         },
       },
     },
@@ -3795,7 +4183,9 @@ export const world = {
           if (ctx.getFlag("cellarOpen")) return "The cellar door already gapes open.";
           ctx.item("cellarDoor").open = true;
           ctx.setFlag("cellarOpen");
-          return "You haul the heavy cellar door up on its hinges. Cold, wet air breathes up from stone steps descending into black.";
+          const points = awardProgress(ctx, "cellarOpened");
+          return "You haul the heavy cellar door up on its hinges. Cold, wet air breathes up from stone steps descending into black." +
+            awardSuffix(points);
         },
       },
     },
@@ -3808,8 +4198,9 @@ export const world = {
         pull(ctx) {
           if (ctx.getFlag("leverPulled")) return "The bookcase already stands open.";
           ctx.setFlag("leverPulled");
+          const points = awardProgress(ctx, "libraryPassageOpened");
           return "You haul on the lever. With a grinding of counterweights a whole section of " +
-            "bookcase swings aside, baring a stair that spirals down into darkness.";
+            "bookcase swings aside, baring a stair that spirals down into darkness." + awardSuffix(points);
         },
       },
     },
@@ -3853,11 +4244,13 @@ export const world = {
       desc: "A leather-bound diary in a spidery hand.",
       on: {
         read(ctx) {
+          const points = awardProgress(ctx, "diaryDecoded");
           ctx.setFlag("knowsCombo");
           return "The last entry reads:\n" +
             "  \"I have hidden the TALISMAN in the wall-safe behind my own PROFILE PAINTING in the PARLOR.\n" +
             "   The combination, lest I forget in my terror: 7 left, 3 right, 9 left. If the wraith\n" +
-            "   takes me, whoever comes after must WEAR the TALISMAN before they dare the CRYPT.\"";
+            "   takes me, whoever comes after must WEAR the TALISMAN before they dare the CRYPT.\"" +
+            awardSuffix(points);
         },
       },
     },
@@ -3876,25 +4269,47 @@ export const world = {
       names: ["music box", "musicbox", "box"], adjectives: ["jeweled", "jewelled", "music"], loc: "nursery",
       takeable: true, treasure: true, points: 15, container: true, openable: true, open: false, capacity: 1,
       desc: "A jeweled music box, its lid inlaid with mother-of-pearl.",
+      on: {
+        open(ctx) {
+          const box = ctx.item("musicBox");
+          if (box.open) return "The music box is already open.";
+          box.open = true;
+          const points = awardProgress(ctx, "musicBoxOpened");
+          return "You release the tiny spring catch and open the MUSIC BOX, revealing a TINY KEY." +
+            awardSuffix(points);
+        },
+      },
     },
     tinyKey: {
       names: ["key"], adjectives: ["tiny", "small", "brass"], loc: "musicBox", takeable: true,
+      progressPoints: 5, progressFlag: "progressItem:tinyKey",
       consumedOnUnlock: "The tiny key disappears into the jewelry box's spring mechanism.",
       desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
     },
 
-    // --- grand bedroom jewelry box -> ruby ring ---
+    // --- grand bedroom jewelry box -> Blackwood Bloodsignet ---
     jewelryBox: {
       names: ["jewelry box", "jewellery box", "jewelry", "box", "casket"], adjectives: ["walnut", "dark"],
       loc: "masterBedroom", fixed: true, container: true, openable: true, open: false, locked: true,
       keyId: "tinyKey", capacity: 2,
       desc: "A dark walnut jewelry box with a tiny keyhole.",
+      on: {
+        open(ctx) {
+          const box = ctx.item("jewelryBox");
+          if (box.locked) return "The jewelry box is locked.";
+          if (box.open) return "The jewelry box is already open.";
+          box.open = true;
+          const points = awardProgress(ctx, "jewelryBoxOpened");
+          return "You open the JEWELRY BOX, revealing a BLACKWOOD BLOODSIGNET." + awardSuffix(points);
+        },
+      },
     },
     rubyRing: {
-      names: ["ring"], adjectives: ["ruby", "red"], loc: "jewelryBox", takeable: true,
+      names: ["bloodsignet", "signet", "ring"],
+      adjectives: ["ruby", "red", "blackwood", "blood"], loc: "jewelryBox", takeable: true,
       treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
-      desc: "A heavy gold ring set with a ruby like a drop of blood. The initials BM are embossed inside the " +
-        "band, marking it as a Blackwood family heirloom.",
+      desc: "The BLACKWOOD BLOODSIGNET: a heavy gold ring set with a ruby like a suspended drop of blood. " +
+        "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
     },
 
     // --- crypt ---
@@ -3939,6 +4354,7 @@ export const world = {
     // --- Post-game (appear only after the bell is rung) ---
     boneKey: {
       names: ["key"], adjectives: ["bone", "pale", "slender"], loc: null, takeable: true,
+      progressPoints: 5, progressFlag: "progressItem:boneKey",
       consumedOnUnlock: "The BONE KEY crumbles into pale dust inside the lock.",
       desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
     },
@@ -3953,7 +4369,9 @@ export const world = {
           if (d.open) return "It already stands open.";
           d.open = true;
           ctx.setFlag("secretWingOpen");
-          return "The secret door swings inward on silent hinges, breathing out cold, clean air.";
+          const points = awardProgress(ctx, "secretDoorOpened");
+          return "The secret door swings inward on silent hinges, breathing out cold, clean air." +
+            awardSuffix(points);
         },
       },
     },
@@ -3977,19 +4395,12 @@ export const world = {
     // --- the only thing in the space between the walls ---
     backwardsWatch: {
       names: ["watch", "pocket watch"], adjectives: ["backwards", "tarnished", "brass"],
-      loc: "betweenWalls", takeable: true,
+      loc: "betweenWalls", takeable: true, treasure: true, points: 12,
+      depositScoreFlag: "heirloomScore:backwardsWatch",
       roomDesc: "A tarnished BACKWARDS WATCH hangs from a bent nail, its hands sweeping the wrong way.",
       desc: "A brass pocket watch, badly tarnished, ticking backwards at a perfectly ordinary speed. It has " +
-        "clearly been here since before there was a \"here.\"",
-      on: {
-        take(ctx) {
-          if (ctx.has("backwardsWatch")) return "You already have the backwards watch.";
-          ctx.moveItem("backwardsWatch", "inventory");
-          ctx.addScore(12);
-          return "You pluck the BACKWARDS WATCH off its nail. Its ticking doesn't change, but you could swear " +
-            "it just ticked FORWARD once, just to see how you'd react. (+12)";
-        },
-      },
+        "clearly been here since before there was a \"here.\" On the back, a family inscription reads: " +
+        "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
     },
   },
 };
@@ -3999,20 +4410,26 @@ function revealKey(ctx) {
   if (ctx.getFlag("statueMoved")) return "You have already taken what was hidden here.";
   ctx.setFlag("statueMoved");
   ctx.moveItem("frontKey", "garden");
-  return "You heave the mossy statue aside. Beneath its plinth, half-sunk in the earth, lies a heavy iron key.";
+  const points = awardProgress(ctx, "statueKeyRevealed");
+  return "You heave the mossy statue aside. Beneath its plinth, half-sunk in the earth, lies a heavy iron key." +
+    awardSuffix(points);
 }
 function revealSafe(ctx) {
   if (ctx.getFlag("safeRevealed")) return "The PROFILE PAINTING already hangs aside, baring the iron SAFE.";
   ctx.setFlag("safeRevealed");
   ctx.moveItem("safe", "parlor");
-  return "You swing the PROFILE PAINTING aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE.";
+  const points = awardProgress(ctx, "safeRevealed");
+  return "You swing the PROFILE PAINTING aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE." +
+    awardSuffix(points);
 }
 function revealWallGap(ctx) {
   if (ctx.getFlag("wallGapFound"))
     return "The gap in the wall stands open, dust-dark and waiting, right where you left it.";
   ctx.setFlag("wallGapFound", true);
+  const points = awardProgress(ctx, "wallGapFound");
   return "You peel back a curling tongue of WALLPAPER — and keep peeling, because a whole panel of rotten " +
-    "lath comes away in your hands, baring a gap just wide enough to squeeze IN, into the dark between the walls.";
+    "lath comes away in your hands, baring a gap just wide enough to squeeze IN, into the dark between the walls." +
+    awardSuffix(points);
 }
 
 // --- Self-immolation & stop-drop-roll in ANY room (Andy's idea) --------------

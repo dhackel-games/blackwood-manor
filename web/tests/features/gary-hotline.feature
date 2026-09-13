@@ -1,4 +1,4 @@
-# gary-hotline.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -7,6 +7,17 @@ Feature: Gary's hint line
 
   Background:
     Given a fresh manor game
+
+  Scenario: Gary identifies the newly required backwards watch
+    Given flag "frontDoorOpen" is set
+    And item "candlestick" is carried
+    And item "matches" is carried
+    When I send "light candle"
+    Given every treasure but the "backwardsWatch" is already in the reliquary
+    When I send "call"
+    Then the output contains "NURSERY"
+    And the output contains "WALLPAPER"
+    And the output contains "BACKWARDS WATCH"
 
   Scenario: Call Gary, converse, hang up, and resume play
     When I send "call"

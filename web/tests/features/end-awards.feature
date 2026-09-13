@@ -1,4 +1,4 @@
-# end-awards.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# end-awards.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @unit
 Feature: End-game self-reliance awards
@@ -52,7 +52,7 @@ Feature: End-game self-reliance awards
     When I send "read diary"
     And I win with "You escape."
     Then the output contains "Extra Super Duper Helpless"
-    And the game score is 35
+    And the game score is 40
 
   Scenario: NO TAKEBACKS rewards a finish without SAVE or RESTORE
     Given flag "usedHelp" is set

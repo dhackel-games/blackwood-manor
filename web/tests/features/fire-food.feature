@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -51,6 +51,14 @@ Feature: Fire and food consequences
     Then the output contains "on fire"
     When I send "extinguish self"
     Then the output contains "no longer on fire"
+    And the output contains "(+10)"
+    And the game score is 10
+    Given item "matches" is carried
+    When I send "light self on fire with match"
+    Then the output contains "(-5)"
+    And the game score is 5
+    When I send "extinguish self"
+    Then the game score is 5
     When I send "light mailbox"
     Then the output equals "You can't light that."
 
@@ -101,18 +109,20 @@ Feature: Fire and food consequences
     And flag "brazierLit" is unset
     When I send "light self on fire with match"
     And I send "light brazier"
-    Then the output contains "EMBER STONE"
+    Then the output contains "EMERALD GEM"
+    And the output contains "(+30)"
+    And the output contains "set yourself on fire and survived"
     And flag "onFire" is false
     And flag "brazierLit" is true
     And item "emberStone" is in "garden"
-    When I send "take ember stone"
+    When I send "take emerald gem"
     Then item "emberStone" is in "inventory"
     And the output contains "Taken"
     When the player moves directly to room "grandHall"
-    And I send "put ember stone in reliquary"
+    And I send "place emerald gem in reliquary"
     Then item "emberStone" is in "reliquary"
-    And the game score is 9
-    And the output contains "Family heirlooms: 0/12"
+    And the game score is 40
+    And the output contains "Family heirlooms: 0/13"
     And the output contains "does not contribute"
 
   Scenario: A lit candlestick can patiently ignite the garden brazier
@@ -125,7 +135,9 @@ Feature: Fire and food consequences
     And flag "onFire" is unset
     And item "emberStone" is in "garden"
     And the output contains "LIT CANDLESTICK"
-    And the output contains "EMBER STONE"
+    And the output contains "EMERALD GEM"
+    And the output contains "(+10)"
+    And the game score is 10
 
   Scenario: Water-offer flavor advances only when the offer is displayed
     Given the player is on fire
@@ -162,6 +174,9 @@ Feature: Fire and food consequences
     When I send "drink milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true
+    And the output contains "survived the super burrito"
+    And the output contains "(+25)"
+    And the game score is 30
     When I win with "You step into the dawn."
     Then the output contains "Got Milk?"
 
@@ -362,6 +377,8 @@ Feature: Fire and food consequences
     And I send "<command>"
     Then the output contains "CURED"
     And flag "sick" equals 0
+    And the output contains "(+25)"
+    And the game score is 25
 
     Examples:
       | command      |

@@ -1,4 +1,4 @@
-# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough
 Feature: The mushroom trip's third eye
@@ -27,7 +27,7 @@ Feature: The mushroom trip's third eye
     And the player moves directly to room "masterBedroom"
     When I send "look"
     Then the output contains "THIRD EYE (👁️ 11 turns left)"
-    And the output contains "RUBY RING"
+    And the output contains "BLACKWOOD BLOODSIGNET"
     And vision status has 11 turns
     And flight status has 11 turns
     When I send "look"

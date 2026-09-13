@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven. -->
 
 # Blackwood Manor
 
@@ -65,7 +65,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
-  one compact slot.
+  one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
+  one-time progress points; `::winmax` performs every deterministic scoring
+  challenge and intentionally leaves the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
@@ -73,9 +75,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
   unworn item can be deposited. PUT auto-opens it; the completed cabinet must
   be explicitly CLOSED before the BELL will answer. The `💎` HUD appears after
-  the first deposit as `required/12 +extra`. The BM SPYGLASS in the TREE FORT
-  and the BM-crested protective TALISMAN are required heirlooms; the EMBER STONE
-  from the GARDEN BRAZIER unlocks the SPYGLASS route.
+  the   first deposit as `required/13 +extra`. The BM SPYGLASS in the TREE FORT,
+  the BM-crested protective TALISMAN, and the inscribed BACKWARDS WATCH are
+  required heirlooms; the EMERALD GEM from the GARDEN BRAZIER unlocks the
+  SPYGLASS route.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -106,6 +109,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   RELOAD puts the greatest version into persistent cache. A changed
   `manifest.json` independently offers an iOS app update through TestFlight.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
+- **One-word targeting:** every room and item has a globally unique canonical
+  one-word name (for example `grand`, `bloodsignet`, `iron`, and `dreadvault`).
+  Existing full names remain accepted, while generated `::` routes use the
+  compact forms so command and bug histories stay readable.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
   MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
@@ -178,7 +185,7 @@ items: {
 Useful item flags: `takeable, fixed, scenery, treasure, points, container,
 openable, open, locked, keyId, capacity, carryCapacity, lightSource, selfPowered,
 lit, fuel, wearable, wearSlot, autoWearOnTake, worn, readable, text, edible,
-drinkable, roomDesc`.
+drinkable, progressPoints, progressFlag, depositScoreFlag, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
 part of the win condition. `REQUIRED_FAMILY_ITEM_COUNT` records how many required

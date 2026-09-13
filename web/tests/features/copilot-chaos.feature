@@ -1,4 +1,4 @@
-# copilot-chaos.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @chaos
 Feature: Copilot's mystery package and lightning jumps
@@ -64,12 +64,18 @@ Feature: Copilot's mystery package and lightning jumps
     When the player moves directly to room "betweenWalls"
     And I send "look"
     Then the output contains "BACKWARDS WATCH"
+    When I send "examine watch"
+    Then the output contains "B.W."
+    And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
     When I send "take watch"
-    Then the output contains "ticked FORWARD"
+    Then the output contains "Taken"
     And item "backwardsWatch" is in "inventory"
-    And the game score is 12
+    And the game score is 0
     When I send "out"
     Then the current room is "grandHall"
+    When I send "put backwards watch in reliquary"
+    Then the output contains "Family heirlooms: 1/13"
+    And the game score is 12
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
     Given the mystery package teleport selects room "crypt"
@@ -88,6 +94,18 @@ Feature: Copilot's mystery package and lightning jumps
     And I send "go in"
     Then the current room is "betweenWalls"
     And the output contains "BACKWARDS WATCH"
+
+  Scenario: Flying between the walls preserves its one-time discovery award
+    Given item "wingedShoes" is carried
+    When I send "wear winged shoes"
+    And I send "fly between"
+    Then the current room is "betweenWalls"
+    And the output contains "(+20)"
+    And the game score is 20
+    Given the player is in room "nursery"
+    When I send "pull wallpaper"
+    And I send "in"
+    Then the game score is 25
 
   Scenario: The wallpaper gap stays shut until it has been peeled
     Given the player is in room "nursery"
@@ -169,7 +187,7 @@ Feature: Copilot's mystery package and lightning jumps
     And the current room is not "secretChamber"
     And the current room is not "treeFort"
 
-  Scenario: Lightning cannot bypass the RGB lift into the tree fort
+  Scenario: Lightning cannot bypass the mirrored gem lift into the tree fort
     Given chaos events (lightning jumps) are enabled
     And flag "frontDoorOpen" is set
     And the lightning bolt teleport would select room "treeFort"
