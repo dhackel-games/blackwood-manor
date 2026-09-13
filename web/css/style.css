@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -69,13 +69,6 @@ body { -webkit-text-size-adjust: 100%; }
   font-size: 1.5em;
   line-height: 0;
   vertical-align: -0.08em;
-}
-/* The copyright-version gets its own wrapping row above the compact counters. */
-#hud #hud-version {
-  flex: 1 0 100%;
-  line-height: 1.25;
-  opacity: 0.75;
-  overflow-wrap: anywhere;
 }
 /* Sound toggle: tiny icon button that sits inline in the HUD row — always
    reachable without opening the phone, independent of Gary's voice mute. */

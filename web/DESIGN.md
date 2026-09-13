@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
 ```
 
 ---
@@ -293,12 +293,13 @@ the mansion.
   `git -c credential.helper='!f() { echo username=dhackel-games; echo password=$T; }; f' push`
   with `T=$(gh auth token -u dhackel-games)`.)
 - **Copyright-version stamp:** `web/js/version.js` is the single source of truth (`VERSION`).
-  It renders verbatim in the intro banner and always-visible HUD. Its format is
+  The platform-aware app/content version renders in the intro banner, VERSION
+  command, and bug diagnostics; the compact HUD intentionally omits it. Its source-file format is
   `Copyright (c) dhackel-games. All Rights Reserved. 2026...YYYY-MM-DD.0aNN:username` where
   `0aNN` increments for each build on that date. **Bump it in the same commit as any
   gameplay/engine change** and encode the release date in `web/package.json` as the date-only
   SemVer `YYYY.M.D`. Pages serves `js/` with `cache-control: max-age=600`,
-  so a stale tab can lag about 10 minutes behind a push; hard-refresh when the HUD stamp differs.
+  so a stale tab can lag about 10 minutes behind a push; use VERSION or hard-refresh to confirm it.
 - **iOS:** `ios/` is a SwiftUI + `WKWebView` wrapper bundling `web/` for offline play, with a
   native `app://` scheme handler and a native speech-to-text bridge. Bundle
   `com.dhackel.BlackwoodManor`, team `9W789FP4LG`.
@@ -448,11 +449,12 @@ and `core.js` runs each fragment through `runOne()` in order. So
 - `game.send()` stays **synchronous** so the engine and tests are unaffected.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
-`js/version.js` is the single source of truth for the exact copyright-version shown in the banner
-and always-visible HUD. The current format combines owner, copyright range, build date, same-day
+`js/version.js` is the single source of truth for the exact copyright-version shown in the intro,
+VERSION command, and bug diagnostics. The HUD contains gameplay state only. The current source-header
+format combines owner, copyright range, build date, same-day
 alphanumeric sequence, acting GitHub username, and rights notice. `package.json` carries the date-only SemVer
 (`YYYY.M.D`). GitHub Pages does not cache-bust module imports, so a tab can lag about
-10 minutes behind a push. If the HUD stamp differs from the deployed source, hard-refresh.
+10 minutes behind a push. Use VERSION or hard-refresh to confirm deployed content.
 
 ## 12.14 Gary's on-device brain (v2.2.0)
 Gary can now *think*. He runs on **Apple Foundation Models** — the ~3B on-device model in
