@@ -1,4 +1,4 @@
-# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.083:acoven.
 
 @chaos
 Feature: Copilot's mystery package and lightning jumps
@@ -136,6 +136,7 @@ Feature: Copilot's mystery package and lightning jumps
     And the random number generator always returns 0.0
     When I send "wait"
     Then the output contains "LIGHTNING"
+    And the output contains "           ____╲"
     And the output contains "TOUCH it, if you dare"
     And the current room is "grandHall"
     And item "lightningBolt" is in "grandHall"
