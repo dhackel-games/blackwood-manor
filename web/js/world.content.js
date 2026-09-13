@@ -359,5 +359,268 @@ export const content = {
     },
   },
 
-  items: {},
+  items: {
+    bell: {
+      desc: "A great brass bell hung above the RELIQUARY, a frayed pull-rope trailing from it.",
+    },
+    mysteryPackage: {
+      roomDesc: "A suspiciously nice, ribbon-tied PACKAGE sits on the floor, propped against the wall.",
+      desc: "A beautifully wrapped package, ribbon and all, entirely out of place in this cobwebbed ruin. A " +
+        "small card is tucked under the bow. It reads:\n\n" +
+        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+      text:
+        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+    },
+    lightningBolt: {
+      roomDesc: "A jagged bolt of LIGHTNING is speared into the floor here, hissing and crackling, scorch " +
+        "marks spreading outward.",
+      desc: "Still crackling, blue-white and hair-raising, driven into the floorboards like it's daring you " +
+        "to get closer.",
+    },
+    statue: {
+      desc: "A robed stone woman, features worn smooth. She leans oddly, as if something props her up.",
+    },
+    well: {
+      desc: "A round stone well, its bucket and windlass long gone. The shaft drops into " +
+        "pure black — a long way DOWN. Without a ROPE to climb back out, going DOWN there " +
+        "would be the last thing you ever did.",
+    },
+    frontKey: {
+      desc: "A heavy iron door-key, cold and gritty with earth. Age has left a deep crack along its shaft.",
+    },
+    mailbox: {
+      desc: "A dented brass mailbox bolted to the PORCH rail.",
+    },
+    letter: {
+      desc: "A single sheet of good paper, water-stained.",
+      text:
+        "The letter reads: \"To whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
+        "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +
+        "Do not linger in the dark. And God help you in the CRYPT.\"",
+    },
+    brazier: {
+      roomDesc: "A cold iron BRAZIER stands on a tripod amid the weeds, heaped with damp moss.",
+      desc: "A cold iron brazier on a rusted tripod, heaped with grave-damp moss and packed black kindling. " +
+        "Old scorch-marks ring its base. A lone match won't touch moss this wet, but a sustained candle flame " +
+        "worked around the whole bowl might.",
+    },
+    emberStone: {
+      desc: "A deep-green EMERALD GEM, warm from the brazier and faceted so precisely that even weak sunlight " +
+        "passes through it in a narrow green beam.",
+    },
+    oakMechanism: {
+      desc: "A dark iron PANEL inset in the GREAT OAK, fitted with three vertically stacked slots beneath " +
+        "a web of small mirrors and sun shafts.",
+    },
+    greenGlassStone: {
+      desc: "A translucent RUBY GEM cut into a deep red prism that fits one of the GREAT OAK'S three slots.",
+    },
+    blueGlassStone: {
+      desc: "A translucent SAPPHIRE GEM cut into a deep blue prism that fits one of the GREAT OAK'S three slots.",
+    },
+    oakPlatform: {
+      desc: "A broad wooden PLATFORM hanging from old but sturdy ropes. It shuttles between the roots and the TREE FORT.",
+    },
+    signalFlags: {
+      desc: "A string of faded SIGNAL FLAGS spells something that was probably hilarious to children a century ago.",
+    },
+    blanketHideout: {
+      desc: "A blanket HIDEOUT occupies one corner, furnished with a cracked compass, three acorn cups, and a sign: NO ADULTS.",
+    },
+    woodenSlingshot: {
+      desc: "A forked wooden SLINGSHOT has been nailed to the wall after what appears to have been one incident too many.",
+    },
+    spyglassCradle: {
+      desc: "The iron swivel CRADLE is rusted solid, aimed permanently at the manor's BELFRY.",
+    },
+    spyglass: {
+      roomDesc: "A brass SPYGLASS marked BM sits in a rusted swivel cradle aimed at the distant BELFRY.",
+      desc: "A handsome brass SPYGLASS. The initials BM are etched into its barrel, identifying it as a Blackwood heirloom.",
+    },
+    mushrooms: {
+      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
+      desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
+    },
+    outhouseMushrooms: {
+      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable shit and piss.",
+      desc: "Fresh, shit-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
+    },
+    burrito: {
+      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",
+      desc: "Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
+        "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
+        "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
+        "available evidence, it may be edible if you're feeling adventurous.",
+    },
+    obsidianEye: {
+      roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
+      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
+        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
+        "It does not produce light.",
+    },
+    burritoWrapper: {
+      roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
+      desc: "The used burrito wrapper is laminated with a stubborn sheet of tin foil. It smells dangerous, but " +
+        "its shiny inner surface looks capable of redirecting a brief digestive flame.",
+    },
+    milk: {
+      roomDesc: "A cold BOTTLE OF MILK sits untouched in the pantry nook.",
+      desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
+    },
+    apple: {
+      roomDesc: "A single crisp red APPLE sits in a shallow pantry basket.",
+      desc: "A flawless red apple. In this KITCHEN, its lack of mould is almost supernatural.",
+    },
+    toilet: {
+      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. A faint purple glimmer leaks from below the rim.",
+      desc: "A wooden seat over a raw hole in the earth. Something faintly purple glimmers below. It has no plumbing.",
+    },
+    dreadmaw: {
+      desc: "DREADMAW THE DRAGON: an ancient female dragon armoured in plates like burnt cathedral stone. " +
+        "She is sleeping directly across the CAVE entrance.",
+    },
+    goldDoubloon: {
+      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed. " +
+        "Around its edge, one word has been etched by hand: LORE.",
+    },
+    dragonVaultDoor: {
+      desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
+    },
+    caveTroll: {
+      desc: "A broad male TROLL with granite-coloured warts sits before the VAULT DOOR. He looks more literary than hungry.",
+    },
+    dragonHoard: {
+      desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
+    },
+    familyRing: {
+      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
+      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
+    },
+    backpack: {
+      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
+      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
+    },
+    headlamp: {
+      roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
+      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
+    },
+    familyCrest: {
+      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
+    },
+    wingedShoes: {
+      roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
+      desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
+    },
+    hallBed: {
+      desc: "A narrow BED made with yellowed but carefully tucked linen.",
+    },
+    hallMirror: {
+      desc: "A tarnished MIRROR that makes every reflection look slightly farther away than it should.",
+    },
+    nightTable: {
+      desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
+    },
+    nightDrawer: {
+      desc: "A cheap wooden DRAWER in the NIGHT TABLE.",
+    },
+    bedsideLamp: {
+      desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
+    },
+    xrayGoggles: {
+      desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
+    },
+    frontDoor: {
+      desc: "A great oak door, black with age, with a heavy iron lock.",
+    },
+    candlestick: {
+      desc: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt.",
+    },
+    matches: {
+      desc: "A box holding a single dry match. Just one.",
+    },
+    rope: {
+      desc: "A coil of stout rope, still sound.",
+    },
+    cellarDoor: {
+      desc: "A heavy trap-door set flush in the KITCHEN floor, iron-ringed.",
+    },
+    lever: {
+      desc: "A brass lever set into the shelving where a book should be.",
+    },
+    grimoire: {
+      desc: "A heavy black grimoire, clasped in tarnished silver — a priceless first edition.",
+      text: "The grimoire is written in a hand that hurts to follow. You snap it shut. Some things are worth money, not reading.",
+    },
+    portrait: {
+      desc: "A grim PROFILE PAINTING of the patriarch. The frame stands slightly proud of the wall, as if hinged.",
+    },
+    safe: {
+      desc: "A squat iron safe set into the wall, fitted with a combination dial.",
+    },
+    talisman: {
+      desc: "A silver talisman on a chain, warm to the touch and graven with wards against the dead. The back " +
+        "bears the BM crest, identifying the protective charm as a Blackwood family heirloom.",
+    },
+    desk: {
+      desc: "A great oak desk, its drawers swollen shut.",
+    },
+    diary: {
+      desc: "A leather-bound diary in a spidery hand.",
+    },
+    wallpaper: {
+      desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
+        "pulled almost all the way free, and the lath behind it sounds hollow when you rap on it.",
+    },
+    musicBox: {
+      desc: "A jeweled music box, its lid inlaid with mother-of-pearl.",
+    },
+    tinyKey: {
+      desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
+    },
+    jewelryBox: {
+      desc: "A dark walnut jewelry box with a tiny keyhole.",
+    },
+    rubyRing: {
+      desc: "The RAVENBLOOD SIGNET: a heavy gold ring set with a dark red garnet like a suspended drop of blood. " +
+        "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
+    },
+    wraith: {
+      desc: "A shroud of cold hatred, kept at bay by the TALISMAN. It hisses from the corners.",
+    },
+    goldLocket: {
+      desc: "A gold locket, cold as the grave, its clasp shaped like clasped hands.",
+    },
+    cord: {
+      desc: "A frayed cord dangling from the ATTIC trap-door in the ceiling.",
+    },
+    ancientCoin: {
+      desc: "An ancient coin, worn smooth, stamped with a face no one remembers.",
+    },
+    crystalDecanter: {
+      desc: "A cut-crystal decanter, still full, throwing splinters of colour even in the gloom.",
+    },
+    ancestralPortrait: {
+      desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
+        "unsettlingly like the STATUE in the GARDEN.",
+    },
+    boneKey: {
+      desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
+    },
+    secretDoor: {
+      desc: "A door of black wood where no door was, fitted with a keyhole shaped like a tooth.",
+    },
+    spirit: {
+      desc: "The pale spirit of a robed woman — the face from the GARDEN STATUE and the little portrait. " +
+        "She was weeping, but her eyes are kind now.",
+    },
+    silverMirror: {
+      desc: "An age-clouded silver hand-mirror. In it, for just a moment, you see BLACKWOOD MANOR whole and " +
+        "bright and full of the living.",
+    },
+    backwardsWatch: {
+      roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
+      desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
+        "On the back, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+    },
+  },
 };

@@ -3589,7 +3589,6 @@ const logicWorld = {
     },
     bell: {
       names: ["bell", "rope"], adjectives: ["brass", "great"], loc: "grandHall", fixed: true, scenery: true,
-      desc: "A great brass bell hung above the RELIQUARY, a frayed pull-rope trailing from it.",
       searchActions: ["ring"],
     },
 
@@ -3597,12 +3596,6 @@ const logicWorld = {
     mysteryPackage: {
       names: ["package", "box", "parcel", "gift"], adjectives: ["mystery", "nice", "wrapped", "ribboned"],
       loc: "grandHall", takeable: true, readable: true,
-      roomDesc: "A suspiciously nice, ribbon-tied PACKAGE sits on the floor, propped against the wall.",
-      desc: "A beautifully wrapped package, ribbon and all, entirely out of place in this cobwebbed ruin. A " +
-        "small card is tucked under the bow. It reads:\n\n" +
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
-      text:
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
       on: { open: openMysteryPackage },
     },
 
@@ -3610,44 +3603,29 @@ const logicWorld = {
     lightningBolt: {
       names: ["bolt", "lightning"], adjectives: ["lightning", "crackling", "jagged"],
       loc: null, fixed: true,
-      roomDesc: "A jagged bolt of LIGHTNING is speared into the floor here, hissing and crackling, scorch " +
-        "marks spreading outward.",
-      desc: "Still crackling, blue-white and hair-raising, driven into the floorboards like it's daring you " +
-        "to get closer.",
       on: { touch: touchLightningBolt },
     },
 
     // --- getting inside ---
     statue: {
       names: ["statue", "woman"], adjectives: ["stone", "robed"], loc: "garden", fixed: true, scenery: true,
-      desc: "A robed stone woman, features worn smooth. She leans oddly, as if something props her up.",
       on: { move: revealKey, push: revealKey, pull: revealKey, examine: revealKey },
     },
     well: {
       names: ["well", "shaft"], loc: "garden", fixed: true, scenery: true,
-      desc: "A round stone well, its bucket and windlass long gone. The shaft drops into " +
-        "pure black — a long way DOWN. Without a ROPE to climb back out, going DOWN there " +
-        "would be the last thing you ever did.",
       on: { enter: descendWell, climb: descendWell },
     },
     frontKey: {
       names: ["key"], adjectives: ["iron", "front", "door", "heavy"], loc: null, takeable: true,
       progressPoints: 5, progressFlag: "progressItem:frontKey",
       consumedOnUnlock: "The old iron key snaps off inside the lock and is spent.",
-      desc: "A heavy iron door-key, cold and gritty with earth. Age has left a deep crack along its shaft.",
     },
     mailbox: {
       names: ["mailbox"], adjectives: ["brass"], loc: "porch", fixed: true, container: true,
       openable: true, open: false, capacity: 2,
-      desc: "A dented brass mailbox bolted to the PORCH rail.",
     },
     letter: {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
-      desc: "A single sheet of good paper, water-stained.",
-      text:
-        "The letter reads: \"To whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
-        "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +
-        "Do not linger in the dark. And God help you in the CRYPT.\"",
       on: { burn: burnLetter },
     },
 
@@ -3655,69 +3633,52 @@ const logicWorld = {
     brazier: {
       names: ["brazier", "firebowl", "bowl"], adjectives: ["iron", "cold", "ceremonial", "old"],
       loc: "garden", fixed: true,
-      roomDesc: "A cold iron BRAZIER stands on a tripod amid the weeds, heaped with damp moss.",
-      desc: "A cold iron brazier on a rusted tripod, heaped with grave-damp moss and packed black kindling. " +
-        "Old scorch-marks ring its base. A lone match won't touch moss this wet, but a sustained candle flame " +
-        "worked around the whole bowl might.",
       on: { light: lightBrazier, burn: lightBrazier },
     },
     emberStone: {
       names: ["emerald gem", "gem", "emerald", "stone"], adjectives: ["emerald", "green", "glassy"],
       loc: null, takeable: true,
-      desc: "A deep-green EMERALD GEM, warm from the brazier and faceted so precisely that even weak sunlight " +
-        "passes through it in a narrow green beam.",
       on: { take: takeOakGem },
     },
     oakMechanism: {
       names: ["panel", "mechanism", "slots", "slot"], adjectives: ["oak", "iron", "inset"],
       loc: "greatOak", fixed: true, scenery: true, container: true, open: true, capacity: 3,
-      desc: "A dark iron PANEL inset in the GREAT OAK, fitted with three vertically stacked slots beneath " +
-        "a web of small mirrors and sun shafts.",
       on: { examine: describeOakPanel, search: describeOakPanel, put: putOakGem },
     },
     greenGlassStone: {
       names: ["ruby gem", "gem", "ruby", "stone"], adjectives: ["ruby", "red", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent RUBY GEM cut into a deep red prism that fits one of the GREAT OAK'S three slots.",
       on: { take: takeOakGem },
     },
     blueGlassStone: {
       names: ["sapphire gem", "gem", "sapphire", "stone"], adjectives: ["sapphire", "blue", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent SAPPHIRE GEM cut into a deep blue prism that fits one of the GREAT OAK'S three slots.",
       on: { take: takeOakGem },
     },
     oakPlatform: {
       names: ["platform", "lift"], adjectives: ["wooden", "oak", "pulley"],
       loc: null, fixed: true, scenery: true,
-      desc: "A broad wooden PLATFORM hanging from old but sturdy ropes. It shuttles between the roots and the TREE FORT.",
       on: { enter: enterOakPlatform, climb: enterOakPlatform },
     },
     signalFlags: {
       names: ["flags", "flag", "signals"], adjectives: ["signal", "faded"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A string of faded SIGNAL FLAGS spells something that was probably hilarious to children a century ago.",
     },
     blanketHideout: {
       names: ["hideout", "blanket", "fort"], adjectives: ["blanket", "secret"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A blanket HIDEOUT occupies one corner, furnished with a cracked compass, three acorn cups, and a sign: NO ADULTS.",
     },
     woodenSlingshot: {
       names: ["slingshot", "catapult"], adjectives: ["wooden", "forked"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A forked wooden SLINGSHOT has been nailed to the wall after what appears to have been one incident too many.",
     },
     spyglassCradle: {
       names: ["cradle", "mount", "swivel"], adjectives: ["rusted", "spyglass"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "The iron swivel CRADLE is rusted solid, aimed permanently at the manor's BELFRY.",
     },
     spyglass: {
       names: ["spyglass", "telescope"], adjectives: ["brass", "blackwood", "bm"],
       loc: "treeFort", takeable: true, treasure: true, points: 8,
-      roomDesc: "A brass SPYGLASS marked BM sits in a rusted swivel cradle aimed at the distant BELFRY.",
-      desc: "A handsome brass SPYGLASS. The initials BM are etched into its barrel, identifying it as a Blackwood heirloom.",
       on: { examine: inspectSpyglass, search: inspectSpyglass, take: takeSpyglass },
     },
 
@@ -3725,26 +3686,17 @@ const logicWorld = {
     mushrooms: {
       names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
       loc: "kitchen", takeable: true, edible: true, highTurns: 12,
-      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
-      desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
       on: { eat: eatMushrooms },
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
       adjectives: ["fresh", "shit-fueled", "purple", "toilet"],
       loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
-      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable shit and piss.",
-      desc: "Fresh, shit-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
       on: { take: takeToiletMushrooms, eat: eatMushrooms },
     },
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",
-      desc: "Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
-        "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
-        "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
-        "available evidence, it may be edible if you're feeling adventurous.",
       on: {
         eat: eatBurrito,
       },
@@ -3753,37 +3705,24 @@ const logicWorld = {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
       loc: "hiddenVault", takeable: true, wearable: true, worn: false,
       wearSlot: "forehead", grantsHiddenSight: true,
-      roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
-      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
-        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
-        "It does not produce light.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {
       names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
       loc: null, takeable: true,
-      roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
-      desc: "The used burrito wrapper is laminated with a stubborn sheet of tin foil. It smells dangerous, but " +
-        "its shiny inner surface looks capable of redirecting a brief digestive flame.",
     },
     milk: {
       names: ["milk", "bottle"], adjectives: ["cold", "fresh", "glass"],
       loc: "kitchen", takeable: true, drinkable: true,
-      roomDesc: "A cold BOTTLE OF MILK sits untouched in the pantry nook.",
-      desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
       on: { drink: drinkMilk },
     },
     apple: {
       names: ["apple"], adjectives: ["red", "crisp", "kitchen"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A single crisp red APPLE sits in a shallow pantry basket.",
-      desc: "A flawless red apple. In this KITCHEN, its lack of mould is almost supernatural.",
     },
     toilet: {
       names: ["toilet", "hole", "latrine", "loo"], adjectives: ["outhouse", "dark", "earthen"],
       loc: "privy", fixed: true, container: true, open: true, capacity: 8,
-      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. A faint purple glimmer leaks from below the rim.",
-      desc: "A wooden seat over a raw hole in the earth. Something faintly purple glimmers below. It has no plumbing.",
       on: {
         sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet,
         examine: inspectToilet,
@@ -3792,8 +3731,6 @@ const logicWorld = {
     dreadmaw: {
       names: ["dragon", "dreadmaw", "wyrm"], adjectives: ["sleeping", "female", "vast", "ashen"],
       loc: "dragonCaveMouth", fixed: true, scenery: true,
-      desc: "DREADMAW THE DRAGON: an ancient female dragon armoured in plates like burnt cathedral stone. " +
-        "She is sleeping directly across the CAVE entrance.",
       on: {
         talk: talkToDragon, wake: wakeDragon, give: giveDragon, put: giveDragon,
         say: sayNearDragon,
@@ -3804,39 +3741,30 @@ const logicWorld = {
     goldDoubloon: {
       names: ["doubloon", "coin"], adjectives: ["gold", "dragon", "dreadmaw"],
       loc: null, takeable: true,
-      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed. " +
-        "Around its edge, one word has been etched by hand: LORE.",
     },
     dragonVaultDoor: {
       names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
       loc: "trollGate", fixed: true, scenery: true,
-      desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
       on: { say: answerTrollRiddle },
     },
     caveTroll: {
       names: ["troll", "guard"], adjectives: ["cave", "warty", "broad", "male"],
       loc: "trollGate", fixed: true, scenery: true,
-      desc: "A broad male TROLL with granite-coloured warts sits before the VAULT DOOR. He looks more literary than hungry.",
       on: { talk: talkToTroll, wake: talkToTroll },
     },
     dragonHoard: {
       names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
       loc: "dreadmawVault", fixed: true, scenery: true,
-      desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
     familyRing: {
       names: ["ring", "signet"], adjectives: ["dusty", "family", "blackwood", "bm"],
       loc: "dragonAntechamber", takeable: true, treasure: true, points: 20,
       wearable: true, worn: false, wearSlot: "finger",
-      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
-      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
     },
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
       wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
-      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
-      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
     },
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
@@ -3844,62 +3772,50 @@ const logicWorld = {
       lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
-      roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
-      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
     familyCrest: {
       names: ["crest", "emblem", "arms"], adjectives: ["family", "blackwood", "silver"],
       loc: "dreadmawVault", takeable: true, treasure: true, points: 15,
-      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
       desc: "The BLACKWOOD FAMILY CREST, cast in blackened silver: a raven above crossed keys. One of the " +
         `${REQUIRED_FAMILY_ITEM_COUNT} heirlooms required by the RELIQUARY.`,
     },
     wingedShoes: {
       names: ["shoes", "sandals"], adjectives: ["winged", "gold", "golden"],
       loc: "dreadmawVault", takeable: true, wearable: true, wearSlot: "feet", grantsFlight: true,
-      roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
-      desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
       wearMsg: "You lace the WINGED SHOES onto your feet. The little feathers snap taut, beat once — and your heels rise off the floor.",
       wearArt: MAP_MARK + WINGED_SHOES_ART + MAP_MARK,
     },
     hallBed: {
       names: ["bed"], adjectives: ["hall", "narrow", "made"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A narrow BED made with yellowed but carefully tucked linen.",
     },
     hallMirror: {
       names: ["mirror"], adjectives: ["hall", "bedroom", "tarnished"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A tarnished MIRROR that makes every reflection look slightly farther away than it should.",
     },
     nightTable: {
       names: ["table", "nightstand"], adjectives: ["night", "bedside", "small"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
     },
     nightDrawer: {
       names: ["drawer"], adjectives: ["night", "table", "bedside"],
       loc: "hallBedroom", fixed: true, scenery: true,
       container: true, openable: true, open: false, capacity: 3,
-      desc: "A cheap wooden DRAWER in the NIGHT TABLE.",
     },
     bedsideLamp: {
       names: ["lamp"], adjectives: ["night", "bedside", "table"],
       loc: "hallBedroom", fixed: true, scenery: true,
       lightSource: true, selfPowered: true, lit: false,
-      desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
     },
     xrayGoggles: {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
       loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
       grantsMushroomVision: true, grantsDarkVision: true,
-      desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
       loc: "porch", fixed: true, scenery: true, enterTo: "north",
       openable: true, open: false, locked: true, keyId: "frontKey",
-      desc: "A great oak door, black with age, with a heavy iron lock.",
       on: {
         open(ctx) {
           const d = ctx.item("frontDoor");
@@ -3918,7 +3834,6 @@ const logicWorld = {
     candlestick: {
       names: ["candlestick", "candle"], adjectives: ["silver", "tarnished"], loc: "diningRoom",
       takeable: true, treasure: true, points: 10, lightSource: true, lit: false, fuel: 120,
-      desc: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt.",
       on: {
         light(ctx) {
           const c = ctx.item("candlestick");
@@ -3935,16 +3850,13 @@ const logicWorld = {
     },
     matches: {
       names: ["matches", "match"], adjectives: ["box"], loc: "kitchen", takeable: true,
-      desc: "A box holding a single dry match. Just one.",
     },
     rope: {
       names: ["rope", "coil"], adjectives: ["stout"], loc: "kitchen", takeable: true,
-      desc: "A coil of stout rope, still sound.",
     },
     cellarDoor: {
       names: ["cellar", "trapdoor", "door"], adjectives: ["heavy", "cellar"],
       loc: "kitchen", fixed: true, scenery: true, enterTo: "down", openable: true, open: false,
-      desc: "A heavy trap-door set flush in the KITCHEN floor, iron-ringed.",
       on: {
         open(ctx) {
           if (ctx.getFlag("cellarOpen")) return "The cellar door already gapes open.";
@@ -3960,7 +3872,6 @@ const logicWorld = {
     // --- library / secret chamber ---
     lever: {
       names: ["lever"], adjectives: ["brass"], loc: "library", fixed: true, scenery: true,
-      desc: "A brass lever set into the shelving where a book should be.",
       on: {
         pull(ctx) {
           if (ctx.getFlag("leverPulled")) return "The bookcase already stands open.";
@@ -3974,21 +3885,17 @@ const logicWorld = {
     grimoire: {
       names: ["grimoire", "book"], adjectives: ["first-edition", "forbidden", "black"], loc: "secretChamber",
       takeable: true, treasure: true, points: 15, readable: true,
-      desc: "A heavy black grimoire, clasped in tarnished silver — a priceless first edition.",
-      text: "The grimoire is written in a hand that hurts to follow. You snap it shut. Some things are worth money, not reading.",
     },
 
     // --- parlor safe (behind the profile painting) ---
     portrait: {
       names: ["painting", "profile", "portrait"], adjectives: ["grim", "patriarch", "huge"], loc: "parlor",
       fixed: true, scenery: true,
-      desc: "A grim PROFILE PAINTING of the patriarch. The frame stands slightly proud of the wall, as if hinged.",
       on: { move: revealSafe, push: revealSafe, examine: revealSafe },
     },
     safe: {
       names: ["safe"], adjectives: ["iron"], loc: null, fixed: true, container: true, openable: true,
       open: false, locked: true, capacity: 3,
-      desc: "A squat iron safe set into the wall, fitted with a combination dial.",
       on: {
         open: openSafe,
       },
@@ -3996,19 +3903,15 @@ const logicWorld = {
     talisman: {
       names: ["talisman", "amulet"], adjectives: ["silver", "protective"], loc: "safe", takeable: true,
       wearable: true, worn: false, wearSlot: "neck", treasure: true, points: 15,
-      desc: "A silver talisman on a chain, warm to the touch and graven with wards against the dead. The back " +
-        "bears the BM crest, identifying the protective charm as a Blackwood family heirloom.",
     },
 
     // --- study diary ---
     desk: {
       names: ["desk"], adjectives: ["oak"], loc: "study", fixed: true, scenery: true,
-      desc: "A great oak desk, its drawers swollen shut.",
     },
     diary: {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,
       readable: true,
-      desc: "A leather-bound diary in a spidery hand.",
       on: {
         read(ctx) {
           const points = awardProgress(ctx, "diaryDecoded");
@@ -4026,8 +3929,6 @@ const logicWorld = {
     wallpaper: {
       names: ["wallpaper", "wall", "lath"], adjectives: ["peeling", "loose", "curling"],
       loc: "nursery", fixed: true, scenery: true,
-      desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
-        "pulled almost all the way free, and the lath behind it sounds hollow when you rap on it.",
       on: { pull: revealWallGap, push: revealWallGap, search: revealWallGap },
     },
 
@@ -4035,7 +3936,6 @@ const logicWorld = {
     musicBox: {
       names: ["music box", "musicbox", "box"], adjectives: ["jeweled", "jewelled", "music"], loc: "nursery",
       takeable: true, treasure: true, points: 15, container: true, openable: true, open: false, capacity: 1,
-      desc: "A jeweled music box, its lid inlaid with mother-of-pearl.",
       on: {
         open(ctx) {
           const box = ctx.item("musicBox");
@@ -4051,7 +3951,6 @@ const logicWorld = {
       names: ["key"], adjectives: ["tiny", "small", "brass"], loc: "musicBox", takeable: true,
       progressPoints: 5, progressFlag: "progressItem:tinyKey",
       consumedOnUnlock: "The tiny key disappears into the jewelry box's spring mechanism.",
-      desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
     },
 
     // --- grand bedroom jewelry box -> Ravenblood Signet ---
@@ -4059,7 +3958,6 @@ const logicWorld = {
       names: ["jewelry box", "jewellery box", "jewelry", "box", "casket"], adjectives: ["walnut", "dark"],
       loc: "masterBedroom", fixed: true, container: true, openable: true, open: false, locked: true,
       keyId: "tinyKey", capacity: 2,
-      desc: "A dark walnut jewelry box with a tiny keyhole.",
       on: {
         open(ctx) {
           const box = ctx.item("jewelryBox");
@@ -4075,24 +3973,19 @@ const logicWorld = {
       names: ["ravenblood signet", "signet", "ring", "ravenblood"],
       adjectives: ["ravenblood", "ruby", "red", "blackwood", "blood"], loc: "jewelryBox", takeable: true,
       treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
-      desc: "The RAVENBLOOD SIGNET: a heavy gold ring set with a dark red garnet like a suspended drop of blood. " +
-        "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
     },
 
     // --- crypt ---
     wraith: {
       names: ["wraith", "ghost", "spirit"], loc: "crypt", fixed: true, scenery: true,
-      desc: "A shroud of cold hatred, kept at bay by the TALISMAN. It hisses from the corners.",
     },
     goldLocket: {
       names: ["locket"], adjectives: ["gold"], loc: "crypt", takeable: true, treasure: true, points: 20,
-      desc: "A gold locket, cold as the grave, its clasp shaped like clasped hands.",
     },
 
     // --- landing cord (attic ladder) ---
     cord: {
       names: ["cord"], adjectives: ["frayed"], loc: "landing", fixed: true, scenery: true,
-      desc: "A frayed cord dangling from the ATTIC trap-door in the ceiling.",
       on: {
         pull(ctx) {
           if (ctx.getFlag("ladderDown")) return "The ladder is already down.";
@@ -4105,17 +3998,13 @@ const logicWorld = {
     // --- other treasures ---
     ancientCoin: {
       names: ["coin"], adjectives: ["ancient", "old"], loc: null, takeable: true, treasure: true, points: 10,
-      desc: "An ancient coin, worn smooth, stamped with a face no one remembers.",
     },
     crystalDecanter: {
       names: ["decanter"], adjectives: ["crystal"], loc: "wineCellar", takeable: true, treasure: true, points: 15,
-      desc: "A cut-crystal decanter, still full, throwing splinters of colour even in the gloom.",
     },
     ancestralPortrait: {
       names: ["portrait", "miniature"], adjectives: ["ancestral", "small", "gilt"], loc: "attic",
       takeable: true, treasure: true, points: 20, scenery: true,
-      desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
-        "unsettlingly like the STATUE in the GARDEN.",
     },
 
     // --- Post-game (appear only after the bell is rung) ---
@@ -4123,12 +4012,10 @@ const logicWorld = {
       names: ["key"], adjectives: ["bone", "pale", "slender"], loc: null, takeable: true,
       progressPoints: 5, progressFlag: "progressItem:boneKey",
       consumedOnUnlock: "The BONE KEY crumbles into pale dust inside the lock.",
-      desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
     },
     secretDoor: {
       names: ["door", "seam"], adjectives: ["secret", "hidden", "north"], loc: null, fixed: true, scenery: true,
       openable: true, open: false, locked: true, keyId: "boneKey", enterTo: "north",
-      desc: "A door of black wood where no door was, fitted with a keyhole shaped like a tooth.",
       on: {
         open(ctx) {
           const d = ctx.item("secretDoor");
@@ -4145,8 +4032,6 @@ const logicWorld = {
     spirit: {
       names: ["spirit", "matriarch", "woman", "ghost"], adjectives: ["pale", "grey", "robed"],
       loc: "hollowSanctum", fixed: true, scenery: true,
-      desc: "The pale spirit of a robed woman — the face from the GARDEN STATUE and the little portrait. " +
-        "She was weeping, but her eyes are kind now.",
       on: {
         pray: () => "She bows her head. \"You lifted what my own blood could not. Take the mirror, and go and live — since I no longer can.\"",
         give: () => "She shakes her head gently. \"I need nothing now but rest, and you have given me that.\"",
@@ -4154,9 +4039,7 @@ const logicWorld = {
       },
     },
     silverMirror: {
-      names: ["mirror"], adjectives: ["silver"], loc: "hollowSanctum", takeable: true,
-      desc: "An age-clouded silver hand-mirror. In it, for just a moment, you see BLACKWOOD MANOR whole and " +
-        "bright and full of the living.",
+      names: ["mirror"], adjectives: ["silver"],       loc: "hollowSanctum", takeable: true,
     },
 
     // --- the only thing in the space between the walls ---
@@ -4165,9 +4048,6 @@ const logicWorld = {
       adjectives: ["tarnished", "woodblack", "backwards", "brass"],
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
       depositScoreFlag: "heirloomScore:backwardsWatch",
-      roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
-      desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
-        "On the back, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
       on: { examine: inspectWoodblackWatch, read: inspectWoodblackWatch },
     },
   },
