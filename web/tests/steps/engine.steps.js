@@ -166,6 +166,10 @@ When("I save a game snapshot", function () {
   this.snapshot = this.game.snapshot();
 });
 
+When("I restore that snapshot", function () {
+  this.game.restore(this.snapshot);
+});
+
 When("I restore that snapshot into a fresh fixture game", function () {
   const restored = createGame(fixture());
   restored.restore(this.snapshot);
@@ -277,8 +281,11 @@ Then("HELP is one alphabetized command-per-line data block", function () {
   assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search \| Inspect \//);
   assert.match(HELP_TEXT,
     /\(n\)orth, \(s\)outh, \(e\)ast, \(w\)est, northeast \(ne\), northwest \(nw\), southeast \(se\), southwest \(sw\), \(u\)p, \(d\)own, in, out \| Directions \/ Go that direction\./);
-  assert.match(HELP_TEXT, /get\/take\/grab <thing>\/all \| Take \//);
+  assert.match(HELP_TEXT, /get\/\(t\)ake\/grab <thing>\/all \| Take \//);
+  assert.match(HELP_TEXT, /\(g\)o <room> \| Go \//);
   assert.match(HELP_TEXT, /\(c\)lose\/shut <thing> \| Close \//);
+  assert.match(HELP_TEXT, /lock\/\(lk\) <thing> with <key> \| Lock \//);
+  assert.match(HELP_TEXT, /unlock\/\(un\) <thing> with <key> \| Unlock \//);
   assert.match(HELP_TEXT, /put\/place <thing> in <container\/slot> \| Put \//);
   assert.match(HELP_TEXT, /say\/talk <words\/person> \| Speak \//);
   assert.match(HELP_TEXT, /\(u\)se\/wear\/don\/eat\/drink <thing> \| Use \//);

@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 ```
 
 ---
@@ -133,6 +133,10 @@ Classic Infocom style, richer than strict two-word.
   search, move/push/pull, turn on/off, light, extinguish, attack/kill … with …, eat,
   drink, use/u, wear/don, remove, throw … at …, put/place, enter, climb, ring,
   touch, listen, smell, give … to …
+- **Compact verbs:** `t` = TAKE, `un` = UNLOCK, and `lk` = LOCK. `l` remains
+  LOOK, including `l <thing>`, so it is intentionally not reused for LOCK.
+  Bare `g` remains AGAIN; `g <room>` means GO and replaces `fly <room>` in
+  generated SYSOP routes.
 - **Meta:** inventory/i, wait/z, again/g, look, score, save, restore, restart,
   verbose/brief, help, quit
 - **Niceties:** synonyms, "it" pronoun resolution, up-arrow command history, tolerant of
@@ -404,7 +408,7 @@ the mansion.
 ## 12.9 Food & afflictions (kitchen) + the privy
 - **Strange mushrooms** → `high` (trippy per-turn flavor, harmless). The dried kitchen
   cluster lasts 6 turns. A purple glimmer subtly invites the player to `LOOK IN TOILET`;
-  only then are the fresh, shit-and-piss-covered mushrooms revealed inside the OUTHOUSE's
+  only then are the fresh, crap-and-piss-covered mushrooms revealed inside the OUTHOUSE's
   TOILET HOLE. They last 12 turns. `GET MUSHROOMS FROM TOILET` or
   `REACH INTO TOILET FOR MUSHROOMS` retrieves them after inspection.
 - **Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito** contains two kinds of beans,
@@ -445,7 +449,7 @@ and `core.js` runs each fragment through `runOne()` in order. So
 
 - **Aborts** the rest of the chain on: an unknown word, death, victory, or picking up the phone.
 - **Never splits while `onCall`** — Gary is a conversation and commas belong to him.
-- Capped at `MAX_CHAIN = 20`; `g`/`again` repeats the previous *chain*.
+- Capped at `MAX_CHAIN = 256`; `g`/`again` repeats the previous command.
 - `game.send()` stays **synchronous** so the engine and tests are unaffected.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)

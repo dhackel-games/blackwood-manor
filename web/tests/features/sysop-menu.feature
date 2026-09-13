@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @unit
 Feature: Sysop compound command shortcuts
@@ -32,20 +32,90 @@ Feature: Sysop compound command shortcuts
       | down                    | d                    |
       | open mailbox            | o mailbox            |
       | close reliquary         | c reliquary          |
-      | take family crest       | get family crest     |
+      | take family crest       | t family crest       |
       | wear winged shoes       | u winged shoes        |
       | remove talisman         | doff talisman        |
       | offer apple to dragon   | give apple to dragon |
       | place ruby gem in panel | put ruby gem in panel |
-      | unlock front door with iron key | unlock front door w/iron key |
+      | unlock front door with iron key | un front door w/iron key     |
+      | use mushrooms           | u mushrooms          |
+      | eat mushrooms           | u mushrooms          |
+      | drink milk              | u milk               |
+      | fly kitchen             | g kitchen             |
+      | lock front door with iron key | lk front door w/iron key |
       | enter platform          | in platform          |
       | wait                    | z                    |
+
+  Scenario: Collection prompts bulk-take rooms and let direct use acquire visible gear
+    Then sysop command "::powerup" includes "u shoes"
+    And sysop command "::powerup" includes "u fresh"
+    And sysop command "::powerup" omits "t shoes"
+    And sysop command "::winquick" includes "t all"
+    And sysop command "::winquick" includes "u shoes"
+    And sysop command "::winquick" contains sequence "g dreadvault; u shoes; t all"
+    And sysop command "::winquick" includes "u fresh"
+    And sysop command "::winquick" omits "t shoes"
+    And sysop command "::winquick" omits "t crest"
+    And sysop command "::winmax" includes "t all"
+    And sysop command "::winmax" includes "u shoes"
+    And sysop command "::winmax" contains sequence "u shoes; t all"
+    And sysop command "::winmax" includes "u fresh"
+    And sysop command "::winmax" omits "t shoes"
+    And sysop command "::winmax" omits "t crest"
+    And every hidden prompt avoids an explicit take immediately before direct use
+
+  Scenario: Powerup targets fresh mushrooms when both varieties are carried
+    Given flag "outhouseMushroomsFound" is set
+    And item "mushrooms" is carried
+    And item "outhouseMushrooms" is carried
+    When I execute sysop command "::powerup"
+    Then item "wingedShoes" is worn in slot "feet"
+    And the game is not won
+
+  Scenario: Powerup falls back to dried mushrooms after the privy crop is gone
+    Given flag "outhouseMushroomsFound" is set
+    And item "outhouseMushrooms" is destroyed
+    Then sysop command "::powerup" includes "u dried"
+    When I execute sysop command "::powerup"
+    Then item "wingedShoes" is worn in slot "feet"
+    And the game is not won
+
+  Scenario Outline: Every sysop route recovers on foot when both mushroom batches are gone
+    Given flag "outhouseMushroomsFound" is set
+    And item "outhouseMushrooms" has been destroyed
+    And item "mushrooms" has been destroyed
+    When I execute sysop command "<command>"
+    Then item "wingedShoes" is worn in slot "feet"
+    And the current room is "<room>"
+    And the game is alive
+
+    Examples:
+      | command     | room           |
+      | ::powerup   | hiddenVault    |
+      | ::winquick  | hollowSanctum  |
+      | ::garycliff | garysLair      |
+      | ::winmax    | hollowSanctum  |
+
+  Scenario Outline: Shoes-only flight acquires dark vision before entering the shaft
+    Given flag "outhouseMushroomsFound" is set
+    And item "outhouseMushrooms" has been destroyed
+    And item "mushrooms" has been destroyed
+    And item "wingedShoes" is carried
+    When I execute sysop command "<command>"
+    Then the game is alive
+    And the current room is "<room>"
+
+    Examples:
+      | command     | room          |
+      | ::powerup   | hiddenVault   |
+      | ::winquick  | hollowSanctum |
+      | ::garycliff | garysLair     |
 
   Scenario: Prompt expansion skips items already carried or worn
     Given item "backpack" is carried
     And item "wingedShoes" is carried
     When I send "wear winged shoes"
-    Then sysop command "::powerup" omits "take backpack"
+    Then sysop command "::powerup" omits "t backpack"
     And sysop command "::powerup" includes "u backpack"
     And sysop command "::powerup" omits "u shoes"
 
@@ -84,8 +154,8 @@ Feature: Sysop compound command shortcuts
 
   Scenario: An already-solved oak still uses its one-word room alias
     Given flag "oakLightAligned" is set
-    Then sysop command "::winquick" includes "fly fort"
-    And sysop command "::winquick" omits "fly tree fort"
+    Then sysop command "::winquick" includes "g fort"
+    And sysop command "::winquick" omits "g tree fort"
 
   Scenario: Quick win skips the crypt after its heirlooms are deposited
     Given item "goldLocket" is carried

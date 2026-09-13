@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -102,7 +102,7 @@ export const ROOM_SHORT_NAMES = Object.freeze({
   hedgeMazeGate: "yewgate",
   hedgeMazeKnot: "thornknot",
   hedgeMazeLoop: "loop",
-  dragonCaveMouth: "cavemouth",
+  dragonCaveMouth: "mouth",
   dragonAntechamber: "antechamber",
   mineGallery: "gallery",
   deepShaft: "shaft",
@@ -912,6 +912,9 @@ function hotline(ctx) {
   return `${aside}${intro}\n\n${frameHint(ctx, nextHint(ctx))}\n\n${tail}`;
 }
 
+const GARY_GAME_COMMAND =
+  /^(n|s|e|w|ne|nw|se|sw|u|d|g|t|o|c|l|ex|x|un|lk|z|up|down|in|out|go|walk|take|get|grab|open|close|look|examine|light|read|push|pull|unlock|lock|move|enter|climb|ring|put|drop|wear|attack|search|inventory|inv|i)\b/;
+
 // While you're on the line, everything you type is routed here (core.send).
 function hotlineTalk(ctx, text) {
   const t = (text || "").trim().toLowerCase();
@@ -1017,7 +1020,7 @@ function hotlineTalk(ctx, text) {
       "That means more than you know. This is growth. YOUR growth. Also mine. We're doing it. That'll be $1.99.",
     ]);
   }
-  if (/^(n|s|e|w|ne|nw|se|sw|u|d|up|down|in|out|go|walk|take|get|grab|open|close|look|examine|x|light|read|push|pull|unlock|lock|move|enter|climb|ring|put|drop|wear|attack|search|inventory|i)\b/.test(t)) {
+  if (GARY_GAME_COMMAND.test(t)) {
     return say(ctx, [
       "I'm a HINT LINE, not your legs. I can't walk you around the house — HANG UP and do it yourself, hotshot.",
       "I can't move you around, pal. That part's on you. HANG UP and go.",
@@ -1054,7 +1057,7 @@ const MECHANICAL = [
   /\b(hint|help|stuck|clue|next|where|advice|tip)\b/,
   /how (do|to|the heck|am i)/,
   /what.*(do|now|next)/,
-  /^(n|s|e|w|ne|nw|se|sw|u|d|up|down|in|out|go|walk|take|get|grab|open|close|look|examine|x|light|read|push|pull|unlock|lock|move|enter|climb|ring|put|drop|wear|attack|search|inventory|i)\b/,
+  GARY_GAME_COMMAND,
 ];
 
 // Rough topic tag, purely to steer the model's attention.
@@ -1552,7 +1555,7 @@ function eatMushrooms(ctx, cmd) {
   ctx.setFlag("highGrace", true);
   ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
   const origin = mushrooms?.fresh
-    ? "You eat the fresh mushrooms. They are slick with literal shit and piss from the TOILET HOLE — " +
+    ? "You eat the fresh mushrooms. They are slick with literal crap and piss from the TOILET HOLE — " +
       "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway."
     : "You chew through the dried kitchen mushrooms. They are dusty and bitter, but the trip hits just the same.";
   return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
@@ -2313,15 +2316,15 @@ function inspectToilet(ctx) {
     ctx.setFlag("outhouseMushroomsFound");
     ctx.moveItem("outhouseMushrooms", "privy");
     return "You lean over and LOOK IN the TOILET HOLE. Fresh purple MUSHROOMS are growing directly in a wet " +
-      "bed of literal shit and piss. They glow twice as brightly as the dried kitchen ones.";
+      "bed of literal crap and piss. They glow twice as brightly as the dried kitchen ones.";
   }
   if (mushrooms && mushrooms.loc === "privy") {
-    return "Inside the TOILET HOLE, the fresh MUSHROOMS remain rooted in literal shit and piss.";
+    return "Inside the TOILET HOLE, the fresh MUSHROOMS remain rooted in literal crap and piss.";
   }
   if (mushrooms && mushrooms.loc === "inventory") {
     return "The TOILET HOLE sits empty — you already pulled this crop free.";
   }
-  return "You look into the TOILET HOLE. Only shit, piss, and the torn roots of the last crop remain. The " +
+  return "You look into the TOILET HOLE. Only crap, piss, and the torn roots of the last crop remain. The " +
     "muck looks fertile enough that another might push through, given time.";
 }
 function takeToiletMushrooms(ctx) {
@@ -2329,13 +2332,13 @@ function takeToiletMushrooms(ctx) {
     return "You stop before reaching blindly into the dark hole. You should LOOK IN THE TOILET first.";
   }
   const mushrooms = ctx.item("outhouseMushrooms");
-  if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just shit and piss.";
+  if (!mushrooms || mushrooms.loc !== "privy") return "There's nothing to pull free right now — just crap and piss.";
   if (ctx.has("outhouseMushrooms")) return "You already have the fresh mushrooms.";
   if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
     return "Your hands are full. You'll have to drop something before reaching into that.";
   ctx.moveItem("outhouseMushrooms", "inventory");
   return "You reach into the TOILET HOLE and pull the MUSHROOMS free. Your hand comes back coated in literal " +
-    "shit and piss. The mushrooms are not cleaner.";
+    "crap and piss. The mushrooms are not cleaner.";
 }
 function reachIntoToilet(ctx, cmd) {
   const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
@@ -2346,8 +2349,9 @@ function deriveCommand(ctx, cmd) {
   if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
   if (!["take", "eat", "reach", "use"].includes(cmd.verb)) return [];
   const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
-  if (!/\b(mushroom|mushrooms|fungus|toilet|hole)\b/.test(target)) return [];
-  if (cmd.verb === "use" && !/\b(mushroom|mushrooms|fungus)\b/.test(target)) return [];
+  const mushroomTarget = /\b(mushroom|mushrooms|fungus)\b/.test(target) || target.trim() === "fresh";
+  if (!mushroomTarget && !/\b(toilet|hole)\b/.test(target)) return [];
+  if (cmd.verb === "use" && !mushroomTarget) return [];
   inspectToilet(ctx);
   return ["look in toilet"];
 }
@@ -2416,11 +2420,12 @@ function openSafe(ctx, cmd) {
   return finishOpeningSafe(ctx, "You dial the combination from the DIARY — seven left, three right, nine left.");
 }
 
-const TROLL_RHYMES = new Set(["more", "door", "floor", "core", "roar", "lore", "shore", "store", "before"]);
+const TROLL_RHYMES = new Set(["lore"]);
 const TROLL_REJECTED_RHYMES = new Set([
-  "adore", "boar", "bore", "chore", "explore", "fore", "four", "gore",
+  "adore", "before", "boar", "bore", "chore", "core", "door", "explore",
+  "floor", "fore", "four", "gore",
   "ignore", "oar", "or", "pore", "poor", "pour", "score", "snore",
-  "sore", "therefore", "tore", "war", "wore", "yore",
+  "more", "roar", "shore", "sore", "store", "therefore", "tore", "war", "wore", "yore",
 ]);
 const TROLL_RIDDLE =
   "\"Past this door lie gold and ore,\n" +
@@ -3690,7 +3695,7 @@ const logicWorld = {
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
-      adjectives: ["fresh", "shit-fueled", "purple", "toilet"],
+      adjectives: ["fresh", "crap-fueled", "purple", "toilet"],
       loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
       on: { take: takeToiletMushrooms, eat: eatMushrooms },
     },

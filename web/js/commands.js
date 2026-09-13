@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -82,17 +82,18 @@ call/hint | Gary / Call Gary's paid hint line.
 (c)lose/shut <thing> | Close / Close an open door or container.
 drop <thing>/all | Drop / Drop one carried item or every unworn item.
 extinguish <thing> | Extinguish / Put out a light or flame.
-get/take/grab <thing>/all | Take / Take one visible item or everything portable.
+get/(t)ake/grab <thing>/all | Take / Take one visible item or everything portable.
 give <thing> to <character> | Give / Hand over an item.
+(g)o <room> | Go / Go to a named room when movement or flight allows; bare g repeats AGAIN.
 help/? | Help / Show this command reference.
 (i)nventory | Inventory / List everything you carry and wear.
 light <thing> | Light / Ignite a usable light source.
-lock <thing> with <key> | Lock / Lock something with a matching key.
+lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 (l)ook/e(x)amine/search | Inspect / Inspect the room or a visible thing more closely.
 (m)ap | Map / Show Gary's map of visited locations.
 move <thing> | Move / Shift or jostle something.
 (n)orth, (s)outh, (e)ast, (w)est, northeast (ne), northwest (nw), southeast (se), southwest (sw), (u)p, (d)own, in, out | Directions / Go that direction.
-(o)pen <thing> | Open / Open a door or container.
+(o)pen <thing> [w/<key>] | Open / Unlock with a supplied key, then open.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
 put/place <thing> in <container/slot> | Put / Place a carried item inside a container or named slot.
@@ -108,7 +109,7 @@ save | Save / Save the current game in this browser.
 say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
 score | Score / Show points, turns, and rank.
 throw <thing> at <target> | Throw / Throw a carried item.
-unlock <thing> with <key> | Unlock / Unlock something with a matching key.
+unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
 verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
@@ -521,7 +522,7 @@ export const commands = {
 
   verbose(ctx) { ctx.setFlag("__verbose", true); return "Maximum verbosity."; },
   brief(ctx) { ctx.setFlag("__verbose", false); return "Brief descriptions."; },
-  again() { return null; }, // handled by UI (repeat last); no-op in core
+  again() { return null; }, // handled by core before dispatch
   help(ctx) {
     ctx.setFlag("usedHelp", true);
     return HELP_TEXT;

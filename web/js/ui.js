@@ -1,6 +1,6 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
-// (save/restore/restart/quit/again), command history, autosave, and the "phone
+// (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
 import { createGame } from "./core.js?v=source";
 import { world } from "./world.js?v=source";
@@ -68,7 +68,6 @@ let game = createGame(world);
 let bugTrace = createBugTrace("page reload");
 const history = [];
 let hi = 0;
-let lastCmd = "";
 
 // Only auto-focus the text field on devices with a real keyboard (desktop).
 // On touch devices, focusing pops the on-screen keyboard, which is jarring when
@@ -632,7 +631,6 @@ function newGame(origin = "restart") {
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
-  lastCmd = "";
   print("\n" + game.describeRoom(true));
   updateHud();
 }
@@ -675,14 +673,6 @@ function handle(raw) {
   history.push(cmd);
   hi = history.length;
 
-  if (/^(again|g)$/i.test(cmd)) {
-    if (!lastCmd) {
-      recordBugCommand(bugTrace, submitted);
-      onCall ? printToPhone("(nothing to repeat)", "sys") : print("Nothing to repeat.");
-      return;
-    }
-    cmd = lastCmd;
-  }
   const low = cmd.toLowerCase();
 
   const bugDescription = bugReportDescription(cmd);
@@ -754,7 +744,6 @@ function handle(raw) {
     }
   }
 
-  lastCmd = cmd;
   const prevFlags = { ...game.state.flags };
   const turnsBefore = game.state.turns;
   const out = game.send(cmd);

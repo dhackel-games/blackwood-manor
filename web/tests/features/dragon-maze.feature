@@ -1,4 +1,4 @@
-# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @walkthrough @dragon
 Feature: Dreadmaw's hedge maze and hoard
@@ -97,7 +97,7 @@ Feature: Dreadmaw's hedge maze and hoard
     And I send "examine doubloon"
     Then the output contains "etched by hand: LORE"
 
-  Scenario Outline: A valid rhyming word opens Dreadmaw's inner vault
+  Scenario: LORE opens Dreadmaw's inner vault
     Given item "apple" is carried
     And the player is in room "dragonCaveMouth"
     When I send "offer apple to dragon"
@@ -113,28 +113,14 @@ Feature: Dreadmaw's hedge maze and hoard
     When I send "talk to troll"
     Then the output contains "Past this door lie gold and ore"
     And the output contains "Treasure, terror, blood, and ____"
-    When I send "say <rhyme>"
+    When I send "say lore"
     Then flag "dragonVaultOpen" is true
     And the output contains "vault door rolls open"
     And the output contains "(+5)"
     And the game score is 15
-    When I send "say more"
-    Then the game score is 15
     When I send "east"
     Then the current room is "dreadmawVault"
     And the output contains "DREADMAW'S VAULT"
-
-    Examples:
-      | rhyme  |
-      | more   |
-      | door   |
-      | floor  |
-      | core   |
-      | roar   |
-      | lore   |
-      | shore  |
-      | store  |
-      | before |
 
   Scenario: ENTER VAULT works the same as EAST once the door is open
     Given item "apple" is carried
@@ -152,7 +138,7 @@ Feature: Dreadmaw's hedge maze and hoard
     Then the current room is "trollGate"
     And the output contains "sealed behind the TROLL"
     When I send "talk to troll"
-    And I send "say more"
+    And I send "say lore"
     Then flag "dragonVaultOpen" is true
     When I send "enter vault"
     Then the current room is "dreadmawVault"
@@ -181,10 +167,10 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is unset
     And the output contains "does not rhyme"
 
-  Scenario: A rejected rhyme gets accurate feedback
+  Scenario: MORE rhymes but is not the correct answer
     Given flag "trollAskedRiddle" is set
     And the player is in room "trollGate"
-    When I send "answer gore"
+    When I send "answer more"
     Then flag "dragonVaultOpen" is unset
     And flag "trollWrongGuesses" equals 1
     And the output contains "It does rhyme"

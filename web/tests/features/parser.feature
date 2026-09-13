@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @unit
 Feature: Player command parsing
@@ -9,6 +9,8 @@ Feature: Player command parsing
     Then the following commands parse as:
       | input                               | verb    | direct    | preposition | indirect  |
       | n                                   | go      | north     | [none]      | [none]    |
+      | g                                   | again   | [none]    | [none]      | [none]    |
+      | g kitchen                           | go      | kitchen   | [none]      | [none]    |
       | northeast                           | go      | ne        | [none]      | [none]    |
       | northwest                           | go      | nw        | [none]      | [none]    |
       | southeast                           | go      | se        | [none]      | [none]    |
@@ -16,9 +18,12 @@ Feature: Player command parsing
       | u                                   | go      | up        | [none]      | [none]    |
       | u talisman                          | use     | talisman  | [none]      | [none]    |
       | take the brass key                  | take    | brass key | [none]      | [none]    |
+      | t rope                              | take    | rope      | [none]      | [none]    |
       | grab brass key                      | take    | brass key | [none]      | [none]    |
       | unlock the oak door with the brass key | unlock | oak door | with      | brass key |
       | unlock front d w/iron               | unlock | front door | with       | iron       |
+      | un frontd w/iron                    | unlock | frontd     | with       | iron       |
+      | lk frontd w/iron                    | lock   | frontd      | with       | iron       |
       | unlock front d w/ iron              | unlock | front door | with       | iron       |
       | fly grand br                        | go      | grand bedroom | [none]   | [none]     |
       | look                                | look    | [none]    | [none]      | [none]    |

@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -107,6 +107,10 @@ Given("the player is on fire", function () {
 
 Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
+});
+
+Given("item {string} has been destroyed", function (item) {
+  this.game.destroy(item);
 });
 
 Given("a legacy pre-oak save with the ember deposited is restored", function () {
@@ -349,6 +353,16 @@ Then("every hidden compound prompt uses shortest command forms", function () {
   }
 });
 
+Then("every hidden prompt avoids an explicit take immediately before direct use", function () {
+  for (const entry of SYSOP_COMMANDS) {
+    const commands = entry.compoundPrompt.split(";").map((part) => part.trim());
+    for (let index = 0; index < commands.length - 1; index += 1) {
+      const take = commands[index].match(/^t (\S+)$/);
+      if (take) assert.notEqual(commands[index + 1], `u ${take[1]}`, `${entry.cmd}: ${take[1]}`);
+    }
+  }
+});
+
 Then("every hidden prompt uses globally unique one-word targets", function () {
   assert.deepEqual(Object.keys(world.itemShortNames).sort(), Object.keys(world.items).sort());
   assert.deepEqual(Object.keys(world.roomShortNames).sort(), Object.keys(world.rooms).sort());
@@ -421,6 +435,12 @@ Then("sysop command {string} includes {string}", function (command, included) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
   assert.ok(expandSysopCommand(shortcut, this.game).split("; ").includes(included));
+});
+
+Then("sysop command {string} contains sequence {string}", function (command, sequence) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  assert.ok(expandSysopCommand(shortcut, this.game).includes(sequence));
 });
 
 Then("item {string} is absent from game state", function (item) {

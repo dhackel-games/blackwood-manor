@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -62,6 +62,24 @@ Feature: Gary's hint line
       | shut up                 |
       | n                       |
       | take lamp               |
+
+  Scenario Outline: Compact game commands remain mechanical on the hotline
+    When I send "call"
+    And I send "<command>"
+    Then the output matches "HANG UP|hint line|legs"
+    And Gary turn "<command>" is mechanical
+
+    Examples:
+      | command            |
+      | g kitchen          |
+      | t all              |
+      | o frontd           |
+      | c frontd           |
+      | l                  |
+      | ex shoes           |
+      | inv                |
+      | un frontd w/iron   |
+      | lk frontd w/iron   |
 
   Scenario: Conversational hotline turns may use the model
     When I send "call"

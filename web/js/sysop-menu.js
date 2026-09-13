@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -22,12 +22,15 @@ export function shortestCommand(command) {
   return text
     .replace(/^open\b/i, "o")
     .replace(/^close\b/i, "c")
-    .replace(/^take\b/i, "get")
+    .replace(/^(?:take|get)\b/i, "t")
     .replace(/^place\b/i, "put")
-    .replace(/^(?:wear|don)\b/i, "u")
+    .replace(/^(?:use|wear|don|eat|drink)\b/i, "u")
     .replace(/^remove\b/i, "doff")
     .replace(/^offer\b/i, "give")
     .replace(/^enter\b/i, "in")
+    .replace(/^(?:go|fly)\s+/i, "g ")
+    .replace(/^unlock\b/i, "un")
+    .replace(/^lock\b/i, "lk")
     .replace(/^wait$/i, "z")
     .replace(/\s+with\s+/i, " w/");
 }
@@ -77,7 +80,7 @@ const OAK_SPYGLASS_ROUTE = [
   "put sapphire in top",
   "enter platform",
   "wait",
-  "take spyglass",
+  "take all",
   "wait",
   "enter platform",
   "wait",
@@ -87,22 +90,22 @@ const OAK_SPYGLASS_ROUTE = [
 
 const CRYPT_LOOT_ROUTE = [
   "fly crypt",
-  "take locket",
+  "take all",
   "remove talisman",
 ];
 
 const POWERUP = [
   "{{pathto:PRIVY}}",
-  "eat mushrooms",
+  "{{flightmushroom}}",
   "fly dreadvault",
   "wear shoes",
+  "fly hallbr",
+  "open drawer",
+  "wear goggles",
   "fly shaft",
   "wear backpack",
   "fly gallery",
   "wear headlamp",
-  "fly hallbr",
-  "open drawer",
-  "wear goggles",
   "fly parlor",
   "move profile",
   "open safe with 7 3 9",
@@ -113,19 +116,19 @@ const POWERUP = [
 
 const QUICK_COLLECTION = [
   "{{pathto:PRIVY}}",
-  "eat mushrooms",
+  "{{flightmushroom}}",
   "fly dreadvault",
   "wear shoes",
-  "take crest",
+  "take all",
   "fly antechamber",
-  "take family",
-  "fly shaft",
-  "wear backpack",
+  "take all",
   "fly hallbr",
   "open drawer",
   "wear goggles",
+  "fly shaft",
+  "wear backpack",
   "fly dining",
-  "take candlestick",
+  "take all",
   "fly kitchen",
   "take matches",
   "light candle",
@@ -134,29 +137,27 @@ const QUICK_COLLECTION = [
   "down",
   "take ancient",
   "fly hidden",
-  "take grimoire",
+  "take all",
   "fly nursery",
   "pull wallpaper",
   "in",
-  "take woodblack",
+  "take all",
   "out",
   "fly nursery",
   "open musicbox",
-  "take tiny",
-  "take musicbox",
+  "take all",
   "fly grandbr",
-  "unlock jewelry with tiny",
-  "open jewelry",
-  "take ravenblood",
+  "open jewelry with tiny",
+  "take all",
   "fly parlor",
   "move profile",
   "open safe with 7 3 9",
   "wear talisman",
   "{{cryptloot}}",
   "fly wine",
-  "take decanter",
+  "take all",
   "fly attic",
-  "take ancestral",
+  "take all",
   "fly royal",
 ];
 
@@ -180,8 +181,7 @@ const DAWN_ENDING = [
   "close reliquary",
   "ring bell",
   "take bone",
-  "unlock secretd with bone",
-  "open secretd",
+  "open secretd with bone",
   "north",
   "north",
   "north",
@@ -193,30 +193,27 @@ const MAX_COLLECTION = [
   "take iron",
   "west",
   "north",
-  "unlock frontd with iron",
-  "open frontd",
+  "open frontd with iron",
   "south",
   "east",
   "east",
-  "eat mushrooms",
+  "{{flightmushroom}}",
   "fly kitchen",
   "take apple",
-  "fly cavemouth",
+  "fly mouth",
   "offer apple to dragon",
   "east",
-  "take family",
+  "take all",
   "east",
-  "take headlamp",
   "wear headlamp",
   "down",
   "wear backpack",
   "east",
   "talk to troll",
-  "say more",
+  "say lore",
   "east",
-  "take shoes",
   "wear shoes",
-  "take crest",
+  "take all",
   "fly kitchen",
   "take rope",
   "open cellard",
@@ -232,7 +229,7 @@ const MAX_COLLECTION = [
   "fly library",
   "pull lever",
   "down",
-  "take grimoire",
+  "take all",
   "fly study",
   "read diary",
   "fly parlor",
@@ -243,28 +240,25 @@ const MAX_COLLECTION = [
   "open drawer",
   "wear goggles",
   "fly astral",
-  "take obsidian",
   "wear obsidian",
   "fly dining",
-  "take candlestick",
+  "take all",
   "fly nursery",
   "pull wallpaper",
   "in",
-  "take woodblack",
+  "take all",
   "out",
   "fly nursery",
   "open musicbox",
-  "take tiny",
-  "take musicbox",
+  "take all",
   "fly grandbr",
-  "unlock jewelry with tiny",
-  "open jewelry",
-  "take ravenblood",
+  "open jewelry with tiny",
+  "take all",
   "{{cryptloot}}",
   "fly wine",
-  "take decanter",
+  "take all",
   "fly attic",
-  "take ancestral",
+  "take all",
   "fly royal",
 ];
 
@@ -297,11 +291,10 @@ export const SYSOP_COMMANDS = Object.freeze([
       "close reliquary",
       "ring bell",
       "take bone",
-      "unlock secretd with bone",
-      "open secretd",
+      "open secretd with bone",
       "north",
       "north",
-      "take silver",
+      "take all",
       "north",
     ]),
   }),
@@ -359,11 +352,71 @@ export function pathToRoom(game, target) {
 }
 
 export function expandSysopCommand(shortcut, game) {
+  const flightMushroomRoute = (() => {
+    if (game.world.canFly?.(game)) return [];
+    const freshLocation = game.roomOf("outhouseMushrooms");
+    if (freshLocation === "inventory" || freshLocation === "privy") return ["use fresh"];
+    if (!game.getFlag("outhouseMushroomsFound")) return ["use fresh"];
+
+    const driedLocation = game.roomOf("mushrooms");
+    if (driedLocation === "inventory") return ["use dried"];
+    if (driedLocation === "kitchen") {
+      return [
+        "west",
+        "move statue",
+        "take iron",
+        "west",
+        "north",
+        "open frontd with iron",
+        "north",
+        "west",
+        "south",
+        "use dried",
+      ];
+    }
+    if (game.roomOf("wingedShoes") === "inventory") return ["wear shoes"];
+
+    const route = [];
+    if (!game.getFlag("dragonMoved")) {
+      if (game.roomOf("apple") === "inventory") {
+        route.push("west", "west", "west", "west", "south");
+      } else if (game.roomOf("apple") === "kitchen") {
+        route.push(
+          "west",
+          "move statue",
+          "take iron",
+          "west",
+          "north",
+          "open frontd with iron",
+          "north",
+          "west",
+          "south",
+          "take apple",
+          "north",
+          "east",
+          "south",
+          "south",
+          "west",
+          "west",
+          "south",
+        );
+      } else {
+        return ["use fresh"];
+      }
+      route.push("offer apple to dragon");
+    } else {
+      route.push("west", "west", "west", "west", "south");
+    }
+    route.push("east", "east", "wear headlamp", "down", "wear backpack", "east");
+    if (!game.getFlag("dragonVaultOpen")) route.push("talk to troll", "say lore");
+    route.push("east", "wear shoes");
+    return route;
+  })();
   const oakRoute = (() => {
     const spyglassLocation = game.roomOf("spyglass");
     if (spyglassLocation === "inventory" || spyglassLocation === "reliquary") return [];
     if (game.getFlag("oakLightAligned")) {
-      return ["fly fort", "take spyglass", "fly garden"];
+      return ["fly fort", "take all", "fly garden"];
     }
     return OAK_SPYGLASS_ROUTE;
   })();
@@ -374,11 +427,12 @@ export function expandSysopCommand(shortcut, game) {
   })();
   const expanded = shortcut.compoundPrompt
     .replace(/\{\{pathto:([^}]+)\}\}/gi, (_, target) => pathToRoom(game, target).join("; "))
+    .replace(/\{\{flightmushroom\}\}/gi, join(flightMushroomRoute))
     .replace(/\{\{oakspyglass\}\}/gi, join(oakRoute))
     .replace(/\{\{cryptloot\}\}/gi, join(cryptRoute));
   return expanded.split(";").map(shortestCommand).filter((command) => {
     if (!command) return false;
-    const take = /^(?:take|get)\s+(.+)$/i.exec(command);
+    const take = /^(?:take|get|t)\s+(.+)$/i.exec(command);
     if (take && game.find(take[1], game.inventory())) return false;
     const wear = /^(?:wear|don|u)\s+(.+)$/i.exec(command);
     if (wear) {

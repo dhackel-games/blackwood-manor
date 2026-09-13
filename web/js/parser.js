@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
@@ -11,9 +11,10 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
-  take: ["take", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
-  open: ["open", "o", "pry", "force"], close: ["close", "c", "shut"], lock: ["lock"], unlock: ["unlock"],
+  go: ["go", "g", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
+  take: ["take", "t", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
+  open: ["open", "o", "pry", "force"], close: ["close", "c", "shut"],
+  lock: ["lock", "lk"], unlock: ["unlock", "un"],
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
   pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
@@ -27,7 +28,7 @@ const VERBS = {
   pray: ["pray", "perform"],
   sit: ["sit"], use: ["use", "u"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
-  inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
+  inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again"],
   map: ["map", "m", "chart", "floorplan"],
   code: ["code", "combination"],
   yes: ["yes", "y", "yeah", "yep"], no: ["no", "nope", "nah"],
@@ -58,6 +59,7 @@ export function splitCommands(input) {
 export function parse(input) {
   const raw = (input || "").trim().toLowerCase().replace(/\bw\/\s*/g, "with ");
   if (!raw) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
+  if (raw === "g") return { verb: "again", dobj: null, prep: null, iobj: null };
   if (/^[\d\s-]+$/.test(raw) && /\d/.test(raw)) {
     return { verb: "code", dobj: raw, prep: null, iobj: null };
   }

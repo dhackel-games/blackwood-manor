@@ -1,4 +1,4 @@
-# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @walkthrough @mushroom
 Feature: Mushroom vision and flight
@@ -23,7 +23,7 @@ Feature: Mushroom vision and flight
     And the output contains "purple glimmer"
     When I send "eat mushrooms"
     Then the output contains "(look in toilet, get mushrooms, eat mushrooms)"
-    Then the output contains "literal shit and piss"
+    Then the output contains "literal crap and piss"
     And the output contains "actual human waste"
     And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
@@ -66,13 +66,21 @@ Feature: Mushroom vision and flight
     And the player is in room "privy"
     When I send "<command>"
     Then the output contains "(look in toilet"
-    Then the output contains "coated in literal shit and piss"
+    Then the output contains "coated in literal crap and piss"
     And item "outhouseMushrooms" is in "inventory"
 
     Examples:
       | command                         |
       | get mushrooms from toilet       |
       | reach into toilet for mushrooms |
+
+  Scenario: FRESH does not reveal the toilet crop when it describes another item
+    Given a fresh manor game
+    And the player is in room "privy"
+    And item "milk" is carried
+    When I send "use fresh milk"
+    Then flag "outhouseMushroomsFound" is unset
+    And the output does not contain "look in toilet"
 
   Scenario: Dried kitchen mushrooms hint that flight is possible
     Then the output contains "dried kitchen mushrooms"

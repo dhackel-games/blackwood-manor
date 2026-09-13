@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -272,8 +272,8 @@ Feature: Blackwood Manor adventure
   Scenario: Opening a locked door with its key derives unlock then open
     Given the player is in room "porch"
     And item "frontKey" is carried
-    When I send "open door with key"
-    Then the output contains "(unlock door with key, open door)"
+    When I send "o frontd w/iron"
+    Then the output contains "(unlock frontd with iron, open frontd)"
     And item "frontDoor" is open
     And item "frontKey" is destroyed
     And the current room is "porch"

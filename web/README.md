@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
 
 # Blackwood Manor
 
@@ -72,7 +72,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   challenge and intentionally leaves the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
-- **Things:** `take <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
+- **Things:** `take <x>` / `t <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
   `inventory` (`i`). DROP ALL leaves worn equipment equipped.
 - **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
   unworn item can be deposited. PUT auto-opens it; the completed cabinet must

@@ -1,4 +1,4 @@
-# engine.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# engine.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @unit
 Feature: Generic text-adventure engine
@@ -33,6 +33,32 @@ Feature: Generic text-adventure engine
     And item "key" is in "study"
     When I send "south"
     Then the output contains "HALL"
+
+  Scenario Outline: AGAIN repeats the previous command across submissions
+    When I send "take key"
+    And I send "<command>"
+    Then the output contains "already have"
+
+    Examples:
+      | command |
+      | again   |
+      | g       |
+
+  Scenario: AGAIN can begin a later chained submission
+    When I send "take key"
+    And I send "g; look"
+    Then the output contains "> take key"
+    And the output contains "already have"
+    And the output does not contain "Nothing to repeat"
+
+  Scenario: Restoring a snapshot restores its previous command
+    When I send "take key"
+    And I save a game snapshot
+    And I send "north"
+    And I restore that snapshot
+    And I send "g"
+    Then the output contains "already have"
+    And the current room is "hall"
 
   Scenario Outline: Take every reachable portable object
     When I send "<command>"

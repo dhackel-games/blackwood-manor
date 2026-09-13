@@ -1,4 +1,4 @@
-// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 // Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler
@@ -601,7 +601,8 @@ export function createGame(world) {
     };
   }
 
-  const MAX_CHAIN = 128;
+  const MAX_CHAIN = 256;
+  let previousCommand = null;
 
   game.send = (input) => {
     if (state.dead || state.won) {
@@ -625,12 +626,20 @@ export function createGame(world) {
 
     const parts = splitCommands(input);
     if (!parts.length) return "I beg your pardon?";
-    if (parts.length === 1) return runOne(parts[0]).text;
+    if (parts.length === 1) {
+      let part = parts[0];
+      if (/^(again|g)$/i.test(part)) {
+        if (!previousCommand) return "Nothing to repeat.";
+        part = previousCommand;
+      }
+      previousCommand = part;
+      return runOne(part).text;
+    }
 
     const run = parts.slice(0, MAX_CHAIN);
     const out = [];
     let stopped = false;
-    let prev = null;
+    let prev = previousCommand;
     for (let part of run) {
       // AGAIN/G inside a chain repeats the previous command on the same line.
       if (/^(again|g)$/i.test(part)) {
@@ -640,6 +649,7 @@ export function createGame(world) {
       const { text, stop } = runOne(part);
       out.push(`> ${part}\n${text}`);
       prev = part;
+      previousCommand = part;
       if (stop) { stopped = true; break; }
     }
     if (!stopped && parts.length > MAX_CHAIN) {
@@ -649,7 +659,10 @@ export function createGame(world) {
   };
 
   // --- save / restore --------------------------------------------------------
-  game.snapshot = () => ({ state: JSON.parse(JSON.stringify(state)) });
+  game.snapshot = () => ({
+    state: JSON.parse(JSON.stringify(state)),
+    previousCommand,
+  });
   game.restore = (snap) => {
     const c = JSON.parse(JSON.stringify(snap.state));
     const savedItems = c.items;
@@ -657,6 +670,7 @@ export function createGame(world) {
     if (typeof world.migrateState === "function") world.migrateState(c, { savedItems });
     for (const k of Object.keys(state)) delete state[k];
     Object.assign(state, c);
+    previousCommand = typeof snap.previousCommand === "string" ? snap.previousCommand : null;
     return true;
   };
 

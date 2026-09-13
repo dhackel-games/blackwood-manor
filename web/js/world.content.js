@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.071:dhackel.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -442,8 +442,8 @@ export const content = {
       desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
     },
     outhouseMushrooms: {
-      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable shit and piss.",
-      desc: "Fresh, shit-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
+      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable crap and piss.",
+      desc: "Fresh, crap-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
     },
     burrito: {
       roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",

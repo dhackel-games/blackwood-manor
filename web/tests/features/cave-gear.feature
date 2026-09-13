@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -220,6 +220,24 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "use talisman"
     Then item "talisman" is worn in slot "neck"
     And the output contains "(wear talisman)"
+
+  Scenario: U implicitly takes and wears unique visible equipment
+    Given the player is in room "dreadmawVault"
+    When I send "u shoes"
+    Then the output contains "(get shoes, wear shoes)"
+    And item "wingedShoes" is worn in slot "feet"
+
+  Scenario: Wearing the vault shoes first leaves room to take everything else
+    Given item "boneKey" is carried
+    And item "ironKey" is carried
+    And item "candlestick" is carried
+    And item "matches" is carried
+    And item "rope" is carried
+    And the player is in room "dreadmawVault"
+    When I send "u shoes"
+    And I send "t all"
+    Then item "wingedShoes" is worn in slot "feet"
+    And item "familyCrest" is carried
 
   Scenario: Putting into the closed reliquary opens its glass doors first
     Given item "rope" is carried
