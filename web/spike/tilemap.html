@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Blackwood Manor — Chapter 2 tile-map spike</title>
+<style>
+  :root { --bg:#05070a; --panel:#0c1016; --ink:#c9f5d4; --dim:#7c9a86; --line:#1c2733; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Courier New", monospace; }
+  header { padding:14px 16px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0 0 4px; font-size:16px; letter-spacing:1px; }
+  header p { margin:0; color:var(--dim); font-size:12px; max-width:70ch; }
+  .bar { display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+    padding:12px 16px; border-bottom:1px solid var(--line); }
+  label { font-size:12px; color:var(--dim); }
+  select, button { font-family:inherit; font-size:13px; background:var(--panel);
+    color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+  button { cursor:pointer; }
+  .stage { padding:16px; overflow:auto; }
+  canvas { background:#000; border:1px solid var(--line); border-radius:8px;
+    image-rendering: pixelated; display:block; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; padding:10px 16px 4px;
+    font-size:12px; color:var(--dim); }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .sw { width:14px; height:14px; border:1px solid #0008; display:inline-block; }
+  .note { margin:8px 16px 20px; padding:12px 14px; background:var(--panel);
+    border:1px solid var(--line); border-radius:8px; color:var(--dim);
+    font-size:12px; line-height:1.5; max-width:78ch; }
+  .note b { color:var(--ink); }
+  code { color:#8fd3ff; }
+  .hud { display:flex; flex-wrap:wrap; gap:18px; padding:8px 16px; font-size:13px; }
+  .hud b { color:var(--ink); }
+  .msg { color:#ffd479; }
+  .exits { display:flex; flex-wrap:wrap; gap:8px; padding:2px 16px 8px; }
+  .exits:empty { display:none; }
+  .exits button { border-color:#3a5; }
+  canvas { cursor:pointer; }
+</style>
+</head>
+<body>
+<header>
+  <h1>CHAPTER 2 — WALK THE MANOR AS GARY (Phase 1 · playable spike)</h1>
+  <p>You are Gary the ghost. Drift room to room — the manor you once explored in
+  text now <b>develops in 8-bit as you enter each room</b>, while places you
+  haven't visited stay fogged. Arrow keys / WASD or click a lit room to move;
+  take the green <b>stairs</b> buttons to change floors. Still fully isolated
+  under <code>web/spike/</code> — the shipped game and its tests are untouched.</p>
+</header>
+
+<div class="bar">
+  <label>Jump to floor
+    <select id="floor"></select>
+  </label>
+  <label><input type="checkbox" id="reveal" /> reveal all (map view)</label>
+  <label><input type="checkbox" id="labels" checked /> room labels</label>
+  <label>Zoom
+    <select id="zoom">
+      <option value="2">2×</option>
+      <option value="3" selected>3×</option>
+      <option value="4">4×</option>
+    </select>
+  </label>
+  <button id="resetBtn">reset</button>
+  <button id="atlasBtn">load atlas…</button>
+  <input type="file" id="atlasFile" accept="image/png,image/*" hidden />
+</div>
+
+<div class="hud" id="hud"></div>
+<div class="exits" id="exits"></div>
+<div class="legend" id="legend"></div>
+<div class="stage"><canvas id="c" tabindex="0"></canvas></div>
+
+<div class="note">
+  <b>The fun kernel we're testing:</b> re-experiencing familiar rooms in a new
+  form. You saw the Royal Hall, the Cellar, Dreadmaw's cave as ASCII in Chapter
+  1; here they redraw in 8-bit the moment you step in — a fresh view of ground
+  you already know.<br /><br />
+  <b>Next layer (already wired in <code>tilemap.js</code>, not turned on yet):</b>
+  a wandering Guest you manipulate — drop bait and they path toward it
+  (<code>guestStep</code>). We'll switch that on once moving around already feels
+  good on its own.<br /><br />
+  <b>Art:</b> click <b>load atlas…</b> to swap a different Firefly/NanoBanana
+  tileset live (the bundled one loads by default).
+</div>
+
+<script type="module">
+  import {
+    FLOORS, LABELS, TILE, PALETTE, buildTileGrid, drawToCanvas,
+    buildManorGraph, coordsOnFloor, neighborInDirection, crossFloorExits,
+  } from "./tilemap.js";
+
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+  const floorSel = document.getElementById("floor");
+  const revealChk = document.getElementById("reveal");
+  const labelsChk = document.getElementById("labels");
+  const zoom = document.getElementById("zoom");
+  const atlasBtn = document.getElementById("atlasBtn");
+  const atlasFile = document.getElementById("atlasFile");
+  const resetBtn = document.getElementById("resetBtn");
+  const legend = document.getElementById("legend");
+  const hud = document.getElementById("hud");
+  const exitsEl = document.getElementById("exits");
+
+  const TILEPX = 16;
+  const graph = buildManorGraph();
+  let atlas = null;
+  const atlasMap = { [TILE.VOID]:0, [TILE.FLOOR]:1, [TILE.WALL]:2, [TILE.DOOR]:3,
+    [TILE.CORRIDOR]:4, [TILE.FOG]:5, [TILE.STAIR]:6, [TILE.PLAYER]:7 };
+
+  // --- play state -----------------------------------------------------------
+  const START = "grandHall";
+  let gary, seen, steps, msg;
+  function reset() {
+    gary = START; seen = new Set([START]); steps = 0;
+    msg = "You are Gary. Drift through the manor — each room you enter redraws in 8-bit.";
+    render(); canvas.focus();
+  }
+  const floorOf = (id) => graph.home.get(id).floorIndex;
+
+  FLOORS.forEach((f, i) => {
+    const o = document.createElement("option");
+    o.value = String(i); o.textContent = f.title; floorSel.appendChild(o);
+  });
+
+  const LEGEND = [
+    [TILE.FLOOR, "floor"], [TILE.WALL, "wall"], [TILE.DOOR, "door"],
+    [TILE.CORRIDOR, "corridor"], [TILE.STAIR, "stairs"],
+    [TILE.PLAYER, "Gary (you)"], [TILE.FOG, "unexplored"],
+  ];
+  legend.innerHTML = "";
+  for (const [t, name] of LEGEND) {
+    const el = document.createElement("span");
+    el.innerHTML = `<i class="sw" style="background:${PALETTE[t]}"></i>${name}`;
+    legend.appendChild(el);
+  }
+
+  const isSeen = (id) => revealChk.checked || seen.has(id);
+
+  function render() {
+    const fi = floorOf(gary);
+    const floor = FLOORS[fi];
+    const layout = buildTileGrid(floor, { isSeen, playerRoom: gary });
+    drawToCanvas(canvas, layout, {
+      tile: TILEPX, scale: Number(zoom.value),
+      showLabels: labelsChk.checked,
+      atlas, atlasMap: atlas ? atlasMap : null, atlasTile: 32,
+    });
+    drawReachable(layout);
+    floorSel.value = String(fi);
+    renderHud();
+    renderExits(fi);
+  }
+
+  // Dashed green outline on rooms you can step to on this floor.
+  function drawReachable(layout) {
+    ctx.lineWidth = 2; ctx.setLineDash([4, 3]);
+    ctx.strokeStyle = "rgba(73,255,122,0.9)";
+    for (const n of graph.adj.get(gary) || []) {
+      const box = layout.boxes.find((b) => b.id === n.id);
+      if (!box) continue;
+      ctx.strokeRect(box.x*TILEPX+1, box.y*TILEPX+1, box.w*TILEPX-2, box.h*TILEPX-2);
+    }
+    ctx.setLineDash([]);
+  }
+
+  function renderHud() {
+    const here = graph.home.get(gary).label;
+    hud.innerHTML =
+      `<span>📍 <b>${here}</b></span>` +
+      `<span>🗺️ explored <b>${seen.size}</b>/${graph.home.size}</span>` +
+      `<span>👣 steps <b>${steps}</b></span>` +
+      `<span class="msg">${msg}</span>`;
+  }
+
+  function renderExits(fi) {
+    exitsEl.innerHTML = "";
+    for (const ex of crossFloorExits(graph, fi, gary)) {
+      const label = ex.note ? `${ex.note.toUpperCase()} → ${ex.label}` : `→ ${ex.label}`;
+      const b = document.createElement("button");
+      b.textContent = `🪜 ${label}`;
+      b.onclick = () => moveTo(ex.id, ex.label);
+      exitsEl.appendChild(b);
+    }
+  }
+
+  function moveTo(id, label) {
+    const first = !seen.has(id);
+    gary = id; seen.add(id); steps++;
+    const name = label || graph.home.get(id).label;
+    msg = first ? `You seep into ${name} for the first time…` : `You drift into ${name}.`;
+    render(); canvas.focus();
+  }
+
+  // Keyboard: arrows / WASD move to the best-matching room on this floor.
+  const DIRS = {
+    ArrowUp:[0,-1], KeyW:[0,-1], ArrowDown:[0,1], KeyS:[0,1],
+    ArrowLeft:[-1,0], KeyA:[-1,0], ArrowRight:[1,0], KeyD:[1,0],
+  };
+  window.addEventListener("keydown", (e) => {
+    const d = DIRS[e.code];
+    if (!d) return;
+    e.preventDefault();
+    const id = neighborInDirection(graph, floorOf(gary), gary, d[0], d[1]);
+    if (id) moveTo(id);
+  });
+
+  // Click a lit, reachable room to move there.
+  canvas.addEventListener("click", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scale = Number(zoom.value);
+    const tx = (e.clientX - rect.left) / scale / TILEPX;
+    const ty = (e.clientY - rect.top) / scale / TILEPX;
+    const fi = floorOf(gary);
+    for (const n of graph.adj.get(gary) || []) {
+      const c = coordsOnFloor(fi, n.id);
+      if (!c) continue;
+      const box = buildTileGrid(FLOORS[fi], { isSeen, playerRoom: gary })
+        .boxes.find((b) => b.id === n.id);
+      if (box && tx >= box.x && tx < box.x+box.w && ty >= box.y && ty < box.y+box.h) {
+        moveTo(n.id); return;
+      }
+    }
+  });
+
+  floorSel.addEventListener("change", () => {
+    const start = FLOORS[Number(floorSel.value)].start;
+    moveTo(start);
+  });
+  [revealChk, labelsChk, zoom].forEach((el) => el.addEventListener("input", render));
+  resetBtn.addEventListener("click", reset);
+
+  atlasBtn.addEventListener("click", () => atlasFile.click());
+  atlasFile.addEventListener("change", () => {
+    const file = atlasFile.files[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = () => { atlas = img; render(); };
+    img.src = URL.createObjectURL(file);
+  });
+
+  reset();
+
+  // Auto-load the bundled NanoBanana atlas so real art shows by default.
+  (() => {
+    const img = new Image();
+    img.onload = () => { atlas = img; render(); };
+    img.onerror = () => {};
+    img.src = "./atlas.png";
+  })();
+</script>
+</body>
+</html>
