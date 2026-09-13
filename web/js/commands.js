@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -113,6 +113,12 @@ unlock <thing> with <key> | Unlock / Unlock something with a matching key.
 verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z) | Wait / Let one turn pass.
+
+TOUCH CONTROLS
+The on-screen buttons mirror typed commands.
+Compass pad: the eight arrows are compass directions - up-left northwest, up north, up-right northeast, left west, right east, down-left southwest, down south, down-right southeast. The center star is decorative.
+Up/down column: the two chevrons are UP and DOWN; the two door icons are IN and OUT.
+Verbs: Look inspects the room; Take, Use, and Say fill the input box so you can type a target; Inv lists inventory; Map shows Gary's map; Call rings Gary; ? opens this help; the beetle reports a bug.
 
 CHAINING
 Separate commands with ".", ";", ",", or THEN.

@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -96,7 +96,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
 
 export const ROOM_SHORT_NAMES = Object.freeze({
   gate: "gate",
-  garden: "gdn",
+  garden: "garden",
   hedgeMazeGate: "yewgate",
   hedgeMazeKnot: "thornknot",
   hedgeMazeLoop: "loop",

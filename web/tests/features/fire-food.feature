@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 
 @walkthrough
 Feature: Fire and food consequences

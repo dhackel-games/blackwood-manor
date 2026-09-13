@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven. -->
 
 # Blackwood Manor
 
@@ -112,7 +112,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
 - **One-word targeting:** every room and item has a globally unique canonical
-  one-word name (for example `gdn`, `grandbr`, `ravenblood`, and `dreadvault`).
+  one-word name (for example `frontd`, `grandbr`, `ravenblood`, and `dreadvault`).
   Existing full names remain accepted, while generated SYSOP MENU (`::`) routes use the
   compact forms so command and bug histories stay readable.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.

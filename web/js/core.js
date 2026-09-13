@@ -1,4 +1,4 @@
-// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler

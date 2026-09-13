@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.

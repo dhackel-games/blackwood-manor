@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -129,7 +129,7 @@ const QUICK_COLLECTION = [
   "fly kitchen",
   "take matches",
   "light candle",
-  "fly gdn",
+  "fly garden",
   "{{oakspyglass}}",
   "down",
   "take ancient",
@@ -223,7 +223,7 @@ const MAX_COLLECTION = [
   "eat burrito",
   "drink milk",
   "take matches",
-  "fly gdn",
+  "fly garden",
   "down",
   "take ancient",
   "light self with match",
@@ -363,7 +363,7 @@ export function expandSysopCommand(shortcut, game) {
     const spyglassLocation = game.roomOf("spyglass");
     if (spyglassLocation === "inventory" || spyglassLocation === "reliquary") return [];
     if (game.getFlag("oakLightAligned")) {
-      return ["fly fort", "take spyglass", "fly gdn"];
+      return ["fly fort", "take spyglass", "fly garden"];
     }
     return OAK_SPYGLASS_ROUTE;
   })();

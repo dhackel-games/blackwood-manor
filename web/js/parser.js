@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 

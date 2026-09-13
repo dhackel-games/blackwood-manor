@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 ```
 
 ---

@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 
 @unit
 Feature: Player command parsing
