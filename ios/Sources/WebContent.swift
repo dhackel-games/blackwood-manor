@@ -1,4 +1,4 @@
-// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 
 import Foundation
 import WebKit
@@ -239,9 +239,24 @@ final class WebContentStore {
 
 final class WebContentUpdater {
     enum UpdateResult: Equatable { case upToDate, updated(label: String), failed }
+
+    // IMPORTANT: Blackwood has three independent version identities.
+    //
+    // 1. INSTALLED APP: CFBundleShortVersionString + CFBundleVersion from the
+    //    installed iOS app's Info.plist. GameViewController owns and reports
+    //    these values. Downloaded web content must NEVER replace them.
+    // 2. LOCAL CONTENT: the CONTENT_VERSION of the web tree actually selected
+    //    by the existing bundle-versus-persistent-cache winner logic. This may
+    //    legitimately be newer than the installed app's bundled web content.
+    // 3. CONTENT SOURCE: the CONTENT_VERSION currently published remotely.
+    //    It is nil when the source cannot be reached.
+    //
+    // manifest.json is compared separately to offer an installed-app update.
+    // It does not select local content and must not be substituted for any of
+    // these values.
     struct VersionLabels: Equatable {
-        let current: String
-        let remote: String?
+        let contentLocal: String
+        let contentSource: String?
     }
 
     private let store: WebContentStore
@@ -297,12 +312,12 @@ final class WebContentUpdater {
     }
 
     func versionLabels(completion: @escaping (VersionLabels) -> Void) {
-        let currentRelease = store.cacheRelease ?? store.bundleRelease
-        let current = currentRelease.map { String($0.contentVersion) } ?? "unknown"
+        let releaseLocal = store.cacheRelease ?? store.bundleRelease
+        let contentLocal = releaseLocal.map { String($0.contentVersion) } ?? "unknown"
         fetchRemoteRelease { remote, _ in
             completion(VersionLabels(
-                current: current,
-                remote: remote.map { String($0.contentVersion) }))
+                contentLocal: contentLocal,
+                contentSource: remote.map { String($0.contentVersion) }))
         }
     }
 

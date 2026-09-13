@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -53,8 +53,10 @@ const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
-let localContentVersion = CONTENT_VERSION;
-let sourceContentVersion = null;
+const appInstalledVersion = window.__appInstalledVersion || null;
+const appInstalledBuild = window.__appInstalledBuild || null;
+let contentLocal = CONTENT_VERSION;
+let contentSource = null;
 let introBannerElement = null;
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
@@ -580,17 +582,17 @@ function printContentStatus(message) {
   if (game.state.flags.onCall) printToPhone(message, "sys");
   else print(message, "sys");
 }
-window.__contentVersions = (current, remote) => {
-  setContentVersions(current, remote);
-  const status = iosVersionText(current, remote);
+window.__contentVersions = (contentLocalValue, contentSourceValue) => {
+  setContentVersions(contentLocalValue, contentSourceValue);
+  const status = iosVersionText(contentLocalValue, contentSourceValue);
   refreshIntroBanner();
   printContentStatus(status);
 };
 // Launch handshake companion to __contentVersions: refresh only the intro's
 // "Source" field to the live remote content version (or leave "Unavailable" when
 // offline) WITHOUT printing the version line into the transcript.
-window.__contentBanner = (current, remote) => {
-  setContentVersions(current, remote);
+window.__contentBanner = (contentLocalValue, contentSourceValue) => {
+  setContentVersions(contentLocalValue, contentSourceValue);
   refreshIntroBanner();
 };
 window.__contentRefreshFailed = (message) => {
@@ -1019,19 +1021,22 @@ export function modelStatusText() {
 
 export function versionText() {
   return nativeContent
-    ? iosVersionText(localContentVersion, sourceContentVersion)
+    ? iosVersionText(contentLocal, contentSource)
     : `${COPYRIGHT} Web ${APP_VERSION} (Build ${BUILD}). ` +
       `Content: Version ${CONTENT_VERSION}. Continuous updates.`;
 }
 
-function iosVersionText(local, source) {
-  return `${COPYRIGHT} iOS ${APP_VERSION} (Build ${BUILD}). ` +
-    `Content: Local ${local || CONTENT_VERSION}. Source ${source || "Unavailable"}.`;
+function iosVersionText(contentLocalValue, contentSourceValue) {
+  const appIdentity = appInstalledVersion && appInstalledBuild
+    ? `iOS ${appInstalledVersion} (Build ${appInstalledBuild}).`
+    : "iOS App Unavailable.";
+  return `${COPYRIGHT} ${appIdentity} ` +
+    `Content: Local ${contentLocalValue || CONTENT_VERSION}. Source ${contentSourceValue || "Unavailable"}.`;
 }
 
-function setContentVersions(local, source) {
-  localContentVersion = local || CONTENT_VERSION;
-  sourceContentVersion = source || null;
+function setContentVersions(contentLocalValue, contentSourceValue) {
+  contentLocal = contentLocalValue || CONTENT_VERSION;
+  contentSource = contentSourceValue || null;
 }
 
 function refreshIntroBanner() {

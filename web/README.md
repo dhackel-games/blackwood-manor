@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven. -->
 
 # Blackwood Manor
 
@@ -104,9 +104,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   DREADMAW'S VAULT.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
   `reload`/`refresh`,
-  `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION compares the
-  bundled, cached, and GitHub.io `CONTENT_VERSION` values from `version.js`;
-  RELOAD puts the greatest version into persistent cache. A changed
+  `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION reports the
+  installed native app identity separately from the local selected content and
+  remote content source; RELOAD still puts the greatest content version into
+  persistent cache. A changed
   `manifest.json` independently offers an iOS app update through TestFlight.
   VERSION prints the numeric content version and browser continuous-update
   status, or the iOS local-cache and content-source versions.

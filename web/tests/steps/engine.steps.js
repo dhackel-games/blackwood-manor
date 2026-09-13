@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.077:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -718,13 +718,18 @@ Then("Version reports local and source content through the native bridge", funct
   assert.match(ui, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
   assert.match(ui, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
   assert.match(ui, /const message = versionText\(\)/);
-  assert.match(ui, /`\$\{COPYRIGHT\} iOS \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
-  assert.match(ui, /Content: Local \$\{local \|\| CONTENT_VERSION\}\. Source \$\{source \|\| "Unavailable"\}\./);
+  assert.match(ui, /`iOS \$\{appInstalledVersion\} \(Build \$\{appInstalledBuild\}\)\.`/);
+  assert.match(ui, /"iOS App Unavailable\."/);
+  assert.match(ui, /Content: Local \$\{contentLocalValue \|\| CONTENT_VERSION\}\. Source \$\{contentSourceValue \|\| "Unavailable"\}\./);
   assert.doesNotMatch(ui, /running in browser \(no self-update layer\)|GitHub\.io version: unavailable/);
   assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
   assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
-  assert.match(app, /window\.__activeBuildLabel =/);
-  assert.match(updater, /func versionLabels\(completion:[\s\S]*fetchRemoteRelease/);
+  assert.match(app, /CFBundleShortVersionString/);
+  assert.match(app, /CFBundleVersion/);
+  assert.match(app, /window\.__appInstalledVersion/);
+  assert.match(app, /values:\s*\[\s*labels\.contentLocal,\s*labels\.contentSource/s);
+  assert.match(updater,
+    /func versionLabels\(completion:[\s\S]*store\.cacheRelease \?\? store\.bundleRelease[\s\S]*fetchRemoteRelease/);
   assert.match(updater, /appendingPathComponent\("js\/version\.js"\)/);
 });
 
@@ -736,7 +741,7 @@ Then("the iOS launch banner reports the live content source without a transcript
   // On boot the web layer asks the native side for the real remote source version.
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version-banner" \}\)/);
   // The banner-only callback rewrites the existing intro without printing a new line.
-  assert.match(ui, /window\.__contentBanner = \(current, remote\) => \{[\s\S]*setContentVersions\(current, remote\);[\s\S]*refreshIntroBanner\(\);[\s\S]*\};/);
+  assert.match(ui, /window\.__contentBanner = \(contentLocalValue, contentSourceValue\) => \{[\s\S]*setContentVersions\(contentLocalValue, contentSourceValue\);[\s\S]*refreshIntroBanner\(\);[\s\S]*\};/);
   assert.match(ui, /introBannerElement = print\(bannerText\(\), "banner"\)/);
   assert.doesNotMatch(html, /id=["']hud-version["']/);
   assert.doesNotMatch(css, /#hud #hud-version/);
