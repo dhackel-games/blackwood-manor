@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -8,6 +8,7 @@ Feature: Build metadata and touch-control contract
   Scenario: Copyright-version and package date identify the build
     Then the copyright-version is exact
     And the package version is the release date
+    And the large title art has aligned top strokes
 
   Scenario: Touch controls cannot enter a hidden layout state
     Then the touch UI has no control-hiding typing state
@@ -75,7 +76,8 @@ Feature: Build metadata and touch-control contract
   Scenario: Movement controls form a compact arrow rose beside two action rows
     Then the movement controls form an eight-arrow compass around a center star
     And Up, Down, In, and Out use compact directional glyphs
-    And phone movement controls are twenty-five percent larger without widening actions
+    And touch-capable movement controls are twenty-five percent larger without widening actions
+    And the navigation size selector controls sizes one through three
     And action shortcuts occupy two equally wide rows beside movement
 
   Scenario Outline: Every movement direction has a touch button

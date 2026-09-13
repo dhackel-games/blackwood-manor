@@ -1,4 +1,4 @@
-<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven. -->
+<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -56,20 +56,31 @@
           </button>
         </div>
       </div>
-      <div class="verbs">
-        <div class="verb-row">
-          <button data-cmd="look">Look</button>
-          <button data-prefill="take ">Take</button>
-          <button data-prefill="use ">Use</button>
-          <button data-prefill="say ">Say</button>
+      <div class="action-controls">
+        <div class="verbs">
+          <div class="verb-row">
+            <button data-cmd="look">Look</button>
+            <button data-prefill="take ">Take</button>
+            <button data-prefill="use ">Use</button>
+            <button data-prefill="say ">Say</button>
+          </div>
+          <div class="verb-row">
+            <button data-cmd="inventory">Inv</button>
+            <button data-cmd="map">Map</button>
+            <button data-cmd="call">Call</button>
+            <button class="compact-action" data-cmd="help" aria-label="help">?</button>
+            <button class="compact-action" id="bug-report" type="button"
+                    aria-label="report a bug on GitHub">🪲</button>
+          </div>
         </div>
-        <div class="verb-row">
-          <button data-cmd="inventory">Inv</button>
-          <button data-cmd="map">Map</button>
-          <button data-cmd="call">Call</button>
-          <button class="compact-action" data-cmd="help" aria-label="help">?</button>
-          <button class="compact-action" id="bug-report" type="button"
-                  aria-label="report a bug on GitHub">🪲</button>
+        <div id="nav-size-picker" class="nav-size-picker" role="radiogroup"
+             aria-label="navigation button size">
+          <button type="button" data-nav-size="3" aria-label="large navigation buttons"
+                  title="Large navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
+          <button type="button" data-nav-size="2" aria-label="medium navigation buttons"
+                  title="Medium navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
+          <button type="button" data-nav-size="1" aria-label="small navigation buttons"
+                  title="Small navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
         </div>
       </div>
     </div>
