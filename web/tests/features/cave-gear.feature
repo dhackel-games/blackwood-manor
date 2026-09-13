@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -80,7 +80,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the inventory load is 0
     When the player moves directly to room "grandHall"
     And I send "put ring in reliquary"
-    Then the output contains "Remove the bloodsignet"
+    Then the output contains "Remove the ravenblood signet"
     And item "rubyRing" is worn in slot "finger"
 
   Scenario: Only one item can occupy an equipment slot

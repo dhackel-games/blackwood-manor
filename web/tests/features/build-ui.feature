@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -102,7 +102,7 @@ Feature: Build metadata and touch-control contract
     And the TestFlight release replaces its repository-local build folder
 
   Scenario: iOS compares persistent and remote numeric web-content versions
-    Then Version reports cached and GitHub.io content through the native bridge
+    Then Version reports local and source content through the native bridge
     And Reload seeds the local cache and refreshes differing GitHub.io content
     And a changed app manifest offers an iOS update
 

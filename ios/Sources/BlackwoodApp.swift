@@ -1,4 +1,4 @@
-// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 import SwiftUI
 import WebKit
@@ -158,10 +158,10 @@ final class GameViewController: UIViewController, WKUIDelegate {
                     self.activateDownloadedContent(from: fromLabel, to: toLabel)
                 case .upToDate:
                     self.reloadCachedContent(
-                        message: "Cached content matches GitHub.io and has been reloaded.")
+                        message: "Local content matches the content source and has been reloaded.")
                 case .failed:
                     self.reloadCachedContent(
-                        message: "GitHub.io is unavailable; running the persistent local cache.")
+                        message: "Content source unavailable; running the persistent iOS cache.")
                 }
             }
         default:

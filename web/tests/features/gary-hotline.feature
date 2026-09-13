@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -8,7 +8,7 @@ Feature: Gary's hint line
   Background:
     Given a fresh manor game
 
-  Scenario: Gary identifies the newly required backwards watch
+  Scenario: Gary identifies the newly required Woodblack Watch
     Given flag "frontDoorOpen" is set
     And item "candlestick" is carried
     And item "matches" is carried
@@ -17,7 +17,7 @@ Feature: Gary's hint line
     When I send "call"
     Then the output contains "NURSERY"
     And the output contains "WALLPAPER"
-    And the output contains "BACKWARDS WATCH"
+    And the output contains "WOODBLACK WATCH"
 
   Scenario: Call Gary, converse, hang up, and resume play
     When I send "call"

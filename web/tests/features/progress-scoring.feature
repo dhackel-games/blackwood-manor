@@ -1,4 +1,4 @@
-# progress-scoring.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# progress-scoring.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @unit
 Feature: One-time rewards for meaningful progress
@@ -106,7 +106,7 @@ Feature: One-time rewards for meaningful progress
     Then the current room is "betweenWalls"
     And the output contains "(+20)"
     And the game score is 25
-    When I send "take watch"
+    When I send "take woodblack"
     Then the game score is 25
 
   Scenario: Passing the wraith with the talisman awards once

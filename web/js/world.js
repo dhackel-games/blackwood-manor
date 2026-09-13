@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -80,7 +80,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   musicBox: "musicbox",
   tinyKey: "tiny",
   jewelryBox: "jewelry",
-  rubyRing: "bloodsignet",
+  rubyRing: "ravenblood",
   wraith: "wraith",
   goldLocket: "locket",
   cord: "cord",
@@ -91,7 +91,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   secretDoor: "secret",
   spirit: "matriarch",
   silverMirror: "silver",
-  backwardsWatch: "watch",
+  backwardsWatch: "woodblack",
 });
 
 export const ROOM_SHORT_NAMES = Object.freeze({
@@ -528,7 +528,7 @@ function nextHint(ctx) {
     return "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
   }
   if (!dep("rubyRing")) {
-    return "The BLACKWOOD BLOODSIGNET is locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
+    return "The RAVENBLOOD SIGNET is locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
   }
   if (!dep("musicBox")) {
     return "Don't leave the JEWELED MUSIC BOX behind — the box ITSELF is a Blackwood heirloom, not just the tiny key's shell. Once you've got the tiny key out, TAKE the music box and PUT it in the RELIQUARY too.";
@@ -584,13 +584,13 @@ function nextHint(ctx) {
   if (!dep("backwardsWatch")) {
     if (!ctx.getFlag("wallGapFound")) {
       return "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER, go IN, and TAKE the " +
-        "BACKWARDS WATCH bearing a Blackwood family inscription.";
+        "WOODBLACK WATCH bearing a Blackwood family inscription.";
     }
     if (ctx.roomOf("backwardsWatch") === "betweenWalls") {
-      return "Go IN through the NURSERY wall-gap and TAKE the BACKWARDS WATCH. The inscription on its back " +
+      return "Go IN through the NURSERY wall-gap and TAKE the WOODBLACK WATCH. The inscription on its back " +
         "makes it a family heirloom, however badly time behaves around it.";
     }
-    return "The BACKWARDS WATCH is a Blackwood heirloom now, not pocket clutter. PUT WATCH IN RELIQUARY.";
+    return "The WOODBLACK WATCH is a Blackwood heirloom, not pocket clutter. PUT WOODBLACK IN TROPHY CASE.";
   }
   if (!allTreasuresDeposited(ctx)) {
     return "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets.";
@@ -3604,7 +3604,7 @@ export const world = {
         "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
       searchDesc:
         "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a BLACKWOOD BLOODSIGNET inside the locked JEWELRY BOX.",
+      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD SIGNET inside the locked JEWELRY BOX.",
       exits: { west: "landing" },
     },
 
@@ -3780,10 +3780,10 @@ export const world = {
       desc:
         "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
         "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
-        "and a tarnished BACKWARDS WATCH ticks, counter-clockwise, from a bent nail. There is no proper door here — " +
+        "and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — " +
         "only the cramped gap OUT.",
       searchDesc:
-        "Whoever built this space built it to be forgotten. The BACKWARDS WATCH is the only thing in it that " +
+        "Whoever built this space built it to be forgotten. The WOODBLACK WATCH is the only thing in it that " +
         "isn't dust.",
       exits: { out: "grandHall" },
     },
@@ -3792,7 +3792,7 @@ export const world = {
   items: {
     // --- reliquary & bell (royal hall) ---
     reliquary: {
-      names: ["reliquary", "cabinet"], adjectives: ["glass", "glass-fronted", "heirloom"],
+      names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
       loc: "grandHall", fixed: true, container: true, capacity: 20,
       openable: true, open: false, autoOpenOnAccess: true, locksTreasures: true,
       desc: `A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold ` +
@@ -4287,7 +4287,7 @@ export const world = {
       desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
     },
 
-    // --- grand bedroom jewelry box -> Blackwood Bloodsignet ---
+    // --- grand bedroom jewelry box -> Ravenblood Signet ---
     jewelryBox: {
       names: ["jewelry box", "jewellery box", "jewelry", "box", "casket"], adjectives: ["walnut", "dark"],
       loc: "masterBedroom", fixed: true, container: true, openable: true, open: false, locked: true,
@@ -4300,15 +4300,15 @@ export const world = {
           if (box.open) return "The jewelry box is already open.";
           box.open = true;
           const points = awardProgress(ctx, "jewelryBoxOpened");
-          return "You open the JEWELRY BOX, revealing a BLACKWOOD BLOODSIGNET." + awardSuffix(points);
+          return "You open the JEWELRY BOX, revealing a RAVENBLOOD SIGNET." + awardSuffix(points);
         },
       },
     },
     rubyRing: {
-      names: ["bloodsignet", "signet", "ring"],
-      adjectives: ["ruby", "red", "blackwood", "blood"], loc: "jewelryBox", takeable: true,
+      names: ["ravenblood signet", "signet", "ring", "ravenblood"],
+      adjectives: ["ravenblood", "ruby", "red", "blackwood", "blood"], loc: "jewelryBox", takeable: true,
       treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
-      desc: "The BLACKWOOD BLOODSIGNET: a heavy gold ring set with a ruby like a suspended drop of blood. " +
+      desc: "The RAVENBLOOD SIGNET: a heavy gold ring set with a dark red garnet like a suspended drop of blood. " +
         "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
     },
 
@@ -4394,18 +4394,27 @@ export const world = {
 
     // --- the only thing in the space between the walls ---
     backwardsWatch: {
-      names: ["watch", "pocket watch"], adjectives: ["backwards", "tarnished", "brass"],
+      names: ["woodblack watch", "woodblack", "watch", "pocket watch"],
+      adjectives: ["tarnished", "woodblack", "backwards", "brass"],
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
       depositScoreFlag: "heirloomScore:backwardsWatch",
-      roomDesc: "A tarnished BACKWARDS WATCH hangs from a bent nail, its hands sweeping the wrong way.",
-      desc: "A brass pocket watch, badly tarnished, ticking backwards at a perfectly ordinary speed. It has " +
-        "clearly been here since before there was a \"here.\" On the back, a family inscription reads: " +
-        "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+      roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
+      desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
+        "On the back, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+      on: { examine: inspectWoodblackWatch, read: inspectWoodblackWatch },
     },
   },
 };
 
 // ---- handler function definitions referenced above --------------------------
+function inspectWoodblackWatch(ctx) {
+  const remaining = Math.max(0, REQUIRED_FAMILY_ITEM_COUNT - depositedFamilyItemCount(ctx));
+  const heirlooms = remaining === 1 ? "heirloom remains" : "heirlooms remain";
+  return "The WOODBLACK WATCH has no hands and marks no hour. Its face shows only the number " +
+    `${remaining}: ${remaining} ${heirlooms} to place in the RELIQUARY TROPHY CASE. On the back, ` +
+    "a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"";
+}
+
 function revealKey(ctx) {
   if (ctx.getFlag("statueMoved")) return "You have already taken what was hidden here.";
   ctx.setFlag("statueMoved");

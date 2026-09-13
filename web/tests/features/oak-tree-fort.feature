@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -200,7 +200,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
   Scenario: A claimed legacy watch does not score again when deposited
     Given an in-progress pre-watch save with the watch already claimed is restored
     And the player is in room "grandHall"
-    When I send "put watch in reliquary"
+    When I send "put woodblack in reliquary"
     Then item "backwardsWatch" is in "reliquary"
     And the game score is 12
 

@@ -1,4 +1,4 @@
-// cheat-prompts.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// cheat-prompts.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -137,7 +137,7 @@ const QUICK_COLLECTION = [
   "fly nursery",
   "pull wallpaper",
   "in",
-  "take watch",
+  "take woodblack",
   "out",
   "fly nursery",
   "open musicbox",
@@ -146,7 +146,7 @@ const QUICK_COLLECTION = [
   "fly grand",
   "unlock jewelry with tiny",
   "open jewelry",
-  "take bloodsignet",
+  "take ravenblood",
   "fly parlor",
   "move profile",
   "open safe with 7 3 9",
@@ -166,13 +166,13 @@ const REQUIRED_DEPOSITS = [
   "put candlestick in reliquary",
   "put grimoire in reliquary",
   "put musicbox in reliquary",
-  "put bloodsignet in reliquary",
+  "put ravenblood in reliquary",
   "put locket in reliquary",
   "put talisman in reliquary",
   "put ancient in reliquary",
   "put decanter in reliquary",
   "put ancestral in reliquary",
-  "put watch in reliquary",
+  "put woodblack in reliquary",
 ];
 
 const DAWN_ENDING = [
@@ -249,7 +249,7 @@ const MAX_COLLECTION = [
   "fly nursery",
   "pull wallpaper",
   "in",
-  "take watch",
+  "take woodblack",
   "out",
   "fly nursery",
   "open musicbox",
@@ -258,7 +258,7 @@ const MAX_COLLECTION = [
   "fly grand",
   "unlock jewelry with tiny",
   "open jewelry",
-  "take bloodsignet",
+  "take ravenblood",
   "{{cryptloot}}",
   "fly wine",
   "take decanter",
