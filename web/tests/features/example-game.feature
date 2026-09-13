@@ -38,3 +38,27 @@ Feature: Reusable engine runs a non-Blackwood game
     And I send "down"
     Then the current room is "shaft"
     And the output does not contain "grue"
+
+  Scenario: The achievements table awards points declaratively as you progress
+    Given the example spaceport game
+    When I send "take keycard"
+    Then the output contains "[+5] Salvage"
+    And the game score is 5
+    When I send "north"
+    And I send "north"
+    Then the current room is "bridge"
+    And the output contains "[+10] Navigator"
+    And the game score is 15
+    When I send "use pod"
+    Then the game is won
+    And the output contains "[+25] Escapee"
+    And the game score is 40
+
+  Scenario: An achievement fires at most once
+    Given the example spaceport game
+    When I send "take keycard"
+    Then the game score is 5
+    When I send "drop keycard"
+    And I send "take keycard"
+    Then the game score is 5
+    And the output does not contain "[+5] Salvage"

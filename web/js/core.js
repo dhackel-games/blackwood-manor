@@ -506,6 +506,31 @@ export function createGame(world) {
   // --- main loop -------------------------------------------------------------
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
+  // --- achievements (generic, data-driven) -----------------------------------
+  // A game may declare world.achievements: an array of
+  //   { id, points?, title?, message?, when(game) => boolean }
+  // Each fires at most once, the first turn its `when` predicate is true, adding
+  // `points` to the score and surfacing `message` (or "[+N] title"). This
+  // replaces scattered, hand-wired award calls with one declarative table.
+  // Games without an achievements table are entirely unaffected.
+  function checkAchievements() {
+    const defs = world.achievements;
+    if (!Array.isArray(defs) || defs.length === 0) return "";
+    if (!state.achieved) state.achieved = {};
+    const notices = [];
+    for (const a of defs) {
+      if (!a || !a.id || state.achieved[a.id]) continue;
+      let hit = false;
+      try { hit = !!a.when(game); } catch { hit = false; }
+      if (!hit) continue;
+      state.achieved[a.id] = true;
+      if (typeof a.points === "number" && a.points) state.score = (state.score || 0) + a.points;
+      if (a.message) notices.push(a.message);
+      else if (a.points) notices.push(`[+${a.points}] ${a.title || a.id}`);
+    }
+    return notices.join("\n");
+  }
+
   function runOne(input) {
     darkWarningRendered = false;
     let cmd = parse(input);
@@ -552,6 +577,8 @@ export function createGame(world) {
       text = r == null ? "You can't do that." : r;
     }
     if (!state.dead && !state.won) tick();
+    const achievementNotice = checkAchievements();
+    if (achievementNotice) text += "\n\n" + achievementNotice;
     deferStatusBanner = false;
     if (derivedSteps.length) {
       let finalStep = executionLabel;

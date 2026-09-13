@@ -68,10 +68,13 @@ Handler `ctx` API (see `js/world.js` header for the full list): `ctx.has(id)`,
 
 ## Generalization backlog (engine still leaks a little content)
 
-These are the concrete blockers to a fully game-neutral engine, found while
-building this example. Each is a small, backward-compatible follow-up:
+See **`ENGINE-DESIGN.md`** for the full simplification backlog (data-table
+refactors that turn this into a genre-neutral engine). Quick status:
 
 - **Win banner** — ✅ done: `config.winBanner` (defaults to Blackwood's line).
+- **Achievements/scoring** — ✅ engine support done: declare `world.achievements`
+  (`[{ id, points, message?, when(game)=>bool }]`); see this example's world and
+  `core.js` `checkAchievements`. A game without the table is unaffected.
 - **Directions** — `parser.js` only knows compass + up/down/in/out; custom
   directions (e.g. fore/aft) aren't parsed. Make the direction vocabulary
   config-driven.

@@ -73,12 +73,42 @@ export const world = {
         // ctx.win(...) ends the game. This is the ONLY bespoke logic in the game.
         use(ctx) {
           if (!ctx.has("keycard")) return "The reader blinks red. It needs a keycard.";
-          ctx.addScore(5);
           return ctx.win("You slot the blue keycard. The pod's clamps release and it fires clear.");
         },
       },
     },
   },
+
+  // achievements: a declarative award table (see core.js checkAchievements).
+  // Each fires once, the first turn its predicate is true, adding points and a
+  // one-line notice — no award calls sprinkled through the handlers above. This
+  // is the engine-wide replacement for scattered awardProgress(...) bookkeeping.
+  achievements: [
+    {
+      id: "salvage",
+      points: 5,
+      message: "[+5] Salvage: you pocketed the crew keycard.",
+      when: (g) => g.has("keycard"),
+    },
+    {
+      id: "navigator",
+      points: 10,
+      message: "[+10] Navigator: you reached the bridge.",
+      when: (g) => g.state.room === "bridge",
+    },
+    {
+      id: "spelunker",
+      points: 5,
+      message: "[+5] Spelunker: you survived the maintenance shaft.",
+      when: (g) => g.state.room === "shaft",
+    },
+    {
+      id: "escapee",
+      points: 25,
+      message: "[+25] Escapee: you launched the pod.",
+      when: (g) => g.state.won === true,
+    },
+  ],
 };
 
 export default world;
