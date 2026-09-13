@@ -1,4 +1,4 @@
-<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. -->
+<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -91,7 +91,11 @@
       <input id="cmd" autocomplete="off" autocapitalize="off"
              autocorrect="off" spellcheck="false" enterkeyhint="send"
              placeholder="type command / tap button" aria-label="command input" />
-      <button id="go" class="entry-submit" aria-label="submit command"><span aria-hidden="true">↑</span></button>
+      <button id="go" class="entry-submit" aria-label="submit command">
+        <svg class="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2 3 12h5v10h8V12h5L12 2z"></path>
+        </svg>
+      </button>
     </div>
   </div>
 
@@ -128,7 +132,11 @@
         <button id="phone-mic" class="iconbtn" aria-label="speak to Gary" hidden>&#127908;</button>
         <input id="phone-cmd" autocomplete="off" autocapitalize="off" autocorrect="off"
                spellcheck="false" enterkeyhint="send" placeholder="say something to Gary…" aria-label="say to Gary" />
-        <button id="phone-go" class="entry-submit" aria-label="send to Gary"><span aria-hidden="true">↑</span></button>
+        <button id="phone-go" class="entry-submit" aria-label="send to Gary">
+          <svg class="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2 3 12h5v10h8V12h5L12 2z"></path>
+          </svg>
+        </button>
       </div>
       <button id="phone-end"><span>END CALL</span></button>
     </div>

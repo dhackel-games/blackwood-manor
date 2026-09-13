@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -552,12 +552,16 @@ Then("overlong bug histories preserve both ends and mark the omission", function
   assert.match(formatted, /command-999$/);
 });
 
-Then("both send arrows are visually doubled and bold without resizing their buttons", function () {
+Then("both submit controls use the same extra-thick SVG arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
-  assert.match(html, /<button[^>]+id=["']go["'][^>]+aria-label=["']submit command["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
-  assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
-  assert.match(css, /\.entry-submit span\s*\{[^}]*font-weight:\s*900[^}]*transform:\s*scale\(2\)/s);
+  const arrows = [...html.matchAll(
+    /<svg class=["']submit-arrow["'] viewBox=["']0 0 24 24["'][^>]*>\s*<path d=["']M12 2 3 12h5v10h8V12h5L12 2z["']><\/path>\s*<\/svg>/g)];
+  assert.equal(arrows.length, 2);
+  assert.match(html, /id=["']go["'][^>]+aria-label=["']submit command["']/);
+  assert.match(html, /id=["']phone-go["'][^>]+aria-label=["']send to Gary["']/);
+  assert.match(css, /\.entry-submit\s*\{[^}]*width:\s*2\.4rem[^}]*height:\s*2\.2rem[^}]*padding:\s*0/s);
+  assert.match(css, /\.entry-submit \.submit-arrow\s*\{[^}]*width:\s*1\.65rem[^}]*height:\s*1\.65rem[^}]*fill:\s*currentColor/s);
 });
 
 Then("Gary's circular voice toggle contains a speaker icon", function () {

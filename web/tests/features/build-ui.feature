@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -55,7 +55,7 @@ Feature: Build metadata and touch-control contract
     And the iOS wrapper opens new-window web links externally
 
   Scenario: Game and Gary use large icon-only submit controls
-    Then both send arrows are visually doubled and bold without resizing their buttons
+    Then both submit controls use the same extra-thick SVG arrow
     And Gary's circular voice toggle contains a speaker icon
     And both entry rows place the microphone left of the text field and submit arrow
     And both entry rows share text-aware submit styling with custom starter text

@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.080:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -315,7 +315,7 @@ body { -webkit-text-size-adjust: 100%; }
 #cmd::placeholder { color: var(--dim); opacity: 1; }
 .entry-submit {
   flex: 0 0 auto;
-  min-height: 2.2rem; padding: 0.35rem 0.9rem;
+  width: 2.4rem; height: 2.2rem; min-height: 2.2rem; padding: 0;
   background: #020402;
   border: 1px solid var(--dim); border-radius: 6px;
   color: var(--dim); font: inherit; font-size: 0.95rem;
@@ -329,11 +329,12 @@ body { -webkit-text-size-adjust: 100%; }
   color: var(--bg);
   text-shadow: none;
 }
-.entry-submit span {
-  display: inline-block;
-  line-height: 1;
-  font-weight: 900;
-  transform: scale(2);
+.entry-submit .submit-arrow {
+  display: block;
+  width: 1.65rem;
+  height: 1.65rem;
+  margin: auto;
+  fill: currentColor;
 }
 .entry-submit:active { background: rgba(67, 255, 122, 0.2); }
 .entry-submit.has-text:active { background: var(--green-bright); }
