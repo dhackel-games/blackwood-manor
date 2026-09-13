@@ -1,4 +1,4 @@
-// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 // Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler
@@ -101,10 +101,14 @@ export function createGame(world) {
 
   game.findItems = (phrase, scope) => {
     if (!phrase) return null;
-    const words = phrase.toLowerCase().split(/\s+/).filter(Boolean);
+    const normalized = phrase.toLowerCase().trim();
+    const words = normalized.split(/\s+/).filter(Boolean);
     const noun = words[words.length - 1];
     const adjs = words.slice(0, -1);
     const candidates = scope || game.visibleItems();
+    const canonical = candidates.filter((it) =>
+      world.itemShortNames?.[it.id]?.toLowerCase() === normalized);
+    if (canonical.length) return canonical;
     return candidates.filter((it) => {
       const names = (it.names || []).map((s) => s.toLowerCase());
       const iadj = (it.adjectives || []).map((s) => s.toLowerCase());
@@ -122,6 +126,15 @@ export function createGame(world) {
   game.moveItem = (id, to) => { if (state.items[id]) state.items[id].loc = to; };
   game.destroy = (id) => { if (state.items[id]) state.items[id].loc = null; };
   game.addScore = (n) => { state.score += n; };
+  game.awardPickup = (item) => {
+    const points = item?.progressPoints || 0;
+    if (!points) return "";
+    const flag = item.progressFlag || `progressItem:${item.id}`;
+    if (game.getFlag(flag)) return "";
+    game.setFlag(flag);
+    game.addScore(points);
+    return ` (+${points})`;
+  };
   const phoneBillLine = () => {
     const b = state.flags.phoneBill;
     if (!b) return "";
@@ -405,6 +418,7 @@ export function createGame(world) {
         result = "Taken.";
       }
     }
+    if (game.has(item.id)) result = (result || "Taken.") + game.awardPickup(item);
     if (!game.has(item.id)) return { blocked: result, step: `get ${item.names[0]}` };
     return {
       step: `get ${item.names[0]}`,

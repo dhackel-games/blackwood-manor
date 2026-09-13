@@ -1,4 +1,4 @@
-# dragon-maze.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough @dragon
 Feature: Dreadmaw's hedge maze and hoard
@@ -70,6 +70,7 @@ Feature: Dreadmaw's hedge maze and hoard
     And item "goldDoubloon" is in "inventory"
     And the output contains "GOLD DOUBLOON"
     And the output contains "troll inside"
+    And the game score is 10
 
     Examples:
       | command                    |
@@ -115,6 +116,10 @@ Feature: Dreadmaw's hedge maze and hoard
     When I send "say <rhyme>"
     Then flag "dragonVaultOpen" is true
     And the output contains "vault door rolls open"
+    And the output contains "(+5)"
+    And the game score is 15
+    When I send "say more"
+    Then the game score is 15
     When I send "east"
     Then the current room is "dreadmawVault"
     And the output contains "DREADMAW'S VAULT"
@@ -212,6 +217,8 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is true
     And the output contains "answered before I even asked"
     And the output contains "vault door rolls open"
+    And the output contains "(+5)"
+    And the game score is 5
 
   Scenario: TALK infers the troll when he is the only conversational target
     Given the player is in room "trollGate"

@@ -1,4 +1,4 @@
-# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough @mushroom
 Feature: Mushroom vision and flight
@@ -10,6 +10,10 @@ Feature: Mushroom vision and flight
     Given a fresh manor game
     And the player is in room "kitchen"
     When I send "eat mushrooms"
+
+  Scenario: A room's canonical one-word alias supports named flight
+    When I send "fly grand"
+    Then the current room is "masterBedroom"
 
   Scenario: Fresh mushrooms grow inside the outhouse toilet hole
     Given a fresh manor game

@@ -1,57 +1,92 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @unit
-Feature: The RGB oak lift and Blackwood tree fort
-  The glass stones must focus sunlight in red-green-blue order before the
-  alternating pulley platform can reach the fort and its family spyglass.
+Feature: The mirrored gem panel and Blackwood tree fort
+  Three gems must focus mirrored sunlight before the alternating pulley
+  platform can reach the fort and its family spyglass.
 
   Background:
     Given a fresh manor game
     And the player is in room "greatOak"
     And item "emberStone" is carried
 
-  Scenario: The mechanism starts incomplete and explicitly hints RGB
-    When I send "examine mechanism"
-    Then the output contains "BLUE · GREEN"
-    And the output contains "R G B"
+  Scenario: The oak and panel explain the optics without printing the solution
+    When I send "look"
+    Then the output contains "PANEL"
+    And the output contains "mirrors"
+    And the output does not contain "RGB"
+    When I send "examine panel"
+    Then the output contains "TOP SLOT: SAPPHIRE GEM"
+    And the output contains "MIDDLE SLOT: EMPTY"
+    And the output contains "BOTTOM SLOT: RUBY GEM"
+    And the output contains "holes bored in the tree"
+    And the output does not contain "R G B"
+    And the output does not contain "MECHANISM"
     And flag "oakLightAligned" is unset
 
-  Scenario: Any order other than RGB scatters the sunlight
-    When I send "take blue stone"
-    And I send "put blue stone in mechanism"
-    Then the output contains "GREEN · BLUE"
-    And the output contains "scatters uselessly"
-    And flag "oakLightAligned" is unset
-    And item "oakPlatform" is destroyed
-
-  Scenario: Red green blue focuses the beam and lowers the platform
-    When I send "take green stone"
-    And I send "take blue stone"
-    And I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
-    Then the output contains "RED · GREEN · BLUE"
-    And the output contains "brilliant white beam"
+  Scenario: PLACE in the panel uses the next open slot from bottom to top
+    When I send "place emerald in panel"
+    Then the output contains "EMERALD GEM"
+    And the output contains "MIDDLE SLOT"
+    And the output contains "brilliant white shaft"
     And flag "oakLightAligned" is set
     And item "oakPlatform" is in "greatOak"
+    And the game score is 5
 
-  Scenario: TAKE ALL removes both installed stones without corrupting their order
+  Scenario: Explicit named slots can assemble the panel
+    When I send "take all"
+    And I send "place emerald gem in middle slot"
+    Then the output contains "EMERALD GEM"
+    And the output contains "MIDDLE SLOT"
+    When I send "place ruby gem in bottom slot"
+    Then the output contains "RUBY GEM"
+    And the output contains "BOTTOM SLOT"
+    When I send "place sapphire gem in top slot"
+    Then the output contains "SAPPHIRE GEM"
+    And the output contains "TOP SLOT"
+    And flag "oakLightAligned" is set
+    And the game score is 5
+
+  Scenario: A complete wrong arrangement ejects every gem
+    When I send "take sapphire gem"
+    And I send "place sapphire in panel"
+    Then the output contains "SAPPHIRE GEM"
+    And the output contains "MIDDLE SLOT"
+    And the output contains "fail to converge"
+    When I send "place emerald in panel"
+    Then the output contains "TOP SLOT"
+    And the output contains "spits every gem onto the ground"
+    And flag "oakLightAligned" is unset
+    And item "oakPlatform" is destroyed
+    And item "emberStone" is in "greatOak"
+    And item "greenGlassStone" is in "greatOak"
+    And item "blueGlassStone" is in "greatOak"
+    And the game score is 0
+    When I send "examine panel"
+    Then the output contains "TOP SLOT: EMPTY"
+    And the output contains "MIDDLE SLOT: EMPTY"
+    And the output contains "BOTTOM SLOT: EMPTY"
+
+  Scenario: An explicitly occupied slot identifies its gem
+    When I send "place emerald in bottom slot"
+    Then the output contains "BOTTOM SLOT already holds the RUBY GEM"
+    And item "emberStone" is carried
+
+  Scenario: TAKE ALL removes both installed gems without corrupting their slots
     When I send "take all"
     Then item "greenGlassStone" is carried
     And item "blueGlassStone" is carried
-    When I send "examine mechanism"
-    Then the output contains "all three sockets are empty"
-    When I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
+    When I send "examine panel"
+    Then the output contains "TOP SLOT: EMPTY"
+    And the output contains "MIDDLE SLOT: EMPTY"
+    And the output contains "BOTTOM SLOT: EMPTY"
+    When I send "put ruby gem in bottom slot"
+    And I send "put emerald gem in middle slot"
+    And I send "put sapphire gem in top slot"
     Then flag "oakLightAligned" is set
 
   Scenario: Boarding waits one turn before carrying the player to the fort
-    When I send "take green stone"
-    And I send "take blue stone"
-    And I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
+    When I send "place emerald in panel"
     And I send "step onto platform"
     Then the current room is "greatOak"
     And the output contains "next turn"
@@ -60,11 +95,7 @@ Feature: The RGB oak lift and Blackwood tree fort
     And the output contains "BLACKWOOD TREE FORT"
 
   Scenario: The empty platform alternates and carries the player back down
-    When I send "take green stone"
-    And I send "take blue stone"
-    And I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
+    When I send "place emerald in panel"
     And I send "enter platform"
     And I send "wait"
     And I send "wait"
@@ -76,22 +107,14 @@ Feature: The RGB oak lift and Blackwood tree fort
     Then the current room is "greatOak"
 
   Scenario: Walking away after boarding disembarks instead of teleporting the player
-    When I send "take green stone"
-    And I send "take blue stone"
-    And I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
+    When I send "place emerald in panel"
     And I send "enter platform"
     And I send "west"
     Then the current room is "privy"
     And flag "oakLiftRiding" is false
 
   Scenario: Hidden shortcuts can route down from the tree fort
-    When I send "take green stone"
-    And I send "take blue stone"
-    And I send "put ember stone in mechanism"
-    And I send "put green stone in mechanism"
-    And I send "put blue stone in mechanism"
+    When I send "place emerald in panel"
     And I send "enter platform"
     And I send "wait"
     Then the path from the current room to "PRIVY" is "out; z; w"
@@ -100,10 +123,10 @@ Feature: The RGB oak lift and Blackwood tree fort
     Given flag "high" is 1
     When I send "fly tree fort"
     Then the current room is "greatOak"
-    And the output contains "RGB sunlight"
+    And the output contains "mirrored sunlight"
     And the game is alive
 
-  Scenario: The BM spyglass reveals the roof route and replaces the ember heirloom
+  Scenario: The BM spyglass reveals the roof route and replaces the old gem reward
     Given the player is in room "treeFort"
     When I send "examine spyglass"
     Then the output contains "BELFRY"
@@ -113,26 +136,26 @@ Feature: The RGB oak lift and Blackwood tree fort
     And the output contains "BM"
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
-    Then the output contains "Family heirlooms: 1/12"
+    Then the output contains "Family heirlooms: 1/13"
     And the game score is 8
 
-  Scenario: The ember stone no longer contributes to the family collection
+  Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
-    When I send "put ember stone in reliquary"
-    Then the output contains "Family heirlooms: 0/12"
+    When I send "place emerald gem in reliquary"
+    Then the output contains "Family heirlooms: 0/13"
     And the output contains "does not contribute"
-    When I send "take ember stone from reliquary"
+    When I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And the output contains "releases the non-contributing"
 
-  Scenario: A stone nested in a deposited heirloom remains retrievable
+  Scenario: A gem nested in a deposited heirloom remains retrievable
     Given item "musicBox" is carried
     And the player is in room "grandHall"
     When I send "open music box"
     And I send "take tiny key"
-    And I send "put ember stone in music box"
+    And I send "place emerald gem in music box"
     And I send "put music box in reliquary"
-    And I send "take ember stone from reliquary"
+    And I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And item "musicBox" is in "reliquary"
     And the output contains "releases the non-contributing"
@@ -165,5 +188,20 @@ Feature: The RGB oak lift and Blackwood tree fort
     Then flag "curseLiftable" is set
     And flag "floorDoorOpen" is set
     And item "talisman" is in "reliquary"
+
+  Scenario: A completed pre-watch collection gains the newly required heirloom
+    Given a completed pre-watch save is restored
+    Then item "backwardsWatch" is in "reliquary"
+    And the required family item count is 13
+    And flag "curseLiftable" is set
+    And flag "floorDoorOpen" is set
+    And the game score is 12
+
+  Scenario: A claimed legacy watch does not score again when deposited
+    Given an in-progress pre-watch save with the watch already claimed is restored
+    And the player is in room "grandHall"
+    When I send "put watch in reliquary"
+    Then item "backwardsWatch" is in "reliquary"
+    And the game score is 12
 
 # end oak-tree-fort.feature

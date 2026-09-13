@@ -1,4 +1,4 @@
-# manor-adventure.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -69,14 +69,14 @@ Feature: Blackwood Manor adventure
       east
       light self on fire
       light brazier
-      take ember stone
+      take emerald gem
       east
       east
-      take green stone
-      take blue stone
-      put ember stone in mechanism
-      put green stone in mechanism
-      put blue stone in mechanism
+      take ruby gem
+      take sapphire gem
+      put ruby gem in bottom slot
+      put emerald gem in middle slot
+      put sapphire gem in top slot
       enter platform
       wait
       take spyglass
@@ -97,6 +97,13 @@ Feature: Blackwood Manor adventure
       south
       read diary
       north
+      west
+      pull wallpaper
+      in
+      take backwards watch
+      out
+      put backwards watch in reliquary
+      up
       west
       open music box
       take tiny key
@@ -157,7 +164,7 @@ Feature: Blackwood Manor adventure
       north
       """
     Then the game is won
-    And the game score is 262
+    And the game score is 450
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: The silver mirror is an optional thirty-point trophy
@@ -391,9 +398,10 @@ Feature: Blackwood Manor adventure
     And item "diary" is in "inventory"
     And flag "knowsCombo" is true
 
-  Scenario: The ruby ring is visibly a Blackwood heirloom
+  Scenario: The Blackwood Bloodsignet is visibly a family heirloom
     Given item "rubyRing" is carried
     When I send "examine ruby ring"
+    Then the output contains "BLACKWOOD BLOODSIGNET"
     Then the output contains "BM"
     And the output contains "Blackwood family heirloom"
 

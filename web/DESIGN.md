@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
 ```
 
 ---
@@ -101,7 +101,8 @@ items: {
 
 Item flags: `takeable, container, openable, open, locked, keyId, lightSource,
 selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, autoWearOnTake,
-carryCapacity, worn, edible, points, capacity, roomDesc`.
+carryCapacity, worn, edible, points, progressPoints, progressFlag,
+depositScoreFlag, capacity, roomDesc`.
 
 Room fields: `name, desc, exits, dark, flags`. Exits are either a room id string or an
 object `{ to, via (flag required), locked, lockedMsg }`.
@@ -127,13 +128,19 @@ Classic Infocom style, richer than strict two-word.
 - **Structure:** `verb [article] [adjective] noun [preposition] [article] [adjective] noun]`
   → `unlock the oak door with the brass key`, `put locket in reliquary`
 - **Directions:** `north/n, s, e, w, ne, nw, se, sw, up/u, down/d, in, out`
-- **Verbs:** look/l, examine/x, go, take/get, drop, open, close, lock, unlock, read,
+- **Verbs:** look/l, examine/x, go, take/get, drop, open/o, close/c/shut, lock, unlock, read,
   search, move/push/pull, turn on/off, light, extinguish, attack/kill … with …, eat,
-  drink, wear, remove, throw … at …, enter, climb, ring, touch, listen, smell, give … to …
+  drink, wear, remove, throw … at …, put/place, enter, climb, ring, touch, listen, smell, give … to …
 - **Meta:** inventory/i, wait/z, again/g, look, score, save, restore, restart,
   verbose/brief, help, quit
 - **Niceties:** synonyms, "it" pronoun resolution, up-arrow command history, tolerant of
   articles, helpful errors ("I don't know the word 'X'." / "You can't see any X here.").
+- **Canonical one-word names:** `ITEM_SHORT_NAMES` and `ROOM_SHORT_NAMES` give every
+  object and room one globally unique token. Exact canonical tokens win before
+  ordinary noun matching, while familiar multiword names and intentional
+  ambiguities remain valid. Generated `::` command chains use only these compact
+  targets; bug reports continue preserving exactly what the player submitted, so
+  an expanded magic command is naturally recorded in its compact form.
 
 ---
 
@@ -190,24 +197,39 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
   holds a treasure.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
-  ruby ring.
+  Blackwood Bloodsignet.
 - **Library lever** opens the **secret chamber** → the curse's focus.
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**12 required family heirlooms**, each worth points: silver candlestick, gold locket,
-first-edition grimoire, jeweled music box, ruby ring, ancient coin (well), crystal
+**13 required family heirlooms**, each worth points: silver candlestick, gold locket,
+first-edition grimoire, jeweled music box, Blackwood Bloodsignet, ancient coin (well), crystal
 decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
 Blackwood family ring marked BM, the BM spyglass recovered from the tree fort, and
-the BM-crested protective talisman after it has served against the crypt wraith.
+the BM-crested protective talisman after it has served against the crypt wraith,
+plus the family-inscribed backwards watch hidden inside the nursery wall.
 
 ---
 
 ## 8. Scoring
 
-Points for finding treasures, more for depositing them in the reliquary, plus milestone
-points. `SCORE` shows points + turn count. End rank scales like Zork:
+Required heirlooms award their declared `points` when deposited in the
+RELIQUARY. Meaningful intermediate discoveries and puzzle completions award
+one-time progress points: most are +5, finding THE SPACE BETWEEN THE WALLS is
++20, surviving the super burrito is +25, and surviving deliberate
+self-immolation the first time is +10. Repeating a solved action cannot farm its
+award; deliberately igniting yourself again after that first survival costs 5
+points.
+
+The BRAZIER awards +10 when lit patiently with the CANDLESTICK or +30 when the
+player transfers their own flames. DREADMAW'S apple remains +10. `::winmax`
+performs every deterministic scoring challenge and leaves the MYSTERY PACKAGE
+untouched because its outcome is random. The deterministic maximum is 485,
+including the +45 combined end-game self-reliance awards and optional SILVER
+MIRROR; a lucky package can push an organic game beyond that benchmark.
+
+`SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*
 
 ---
@@ -356,8 +378,9 @@ the mansion.
 - A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
   **lit candlestick** can ignite it by patiently lighting several points, or the player
   can be **on fire** and `light brazier` to transfer the whole blaze. Either route yields
-  the red **EMBER STONE** needed by the GREAT OAK'S RGB mechanism and awards +10
-  for solving the fire puzzle.
+  the green **EMERALD GEM** needed by the GREAT OAK'S mirrored PANEL. The careful
+  candle route awards +10; the dangerous body-fire route awards +30 and also
+  qualifies for the first-time self-fire survival bonus.
 
 ## 12.8 Gary while you're on fire
 - Dialing in ablaze: Gary smells smoke, quotes a **$1.99** premium (`fireTab`, tracked
@@ -717,7 +740,7 @@ contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `eyes`,
 `feet`, `finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
-The existing TALISMAN and RUBY RING occupy NECK and FINGER; the new HEADLAMP,
+The existing TALISMAN and BLACKWOOD BLOODSIGNET occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
@@ -747,9 +770,9 @@ preserving spoiler hiding for both secret destinations.
   BLACKWOOD FAMILY RING (+20). DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
   (+15) and the wearable WINGED SHOES. The exported `REQUIRED_FAMILY_ITEM_COUNT`
   is the single source for the win threshold and RELIQUARY recess count.
-- **Oak route.** The garden brazier's EMBER STONE is the red component for the
-  GREAT OAK mechanism. Completing RED · GREEN · BLUE opens the route to the
-  required BM SPYGLASS (+8) in the TREE FORT.
+- **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
+  mirrored PANEL. Seating the RUBY, EMERALD, and SAPPHIRE GEMS in the correct
+  named slots opens the route to the required BM SPYGLASS (+8) in the TREE FORT.
 - **Consistency fixes.** The RELIQUARY reads its heirloom-recess count from the
   shared required-item constant. WINGED SHOES flight
   now floats up through the *shut* attic trap-door exactly like a mushroom high
@@ -759,7 +782,7 @@ preserving spoiler hiding for both secret destinations.
 - **Open deposits.** Any unworn carried item can be put into the RELIQUARY. Required
   heirlooms advance the shared total and score; ordinary objects are accepted but
   explicitly reported as non-contributing. The HUD appears after the first deposit
-  in terse `💎 required/12 +extra` form. The RELIQUARY is a glass-fronted cabinet:
+  in terse `💎 required/13 +extra` form. The RELIQUARY is a glass-fronted cabinet:
   PUT (and explicit retrieval) derives OPEN when needed, but the player must
   explicitly CLOSE the completed cabinet before RING BELL can finish the ritual.
 
@@ -782,8 +805,11 @@ feeling like a free skeleton key:
   an endgame/secret. A side effect: lightning can no longer randomly kill you via
   the crypt wraith.
 - **Mystery package unchanged.** COPILOT'S MYSTERY PACKAGE keeps its full-chaos
-  teleport (including the +20 BETWEEN THE WALLS jackpot and the crypt risk) — that
+  teleport (including THE SPACE BETWEEN THE WALLS and the crypt risk) — that
   unpredictability is its whole point; the exclusion applies to lightning only.
+  Every condition or destination it can produce also has a deterministic route:
+  mushrooms, burrito sickness, self-fire, cures, and the nursery wall-gap route.
+  Because its exact outcome cannot be guaranteed, no `::` compound command opens it.
 
 ### 12.30 The secret Gary ending: complete the family collection
 
@@ -828,12 +854,16 @@ not a single scripted finish.
   into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
   the engine is the seed it will grow from.
 
-### 12.31 The GREAT OAK RGB lift and TREE FORT
+### 12.31 The GREAT OAK gem-panel lift and TREE FORT
 
-The path EAST of the PRIVY reaches a GREAT OAK with three sun-facing glass
-sockets. BLUE and GREEN begin installed; the BRAZIER'S EMBER STONE supplies RED.
-The player can remove and reinsert the stones, but only RED · GREEN · BLUE
-focuses a white beam into the overhead pulley. Its PLATFORM then alternates
+The path EAST of the PRIVY reaches a GREAT OAK with a dark iron PANEL inset in
+its trunk. A complex array of mirrors catches the afternoon sun and directs
+three beams through holes in the tree toward vertically stacked slots. A RUBY
+GEM begins in the BOTTOM SLOT and a SAPPHIRE GEM in the TOP SLOT; the BRAZIER
+reveals the missing EMERALD GEM. Players may name the TOP, MIDDLE, or BOTTOM
+SLOT explicitly, while placing a gem merely `IN PANEL` chooses the next empty
+slot from bottom to top. The completed arrangement focuses a white beam into
+the overhead pulley. Its PLATFORM then alternates
 between the roots and the TREE FORT every turn. Boarding holds it for one turn,
 then carries the player on the next.
 
@@ -841,8 +871,9 @@ The fort contains old signal flags, a blanket hideout, a nailed-up slingshot,
 and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
 through it reveals the maintenance hatch inside the roofline and hints that the
 ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
-EMBER STONE as a +8 required heirloom; the newly BM-crested TALISMAN adds a
-twelfth required heirloom after protecting the player from the WRAITH.
+EMERALD GEM as a +8 required heirloom; the newly BM-crested TALISMAN and the
+family-inscribed BACKWARDS WATCH bring the collection to thirteen required
+heirlooms.
 
 ### 12.32 Twelve-line flavor cycles
 
