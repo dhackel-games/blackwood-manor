@@ -1,4 +1,4 @@
-// engine.steps.js Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -23,7 +23,7 @@ import {
   pickGaryVoice,
 } from "../../js/gary-voice.js";
 import { parse, splitCommands } from "../../js/parser.js";
-import { VERSION, APP_VERSION, BUILD, COPYRIGHT } from "../../js/version.js";
+import { VERSION, APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT } from "../../js/version.js";
 
 const NONE = "[none]";
 const EMPTY = "[empty]";
@@ -263,15 +263,23 @@ Then("HELP is one alphabetized command-per-line data block", function () {
   const source = readFileSync(new URL("../../js/commands.js", import.meta.url), "utf8");
   assert.match(source, /export const HELP_TEXT = `COMMANDS[\s\S]+`;/);
   assert.match(source, /help\(ctx\)\s*\{[\s\S]*?return HELP_TEXT;\s*\}/);
-  const commandLines = HELP_TEXT.split("\n").slice(1, HELP_TEXT.indexOf("\n\n") > -1
+  const commandLines = HELP_TEXT.split("\n").slice(2, HELP_TEXT.indexOf("\n\n") > -1
     ? HELP_TEXT.slice(0, HELP_TEXT.indexOf("\n\n")).split("\n").length
     : undefined);
-  assert.ok(commandLines.every((line) => line.includes(":")), "each command must occupy one described line");
+  assert.equal(HELP_TEXT.split("\n")[1], "COMMAND | TITLE / DESCRIPTION");
+  assert.ok(commandLines.every((line) => line.includes(" | ") && line.includes(" / ")),
+    "each command must occupy one command | title / description line");
   const labels = commandLines.map((line) =>
-    line.slice(0, line.indexOf(":")).replace(/[()]/g, "").split("/")[0].toLowerCase());
+    line.slice(0, line.indexOf(" | ")).replace(/[()]/g, "").split(/[\/,]/)[0].toLowerCase());
   const sorted = [...labels].sort((a, b) => a.localeCompare(b));
   assert.deepEqual(labels, sorted);
-  assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search:/);
+  assert.match(HELP_TEXT, /help\/\? \| Help \//);
+  assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search \| Inspect \//);
+  assert.match(HELP_TEXT,
+    /\(n\)orth, \(s\)outh, \(e\)ast, \(w\)est, northeast \(ne\), northwest \(nw\), southeast \(se\), southwest \(sw\), \(u\)p, \(d\)own, in, out \| Directions \/ Go that direction\./);
+  assert.match(HELP_TEXT, /get\/take\/grab <thing>\/all \| Take \//);
+  assert.match(HELP_TEXT, /say\/talk <words\/person> \| Speak \//);
+  assert.match(HELP_TEXT, /use\/wear\/eat\/drink <thing> \| Use \//);
   assert.match(HELP_TEXT, /\nCHAINING\n/);
   assert.match(HELP_TEXT, /\nGARY'S HINT LINE\n/);
 });
@@ -300,10 +308,20 @@ Then("the following command lines split as:", function (table) {
 
 Then("the copyright-version is exact", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
+  const versionSource = readFileSync(new URL("../../js/version.js", import.meta.url), "utf8");
+  const design = readFileSync(new URL("../../DESIGN.md", import.meta.url), "utf8");
   // The clean number we monitor stays locked to the App Store marketing version.
   assert.equal(APP_VERSION, packageJson.version);
   // Apple-style "version (build)" so the on-screen badge mirrors App Store Connect exactly.
   assert.equal(VERSION, `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`);
+  const [year, month, day] = APP_VERSION.split(".");
+  assert.equal(CONTENT_VERSION,
+    Number(`${year}${month.padStart(2, "0")}${day.padStart(2, "0")}${BUILD.padStart(3, "0")}`));
+  assert.match(versionSource.split("\n")[0], new RegExp(
+    `^// version\\.js\\. Copyright \\(c\\) dhackel-games\\. All Rights Reserved\\. ` +
+    `2026\\.\\.\\.\\d{4}-\\d{2}-\\d{2}\\.${BUILD.padStart(3, "0")}:[a-z0-9_-]+\\.$`));
+  assert.match(design, /### Source-file identity header/);
+  assert.match(design, /YYYY-MM-DD\.BBB:\{last editor\}/);
 });
 
 Then("the package version is the release date", function () {
@@ -326,6 +344,14 @@ Then("the transcript shrinks and scrolls inside the viewport", function () {
 Then("the controls remain pinned inside the viewport", function () {
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(css, /#controls\s*\{[^}]*flex:\s*0 0 auto/s);
+});
+
+Then("the local launcher serves every file with no-store headers", function () {
+  const launcher = readFileSync(new URL("../../Play Blackwood Manor.command", import.meta.url), "utf8");
+  const server = readFileSync(new URL("../../tools/no-cache-server.py", import.meta.url), "utf8");
+  assert.match(launcher, /tools\/no-cache-server\.py/);
+  assert.doesNotMatch(launcher, /nohup[^\n]+-m http\.server/);
+  assert.match(server, /Cache-Control", "no-store, no-cache, must-revalidate"/);
 });
 
 Then("the HUD has inventory, reliquary, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators", function () {
@@ -511,12 +537,31 @@ Then("both send arrows are visually doubled and bold without resizing their butt
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(html, /<button[^>]+id=["']go["'][^>]+aria-label=["']submit command["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
   assert.match(html, /<button[^>]+id=["']phone-go["'][^>]+aria-label=["']send to Gary["'][^>]*>\s*<span[^>]+>\s*↑\s*<\/span>\s*<\/button>/);
-  assert.match(css, /#go span,\s*#phone-go span\s*\{[^}]*font-weight:\s*900[^}]*transform:\s*scale\(2\)/s);
+  assert.match(css, /\.entry-submit span\s*\{[^}]*font-weight:\s*900[^}]*transform:\s*scale\(2\)/s);
 });
 
 Then("Gary's circular voice toggle contains a speaker icon", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  assert.match(html, /<div[^>]+id=["']phone-avatar["'][^>]*>\s*🔊\s*<\/div>/);
+  assert.match(html, /<button[^>]+id=["']phone-avatar["'][^>]+type=["']button["'][^>]*>\s*🔊\s*<\/button>/);
+});
+
+Then("both entry rows place the microphone left of the text field and submit arrow", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  assert.match(html, /id=["']inputline["'][\s\S]*id=["']prompt["'][\s\S]*id=["']mic["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
+  assert.match(html, /class=["']phone-inputline["'][\s\S]*id=["']phone-mic["'][\s\S]*id=["']phone-cmd["'][\s\S]*id=["']phone-go["']/);
+});
+
+Then("both entry rows share text-aware submit styling with custom starter text", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.equal((html.match(/class=["']entry-submit["']/g) || []).length, 2);
+  assert.match(css, /\.entry-submit\s*\{[^}]*background:\s*#020402[^}]*color:\s*var\(--dim\)/s);
+  assert.match(css, /\.entry-submit\.has-text\s*\{[^}]*background:\s*var\(--green\)[^}]*color:\s*var\(--bg\)/s);
+  assert.match(ui, /function createChatEntry\(\{ field, submit, starterText \}\)/);
+  assert.match(ui, /submit\.classList\.toggle\("has-text", field\.value\.trim\(\)\.length > 0\)/);
+  assert.match(ui, /starterText: "type command \/ tap button"/);
+  assert.match(ui, /starterText: "say something to Gary…"/);
 });
 
 Then("Gary offers robot and human voice icons", function () {
@@ -546,6 +591,28 @@ Then("Gary remembers the selected voice preset", function () {
   assert.match(ui, /localStorage\.setItem\(GARY_VOICE_PRESET_KEY, garyVoicePreset\)/);
 });
 
+Then("Gary offers persona and volume controls below his sole mute control", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(html, /class=["']phone-name["']>\s*Gary\s*<\/div>[\s\S]*id=["']phone-avatar["'][\s\S]*class=["']voice-controls["']/);
+  assert.match(html, /id=["']gary-voice["'][\s\S]*class=["']gary-volume-icon["'][^>]*>🔉<\/span>[\s\S]*id=["']gary-volume["'][^>]+type=["']range["'][^>]+min=["']0["'][^>]+max=["']100["']/);
+  assert.doesNotMatch(html, /id=["']phone-mute["']|Tap Gary to hear him/);
+  assert.doesNotMatch(ui, /phone-mute|Tap Gary to hear him/);
+  assert.match(ui, /u\.volume = garyVolume/);
+  assert.match(ui, /localStorage\.getItem\(GARY_VOLUME_KEY\)/);
+  assert.match(ui, /localStorage\.setItem\(GARY_VOLUME_KEY, String\(garyVolume\)\)/);
+  assert.match(ui, /phoneAvatar\.addEventListener\("click", toggleVoice\)/);
+});
+
+Then("Gary's help line keeps the game HUD visible", function () {
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(css, /#hud\s*\{[^}]*z-index:\s*60/s);
+  assert.match(css, /#phone\s*\{[^}]*z-index:\s*50[^}]*--phone-hud-offset/s);
+  assert.match(ui, /function syncPhoneHudOffset\(\)[\s\S]*getBoundingClientRect\(\)\.bottom/);
+  assert.match(ui, /updatePhoneStatus\(\);\s*syncPhoneHudOffset\(\);\s*phone\.hidden = false/);
+});
+
 Then("Australian presets remain distinct when only the female accent is installed", function () {
   const voices = [
     { name: "Karen", lang: "en-AU" },
@@ -565,23 +632,61 @@ Then("browser speech accumulates finalized phrases until explicit submission", f
   assert.match(ui, /const text = \(webTranscript \+ webPartial\)\.trim\(\)/);
 });
 
-Then("END CALL disables and shows progress until Gary finishes speaking", function () {
+Then("END CALL disables and stays visible 1.5 times longer while Gary finishes", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(html, /<button[^>]+id=["']phone-end["'][^>]*><span>END CALL<\/span><\/button>/);
   assert.match(css, /#phone-end\.closing::before\s*\{[^}]*animation:\s*end-call-progress/s);
   assert.match(ui, /phoneEnd\.disabled = true/);
-  assert.match(ui, /Promise\.all\(\[speechDone, wait\(duration\)\]\)/);
-  assert.match(ui, /Promise\.all\(\[speechDone, wait\(duration\)\]\)\.then\(\(\) => \{\s*endCallUI\(\)/s);
+  assert.match(ui, /const closeDelay = Math\.round\(duration \* 1\.5\)/);
+  assert.match(ui, /--end-call-duration", `\$\{closeDelay\}ms`/);
+  assert.match(ui, /Promise\.all\(\[speechDone, wait\(closeDelay\)\]\)/);
+  assert.match(ui, /Promise\.all\(\[speechDone, wait\(closeDelay\)\]\)\.then\(\(\) => \{\s*endCallUI\(\)/s);
   assert.match(ui, /if \(onCall\)[\s\S]*finishPhoneCall\(out\)/);
   assert.ok(estimatedSpeechDurationMs("One two three.", 1) >= 1400);
 });
 
-Then("the movement controls are labeled In and Out", function () {
+Then("the movement controls form an eight-arrow compass around a center star", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-  assert.match(html, /<button[^>]+data-cmd=["']in["'][^>]*>\s*In\s*<\/button>/);
-  assert.match(html, /<button[^>]+data-cmd=["']out["'][^>]*>\s*Out\s*<\/button>/);
+  const expected = [
+    ["northwest", "nw", "↖"], ["north", "n", "↑"], ["northeast", "ne", "↗"], ["west", "w", "←"],
+    ["east", "e", "→"], ["southwest", "sw", "↙"], ["south", "s", "↓"], ["southeast", "se", "↘"],
+  ];
+  for (const [direction, title, arrow] of expected) {
+    assert.match(html, new RegExp(
+      `<button[^>]+data-cmd=["']${direction}["'][^>]+title=["']${title}["'][^>]*>\\s*${arrow}\\s*</button>`));
+  }
+  assert.match(html, /<span class=["']compass-center["'][^>]*>\s*✦\s*<\/span>/);
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(css, /#controls \.dpad button\s*\{[^}]*font-size:\s*1\.25rem[^}]*font-weight:\s*900/s);
+  assert.match(css, /#controls \.northwest,[\s\S]*#controls \.southeast\s*\{[^}]*display:\s*flex[^}]*align-items:\s*center[^}]*justify-content:\s*center/s);
+});
+
+Then("Up, Down, In, and Out use compact directional glyphs", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(html, /data-cmd=["']up["'][^>]+title=["']up["'][^>]*>[^<]*<span[^>]*>\s*⇧\s*<\/span>/);
+  assert.match(html, /data-cmd=["']down["'][^>]+title=["']down["'][^>]*>[^<]*<span[^>]*>\s*⇩\s*<\/span>/);
+  assert.match(html, /data-cmd=["']in["'][\s\S]*?<rect x=["']9["'] y=["']4["'] width=["']12["'] height=["']16["'][\s\S]*?<path d=["']M2 12h15M13 8l4 4-4 4["']/);
+  assert.match(html, /data-cmd=["']out["'][\s\S]*?<rect x=["']3\.5["'] y=["']4["'] width=["']11["'] height=["']16["'][\s\S]*?<path d=["']M9 12h14M19 8l4 4-4 4["']/);
+  assert.match(css, /#controls \.level-arrow span\s*\{[^}]*font-size:\s*1\.45rem[^}]*font-weight:\s*900/s);
+  assert.match(css, /#controls \.portal-icon\s*\{[^}]*max-width:\s*1\.45rem[^}]*stroke-width:\s*1\.3/s);
+});
+
+Then("action shortcuts occupy two equally wide rows beside movement", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const rows = [...html.matchAll(/<div class=["']verb-row["']>([\s\S]*?)<\/div>/g)];
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows.map((row) => (row[1].match(/<button\b/g) || []).length), [4, 5]);
+  assert.match(rows[1][1], /data-cmd=["']inventory["'][\s\S]*data-cmd=["']map["'][\s\S]*data-cmd=["']call["']/);
+  assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
+  assert.match(css, /#controls\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 28rem\)/s);
+  assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);
+  assert.match(css, /#controls \.verb-row\s*\{[^}]*grid-template-columns:\s*repeat\(8,/s);
+  assert.match(css, /#controls \.verb-row button\s*\{[^}]*grid-column:\s*span 2/s);
+  assert.match(css, /#controls \.verb-row \.compact-action\s*\{\s*grid-column:\s*span 1/s);
 });
 
 Then("the iOS wrapper opens new-window web links externally", function () {
@@ -597,23 +702,49 @@ Then("Version reports cached and GitHub.io content through the native bridge", f
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
   assert.match(ui, /low === "ver" \|\| low === "version"/);
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "version" \}\)/);
-  assert.match(ui, /versionText\(\).*Cached content:.*GitHub\.io content:/s);
+  assert.match(ui, /versionText\(\).*Cached content version:.*GitHub\.io content version:/s);
   assert.match(ui, /window\.__activeBuildLabel/);
   assert.match(app, /ucc\.add\(updaterBridge, name: "content"\)/);
   assert.match(app, /case "version":[\s\S]*contentUpdater\.versionLabels/);
   assert.match(app, /window\.__activeBuildLabel =/);
-  assert.match(updater, /func versionLabels\(completion:/);
+  assert.match(updater, /func versionLabels\(completion:[\s\S]*fetchRemoteRelease/);
+  assert.match(updater, /appendingPathComponent\("js\/version\.js"\)/);
 });
 
-Then("Refresh forces a GitHub.io cache download through the native bridge", function () {
+Then("Reload seeds the local cache and refreshes differing GitHub.io content", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
-  assert.match(ui, /low === "refresh"/);
+  assert.match(ui, /low === "reload" \|\| low === "refresh"/);
   assert.match(ui, /nativeContent\.postMessage\(\{ action: "refresh" \}\)/);
-  assert.match(app, /case "refresh":[\s\S]*checkForUpdate\(force: true\)/);
-  assert.match(updater, /func checkForUpdate\(force: Bool = false/);
-  assert.match(updater, /guard force \|\| remote\.version > self\.store\.currentVersion/);
+  assert.match(ui, /url\.searchParams\.set\("_bmrefresh", Date\.now\(\)\.toString\(\)\)/);
+  assert.match(ui, /window\.location\.replace\(url\.toString\(\)\)/);
+  assert.match(app, /case "refresh":[\s\S]*ensureCacheFromBundle\(\)[\s\S]*checkForUpdate/);
+  assert.match(updater, /func checkForUpdate\(completion:/);
+  assert.match(updater, /remote\.sortKey > localKey/);
+  assert.match(app, /schemeHandler = AppSchemeHandler\([\s\S]*contentStore\.cacheRoot/);
+});
+
+Then("a changed app manifest offers an iOS update", function () {
+  const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
+  assert.match(updater, /func checkForAppManifestChange/);
+  assert.match(updater, /installed != remote/);
+  assert.match(app, /A new version of Blackwood Manor is available! Download now\?/);
+  assert.match(app, /UIAlertAction\(title: "Okay"/);
+  assert.match(app, /UIAlertAction\(title: "Cancel"/);
+  assert.match(app, /URL\(string: "itms-beta:\/\/"\)/);
+});
+
+Then("local daemon status is announced in the transcript without console noise", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(ui, /if \(!s\.nativeApp && s\.provider !== "daemon"\) return;/);
+  assert.match(ui, /print\(modelStatusText\(\), garyBrain\.isAvailable\(\) \? "sys ok" : "sys"\)/);
+  assert.match(ui, /Lines he actually generates are marked ◆ AI\./);
+  assert.doesNotMatch(ui, /gary scripted|· scripted/);
+  assert.doesNotMatch(css, /gary\.scripted|· scripted/);
+  assert.doesNotMatch(ui, /console\.log\(p[\s\S]*on-device voice active/);
 });
 
 Then("the TestFlight release refreshes the web bundle before generating the Xcode project", function () {
@@ -637,6 +768,23 @@ Then("the TestFlight release synchronizes the app version from the package", fun
   const script = readFileSync(new URL("../../../ios/release-testflight.sh", import.meta.url), "utf8");
   assert.match(script, /require\("\.\.\/web\/package\.json"\)\.version/);
   assert.match(script, /MARKETING_VERSION/);
+});
+
+Then("iOS and Pages derive their deploy identity from CONTENT_VERSION", function () {
+  const copy = readFileSync(new URL("../../../ios/copy-web.sh", import.meta.url), "utf8");
+  const pages = readFileSync(
+    new URL("../../../.github/workflows/pages.yml", import.meta.url), "utf8");
+  assert.match(copy, /gen-web-manifest\.mjs"\s+"\$DST"\s*$/m);
+  assert.match(pages, /gen-web-manifest\.mjs web\s*$/m);
+  assert.doesNotMatch(copy, /git\b[\s\S]*(?:show|rev-parse)/);
+  assert.doesNotMatch(pages, /git\b[\s\S]*(?:show|rev-parse)/);
+});
+
+Then("the TestFlight release replaces its repository-local build folder", function () {
+  const script = readFileSync(new URL("../../../ios/release-testflight.sh", import.meta.url), "utf8");
+  assert.match(script, /BUILD_ROOT="build"/);
+  assert.match(script, /rm -rf "\$BUILD_ROOT"/);
+  assert.match(script, /-derivedDataPath "\$DERIVED_DATA"/);
 });
 
 Then("Gary cleaning produces:", function (table) {

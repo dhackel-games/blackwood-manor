@@ -1,4 +1,4 @@
-# mushroom-vision.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @walkthrough
 Feature: The mushroom trip's third eye
@@ -75,6 +75,14 @@ Feature: The mushroom trip's third eye
     When I send "remove headlamp"
     Then the output contains "pitch black"
     And light status is inactive
+
+  Scenario: USE preserves the obsidian eye's take reward before wearing it
+    Given the player is in room "hiddenVault"
+    When I send "use eye"
+    Then item "obsidianEye" is worn in slot "forehead"
+    And flag "obsidianEyeClaimed" is set
+    And the game score is 15
+    And the output contains "(get obsidian eye, wear eye)"
 
   Scenario: The Obsidian Eye and XRAY GOGGLES can be worn together
     Given item "obsidianEye" is carried

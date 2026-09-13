@@ -1,4 +1,4 @@
-# cheat-prompts.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# cheat-prompts.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @unit
 Feature: Hidden compound prompt shortcuts
@@ -13,20 +13,38 @@ Feature: Hidden compound prompt shortcuts
     Then the hidden cheat menu command is "::"
     And the magic menu unlock passwords are "werdna,evad"
     And the hidden cheat catalog defines "::powerup,::winquick,::garycliff,::winmax"
+    And the magic menu uses the shared command title description format
+    And every hidden compound prompt uses shortest command forms
     And hidden shortcuts replace the editable command prompt without executing
     And public HELP does not reveal hidden cheat commands
     And no hidden cheat prompt uses the removed su command
 
   Scenario: Dynamic path tokens resolve from the current room
-    Then the path from the current room to "PRIVY" is "east; east"
+    Then the path from the current room to "PRIVY" is "e; e"
+
+  Scenario: Compound prompts use the shortest safe command aliases
+    Then long commands shorten as:
+      | long                    | short                |
+      | north                   | n                    |
+      | southwest               | sw                   |
+      | up                      | u                    |
+      | down                    | d                    |
+      | open mailbox            | o mailbox            |
+      | close reliquary         | shut reliquary       |
+      | take family crest       | get family crest     |
+      | wear winged shoes       | don winged shoes     |
+      | remove talisman         | doff talisman        |
+      | offer apple to dragon   | give apple to dragon |
+      | enter platform          | in platform          |
+      | wait                    | z                    |
 
   Scenario: Prompt expansion skips items already carried or worn
     Given item "backpack" is carried
     And item "wingedShoes" is carried
     When I send "wear winged shoes"
     Then hidden cheat "::powerup" omits "take backpack"
-    And hidden cheat "::powerup" includes "wear backpack"
-    And hidden cheat "::powerup" omits "wear winged shoes"
+    And hidden cheat "::powerup" includes "don backpack"
+    And hidden cheat "::powerup" omits "don winged shoes"
 
   Scenario: Powerup equips a backpack that is already carried but not worn
     Given item "backpack" is carried

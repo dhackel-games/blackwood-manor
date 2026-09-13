@@ -1,4 +1,4 @@
-# cave-gear.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -214,6 +214,12 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "talisman" is in "reliquary"
     And the output contains "Family heirlooms: 1/12"
     And the game score is 15
+
+  Scenario: USE wears wearable equipment
+    Given item "talisman" is carried
+    When I send "use talisman"
+    Then item "talisman" is worn in slot "neck"
+    And the output contains "(wear talisman)"
 
   Scenario: Putting into the closed reliquary opens its glass doors first
     Given item "rope" is carried

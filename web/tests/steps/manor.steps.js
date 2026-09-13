@@ -1,4 +1,4 @@
-// manor.steps.js Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -15,6 +15,7 @@ import {
   isMagicMenuPassword,
   magicMenuAction,
   pathToRoom,
+  shortestCommand,
 } from "../../js/cheat-prompts.js";
 import { CYCLING_FLAVOR_POOLS, REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
@@ -298,12 +299,30 @@ Then("the hidden cheat catalog defines {string}", function (commands) {
   }
 });
 
+Then("the magic menu uses the shared command title description format", function () {
+  const menu = cheatMenu().split("\n");
+  assert.equal(menu[1], "COMMAND | TITLE / DESCRIPTION");
+  for (const entry of CHEAT_PROMPTS) {
+    assert.ok(menu.some((line) =>
+      line.includes(`${entry.cmd.padEnd(14)} | ${entry.name} / ${entry.description}`)));
+  }
+});
+
+Then("every hidden compound prompt uses shortest command forms", function () {
+  const longForm = /^(?:north|northeast|east|southeast|south|southwest|west|northwest|up|down|open|close|take|wear|remove|offer|enter|wait)(?:\s|$)/i;
+  for (const entry of CHEAT_PROMPTS) {
+    for (const command of entry.compoundPrompt.split(";").map((part) => part.trim())) {
+      if (!command.startsWith("{{")) assert.doesNotMatch(command, longForm, `${entry.cmd}: ${command}`);
+    }
+  }
+});
+
 Then("hidden shortcuts replace the editable command prompt without executing", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /magicMenuAction\(command, magicMenuUnlocked\)/);
   assert.match(ui, /localStorage\.setItem\(MAGIC_MENU_UNLOCK_KEY, "true"\)/);
   assert.match(ui, /if \(action\.showMenu\)/);
-  assert.match(ui, /input\.value = expandCheatPrompt\(action\.shortcut, game\)/);
+  assert.match(ui, /mainEntry\.setValue\(expandCheatPrompt\(action\.shortcut, game\)\)/);
   assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
   assert.equal(cheatPrompt("::"), null);
   assert.equal(cheatPrompt(":powerup"), null);
@@ -316,6 +335,10 @@ Then("no hidden cheat prompt uses the removed su command", function () {
 
 Then("the path from the current room to {string} is {string}", function (room, path) {
   assert.equal(pathToRoom(this.game, room).join("; "), path);
+});
+
+Then("long commands shorten as:", function (table) {
+  for (const { long, short } of table.hashes()) assert.equal(shortestCommand(long), short);
 });
 
 Then("hidden cheat {string} omits {string}", function (command, omitted) {

@@ -1,9 +1,10 @@
-// commands.js — generic verb handlers. Content-free engine.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
 // returned by ctx.find/ctx.itemsIn (which persist in game state).
 
-import { renderMap } from "./map.js";
+import { renderMap } from "./map.js?v=source";
 
 const normalizeRoomName = (name) => String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -67,50 +68,47 @@ function inspectRoom(ctx) {
 }
 
 export const HELP_TEXT = `COMMANDS
-again/(g): Repeat the previous command.
-ai: Report whether Gary is scripted or using an on-device model.
-attack <thing>: Attack a visible target.
-brief: Use shorter room descriptions after the first visit.
-bug <description>: Open a GitHub issue for the current room.
-call/hint: Call Gary's paid hint line.
-close <thing>: Close an open door or container.
-directions/go: Travel with n, s, e, w, ne, nw, se, sw, up, down, in, or out.
-drink <thing>: Drink a visible beverage.
-drop <thing>/all: Drop one carried item or every unworn item.
-eat <thing>: Eat visible food.
-extinguish <thing>: Put out a light or flame.
-give <thing> to <character>: Hand over an item.
-help/(?): Show this command reference.
-(i)nventory: List everything you carry and wear.
-light <thing>: Ignite a usable light source.
-lock <thing> with <key>: Lock something with a matching key.
-(l)ook/e(x)amine/search: Inspect the room or a visible thing more closely.
-(m)ap: Show Gary's map of visited locations.
-move <thing>: Shift or jostle something.
-open <thing>: Open a door or container.
-pull <thing>: Pull something.
-push <thing>: Push something.
-put <thing> in <container>: Place a carried item inside.
-(q)uit: End the session.
-reach into <thing>: Reach into an opening.
-read <thing>: Read visible writing.
-refresh: Force the iOS app to redownload its GitHub.io web cache.
-remove <thing>: Take off worn equipment.
-restart: Start a fresh game.
-restore: Restore the browser's saved game.
-ring <thing>: Ring a bell or similar object.
-save: Save the current game in this browser.
-say <words>: Speak aloud.
-score: Show points, turns, and rank.
-take <thing>/all: Take one visible item or everything portable.
-talk to <character>: Start a conversation.
-throw <thing> at <target>: Throw a carried item.
-unlock <thing> with <key>: Unlock something with a matching key.
-use <thing>: Use an object whose purpose is clear.
-verbose: Always print full room descriptions.
-(ver)sion/build: Show the loaded build and compare iOS cached content with GitHub.io.
-wait/(z): Let one turn pass.
-wear <thing>: Put on carried equipment.
+COMMAND | TITLE / DESCRIPTION
+again/(g) | Repeat / Repeat the previous command.
+ai | AI status / Report whether Gary is scripted or using an on-device model.
+attack <thing> | Attack / Attack a visible target.
+brief | Brief mode / Shorten room descriptions after the first visit.
+bug <description> | Report bug / Open a GitHub issue with session diagnostics.
+call/hint | Gary / Call Gary's paid hint line.
+close <thing> | Close / Close an open door or container.
+drop <thing>/all | Drop / Drop one carried item or every unworn item.
+extinguish <thing> | Extinguish / Put out a light or flame.
+get/take/grab <thing>/all | Take / Take one visible item or everything portable.
+give <thing> to <character> | Give / Hand over an item.
+help/? | Help / Show this command reference.
+(i)nventory | Inventory / List everything you carry and wear.
+light <thing> | Light / Ignite a usable light source.
+lock <thing> with <key> | Lock / Lock something with a matching key.
+(l)ook/e(x)amine/search | Inspect / Inspect the room or a visible thing more closely.
+(m)ap | Map / Show Gary's map of visited locations.
+move <thing> | Move / Shift or jostle something.
+(n)orth, (s)outh, (e)ast, (w)est, northeast (ne), northwest (nw), southeast (se), southwest (sw), (u)p, (d)own, in, out | Directions / Go that direction.
+(o)pen <thing> | Open / Open a door or container.
+pull <thing> | Pull / Pull something.
+push <thing> | Push / Push something.
+put <thing> in <container> | Put / Place a carried item inside.
+(q)uit | Quit / End the session.
+reach into <thing> | Reach / Reach into an opening.
+read <thing> | Read / Read visible writing.
+reload/refresh | Reload / Reload web files or force the iOS GitHub.io cache download.
+remove <thing> | Remove / Take off worn equipment.
+restart | Restart / Start a fresh game.
+restore | Restore / Restore the browser's saved game.
+ring <thing> | Ring / Ring a bell or similar object.
+save | Save / Save the current game in this browser.
+say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
+score | Score / Show points, turns, and rank.
+throw <thing> at <target> | Throw / Throw a carried item.
+unlock <thing> with <key> | Unlock / Unlock something with a matching key.
+use/wear/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
+verbose | Verbose mode / Always print full room descriptions.
+(ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
+wait/(z) | Wait / Let one turn pass.
 
 CHAINING
 Separate commands with ".", ";", ",", or THEN.

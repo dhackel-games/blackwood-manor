@@ -1,4 +1,4 @@
-# oak-tree-fort.feature Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
 
 @unit
 Feature: The RGB oak lift and Blackwood tree fort
@@ -94,7 +94,7 @@ Feature: The RGB oak lift and Blackwood tree fort
     And I send "put blue stone in mechanism"
     And I send "enter platform"
     And I send "wait"
-    Then the path from the current room to "PRIVY" is "out; wait; west"
+    Then the path from the current room to "PRIVY" is "out; z; w"
 
   Scenario: Temporary flight cannot bypass an unsolved lift and strand the player
     Given flag "high" is 1

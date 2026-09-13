@@ -1,3 +1,4 @@
+<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="Blackwood" />
   <meta name="theme-color" content="#050805" />
   <title>Blackwood Manor</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=source" />
 </head>
 <body>
   <div id="crt">
@@ -27,35 +28,60 @@
 
     <!-- Touch controls: tap to run common commands (typing still works) -->
     <div id="controls">
-      <div class="dpad">
-        <button data-cmd="north">N</button>
-        <button data-cmd="south">S</button>
-        <button data-cmd="east">E</button>
-        <button data-cmd="west">W</button>
-        <button data-cmd="up">Up</button>
-        <button data-cmd="down">Dn</button>
-        <button data-cmd="in">In</button>
-        <button data-cmd="out">Out</button>
+      <div class="movement-controls">
+        <div class="dpad" aria-label="compass directions">
+          <button class="northwest" data-cmd="northwest" aria-label="northwest" title="nw">↖</button>
+          <button class="north" data-cmd="north" aria-label="north" title="n">↑</button>
+          <button class="northeast" data-cmd="northeast" aria-label="northeast" title="ne">↗</button>
+          <button class="west" data-cmd="west" aria-label="west" title="w">←</button>
+          <span class="compass-center" aria-hidden="true">✦</span>
+          <button class="east" data-cmd="east" aria-label="east" title="e">→</button>
+          <button class="southwest" data-cmd="southwest" aria-label="southwest" title="sw">↙</button>
+          <button class="south" data-cmd="south" aria-label="south" title="s">↓</button>
+          <button class="southeast" data-cmd="southeast" aria-label="southeast" title="se">↘</button>
+        </div>
+        <div class="vertical-directions">
+          <button class="level-arrow" data-cmd="up" aria-label="up" title="up"><span aria-hidden="true">⇧</span></button>
+          <button class="portal-arrow" data-cmd="in" aria-label="in" title="in">
+            <svg class="portal-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="4" width="12" height="16" rx="1"></rect>
+              <path d="M2 12h15M13 8l4 4-4 4"></path>
+            </svg>
+          </button>
+          <button class="level-arrow" data-cmd="down" aria-label="down" title="down"><span aria-hidden="true">⇩</span></button>
+          <button class="portal-arrow" data-cmd="out" aria-label="out" title="out">
+            <svg class="portal-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="3.5" y="4" width="11" height="16" rx="1"></rect>
+              <path d="M9 12h14M19 8l4 4-4 4"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="verbs">
-        <button data-cmd="look">Look</button>
-        <button data-prefill="take ">Take</button>
-        <button data-prefill="say ">Say</button>
-        <button data-cmd="inventory">Inv</button>
-        <button data-cmd="map">Map</button>
-        <button data-cmd="call">Call</button>
-        <button data-cmd="help" aria-label="help">?</button>
-        <button id="bug-report" type="button" aria-label="report a bug on GitHub">🪲</button>
+        <div class="verb-row">
+          <button data-cmd="look">Look</button>
+          <button data-prefill="take ">Take</button>
+          <button data-prefill="use ">Use</button>
+          <button data-prefill="say ">Say</button>
+        </div>
+        <div class="verb-row">
+          <button data-cmd="inventory">Inv</button>
+          <button data-cmd="map">Map</button>
+          <button data-cmd="call">Call</button>
+          <button class="compact-action" data-cmd="help" aria-label="help">?</button>
+          <button class="compact-action" id="bug-report" type="button"
+                  aria-label="report a bug on GitHub">🪲</button>
+        </div>
       </div>
     </div>
 
     <div id="inputline">
       <span id="prompt">&gt;</span>
+      <button id="mic" class="iconbtn" aria-label="speak a command" hidden>&#127908;</button>
       <input id="cmd" autocomplete="off" autocapitalize="off"
              autocorrect="off" spellcheck="false" enterkeyhint="send"
              placeholder="type command / tap button" aria-label="command input" />
-      <button id="mic" class="iconbtn" aria-label="speak a command" hidden>&#127908;</button>
-      <button id="go" aria-label="submit command"><span aria-hidden="true">↑</span></button>
+      <button id="go" class="entry-submit" aria-label="submit command"><span aria-hidden="true">↑</span></button>
     </div>
   </div>
 
@@ -68,16 +94,21 @@
         <div class="phone-ai" id="phone-ai" role="button" tabindex="0"
              aria-label="how Gary is being generated">&#9675; checking&hellip;</div>
       </div>
-      <div id="phone-avatar" class="phone-avatar" role="button" tabindex="0" aria-label="tap to turn Gary's voice on or off">🔊</div>
       <div class="phone-name">Gary</div>
+      <button id="phone-avatar" class="phone-avatar" type="button"
+              aria-label="turn Gary's voice on" aria-pressed="false">🔊</button>
       <div class="voice-controls">
-        <div id="phone-mute" class="voice-hint" role="button" tabindex="0" aria-label="toggle Gary's voice"></div>
         <select id="gary-voice" aria-label="Gary voice">
           <option value="computer-male" title="Computer male">🤖♂️</option>
           <option value="computer-female" title="Computer female">🤖♀️</option>
           <option value="australian-male" title="Australian male">👨</option>
           <option value="australian-female" title="Australian female">👩</option>
         </select>
+        <div class="gary-volume-control">
+          <span class="gary-volume-icon" aria-hidden="true">🔉</span>
+          <input id="gary-volume" type="range" min="0" max="100" step="5" value="100"
+                 aria-label="Gary volume" />
+        </div>
       </div>
       <div class="phone-status">
         <span id="phone-timer">00:00</span> &middot; <span id="phone-bill">$0.00</span>
@@ -87,12 +118,12 @@
         <button id="phone-mic" class="iconbtn" aria-label="speak to Gary" hidden>&#127908;</button>
         <input id="phone-cmd" autocomplete="off" autocapitalize="off" autocorrect="off"
                spellcheck="false" enterkeyhint="send" placeholder="say something to Gary…" aria-label="say to Gary" />
-        <button id="phone-go" aria-label="send to Gary"><span aria-hidden="true">↑</span></button>
+        <button id="phone-go" class="entry-submit" aria-label="send to Gary"><span aria-hidden="true">↑</span></button>
       </div>
       <button id="phone-end"><span>END CALL</span></button>
     </div>
   </div>
 
-  <script type="module" src="js/ui.js"></script>
+  <script type="module" src="js/ui.js?v=source"></script>
 </body>
 </html>

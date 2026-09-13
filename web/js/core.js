@@ -1,4 +1,5 @@
-// core.js — game state + rules. DOM-free and content-free. Testable in Node.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler
 // FUNCTIONS (item.on / room.on). Per-game MUTABLE state lives entirely in `state`:
@@ -7,8 +8,8 @@
 //   - state.flags holds boolean/other game flags.
 // This keeps games isolated without ever cloning functions.
 
-import { parse, splitCommands } from "./parser.js";
-import { commands } from "./commands.js";
+import { parse, splitCommands } from "./parser.js?v=source";
+import { commands } from "./commands.js?v=source";
 
 const DARK_WARNING = "It is pitch black. You are likely to be eaten by a grue.";
 
@@ -98,21 +99,19 @@ export function createGame(world) {
     return out;
   };
 
-  game.findItem = (phrase, scope) => {
+  game.findItems = (phrase, scope) => {
     if (!phrase) return null;
     const words = phrase.toLowerCase().split(/\s+/).filter(Boolean);
     const noun = words[words.length - 1];
     const adjs = words.slice(0, -1);
     const candidates = scope || game.visibleItems();
-    for (const it of candidates) {
+    return candidates.filter((it) => {
       const names = (it.names || []).map((s) => s.toLowerCase());
       const iadj = (it.adjectives || []).map((s) => s.toLowerCase());
-      if (names.includes(noun) && adjs.every((a) => iadj.includes(a) || names.includes(a))) {
-        return it;
-      }
-    }
-    return null;
+      return names.includes(noun) && adjs.every((a) => iadj.includes(a) || names.includes(a));
+    });
   };
+  game.findItem = (phrase, scope) => game.findItems(phrase, scope)?.[0] || null;
   game.find = (phrase, scope) => game.findItem(phrase, scope);
 
   // --- ctx API for content handlers -----------------------------------------
@@ -386,8 +385,31 @@ export function createGame(world) {
         step: `get ${item.names[0]}`,
       };
     }
-    game.moveItem(item.id, "inventory");
-    return { step: `get ${item.names[0]}` };
+    const takeCommand = {
+      verb: "take",
+      dobj: item.names[0],
+      prep: null,
+      iobj: null,
+      itemId: item.id,
+    };
+    const itemHandler = world.items[item.id]?.on?.take;
+    let result = itemHandler ? itemHandler(game, takeCommand) : null;
+    const roomHandler = world.rooms[state.room]?.on?.take;
+    if (result == null && roomHandler) result = roomHandler(game, takeCommand);
+    if (result == null) {
+      game.moveItem(item.id, "inventory");
+      if (item.autoWearOnTake && (!item.wearSlot || !game.equipped(item.wearSlot))) {
+        item.worn = true;
+        result = "Taken and worn.";
+      } else {
+        result = "Taken.";
+      }
+    }
+    if (!game.has(item.id)) return { blocked: result, step: `get ${item.names[0]}` };
+    return {
+      step: `get ${item.names[0]}`,
+      completed: cmd.verb === "wear" && game.item(item.id)?.worn ? result : null,
+    };
   }
 
   function inferSoleTalkTarget(cmd) {
@@ -407,6 +429,58 @@ export function createGame(world) {
     return `enter ${target.names[0]}`;
   }
 
+  function inferUseAction(cmd) {
+    if (cmd.verb !== "use" || !cmd.dobj) return null;
+    const carried = game.findItems(cmd.dobj, game.inventory()) || [];
+    if (carried.length > 1) {
+      const choices = [...carried].sort((a, b) => Number(!!b.fresh) - Number(!!a.fresh));
+      const noun = cmd.dobj.split(/\s+/).at(-1).toUpperCase();
+      const labels = choices.map((item) =>
+        (item.adjectives?.[0] || item.names[0]).toUpperCase());
+      state.flags.pendingUseChoice = {
+        ids: choices.map((item) => item.id),
+        noun,
+        labels,
+      };
+      return { prompt: `(which ${noun}? ${labels.join(" or ")}?)` };
+    }
+    const item = carried[0] || game.find(cmd.dobj);
+    if (!item || world.items[item.id]?.on?.use) return null;
+    if (item.wearable) cmd.verb = "wear";
+    else if (item.edible) cmd.verb = "eat";
+    else if (item.drinkable) cmd.verb = "drink";
+    else return null;
+    return { label: `${cmd.verb} ${cmd.dobj}` };
+  }
+
+  function resolvePendingUse(input) {
+    const pending = state.flags.pendingUseChoice;
+    const ids = Array.isArray(pending) ? pending : pending?.ids;
+    if (!Array.isArray(ids) || !ids.length) return null;
+    const raw = String(input || "").trim().toLowerCase();
+    if (/^use\b/.test(raw)) {
+      state.flags.pendingUseChoice = null;
+      return { command: input };
+    }
+    const words = raw.split(/\s+/).filter(Boolean);
+    const matches = ids.map((id) => game.item(id)).filter((item) => item && words.every((word) =>
+      item.id.toLowerCase() === word
+      || item.names.some((name) => name.toLowerCase() === word)
+      || (item.adjectives || []).some((adjective) => adjective.toLowerCase() === word)));
+    if (matches.length !== 1) {
+      const noun = pending?.noun || "ITEM";
+      const labels = pending?.labels || ids.map((id) => {
+        const item = game.item(id);
+        return (item?.adjectives?.[0] || item?.names?.[0] || id).toUpperCase();
+      });
+      return { prompt: `(which ${noun}? ${labels.join(" or ")}?)` };
+    }
+    state.flags.pendingUseChoice = null;
+    const item = matches[0];
+    const adjective = item.adjectives?.[0];
+    return { command: `use ${adjective ? `${adjective} ` : ""}${item.names[0]}` };
+  }
+
   // --- main loop -------------------------------------------------------------
   // Runs exactly one command. Returns { text, stop } — `stop` aborts the rest of
   // a chained line (parse error, game over, or we just picked up the phone).
@@ -423,11 +497,15 @@ export function createGame(world) {
     if (implicitNavigation) cmd = parse(implicitNavigation);
     const implicitEntry = inferGoEntryTarget(cmd);
     const implicitTalk = inferSoleTalkTarget(cmd);
-    const executionLabel = implicitNavigation || implicitEntry || implicitTalk || input.trim().toLowerCase();
-
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || [])
       : [];
+    const useInference = inferUseAction(cmd);
+    if (useInference?.prompt) return { text: useInference.prompt, stop: true };
+    const implicitUse = useInference?.label || null;
+    const executionLabel = implicitNavigation || implicitEntry || implicitTalk || implicitUse
+      || input.trim().toLowerCase();
+
     const acquisition = implicitlyAcquire(cmd);
     if (acquisition) derivedSteps.push(acquisition.step);
     const preparationBlocked = acquisition?.blocked
@@ -442,7 +520,7 @@ export function createGame(world) {
     deferStatusBanner = true;
     describedRoomThisTurn = false;
     if (["look", "examine", "search"].includes(cmd.verb)) game.setFlag("usedInspection");
-    const override = acquisitionBlocked || runHandlers(cmd);
+    const override = acquisitionBlocked || acquisition?.completed || runHandlers(cmd);
     let text;
     if (override != null) {
       text = override;
@@ -460,7 +538,7 @@ export function createGame(world) {
       }
       const sequence = acquisitionBlocked ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join(", ")})\n\n${text}`;
-    } else if (implicitNavigation || implicitEntry || implicitTalk) {
+    } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {
       text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();
@@ -485,6 +563,9 @@ export function createGame(world) {
       state.flags.onCall = false;
       return "The game is over. Type RESTART to play again.";
     }
+    const pendingUse = resolvePendingUse(input);
+    if (pendingUse?.prompt) return pendingUse.prompt;
+    if (pendingUse?.command) input = pendingUse.command;
     // While on the hint line, everything you type goes to Gary verbatim (no
     // splitting — Gary should hear your commas) and no world turn passes.
     if (state.flags.onCall) {
