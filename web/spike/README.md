@@ -13,15 +13,18 @@ answer three questions **before** we commit to Chapter 2:
 Everything lives under `web/spike/`. It is **not** part of the shipped bundle:
 
 - The manifest test only checks `index.html` + `css/**` + `js/**`, so nothing
-  here can break the 365-scenario suite (verified: 365/365 still pass).
+  here can break the 383-scenario suite (verified: 383/383 still pass).
 - `ios/copy-web.sh` only ships `index.html` + `css` + `js`, so the spike never
   enters the iOS app.
 - GitHub Pages uploads all of `web/`, so this page *is* viewable at
   `…/blackwood-manor/spike/tilemap.html` once pushed — handy for phone review.
 
-The floor layout in `tilemap.js` is **copied** from `web/js/map.js` on purpose,
-so the spike imports nothing from the live game. Phase 1 would make `map.js`
-export that data and delete the copy.
+The spike **imports** the shipped engine (`../js/world.js`, `../js/core.js`) at
+runtime but **adds no files** under `web/js` or `web/css`, so the manifest and
+the iOS bundle are untouched. Importing is deliberate: per ADR 0001 there is one
+web engine with many front-ends, and the tile view is just another front-end.
+The floor *layout* in `tilemap.js` is still a copy of `web/js/map.js` (view-only
+geometry); Phase 1 would make `map.js` export it and delete the copy.
 
 ## Run it
 
@@ -53,11 +56,22 @@ The page is now interactive, not just a render test:
 - **Lure loop (early):** press **B** (or the button) to drop bait in Gary's room.
   A wandering guest paths toward the nearest bait (`guestStep`); reaching it
   counts as "lured". This is the seed of the Chapter-2 manipulation mechanic.
+- **Real manor mechanics (live engine):** the command bar runs the *shipped*
+  engine against Gary's current room. Type real verbs — `examine mirror`,
+  `take mirror`, `open`, `read`, `push pedestal`, `pray` — and get the exact
+  responses from the text game. Items that move (take/drop) update on the map and
+  in the inspector immediately, because item lists now come from live world state
+  (`game.itemsIn(room)`) instead of the static snapshot. Movement, bait, reveal,
+  and reset stay local to the spike; everything else falls through to the engine.
+  Note: these are the *protagonist's* verbs — Gary-specific verbs (haunt, doors,
+  scare) are new Chapter-2 design, not in the shipped engine yet.
 
 ### roomdata.json (generated, do not hand-edit)
 
-Descriptions + item placements come from the shipped game, frozen at author time
-so the browser page never imports any engine *logic*:
+Descriptions still come from this frozen snapshot (room descriptions in the
+shipped world can be context-dependent functions, so a static string is safer for
+the inspector). Item *lists* now come from the live engine when it loads, falling
+back to this file otherwise:
 
 ```bash
 node web/spike/gen-roomdata.mjs   # regenerate after world.js / world.content.js edits

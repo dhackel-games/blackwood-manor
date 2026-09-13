@@ -162,17 +162,56 @@
   const TILEPX = 16;
   const graph = buildManorGraph();
   let atlas = null;
-  // Real room descriptions + item placements, frozen from the shipped world by
-  // gen-roomdata.mjs. Loaded async; the page works even before it arrives.
+  // Room descriptions + item placements. ROOMDATA is the static snapshot
+  // (gen-roomdata.mjs) used for descriptions and as a fallback. When the live
+  // engine loads (below), item lists come from real world state instead, so
+  // taking/dropping/opening things is reflected on the map.
   let ROOMDATA = {};
   fetch("./roomdata.json").then((r) => r.json()).then((d) => { ROOMDATA = d; render(); }).catch(() => {});
+
+  // The real shipped engine, imported live (see ADR 0001 — one web engine, many
+  // front-ends). Dynamic so a load failure degrades to the static snapshot
+  // rather than breaking the page.
+  let game = null;
+  (async () => {
+    try {
+      const [{ world }, { createGame }] = await Promise.all([
+        import("../js/world.js"), import("../js/core.js"),
+      ]);
+      game = createGame(world);
+      render();
+    } catch (e) { console.warn("live engine unavailable — using static roomdata", e); }
+  })();
+
+  const kindOf = (it) => it.takeable ? "takeable" : it.container ? "container" : it.scenery ? "scenery" : "fixture";
+  const ITEM_RANK = { takeable:0, container:1, scenery:2, fixture:3 };
+  // Items in a room: live from the engine when available (reflects moves/spawns),
+  // else the static snapshot.
+  function roomItems(id) {
+    if (game) {
+      return game.itemsIn(id)
+        .map((it) => ({ label: (it.names && it.names[0]) || it.id, kind: kindOf(it) }))
+        .sort((a, b) => (ITEM_RANK[a.kind] - ITEM_RANK[b.kind]) || a.label.localeCompare(b.label));
+    }
+    const rd = ROOMDATA[id];
+    return rd ? rd.items : [];
+  }
+
   const atlasMap = { [TILE.VOID]:0, [TILE.FLOOR]:1, [TILE.WALL]:2, [TILE.DOOR]:3,
     [TILE.CORRIDOR]:4, [TILE.FOG]:5, [TILE.STAIR]:6, [TILE.PLAYER]:7 };
+
+  // Interaction verbs forwarded to the real engine from the command bar.
+  const ENGINE_VERBS = new Set([
+    "take","get","grab","pick","drop","put","push","pull","open","close","examine","x",
+    "inspect","read","search","pray","give","turn","use","wear","unlock","lock","light",
+    "extinguish","ring","touch","smell","taste","eat","drink","knock","wave","break",
+    "attack","throw","kiss","shake","empty","fill","pour","tie","untie","dig",
+  ]);
 
   const KIND_ICON = { takeable:"💎", container:"📦", scenery:"🗿", fixture:"⚙️" };
 
   // --- play state -----------------------------------------------------------
-  const START = "grandHall";
+  const START = "gate";
   const GUEST_START = "greatOak";
   let gary, seen, steps, msg, guest, bait, lured, focusId, recenter;
   let lastLayout = null, lastFloor = 0;
@@ -285,9 +324,9 @@
   function drawItemIcons(layout) {
     for (const box of layout.boxes) {
       if (!box.seen) continue;
-      const rd = ROOMDATA[box.id];
-      if (!rd || !rd.items.length) continue;
-      const hasLoot = rd.items.some((i) => i.kind === "takeable");
+      const items = roomItems(box.id);
+      if (!items.length) continue;
+      const hasLoot = items.some((i) => i.kind === "takeable");
       const x = (box.x + box.w - 1.2) * TILEPX, y = (box.y + 0.3) * TILEPX;
       ctx.fillStyle = hasLoot ? "#ffe08a" : "#7fd0ff";
       ctx.strokeStyle = "#0009"; ctx.lineWidth = 1;
@@ -349,7 +388,7 @@
     }
     const rd = ROOMDATA[id];
     const desc = rd && rd.desc ? rd.desc : "(no description on record)";
-    const items = (rd && rd.items) || [];
+    const items = roomItems(id);
     const tag = id === gary ? " · you are here" : (id === guest ? " · the guest" : "");
     let html = `<h2>${label}</h2><div class="sub">${id}${tag}</div>`;
     html += `<div class="desc">${desc}</div>`;
@@ -465,6 +504,18 @@
     e:[1,0], east:[1,0], w:[-1,0], west:[-1,0],
   };
 
+  // Route a line to the shipped engine as if Gary were the protagonist. Keeps
+  // the spike un-brickable: engine death/win are side effects we swallow here.
+  function runEngine(line) {
+    game.state.room = gary;
+    let text;
+    try { text = game.send(line); }
+    catch (e) { text = "The manor does not respond to that."; }
+    if (game.state.dead) { game.state.dead = false; text = (text || "") + "\n(Gary can't truly die — you shake it off.)"; }
+    if (game.state.won) { game.state.won = false; }
+    return (text || "Nothing happens.").trim();
+  }
+
   // Tiny command parser — the seed of a real prompt. Movement, luring, looking,
   // and view toggles for now; a full verb set is Chapter-2 design work.
   function runCommand(raw) {
@@ -474,8 +525,9 @@
     const arg = rest.join(" ");
 
     if (verb === "help" || verb === "?") {
-      msg = "commands: (n/s/e/w) move · up/down stairs · go <room> · look · " +
-        "bait (drop/pick up here) · reveal · reset. Or click/hover rooms.";
+      msg = "move: n/s/e/w · up/down · go <room> · click a room. " +
+        "act: examine/take/open/read/push/pull/pray… (real manor verbs). " +
+        "spike: bait · reveal · reset. Or hover a room to inspect it.";
       render(); return;
     }
     if (WORD_DIRS[verb]) {
@@ -491,14 +543,20 @@
       if (ex) moveTo(ex.id, ex.label); else { msg = `No stairs ${verb} from here.`; render(); }
       return;
     }
-    if (verb === "bait" || verb === "drop" || verb === "lure") { toggleBait(); return; }
-    if (verb === "look" || verb === "l" || verb === "examine") {
+    if (verb === "bait" || verb === "lure" || (verb === "drop" && (!arg || arg === "bait"))) { toggleBait(); return; }
+    if (verb === "look" || verb === "l") {
+      if (game && rest.length) { msg = runEngine(line); render(); return; }
       focusId = gary; const rd = ROOMDATA[gary];
       msg = rd && rd.desc ? rd.desc : `You are in ${graph.home.get(gary).label}.`;
       render(); return;
     }
     if (verb === "reveal" || verb === "map") { revealChk.checked = !revealChk.checked; render(); return; }
     if (verb === "reset") { reset(); return; }
+
+    // Real manor verbs — run the shipped engine against Gary's current room so
+    // examine/take/open/push/etc. behave exactly as in the shipped game and
+    // move real items around on the map.
+    if (game && ENGINE_VERBS.has(verb)) { msg = runEngine(line); render(); return; }
 
     // "go/move/walk/enter <room>" or a bare room name.
     const target = ["go", "move", "walk", "enter", "to"].includes(verb) ? resolveRoom(arg) : resolveRoom(line);
@@ -564,7 +622,7 @@
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
 
   // --- command bar: type what Gary does ------------------------------------
-  cmdForm.addEventListener("submit", (e) => { e.preventDefault(); runCommand(cmdInput.value); cmdInput.value = ""; });
+  cmdForm.addEventListener("submit", (e) => { e.preventDefault(); runCommand(cmdInput.value); cmdInput.value = ""; cmdInput.focus(); });
 
   atlasBtn.addEventListener("click", () => atlasFile.click());
   atlasFile.addEventListener("change", () => {
