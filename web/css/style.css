@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.077:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -44,20 +44,26 @@ body { -webkit-text-size-adjust: 100%; }
 #hud {
   position: relative; z-index: 60;
   flex: 0 0 auto;
-  display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; justify-content: flex-end;
+  display: flex; flex-wrap: nowrap; gap: 0.2rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.15rem; margin-bottom: 0.2rem;
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
 #hud-slots {
   display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
   gap: 0.35rem;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: none;
 }
-.hud-slot { color: var(--green-bright); }
+#hud-slots::-webkit-scrollbar { display: none; }
+.hud-slot { flex: 0 0 auto; color: var(--green-bright); }
 .hud-slot[hidden] { display: none; }
 .hud-slot + .hud-slot::before {
   content: "·";

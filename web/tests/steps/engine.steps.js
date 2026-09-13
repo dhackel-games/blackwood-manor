@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.076:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.077:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -390,6 +390,15 @@ Then("the sound-effects toggle is leftmost in the HUD slots and explains its sta
   assert.match(ui, /Sound effects off — click to turn on/);
   assert.match(ui, /Sound effects on — click to mute/);
   assert.match(ui, /setAttribute\("aria-pressed", String\(!sfxMuted\)\)/);
+});
+
+Then("the HUD remains one non-wrapping row", function () {
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.doesNotMatch(html, /id=["']hud-version["']/);
+  assert.match(css, /#hud\s*\{[^}]*flex-wrap:\s*nowrap/s);
+  assert.match(css, /#hud-slots\s*\{[^}]*flex-wrap:\s*nowrap[^}]*overflow-x:\s*auto/s);
+  assert.match(css, /\.hud-slot\s*\{[^}]*flex:\s*0 0 auto/s);
 });
 
 Then("the bowel meter has no trailing solid cap", function () {
