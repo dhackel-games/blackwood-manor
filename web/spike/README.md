@@ -94,3 +94,10 @@ NanoBanana is the recommended generator for future tiles.
 
 No movement, no gameplay, no Chapter-2 rules, no lure/escape systems. Purely a
 rendering + data-reuse validation. Gameplay design is Phase 1+.
+
+## Architecture principle
+
+This spike follows **ADR 0001 — Web-first engine, thin native shell**
+(`docs/adr/0001-web-first-engine-thin-native-shell.md`): the entire game/engine
+is web; the native layer stays a thin shell so we can eventually port to
+Android by reusing the whole web engine. All Chapter 2 code lives in web.

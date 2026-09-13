@@ -10,6 +10,14 @@ and there's a hidden wing after you win.
 - **`web/`** — the game. Pure static HTML/CSS/JS, no build step, no dependencies.
 - **`ios/`** — a native iOS wrapper (SwiftUI + `WKWebView`) that bundles `web/` for
   offline play on iPhone. Optional — the web version is the whole game.
+- **`docs/adr/`** — architecture decision records.
+
+## Architecture
+
+The game and graphics engine are **web-first**; the native app is a **thin
+shell** (WebView + content updater + a small JS↔native bridge). This keeps us
+portable — an Android port reuses the whole web engine instead of rewriting it.
+See [ADR 0001](docs/adr/0001-web-first-engine-thin-native-shell.md).
 
 ## Play it (web)
 
