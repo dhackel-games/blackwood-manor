@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
 ```
 
 ---
@@ -127,10 +127,12 @@ Classic Infocom style, richer than strict two-word.
 
 - **Structure:** `verb [article] [adjective] noun [preposition] [article] [adjective] noun]`
   → `unlock the oak door with the brass key`, `put locket in reliquary`
-- **Directions:** `north/n, s, e, w, ne, nw, se, sw, up/u, down/d, in, out`
+- **Directions:** `north/n, s, e, w, ne, nw, se, sw, up/u, down/d, in, out`;
+  bare `u` means UP, while `u <thing>` means USE.
 - **Verbs:** look/l, examine/x, go, take/get, drop, open/o, close/c/shut, lock, unlock, read,
   search, move/push/pull, turn on/off, light, extinguish, attack/kill … with …, eat,
-  drink, wear, remove, throw … at …, put/place, enter, climb, ring, touch, listen, smell, give … to …
+  drink, use/u, wear/don, remove, throw … at …, put/place, enter, climb, ring,
+  touch, listen, smell, give … to …
 - **Meta:** inventory/i, wait/z, again/g, look, score, save, restore, restart,
   verbose/brief, help, quit
 - **Niceties:** synonyms, "it" pronoun resolution, up-arrow command history, tolerant of
@@ -138,9 +140,14 @@ Classic Infocom style, richer than strict two-word.
 - **Canonical one-word names:** `ITEM_SHORT_NAMES` and `ROOM_SHORT_NAMES` give every
   object and room one globally unique token. Exact canonical tokens win before
   ordinary noun matching, while familiar multiword names and intentional
-  ambiguities remain valid. Generated `::` command chains use only these compact
+  ambiguities remain valid. Generated SYSOP MENU (`::`) command chains use only these compact
   targets; bug reports continue preserving exactly what the player submitted, so
-  an expanded magic command is naturally recorded in its compact form.
+  an expanded sysop command is naturally recorded in its compact form.
+- **Compact grammar:** `w/` means WITH with or without a following space
+  (`unlock frontd w/iron` and `unlock front d w/ iron`).
+  Within noun phrases, `d` expands to DOOR and `br` to BEDROOM, while canonical
+  one-word compounds such as `frontd`, `secretd`, `grandbr`, and `hallbr` avoid
+  ambiguity. Bare `d` remains DOWN.
 
 ---
 
