@@ -10,6 +10,7 @@ export const CONTENT_FILES = [
   "index.html",
   "js/sysop-menu.js",
   "js/commands.js",
+  "js/compose.js",
   "js/core.js",
   "js/gary-brain.js",
   "js/gary-profile.js",
@@ -21,5 +22,6 @@ export const CONTENT_FILES = [
   "js/save.js",
   "js/ui.js",
   "js/version.js",
+  "js/world.content.js",
   "js/world.js"
 ];

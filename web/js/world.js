@@ -15,6 +15,8 @@
 // undefined lets the default behaviour run.
 
 import { MAP_MARK, renderMap } from "./map.js?v=source";
+import { composeWorld } from "./compose.js?v=source";
+import { content } from "./world.content.js?v=source";
 
 // ---- helpers used by handlers ------------------------------------------------
 export const REQUIRED_FAMILY_ITEM_COUNT = 13;
@@ -2855,7 +2857,7 @@ const IMPLICIT_NAVIGATION = Object.freeze({
 });
 
 // ---- the world ---------------------------------------------------------------
-export const world = {
+const logicWorld = {
   config: {
     start: "gate",
     maxCarry: 6,
@@ -2973,26 +2975,12 @@ export const world = {
 
   rooms: {
     gate: {
-      name: "Front Gate",
       art: ROOM_ART.gate,
-      desc:
-        "You stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains " +
-        "from the sky. The MANOR looms beyond a dead lawn, its windows like sockets. A " +
-        "gravel path leads NORTH to the PORCH. A low wall gives way EAST to the OVERGROWN " +
-        "GARDEN, while a black yew opening enters the HEDGE MAZE to the WEST.",
-      searchDesc:
-        "Fresh scuffs disturb the gravel toward the EASTERN GARDEN. WEST, scorched leaves disappear into the HEDGE MAZE.",
       exits: { north: "porch", east: "garden", west: "hedgeMazeGate" },
     },
 
     garden: {
-      name: "Overgrown Garden",
       art: ROOM_ART.garden,
-      desc:
-        "Brambles have swallowed what was once a formal GARDEN. A weathered stone STATUE " +
-        "of a robed woman leans amid the weeds, and a crumbling WELL shaft plunges into " +
-        "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick OUTHOUSE squats to " +
-        "the EAST; the FRONT GATE lies back to the WEST.",
       searchDesc(ctx) {
         if (!ctx.getFlag("statueMoved")) {
           return "The weeds around the leaning STATUE are crushed, and its base has scraped a shallow arc through " +
@@ -3004,9 +2992,6 @@ export const world = {
         }
         return "The STATUE and WELL have yielded what they hid. Only the grave-damp BRAZIER still looks expectant.";
       },
-      highDesc:
-        "Stone and soil turn translucent. An IRON KEY glints beneath the STATUE, an ANCIENT COIN waits at the " +
-        "bottom of the WELL, and old fire sleeps inside the BRAZIER.",
       extraDirections: ["down"],
       exits: { west: "gate", east: "privy" },
       on: {
@@ -3019,62 +3004,42 @@ export const world = {
     },
 
     hedgeMazeGate: {
-        name: "Hedge Maze: Yew Gate",
         art: [
           "  ||||||     ||||||",
           "  ||  \\       /  ||",
           "  ||   \\_____/   ||",
           "  ||             ||",
         ].join("\n"),
-        desc:
-          "Black yew walls swallow the sky. The FRONT GATE is EAST; passages run WEST and SOUTH, both " +
-          "already looking suspiciously familiar.",
-        searchDesc:
-          "Freshly snapped twigs and one enormous scale lie toward the WESTERN PASSAGE.",
         exits: { east: "gate", west: "hedgeMazeKnot", south: "hedgeMazeLoop" },
       },
 
     hedgeMazeKnot: {
-        name: "Hedge Maze: Thorn Knot",
         art: [
           "  >>>>\\     /<<<<",
           "  >>>> \\___/ <<<<",
           "       /   \\",
           "  <<<< /     \\ >>>>",
         ].join("\n"),
-        desc:
-          "Three thorn corridors knot together beneath clawed branches. The air to the SOUTH smells faintly of apples and smoke.",
-        searchDesc:
-          "A trail of scorched leaves continues SOUTH. The WESTERN corridor circles toward your own footprints.",
         exits: { east: "hedgeMazeGate", west: "hedgeMazeLoop", south: "dragonCaveMouth" },
       },
 
     hedgeMazeLoop: {
-        name: "Hedge Maze: Crooked Loop",
         art: [
           "  /\\/\\/\\/\\/\\/\\",
           "  \\          /",
           "   \\  LOOP  /",
           "    \\/\\/\\/\\/",
         ].join("\n"),
-        desc:
-          "The hedge bends back on itself with malicious precision. Every opening resembles the one you just used.",
-        searchDesc:
-          "Your overlapping footprints prove the NORTHERN opening is a loop; broken thorns point EAST toward the warmer air.",
         exits: { north: "hedgeMazeLoop", east: "hedgeMazeKnot", west: "hedgeMazeGate" },
       },
 
     dragonCaveMouth: {
-        name: "Dreadmaw's Cave Mouth",
         art: [
           "       /\\___/\\",
           "   ___/  -.-  \\___",
           "  /____ DREADMAW ___\\",
           "      \\________/",
         ].join("\n"),
-        desc:
-          "A CAVE yawns in a basalt hill, but DREADMAW THE DRAGON sleeps across its entrance — an ancient female dragon " +
-          "vast enough to serve as the door. The HEDGE MAZE lies NORTH. The CAVE is EAST, entirely blocked by the DRAGON.",
         searchDesc(ctx) {
           return ctx.getFlag("dragonMoved")
             ? "DREADMAW now rests beside the entrance, leaving the PASSAGE EAST open."
@@ -3089,68 +3054,43 @@ export const world = {
       },
 
     dragonAntechamber: {
-        name: "Dragon Cave Antechamber",
         art: [
           "  |\\            /|",
           "  | \\  rails   / |",
           "  |  \\=====>  /  |",
           "  |___\\______/___|",
         ].join("\n"),
-        desc:
-          "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
-          "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
-        searchDesc:
-          "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
         exits: { west: "dragonCaveMouth", east: "mineGallery" },
       },
 
     mineGallery: {
-      name: "Mining Gallery",
       art: [
         "  |--|--|--|--|",
         "  |  o==>      |",
         "  |_/|\\________|",
         "    / \\  rails",
       ].join("\n"),
-      desc:
-        "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. " +
-        "The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
-      searchDesc:
-        "The HEADLAMP still has a sealed battery pack. The rails and fresher TROLL footprints both continue DOWN.",
       exits: { west: "dragonAntechamber", down: "deepShaft" },
     },
 
     deepShaft: {
-      name: "Deep Mining Shaft",
       art: [
         "  |\\          /|",
         "  | \\   ||   / |",
         "  |  \\  ||  /  |",
         "  |___\\_||_/___|",
       ].join("\n"),
-      desc:
-        "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
-        "abandoned seams. A discarded miner's BACKPACK rests on a dry ledge. The MINING GALLERY is UP; " +
-        "a worked tunnel runs EAST to the TROLL GATE.",
-      searchDesc:
-        "The BACKPACK still looks sturdy despite its years underground. Heavy bare footprints lead EAST.",
       dark: true,
       exits: { up: "mineGallery", east: "trollGate" },
     },
 
     trollGate: {
-      name: "Troll Gate",
       art: [
         "  |\\    TROLL   /|",
         "  | \\  .-^^-.  / |",
         "  |  \\[ DOOR ]/  |",
         "  |___\\______/___|",
       ].join("\n"),
-      desc:
-        "The tunnel ends at a seamless black VAULT DOOR. A broad, warty TROLL sits directly in front of it. " +
-        "The DEEP MINING SHAFT lies WEST; DREADMAW'S hoard is sealed EAST.",
-      searchDesc:
-        "No keyhole interrupts the VAULT DOOR. The TROLL watches you expectantly, as if waiting to ask something.",
       exits: {
         west: "deepShaft",
         east: { to: "dreadmawVault", via: "dragonVaultOpen",
@@ -3160,7 +3100,6 @@ export const world = {
     },
 
     dreadmawVault: {
-        name: "Dreadmaw's Vault",
         aliases: ["dreadmaw vault", "dragon hoard", "cave of riches", "hoard"],
         art: [
           "   $  *  $  *  $",
@@ -3168,33 +3107,16 @@ export const world = {
           " /_$$_GEMS_$$_*__\\",
           " \\_______________/",
         ].join("\n"),
-        desc:
-          "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-          "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
-          "a pair of WINGED SHOES. The TROLL GATE is WEST.",
-        searchDesc:
-          "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
-          "essential heirloom; the WINGED SHOES look made to be worn.",
         exits: { west: "trollGate" },
       },
 
     privy: {
-      name: "Ivy-Choked Privy",
       art: ROOM_ART.privy,
-      desc:
-        "A cramped brick OUTHOUSE strangled in ivy. Its only fixture is a rough wooden seat over a dark " +
-        "TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The GARDEN lies WEST; " +
-        "a narrow path continues EAST toward an enormous OAK.",
-      searchDesc:
-        "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. The fresh " +
-        "source of the faint purple glimmer is somewhere DOWN inside it. You would have to LOOK IN. Sunlight " +
-        "flashes strangely through the leaves along the EASTERN path.",
       exits: { west: "garden", east: "greatOak" },
       on: { reach: reachIntoToilet },
     },
 
     greatOak: {
-      name: "The Great Oak",
       aliases: ["great oak", "oak tree", "oak"],
       art: [
         "       /\\  /\\",
@@ -3203,10 +3125,6 @@ export const world = {
         "      ||     ||",
         "     /_______\\",
       ].join("\n"),
-      desc:
-        "An immense GREAT OAK towers over a sunlit clearing EAST of the PRIVY. On the trunk's sunward backside, " +
-        "a dark iron PANEL is inset beneath a high PULLEY. Tiny mirrors glint among the branches overhead. " +
-        "The PRIVY path returns WEST.",
       searchDesc(ctx) {
         const platform = ctx.roomOf("oakPlatform") === "greatOak"
           ? " A wooden PLATFORM is waiting among the roots."
@@ -3229,7 +3147,6 @@ export const world = {
     },
 
     treeFort: {
-      name: "Blackwood Tree Fort",
       aliases: ["tree fort", "treehouse", "tree house"],
       art: [
         "      __________",
@@ -3238,13 +3155,6 @@ export const world = {
         "    | [___]  |  |",
         "    |___||___|__|",
       ].join("\n"),
-      desc:
-        "A weathered TREE FORT fills the GREAT OAK'S crown. Faded SIGNAL FLAGS, a blanket HIDEOUT, a wooden " +
-        "SLINGSHOT, and a crate-table surround a brass SPYGLASS in a rusted swivel cradle. The pulley PLATFORM " +
-        "visits the railing every other turn.",
-      searchDesc:
-        "Child-sized chalk plans cover the planks. The SPYGLASS is unmistakably valuable, and its frozen cradle " +
-        "aims directly toward BLACKWOOD MANOR'S distant BELFRY.",
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "treeFort" ? ["out"] : [],
       exits: {},
       on: {
@@ -3258,11 +3168,7 @@ export const world = {
     },
 
     porch: {
-      name: "Front Porch",
       art: ROOM_ART.porch,
-      desc:
-        "The PORCH boards sag underfoot. A brass MAILBOX is bolted beside a great oak " +
-        "FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
       searchDesc(ctx) {
         const mailbox = ctx.item("mailbox");
         return mailbox && mailbox.open
@@ -3276,13 +3182,7 @@ export const world = {
     },
 
     grandHall: {
-      name: "Royal Hall",
       art: ROOM_ART.grandHall,
-      desc:
-        "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal " +
-        "staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and " +
-        "above it hangs a great brass BELL on a frayed rope. Doorways lead EAST to the " +
-        "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
       searchDesc(ctx) {
         if (ctx.getFlag("bellRung")) {
           return "The BELL is spent. Fresh stone dust outlines the impossible SECRET DOOR in the NORTH wall, and the BONE " +
@@ -3295,7 +3195,6 @@ export const world = {
         return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. The BELL rope hangs directly above them, ` +
           "waiting for a collection not yet complete.";
       },
-      highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
       extraDirections: (ctx) =>
         ctx.getFlag("floorDoorOpen") && ctx.getFlag("reliquarySealed")
           && !ctx.item("reliquary").open ? ["down"] : [],
@@ -3407,28 +3306,18 @@ export const world = {
     },
 
     parlor: {
-      name: "Parlor",
       art: ROOM_ART.parlor,
-      desc:
-        "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
-        "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
       searchDesc(ctx) {
         return ctx.getFlag("safeRevealed")
           ? "Behind the swung-aside PROFILE PAINTING, the iron SAFE's combination dial shows recent fingerprints."
           : "The PROFILE PAINTING frame stands proud of the wall. One side has hinges; the other has fingerprints where a hand might push.";
       },
-      highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
       exits: { west: "grandHall", south: "library" },
       on: { code: enterSafeCode },
     },
 
     library: {
-      name: "Library",
       art: ROOM_ART.library,
-      desc:
-        "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
-        "LEVER where a book should be. The PARLOR lies NORTH.",
       searchDesc(ctx) {
         return ctx.getFlag("leverPulled")
           ? "Scrape marks confirm the open bookcase is a counterweighted door. The concealed stair descends DOWN into darkness."
@@ -3442,40 +3331,18 @@ export const world = {
     },
 
     secretChamber: {
-      name: "Hidden Chamber",
       art: ROOM_ART.secretChamber,
-      desc:
-        "A cramped HIDDEN CHAMBER that has not seen daylight in a century. A single lectern " +
-        "stands at its centre. The only way out is the stair UP to the LIBRARY.",
-      searchDesc:
-        "The lectern's silver clasp-marks fit the GRIMOIRE exactly. Nothing else here has survived except the warning chill.",
       dark: true,
       exits: { up: "library" },
     },
 
     diningRoom: {
-      name: "Dining Room",
       art: ROOM_ART.diningRoom,
-      desc:
-        "A long banquet table lies buried under dust and fallen plaster. Upon it, " +
-        "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The ROYAL HALL " +
-        "is EAST; a swinging door leads SOUTH to the KITCHEN.",
-      searchDesc:
-        "Everything is dust-choked except the CANDLESTICK's wick. It is dry and usable, but it will need the MANOR'S " +
-        "single precious MATCH.",
       exits: { east: "grandHall", south: "kitchen" },
     },
 
     kitchen: {
-      name: "Kitchen",
       art: ROOM_ART.kitchen,
-      desc:
-        "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
-        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR DOOR is set in " +
-        "the floor. The DINING ROOM lies NORTH.",
-      searchDesc:
-        "The MATCHBOX contains exactly one MATCH. The ROPE remains sound, the CELLAR DOOR has a lift-ring, and the " +
-        "sweating super BURRITO appears to violate several eras of food-safety law.",
       exits: {
         north: "diningRoom",
         down: { to: "wineCellar", via: "cellarOpen", lockedMsg: "The cellar door is shut." },
@@ -3483,15 +3350,7 @@ export const world = {
     },
 
     wineCellar: {
-      name: "Wine Cellar",
       art: ROOM_ART.wineCellar,
-      desc:
-        "Racks of burst and blackened bottles line the dripping WINE CELLAR. One survivor gleams: " +
-        "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb UP " +
-        "to the KITCHEN; an arch leads SOUTH, deeper, into a cold that raises the hairs on your neck.",
-      searchDesc:
-        "The DECANTER is the only intact valuable. Frost rims the SOUTHERN arch in the shape of grasping fingers; " +
-        "crossing it without the TALISMAN feels terminal.",
       dark: true,
       exits: { up: "kitchen", south: "crypt" },
       on: {
@@ -3514,25 +3373,13 @@ export const world = {
     },
 
     crypt: {
-      name: "Crypt",
       art: ROOM_ART.crypt,
-      desc:
-        "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
-        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
-        "LOCKET. The only way out is NORTH to the WINE CELLAR.",
-      searchDesc:
-        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
       dark: true,
       exits: { north: "wineCellar" },
     },
 
     landing: {
-      name: "Upstairs Landing",
       art: ROOM_ART.landing,
-      desc:
-        "A long UPSTAIRS LANDING overlooks the ROYAL HALL below. Doors open WEST to the NURSERY, " +
-        "EAST to the GRAND BEDROOM, NORTH to the HALL BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
-        "trap-door in the ceiling. The stairs go DOWN.",
       searchDesc(ctx) {
         return ctx.getFlag("ladderDown")
           ? "The lowered ATTIC ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
@@ -3569,15 +3416,7 @@ export const world = {
     },
 
     nursery: {
-      name: "Nursery",
       art: ROOM_ART.nursery,
-      desc:
-        "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
-        "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
-      searchDesc:
-        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
-        "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
-      highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
       exits: {
         east: "landing",
         // A crawl-gap into the space between the walls — the one deliberate,
@@ -3597,52 +3436,27 @@ export const world = {
     },
 
     masterBedroom: {
-      name: "Grand Bedroom",
       art: ROOM_ART.masterBedroom,
-      desc:
-        "A great canopied bed rots beneath a collapsed tester in the GRAND BEDROOM. On the vanity stands a locked " +
-        "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
-      searchDesc:
-        "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD SIGNET inside the locked JEWELRY BOX.",
       exits: { west: "landing" },
     },
 
     study: {
-      name: "Study",
       art: ROOM_ART.study,
-      desc:
-        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
-        "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
-      searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
       exits: { north: "landing" },
     },
 
     hallBedroom: {
-      name: "Hall Bedroom",
       art: [
         "  .--------------.",
         "  | BED    ( O ) |",
         "  |        [_]   |",
         "  '----DOOR------'",
       ].join("\n"),
-      desc:
-        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. " +
-        "Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
-      searchDesc:
-        "The BED is untouched, the MIRROR is clouded, and the NIGHT TABLE'S DRAWER has a cheap plastic handle.",
       exits: { south: "landing" },
     },
 
     attic: {
-      name: "Attic",
       art: ROOM_ART.attic,
-      desc:
-        "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
-        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
-      searchDesc:
-        "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
       extraDirections: (ctx) => canFly(ctx) ? ["up"] : [],
       exits: {
         down: "landing",
@@ -3663,7 +3477,6 @@ export const world = {
     },
 
     roof: {
-      name: "Manor Roof",
       aliases: ["roof"],
       art: [
         "       /\\       |^|",
@@ -3671,33 +3484,21 @@ export const world = {
         " /_______________\\|",
         "      ROOFLINE",
       ].join("\n"),
-      desc:
-        "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
-        "a narrow ridge runs EAST to the BELFRY.",
-      searchDesc:
-        "Only someone able to fly could cross the missing slates safely. The BELFRY'S louvers stand open.",
       exits: { down: "attic", east: "belfry" },
     },
 
     belfry: {
-      name: "Belfry",
       art: [
         "      ______",
         "     / BELL \\",
         "    |   ()   |",
         "    |___||___|",
       ].join("\n"),
-      desc:
-        "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. " +
-        "A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
-      searchDesc:
-        "The hatch bypasses the sealed ATTIC gable entirely. Its iron ladder drops directly beside the OBSIDIAN EYE.",
       exits: { west: "roof", down: "hiddenVault" },
     },
 
     // --- The astral treasure vault, reached by altered sight, flight, or belfry --
     hiddenVault: {
-      name: "Astral Chamber",
       aliases: ["astral chamber", "obsidian chamber"],
       art: [
         "  .==============.",
@@ -3706,37 +3507,17 @@ export const world = {
         "  |  '--------'  |",
         "  '=============='",
       ].join("\n"),
-      desc:
-        "A windowless ASTRAL CHAMBER the living were never meant to find, mortared behind the ATTIC'S NORTH " +
-        "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
-        "seems to watch you back. The ATTIC lies SOUTH; a BELFRY ladder climbs UP.",
-      searchDesc:
-        "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
       dark: true,
       exits: { south: "attic", up: "belfry" },
     },
 
     // --- The hidden wing, revealed only after the curse is lifted (bell rung) ---
     hollowPassage: {
-      name: "Hollow Passage",
       art: ROOM_ART.hollowPassage,
-      desc:
-        "A narrow HOLLOW PASSAGE of pale stone the MANOR kept hidden all this time. It is oddly warm, " +
-        "and lit by no lamp you can find — as if the walls themselves remember daylight. The ROYAL HALL " +
-        "lies back to the SOUTH; the PASSAGE runs NORTH.",
-      searchDesc:
-        "No mechanism or side PASSAGE interrupts the pale stone. The warmth and faint light both strengthen toward the NORTH.",
       exits: { south: "grandHall", north: "hollowSanctum" },
     },
     hollowSanctum: {
-      name: "The Hollow Sanctum",
       art: ROOM_ART.hollowSanctum,
-      desc:
-        "A round, domed HOLLOW SANCTUM at the MANOR'S secret heart, filled with a soft grey light. The pale " +
-        "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
-        "Beyond her, an archway opens NORTH onto a growing dawn.",
-      searchDesc:
-        "The SPIRIT guards nothing now. The SILVER MIRROR lifts freely from its pedestal, and the NORTHERN dawn feels like an ending.",
       extraDirections: ["north"],
       exits: { south: "hollowPassage" },
       on: {
@@ -3764,27 +3545,13 @@ export const world = {
     // so this room is essentially never explored interactively — it exists so
     // the destination is valid (and as the seed of BLACKWOOD MANOR II).
     garysLair: {
-      name: "Gary's Call-Cave",
       art: GARY_LAIR_ART,
-      desc:
-        "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
-        "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
-      searchDesc: "Whoever worked down here left in a violent hurry — and took your heirlooms with them.",
       exits: { up: "grandHall" },
     },
 
     // --- The hidden space reached through the nursery wall or random teleport ---
     betweenWalls: {
-      name: "The Space Between the Walls",
       art: ROOM_ART.betweenWalls,
-      desc:
-        "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
-        "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
-        "and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — " +
-        "only the cramped gap OUT.",
-      searchDesc:
-        "Whoever built this space built it to be forgotten. The WOODBLACK WATCH is the only thing in it that " +
-        "isn't dust.",
       exits: { out: "grandHall" },
     },
   },
@@ -3822,7 +3589,6 @@ export const world = {
     },
     bell: {
       names: ["bell", "rope"], adjectives: ["brass", "great"], loc: "grandHall", fixed: true, scenery: true,
-      desc: "A great brass bell hung above the RELIQUARY, a frayed pull-rope trailing from it.",
       searchActions: ["ring"],
     },
 
@@ -3830,12 +3596,6 @@ export const world = {
     mysteryPackage: {
       names: ["package", "box", "parcel", "gift"], adjectives: ["mystery", "nice", "wrapped", "ribboned"],
       loc: "grandHall", takeable: true, readable: true,
-      roomDesc: "A suspiciously nice, ribbon-tied PACKAGE sits on the floor, propped against the wall.",
-      desc: "A beautifully wrapped package, ribbon and all, entirely out of place in this cobwebbed ruin. A " +
-        "small card is tucked under the bow. It reads:\n\n" +
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
-      text:
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
       on: { open: openMysteryPackage },
     },
 
@@ -3843,44 +3603,29 @@ export const world = {
     lightningBolt: {
       names: ["bolt", "lightning"], adjectives: ["lightning", "crackling", "jagged"],
       loc: null, fixed: true,
-      roomDesc: "A jagged bolt of LIGHTNING is speared into the floor here, hissing and crackling, scorch " +
-        "marks spreading outward.",
-      desc: "Still crackling, blue-white and hair-raising, driven into the floorboards like it's daring you " +
-        "to get closer.",
       on: { touch: touchLightningBolt },
     },
 
     // --- getting inside ---
     statue: {
       names: ["statue", "woman"], adjectives: ["stone", "robed"], loc: "garden", fixed: true, scenery: true,
-      desc: "A robed stone woman, features worn smooth. She leans oddly, as if something props her up.",
       on: { move: revealKey, push: revealKey, pull: revealKey, examine: revealKey },
     },
     well: {
       names: ["well", "shaft"], loc: "garden", fixed: true, scenery: true,
-      desc: "A round stone well, its bucket and windlass long gone. The shaft drops into " +
-        "pure black — a long way DOWN. Without a ROPE to climb back out, going DOWN there " +
-        "would be the last thing you ever did.",
       on: { enter: descendWell, climb: descendWell },
     },
     frontKey: {
       names: ["key"], adjectives: ["iron", "front", "door", "heavy"], loc: null, takeable: true,
       progressPoints: 5, progressFlag: "progressItem:frontKey",
       consumedOnUnlock: "The old iron key snaps off inside the lock and is spent.",
-      desc: "A heavy iron door-key, cold and gritty with earth. Age has left a deep crack along its shaft.",
     },
     mailbox: {
       names: ["mailbox"], adjectives: ["brass"], loc: "porch", fixed: true, container: true,
       openable: true, open: false, capacity: 2,
-      desc: "A dented brass mailbox bolted to the PORCH rail.",
     },
     letter: {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
-      desc: "A single sheet of good paper, water-stained.",
-      text:
-        "The letter reads: \"To whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
-        "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +
-        "Do not linger in the dark. And God help you in the CRYPT.\"",
       on: { burn: burnLetter },
     },
 
@@ -3888,69 +3633,52 @@ export const world = {
     brazier: {
       names: ["brazier", "firebowl", "bowl"], adjectives: ["iron", "cold", "ceremonial", "old"],
       loc: "garden", fixed: true,
-      roomDesc: "A cold iron BRAZIER stands on a tripod amid the weeds, heaped with damp moss.",
-      desc: "A cold iron brazier on a rusted tripod, heaped with grave-damp moss and packed black kindling. " +
-        "Old scorch-marks ring its base. A lone match won't touch moss this wet, but a sustained candle flame " +
-        "worked around the whole bowl might.",
       on: { light: lightBrazier, burn: lightBrazier },
     },
     emberStone: {
       names: ["emerald gem", "gem", "emerald", "stone"], adjectives: ["emerald", "green", "glassy"],
       loc: null, takeable: true,
-      desc: "A deep-green EMERALD GEM, warm from the brazier and faceted so precisely that even weak sunlight " +
-        "passes through it in a narrow green beam.",
       on: { take: takeOakGem },
     },
     oakMechanism: {
       names: ["panel", "mechanism", "slots", "slot"], adjectives: ["oak", "iron", "inset"],
       loc: "greatOak", fixed: true, scenery: true, container: true, open: true, capacity: 3,
-      desc: "A dark iron PANEL inset in the GREAT OAK, fitted with three vertically stacked slots beneath " +
-        "a web of small mirrors and sun shafts.",
       on: { examine: describeOakPanel, search: describeOakPanel, put: putOakGem },
     },
     greenGlassStone: {
       names: ["ruby gem", "gem", "ruby", "stone"], adjectives: ["ruby", "red", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent RUBY GEM cut into a deep red prism that fits one of the GREAT OAK'S three slots.",
       on: { take: takeOakGem },
     },
     blueGlassStone: {
       names: ["sapphire gem", "gem", "sapphire", "stone"], adjectives: ["sapphire", "blue", "glassy"],
       loc: "oakMechanism", takeable: true,
-      desc: "A translucent SAPPHIRE GEM cut into a deep blue prism that fits one of the GREAT OAK'S three slots.",
       on: { take: takeOakGem },
     },
     oakPlatform: {
       names: ["platform", "lift"], adjectives: ["wooden", "oak", "pulley"],
       loc: null, fixed: true, scenery: true,
-      desc: "A broad wooden PLATFORM hanging from old but sturdy ropes. It shuttles between the roots and the TREE FORT.",
       on: { enter: enterOakPlatform, climb: enterOakPlatform },
     },
     signalFlags: {
       names: ["flags", "flag", "signals"], adjectives: ["signal", "faded"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A string of faded SIGNAL FLAGS spells something that was probably hilarious to children a century ago.",
     },
     blanketHideout: {
       names: ["hideout", "blanket", "fort"], adjectives: ["blanket", "secret"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A blanket HIDEOUT occupies one corner, furnished with a cracked compass, three acorn cups, and a sign: NO ADULTS.",
     },
     woodenSlingshot: {
       names: ["slingshot", "catapult"], adjectives: ["wooden", "forked"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "A forked wooden SLINGSHOT has been nailed to the wall after what appears to have been one incident too many.",
     },
     spyglassCradle: {
       names: ["cradle", "mount", "swivel"], adjectives: ["rusted", "spyglass"],
       loc: "treeFort", fixed: true, scenery: true,
-      desc: "The iron swivel CRADLE is rusted solid, aimed permanently at the manor's BELFRY.",
     },
     spyglass: {
       names: ["spyglass", "telescope"], adjectives: ["brass", "blackwood", "bm"],
       loc: "treeFort", takeable: true, treasure: true, points: 8,
-      roomDesc: "A brass SPYGLASS marked BM sits in a rusted swivel cradle aimed at the distant BELFRY.",
-      desc: "A handsome brass SPYGLASS. The initials BM are etched into its barrel, identifying it as a Blackwood heirloom.",
       on: { examine: inspectSpyglass, search: inspectSpyglass, take: takeSpyglass },
     },
 
@@ -3958,26 +3686,17 @@ export const world = {
     mushrooms: {
       names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
       loc: "kitchen", takeable: true, edible: true, highTurns: 12,
-      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
-      desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
       on: { eat: eatMushrooms },
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
       adjectives: ["fresh", "shit-fueled", "purple", "toilet"],
       loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
-      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable shit and piss.",
-      desc: "Fresh, shit-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
       on: { take: takeToiletMushrooms, eat: eatMushrooms },
     },
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",
-      desc: "Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
-        "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
-        "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
-        "available evidence, it may be edible if you're feeling adventurous.",
       on: {
         eat: eatBurrito,
       },
@@ -3986,37 +3705,24 @@ export const world = {
       names: ["obsidian eye", "eye", "sphere", "orb"], adjectives: ["obsidian", "black", "cold", "glass", "scrying"],
       loc: "hiddenVault", takeable: true, wearable: true, worn: false,
       wearSlot: "forehead", grantsHiddenSight: true,
-      roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
-      desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
-        "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
-        "It does not produce light.",
       on: { take: takeObsidianEye },
     },
     burritoWrapper: {
       names: ["wrapper", "foil", "tinfoil"], adjectives: ["burrito", "crumpled", "used", "tin"],
       loc: null, takeable: true,
-      roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
-      desc: "The used burrito wrapper is laminated with a stubborn sheet of tin foil. It smells dangerous, but " +
-        "its shiny inner surface looks capable of redirecting a brief digestive flame.",
     },
     milk: {
       names: ["milk", "bottle"], adjectives: ["cold", "fresh", "glass"],
       loc: "kitchen", takeable: true, drinkable: true,
-      roomDesc: "A cold BOTTLE OF MILK sits untouched in the pantry nook.",
-      desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
       on: { drink: drinkMilk },
     },
     apple: {
       names: ["apple"], adjectives: ["red", "crisp", "kitchen"],
       loc: "kitchen", takeable: true, edible: true,
-      roomDesc: "A single crisp red APPLE sits in a shallow pantry basket.",
-      desc: "A flawless red apple. In this KITCHEN, its lack of mould is almost supernatural.",
     },
     toilet: {
       names: ["toilet", "hole", "latrine", "loo"], adjectives: ["outhouse", "dark", "earthen"],
       loc: "privy", fixed: true, container: true, open: true, capacity: 8,
-      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. A faint purple glimmer leaks from below the rim.",
-      desc: "A wooden seat over a raw hole in the earth. Something faintly purple glimmers below. It has no plumbing.",
       on: {
         sit: useToilet, use: useToilet, enter: useToilet, flush: flushToilet,
         examine: inspectToilet,
@@ -4025,8 +3731,6 @@ export const world = {
     dreadmaw: {
       names: ["dragon", "dreadmaw", "wyrm"], adjectives: ["sleeping", "female", "vast", "ashen"],
       loc: "dragonCaveMouth", fixed: true, scenery: true,
-      desc: "DREADMAW THE DRAGON: an ancient female dragon armoured in plates like burnt cathedral stone. " +
-        "She is sleeping directly across the CAVE entrance.",
       on: {
         talk: talkToDragon, wake: wakeDragon, give: giveDragon, put: giveDragon,
         say: sayNearDragon,
@@ -4037,39 +3741,30 @@ export const world = {
     goldDoubloon: {
       names: ["doubloon", "coin"], adjectives: ["gold", "dragon", "dreadmaw"],
       loc: null, takeable: true,
-      desc: "A heavy GOLD DOUBLOON stamped with DREADMAW's horned profile and a sun being swallowed. " +
-        "Around its edge, one word has been etched by hand: LORE.",
     },
     dragonVaultDoor: {
       names: ["door", "vault"], adjectives: ["inner", "black", "sealed", "vault"],
       loc: "trollGate", fixed: true, scenery: true,
-      desc: "A seamless black VAULT DOOR with no keyhole. One rune resembles a listening ear.",
       on: { say: answerTrollRiddle },
     },
     caveTroll: {
       names: ["troll", "guard"], adjectives: ["cave", "warty", "broad", "male"],
       loc: "trollGate", fixed: true, scenery: true,
-      desc: "A broad male TROLL with granite-coloured warts sits before the VAULT DOOR. He looks more literary than hungry.",
       on: { talk: talkToTroll, wake: talkToTroll },
     },
     dragonHoard: {
       names: ["hoard", "riches", "gold", "treasure"], adjectives: ["dragon", "vast", "dreadmaw"],
       loc: "dreadmawVault", fixed: true, scenery: true,
-      desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
     familyRing: {
       names: ["ring", "signet"], adjectives: ["dusty", "family", "blackwood", "bm"],
       loc: "dragonAntechamber", takeable: true, treasure: true, points: 20,
       wearable: true, worn: false, wearSlot: "finger",
-      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
-      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
     },
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
       wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
-      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
-      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
     },
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
@@ -4077,62 +3772,50 @@ export const world = {
       lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
-      roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
-      desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
     familyCrest: {
       names: ["crest", "emblem", "arms"], adjectives: ["family", "blackwood", "silver"],
       loc: "dreadmawVault", takeable: true, treasure: true, points: 15,
-      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
       desc: "The BLACKWOOD FAMILY CREST, cast in blackened silver: a raven above crossed keys. One of the " +
         `${REQUIRED_FAMILY_ITEM_COUNT} heirlooms required by the RELIQUARY.`,
     },
     wingedShoes: {
       names: ["shoes", "sandals"], adjectives: ["winged", "gold", "golden"],
       loc: "dreadmawVault", takeable: true, wearable: true, wearSlot: "feet", grantsFlight: true,
-      roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
-      desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
       wearMsg: "You lace the WINGED SHOES onto your feet. The little feathers snap taut, beat once — and your heels rise off the floor.",
       wearArt: MAP_MARK + WINGED_SHOES_ART + MAP_MARK,
     },
     hallBed: {
       names: ["bed"], adjectives: ["hall", "narrow", "made"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A narrow BED made with yellowed but carefully tucked linen.",
     },
     hallMirror: {
       names: ["mirror"], adjectives: ["hall", "bedroom", "tarnished"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A tarnished MIRROR that makes every reflection look slightly farther away than it should.",
     },
     nightTable: {
       names: ["table", "nightstand"], adjectives: ["night", "bedside", "small"],
       loc: "hallBedroom", fixed: true, scenery: true,
-      desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
     },
     nightDrawer: {
       names: ["drawer"], adjectives: ["night", "table", "bedside"],
       loc: "hallBedroom", fixed: true, scenery: true,
       container: true, openable: true, open: false, capacity: 3,
-      desc: "A cheap wooden DRAWER in the NIGHT TABLE.",
     },
     bedsideLamp: {
       names: ["lamp"], adjectives: ["night", "bedside", "table"],
       loc: "hallBedroom", fixed: true, scenery: true,
       lightSource: true, selfPowered: true, lit: false,
-      desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
     },
     xrayGoggles: {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
       loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
       grantsMushroomVision: true, grantsDarkVision: true,
-      desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
       loc: "porch", fixed: true, scenery: true, enterTo: "north",
       openable: true, open: false, locked: true, keyId: "frontKey",
-      desc: "A great oak door, black with age, with a heavy iron lock.",
       on: {
         open(ctx) {
           const d = ctx.item("frontDoor");
@@ -4151,7 +3834,6 @@ export const world = {
     candlestick: {
       names: ["candlestick", "candle"], adjectives: ["silver", "tarnished"], loc: "diningRoom",
       takeable: true, treasure: true, points: 10, lightSource: true, lit: false, fuel: 120,
-      desc: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt.",
       on: {
         light(ctx) {
           const c = ctx.item("candlestick");
@@ -4168,16 +3850,13 @@ export const world = {
     },
     matches: {
       names: ["matches", "match"], adjectives: ["box"], loc: "kitchen", takeable: true,
-      desc: "A box holding a single dry match. Just one.",
     },
     rope: {
       names: ["rope", "coil"], adjectives: ["stout"], loc: "kitchen", takeable: true,
-      desc: "A coil of stout rope, still sound.",
     },
     cellarDoor: {
       names: ["cellar", "trapdoor", "door"], adjectives: ["heavy", "cellar"],
       loc: "kitchen", fixed: true, scenery: true, enterTo: "down", openable: true, open: false,
-      desc: "A heavy trap-door set flush in the KITCHEN floor, iron-ringed.",
       on: {
         open(ctx) {
           if (ctx.getFlag("cellarOpen")) return "The cellar door already gapes open.";
@@ -4193,7 +3872,6 @@ export const world = {
     // --- library / secret chamber ---
     lever: {
       names: ["lever"], adjectives: ["brass"], loc: "library", fixed: true, scenery: true,
-      desc: "A brass lever set into the shelving where a book should be.",
       on: {
         pull(ctx) {
           if (ctx.getFlag("leverPulled")) return "The bookcase already stands open.";
@@ -4207,21 +3885,17 @@ export const world = {
     grimoire: {
       names: ["grimoire", "book"], adjectives: ["first-edition", "forbidden", "black"], loc: "secretChamber",
       takeable: true, treasure: true, points: 15, readable: true,
-      desc: "A heavy black grimoire, clasped in tarnished silver — a priceless first edition.",
-      text: "The grimoire is written in a hand that hurts to follow. You snap it shut. Some things are worth money, not reading.",
     },
 
     // --- parlor safe (behind the profile painting) ---
     portrait: {
       names: ["painting", "profile", "portrait"], adjectives: ["grim", "patriarch", "huge"], loc: "parlor",
       fixed: true, scenery: true,
-      desc: "A grim PROFILE PAINTING of the patriarch. The frame stands slightly proud of the wall, as if hinged.",
       on: { move: revealSafe, push: revealSafe, examine: revealSafe },
     },
     safe: {
       names: ["safe"], adjectives: ["iron"], loc: null, fixed: true, container: true, openable: true,
       open: false, locked: true, capacity: 3,
-      desc: "A squat iron safe set into the wall, fitted with a combination dial.",
       on: {
         open: openSafe,
       },
@@ -4229,19 +3903,15 @@ export const world = {
     talisman: {
       names: ["talisman", "amulet"], adjectives: ["silver", "protective"], loc: "safe", takeable: true,
       wearable: true, worn: false, wearSlot: "neck", treasure: true, points: 15,
-      desc: "A silver talisman on a chain, warm to the touch and graven with wards against the dead. The back " +
-        "bears the BM crest, identifying the protective charm as a Blackwood family heirloom.",
     },
 
     // --- study diary ---
     desk: {
       names: ["desk"], adjectives: ["oak"], loc: "study", fixed: true, scenery: true,
-      desc: "A great oak desk, its drawers swollen shut.",
     },
     diary: {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,
       readable: true,
-      desc: "A leather-bound diary in a spidery hand.",
       on: {
         read(ctx) {
           const points = awardProgress(ctx, "diaryDecoded");
@@ -4259,8 +3929,6 @@ export const world = {
     wallpaper: {
       names: ["wallpaper", "wall", "lath"], adjectives: ["peeling", "loose", "curling"],
       loc: "nursery", fixed: true, scenery: true,
-      desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
-        "pulled almost all the way free, and the lath behind it sounds hollow when you rap on it.",
       on: { pull: revealWallGap, push: revealWallGap, search: revealWallGap },
     },
 
@@ -4268,7 +3936,6 @@ export const world = {
     musicBox: {
       names: ["music box", "musicbox", "box"], adjectives: ["jeweled", "jewelled", "music"], loc: "nursery",
       takeable: true, treasure: true, points: 15, container: true, openable: true, open: false, capacity: 1,
-      desc: "A jeweled music box, its lid inlaid with mother-of-pearl.",
       on: {
         open(ctx) {
           const box = ctx.item("musicBox");
@@ -4284,7 +3951,6 @@ export const world = {
       names: ["key"], adjectives: ["tiny", "small", "brass"], loc: "musicBox", takeable: true,
       progressPoints: 5, progressFlag: "progressItem:tinyKey",
       consumedOnUnlock: "The tiny key disappears into the jewelry box's spring mechanism.",
-      desc: "A tiny brass key, no longer than your thumbnail, made for a single delicate mechanism.",
     },
 
     // --- grand bedroom jewelry box -> Ravenblood Signet ---
@@ -4292,7 +3958,6 @@ export const world = {
       names: ["jewelry box", "jewellery box", "jewelry", "box", "casket"], adjectives: ["walnut", "dark"],
       loc: "masterBedroom", fixed: true, container: true, openable: true, open: false, locked: true,
       keyId: "tinyKey", capacity: 2,
-      desc: "A dark walnut jewelry box with a tiny keyhole.",
       on: {
         open(ctx) {
           const box = ctx.item("jewelryBox");
@@ -4308,24 +3973,19 @@ export const world = {
       names: ["ravenblood signet", "signet", "ring", "ravenblood"],
       adjectives: ["ravenblood", "ruby", "red", "blackwood", "blood"], loc: "jewelryBox", takeable: true,
       treasure: true, points: 20, wearable: true, worn: false, wearSlot: "finger",
-      desc: "The RAVENBLOOD SIGNET: a heavy gold ring set with a dark red garnet like a suspended drop of blood. " +
-        "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
     },
 
     // --- crypt ---
     wraith: {
       names: ["wraith", "ghost", "spirit"], loc: "crypt", fixed: true, scenery: true,
-      desc: "A shroud of cold hatred, kept at bay by the TALISMAN. It hisses from the corners.",
     },
     goldLocket: {
       names: ["locket"], adjectives: ["gold"], loc: "crypt", takeable: true, treasure: true, points: 20,
-      desc: "A gold locket, cold as the grave, its clasp shaped like clasped hands.",
     },
 
     // --- landing cord (attic ladder) ---
     cord: {
       names: ["cord"], adjectives: ["frayed"], loc: "landing", fixed: true, scenery: true,
-      desc: "A frayed cord dangling from the ATTIC trap-door in the ceiling.",
       on: {
         pull(ctx) {
           if (ctx.getFlag("ladderDown")) return "The ladder is already down.";
@@ -4338,17 +3998,13 @@ export const world = {
     // --- other treasures ---
     ancientCoin: {
       names: ["coin"], adjectives: ["ancient", "old"], loc: null, takeable: true, treasure: true, points: 10,
-      desc: "An ancient coin, worn smooth, stamped with a face no one remembers.",
     },
     crystalDecanter: {
       names: ["decanter"], adjectives: ["crystal"], loc: "wineCellar", takeable: true, treasure: true, points: 15,
-      desc: "A cut-crystal decanter, still full, throwing splinters of colour even in the gloom.",
     },
     ancestralPortrait: {
       names: ["portrait", "miniature"], adjectives: ["ancestral", "small", "gilt"], loc: "attic",
       takeable: true, treasure: true, points: 20, scenery: true,
-      desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
-        "unsettlingly like the STATUE in the GARDEN.",
     },
 
     // --- Post-game (appear only after the bell is rung) ---
@@ -4356,12 +4012,10 @@ export const world = {
       names: ["key"], adjectives: ["bone", "pale", "slender"], loc: null, takeable: true,
       progressPoints: 5, progressFlag: "progressItem:boneKey",
       consumedOnUnlock: "The BONE KEY crumbles into pale dust inside the lock.",
-      desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
     },
     secretDoor: {
       names: ["door", "seam"], adjectives: ["secret", "hidden", "north"], loc: null, fixed: true, scenery: true,
       openable: true, open: false, locked: true, keyId: "boneKey", enterTo: "north",
-      desc: "A door of black wood where no door was, fitted with a keyhole shaped like a tooth.",
       on: {
         open(ctx) {
           const d = ctx.item("secretDoor");
@@ -4378,8 +4032,6 @@ export const world = {
     spirit: {
       names: ["spirit", "matriarch", "woman", "ghost"], adjectives: ["pale", "grey", "robed"],
       loc: "hollowSanctum", fixed: true, scenery: true,
-      desc: "The pale spirit of a robed woman — the face from the GARDEN STATUE and the little portrait. " +
-        "She was weeping, but her eyes are kind now.",
       on: {
         pray: () => "She bows her head. \"You lifted what my own blood could not. Take the mirror, and go and live — since I no longer can.\"",
         give: () => "She shakes her head gently. \"I need nothing now but rest, and you have given me that.\"",
@@ -4387,9 +4039,7 @@ export const world = {
       },
     },
     silverMirror: {
-      names: ["mirror"], adjectives: ["silver"], loc: "hollowSanctum", takeable: true,
-      desc: "An age-clouded silver hand-mirror. In it, for just a moment, you see BLACKWOOD MANOR whole and " +
-        "bright and full of the living.",
+      names: ["mirror"], adjectives: ["silver"],       loc: "hollowSanctum", takeable: true,
     },
 
     // --- the only thing in the space between the walls ---
@@ -4398,13 +4048,12 @@ export const world = {
       adjectives: ["tarnished", "woodblack", "backwards", "brass"],
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
       depositScoreFlag: "heirloomScore:backwardsWatch",
-      roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
-      desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
-        "On the back, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
       on: { examine: inspectWoodblackWatch, read: inspectWoodblackWatch },
     },
   },
 };
+
+export const world = composeWorld(logicWorld, content);
 
 // ---- handler function definitions referenced above --------------------------
 function inspectWoodblackWatch(ctx) {
