@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -6,18 +6,18 @@ import { createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
 import { parse } from "../../js/parser.js";
 import {
-  CHEAT_PROMPTS,
-  MAGIC_MENU_COMMAND,
-  MAGIC_MENU_DISCOVERY_MESSAGE,
-  MAGIC_MENU_PASSWORDS,
-  cheatMenu,
-  cheatPrompt,
-  expandCheatPrompt,
-  isMagicMenuPassword,
-  magicMenuAction,
+  SYSOP_COMMANDS,
+  SYSOP_MENU_COMMAND,
+  SYSOP_MENU_DISCOVERY_MESSAGE,
+  SYSOP_MENU_PASSWORDS,
+  expandSysopCommand,
+  isSysopMenuPassword,
   pathToRoom,
+  renderSysopMenu,
   shortestCommand,
-} from "../../js/cheat-prompts.js";
+  sysopCommand,
+  sysopMenuAction,
+} from "../../js/sysop-menu.js";
 import { CYCLING_FLAVOR_POOLS, REQUIRED_FAMILY_ITEM_COUNT, world } from "../../js/world.js";
 
 const realMathRandom = Math.random;
@@ -189,10 +189,10 @@ When("I play this command sequence:", function (docString) {
   playSequence(this, docString, false);
 });
 
-When("I execute hidden cheat {string}", function (command) {
-  const shortcut = cheatPrompt(command);
-  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
-  this.output = this.game.send(expandCheatPrompt(shortcut, this.game));
+When("I execute sysop command {string}", function (command) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  this.output = this.game.send(expandSysopCommand(shortcut, this.game));
 });
 
 When("I play until death:", function (docString) {
@@ -294,36 +294,36 @@ Then("the inventory capacity is {int}", function (capacity) {
   assert.equal(this.game.inventoryCapacity(), capacity);
 });
 
-Then("the hidden cheat menu command is {string}", function (command) {
-  assert.equal(command, MAGIC_MENU_COMMAND);
-  assert.match(cheatMenu(), /== MAGIC MENU ==/);
+Then("the sysop menu command is {string}", function (command) {
+  assert.equal(command, SYSOP_MENU_COMMAND);
+  assert.match(renderSysopMenu(), /== SYSOP MENU ==/);
 });
 
-Then("the magic menu unlock passwords are {string}", function (passwords) {
-  assert.deepEqual(MAGIC_MENU_PASSWORDS, passwords.split(","));
-  for (const password of MAGIC_MENU_PASSWORDS) assert.equal(isMagicMenuPassword(`::${password}`), true);
-  assert.equal(isMagicMenuPassword("::wrong"), false);
-  assert.equal(MAGIC_MENU_DISCOVERY_MESSAGE,
-    "You've discovered the magic menu. Please invoke it the first time with your password via ::<password>");
-  assert.deepEqual(magicMenuAction("::", false), {
-    handled: true, unlocked: false, message: MAGIC_MENU_DISCOVERY_MESSAGE,
+Then("the sysop menu unlock passwords are {string}", function (passwords) {
+  assert.deepEqual(SYSOP_MENU_PASSWORDS, passwords.split(","));
+  for (const password of SYSOP_MENU_PASSWORDS) assert.equal(isSysopMenuPassword(`::${password}`), true);
+  assert.equal(isSysopMenuPassword("::wrong"), false);
+  assert.equal(SYSOP_MENU_DISCOVERY_MESSAGE,
+    "You've discovered the sysop menu. Please invoke it the first time with your password via ::<password>");
+  assert.deepEqual(sysopMenuAction("::", false), {
+    handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
-  assert.deepEqual(magicMenuAction("::powerup", false), {
-    handled: true, unlocked: false, message: MAGIC_MENU_DISCOVERY_MESSAGE,
+  assert.deepEqual(sysopMenuAction("::powerup", false), {
+    handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
-  assert.deepEqual(magicMenuAction("::werdna", false), {
+  assert.deepEqual(sysopMenuAction("::werdna", false), {
     handled: true, unlocked: true, showMenu: true,
   });
-  assert.deepEqual(magicMenuAction("::", true), {
+  assert.deepEqual(sysopMenuAction("::", true), {
     handled: true, unlocked: true, showMenu: true,
   });
-  assert.equal(magicMenuAction("::powerup", true).shortcut?.cmd, "::powerup");
-  assert.deepEqual(magicMenuAction(":powerup", true), { handled: false, unlocked: true });
+  assert.equal(sysopMenuAction("::powerup", true).shortcut?.cmd, "::powerup");
+  assert.deepEqual(sysopMenuAction(":powerup", true), { handled: false, unlocked: true });
 });
 
-Then("the hidden cheat catalog defines {string}", function (commands) {
-  assert.deepEqual(CHEAT_PROMPTS.map((entry) => entry.cmd), commands.split(","));
-  for (const entry of CHEAT_PROMPTS) {
+Then("the sysop command catalog defines {string}", function (commands) {
+  assert.deepEqual(SYSOP_COMMANDS.map((entry) => entry.cmd), commands.split(","));
+  for (const entry of SYSOP_COMMANDS) {
     assert.equal(typeof entry.name, "string");
     assert.equal(typeof entry.description, "string");
     assert.equal(typeof entry.compoundPrompt, "string");
@@ -331,10 +331,10 @@ Then("the hidden cheat catalog defines {string}", function (commands) {
   }
 });
 
-Then("the magic menu uses the shared command title description format", function () {
-  const menu = cheatMenu().split("\n");
+Then("the sysop menu uses the shared command title description format", function () {
+  const menu = renderSysopMenu().split("\n");
   assert.equal(menu[1], "COMMAND | TITLE / DESCRIPTION");
-  for (const entry of CHEAT_PROMPTS) {
+  for (const entry of SYSOP_COMMANDS) {
     assert.ok(menu.some((line) =>
       line.includes(`${entry.cmd.padEnd(14)} | ${entry.name} / ${entry.description}`)));
   }
@@ -342,7 +342,7 @@ Then("the magic menu uses the shared command title description format", function
 
 Then("every hidden compound prompt uses shortest command forms", function () {
   const longForm = /^(?:north|northeast|east|southeast|south|southwest|west|northwest|up|down|open|close|take|place|wear|remove|offer|enter|wait)(?:\s|$)/i;
-  for (const entry of CHEAT_PROMPTS) {
+  for (const entry of SYSOP_COMMANDS) {
     for (const command of entry.compoundPrompt.split(";").map((part) => part.trim())) {
       if (!command.startsWith("{{")) assert.doesNotMatch(command, longForm, `${entry.cmd}: ${command}`);
     }
@@ -377,8 +377,8 @@ Then("every hidden prompt uses globally unique one-word targets", function () {
     assert.equal(game.state.room, id, `${alias} must resolve to ${id}`);
   }
 
-  for (const shortcut of CHEAT_PROMPTS) {
-    for (const command of expandCheatPrompt(shortcut, this.game).split(";").map((part) => part.trim())) {
+  for (const shortcut of SYSOP_COMMANDS) {
+    for (const command of expandSysopCommand(shortcut, this.game).split(";").map((part) => part.trim())) {
       const parsed = parse(command);
       assert.ok(!parsed.dobj || !/\s/.test(parsed.dobj), `${shortcut.cmd}: ${command}`);
       assert.ok(!parsed.iobj || /^\d+(?:\s+\d+)*$/.test(parsed.iobj) || !/\s/.test(parsed.iobj),
@@ -389,17 +389,17 @@ Then("every hidden prompt uses globally unique one-word targets", function () {
 
 Then("hidden shortcuts replace the editable command prompt without executing", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /magicMenuAction\(command, magicMenuUnlocked\)/);
-  assert.match(ui, /localStorage\.setItem\(MAGIC_MENU_UNLOCK_KEY, "true"\)/);
+  assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked\)/);
+  assert.match(ui, /localStorage\.setItem\(SYSOP_MENU_UNLOCK_KEY, "true"\)/);
   assert.match(ui, /if \(action\.showMenu\)/);
-  assert.match(ui, /mainEntry\.setValue\(expandCheatPrompt\(action\.shortcut, game\)\)/);
+  assert.match(ui, /mainEntry\.setValue\(expandSysopCommand\(action\.shortcut, game\)\)/);
   assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
-  assert.equal(cheatPrompt("::"), null);
-  assert.equal(cheatPrompt(":powerup"), null);
+  assert.equal(sysopCommand("::"), null);
+  assert.equal(sysopCommand(":powerup"), null);
 });
 
-Then("no hidden cheat prompt uses the removed su command", function () {
-  for (const entry of CHEAT_PROMPTS) assert.doesNotMatch(entry.compoundPrompt, /\bsu(?:do)?\b/i);
+Then("no sysop command uses the removed su command", function () {
+  for (const entry of SYSOP_COMMANDS) assert.doesNotMatch(entry.compoundPrompt, /\bsu(?:do)?\b/i);
   assert.match(this.game.send("su"), /don't know the word/i);
 });
 
@@ -411,26 +411,26 @@ Then("long commands shorten as:", function (table) {
   for (const { long, short } of table.hashes()) assert.equal(shortestCommand(long), short);
 });
 
-Then("hidden cheat {string} omits {string}", function (command, omitted) {
-  const shortcut = cheatPrompt(command);
-  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
-  assert.ok(!expandCheatPrompt(shortcut, this.game).split("; ").includes(omitted));
+Then("sysop command {string} omits {string}", function (command, omitted) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  assert.ok(!expandSysopCommand(shortcut, this.game).split("; ").includes(omitted));
 });
 
-Then("hidden cheat {string} includes {string}", function (command, included) {
-  const shortcut = cheatPrompt(command);
-  assert.ok(shortcut, `Unknown hidden cheat: ${command}`);
-  assert.ok(expandCheatPrompt(shortcut, this.game).split("; ").includes(included));
+Then("sysop command {string} includes {string}", function (command, included) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  assert.ok(expandSysopCommand(shortcut, this.game).split("; ").includes(included));
 });
 
 Then("item {string} is absent from game state", function (item) {
   assert.equal(this.game.item(item), null);
 });
 
-Then("public HELP does not reveal hidden cheat commands", function () {
+Then("public HELP does not reveal sysop commands", function () {
   const help = this.game.send("help");
-  for (const entry of CHEAT_PROMPTS) assert.ok(!help.includes(entry.cmd));
-  assert.ok(!help.includes(MAGIC_MENU_COMMAND));
+  for (const entry of SYSOP_COMMANDS) assert.ok(!help.includes(entry.cmd));
+  assert.ok(!help.includes(SYSOP_MENU_COMMAND));
 });
 
 Then("every required family item is in the reliquary", function () {

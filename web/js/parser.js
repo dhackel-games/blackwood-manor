@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
@@ -25,7 +25,7 @@ const VERBS = {
   talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],
-  sit: ["sit"], use: ["use"], flush: ["flush"],
+  sit: ["sit"], use: ["use", "u"], flush: ["flush"],
   hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again", "g"],
   map: ["map", "m", "chart", "floorplan"],
@@ -41,6 +41,7 @@ for (const [canon, list] of Object.entries(VERBS)) {
 
 const ARTICLES = new Set(["the", "a", "an", "some"]);
 const PREPS = new Set(["with", "in", "into", "on", "onto", "at", "to", "from", "under", "behind", "inside"]);
+const NOUN_SHORTCUTS = Object.freeze({ d: "door", br: "bedroom" });
 
 // Split a raw input line into separate commands.
 // Classic-parser separators: "." ";" "," and the word "then".
@@ -55,7 +56,7 @@ export function splitCommands(input) {
 }
 
 export function parse(input) {
-  const raw = (input || "").trim().toLowerCase();
+  const raw = (input || "").trim().toLowerCase().replace(/\bw\/(?=\S)/g, "with ");
   if (!raw) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
   if (/^[\d\s-]+$/.test(raw) && /\d/.test(raw)) {
     return { verb: "code", dobj: raw, prep: null, iobj: null };
@@ -100,6 +101,9 @@ export function parse(input) {
   // "go north" / "go n" / "climb up"
   if ((verb === "go" || verb === "climb") && rest.length && DIRECTIONS[rest[0]]) {
     return { verb: "go", dobj: DIRECTIONS[rest[0]], prep: null, iobj: null };
+  }
+  if (verb !== "say") {
+    rest = rest.map((word) => NOUN_SHORTCUTS[word] || word);
   }
   // "pick up X" / "take up X" => drop the stray "up"
   if (verb === "take" && rest[0] === "up") rest = rest.slice(1);

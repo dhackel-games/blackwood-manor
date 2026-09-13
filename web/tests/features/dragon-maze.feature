@@ -1,4 +1,4 @@
-# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 
 @walkthrough @dragon
 Feature: Dreadmaw's hedge maze and hoard
@@ -173,6 +173,13 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is unset
     And the output contains "does not rhyme"
     And the output contains "2 guesses remain"
+
+  Scenario: Noun abbreviations do not rewrite spoken riddle answers
+    Given flag "trollAskedRiddle" is set
+    And the player is in room "trollGate"
+    When I send "say d"
+    Then flag "dragonVaultOpen" is unset
+    And the output contains "does not rhyme"
 
   Scenario: A rejected rhyme gets accurate feedback
     Given flag "trollAskedRiddle" is set

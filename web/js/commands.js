@@ -1,4 +1,4 @@
-// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// commands.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 // Generic verb handlers. Content-free engine.
 // Each handler is (ctx, cmd) => string, where ctx is the game object from core.js
 // and cmd is { verb, dobj, prep, iobj }. Handlers mutate live item objects
@@ -109,7 +109,7 @@ say/talk <words/person> | Speak / Say words aloud or talk to a visible character
 score | Score / Show points, turns, and rank.
 throw <thing> at <target> | Throw / Throw a carried item.
 unlock <thing> with <key> | Unlock / Unlock something with a matching key.
-use/wear/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
+(u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
 verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z) | Wait / Let one turn pass.
@@ -118,6 +118,8 @@ CHAINING
 Separate commands with ".", ";", ",", or THEN.
 Example: n; open mailbox; read letter
 A chain stops at the first unknown word.
+WITH may be shortened to w/ with no following space: unlock frontd w/iron.
+In object names, d means DOOR and br means BEDROOM: open front d; fly grand br.
 
 GARY'S HINT LINE
 CALL or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.

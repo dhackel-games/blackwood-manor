@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -220,6 +220,16 @@ Feature: Fire and food consequences
     Then item "outhouseMushrooms" is destroyed
     And the current room is "gate"
     And the turn count is 1
+
+  Scenario: The U alias can replace an ambiguous USE command
+    Given a fresh manor game
+    And item "mushrooms" is carried
+    And item "outhouseMushrooms" is carried
+    When I send "u mushrooms"
+    Then the output contains "(which MUSHROOMS? FRESH or DRIED?)"
+    When I send "u fresh mushroom"
+    Then item "outhouseMushrooms" is destroyed
+    And item "mushrooms" is carried
 
   Scenario: A USE clarification remembers non-mushroom choices
     Given a fresh manor game

@@ -1,4 +1,4 @@
-// cheat-prompts.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -24,44 +24,45 @@ export function shortestCommand(command) {
     .replace(/^close\b/i, "c")
     .replace(/^take\b/i, "get")
     .replace(/^place\b/i, "put")
-    .replace(/^wear\b/i, "don")
+    .replace(/^(?:wear|don)\b/i, "u")
     .replace(/^remove\b/i, "doff")
     .replace(/^offer\b/i, "give")
     .replace(/^enter\b/i, "in")
-    .replace(/^wait$/i, "z");
+    .replace(/^wait$/i, "z")
+    .replace(/\s+with\s+/i, " w/");
 }
 
 const join = (commands) => commands.map(shortestCommand).join("; ");
 
-export const MAGIC_MENU_COMMAND = "::";
-export const MAGIC_MENU_DISCOVERY_MESSAGE =
-  "You've discovered the magic menu. Please invoke it the first time with your password via ::<password>";
-export const MAGIC_MENU_PASSWORDS = Object.freeze(["werdna", "evad"]);
+export const SYSOP_MENU_COMMAND = "::";
+export const SYSOP_MENU_DISCOVERY_MESSAGE =
+  "You've discovered the sysop menu. Please invoke it the first time with your password via ::<password>";
+export const SYSOP_MENU_PASSWORDS = Object.freeze(["werdna", "evad"]);
 
-export function isMagicMenuPassword(command) {
+export function isSysopMenuPassword(command) {
   const normalized = String(command || "").trim().toLowerCase();
-  return MAGIC_MENU_PASSWORDS.some((password) => normalized === `::${password}`);
+  return SYSOP_MENU_PASSWORDS.some((password) => normalized === `::${password}`);
 }
 
-export function magicMenuAction(command, unlocked) {
+export function sysopMenuAction(command, unlocked) {
   const normalized = String(command || "").trim().toLowerCase();
-  if (!normalized.startsWith(MAGIC_MENU_COMMAND)) return { handled: false, unlocked };
-  if (isMagicMenuPassword(normalized)) {
+  if (!normalized.startsWith(SYSOP_MENU_COMMAND)) return { handled: false, unlocked };
+  if (isSysopMenuPassword(normalized)) {
     return { handled: true, unlocked: true, showMenu: true };
   }
   if (!unlocked) {
-    return { handled: true, unlocked: false, message: MAGIC_MENU_DISCOVERY_MESSAGE };
+    return { handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE };
   }
-  if (normalized === MAGIC_MENU_COMMAND) {
+  if (normalized === SYSOP_MENU_COMMAND) {
     return { handled: true, unlocked: true, showMenu: true };
   }
-  const shortcut = cheatPrompt(normalized);
+  const shortcut = sysopCommand(normalized);
   return shortcut
     ? { handled: true, unlocked: true, shortcut }
     : {
         handled: true,
         unlocked: true,
-        message: `Unknown magic menu command. Type ${MAGIC_MENU_COMMAND} to list available commands.`,
+        message: `Unknown sysop menu command. Type ${SYSOP_MENU_COMMAND} to list available commands.`,
       };
 }
 
@@ -99,7 +100,7 @@ const POWERUP = [
   "wear backpack",
   "fly gallery",
   "wear headlamp",
-  "fly hallbedroom",
+  "fly hallbr",
   "open drawer",
   "wear goggles",
   "fly parlor",
@@ -120,7 +121,7 @@ const QUICK_COLLECTION = [
   "take family",
   "fly shaft",
   "wear backpack",
-  "fly hallbedroom",
+  "fly hallbr",
   "open drawer",
   "wear goggles",
   "fly dining",
@@ -128,7 +129,7 @@ const QUICK_COLLECTION = [
   "fly kitchen",
   "take matches",
   "light candle",
-  "fly garden",
+  "fly gdn",
   "{{oakspyglass}}",
   "down",
   "take ancient",
@@ -143,7 +144,7 @@ const QUICK_COLLECTION = [
   "open musicbox",
   "take tiny",
   "take musicbox",
-  "fly grand",
+  "fly grandbr",
   "unlock jewelry with tiny",
   "open jewelry",
   "take ravenblood",
@@ -179,8 +180,8 @@ const DAWN_ENDING = [
   "close reliquary",
   "ring bell",
   "take bone",
-  "unlock secret with bone",
-  "open secret",
+  "unlock secretd with bone",
+  "open secretd",
   "north",
   "north",
   "north",
@@ -192,8 +193,8 @@ const MAX_COLLECTION = [
   "take iron",
   "west",
   "north",
-  "unlock frontdoor with iron",
-  "open frontdoor",
+  "unlock frontd with iron",
+  "open frontd",
   "south",
   "east",
   "east",
@@ -218,11 +219,11 @@ const MAX_COLLECTION = [
   "take crest",
   "fly kitchen",
   "take rope",
-  "open cellar",
+  "open cellard",
   "eat burrito",
   "drink milk",
   "take matches",
-  "fly garden",
+  "fly gdn",
   "down",
   "take ancient",
   "light self with match",
@@ -238,7 +239,7 @@ const MAX_COLLECTION = [
   "move painting",
   "open safe with 7 3 9",
   "wear talisman",
-  "fly hallbedroom",
+  "fly hallbr",
   "open drawer",
   "wear goggles",
   "fly astral",
@@ -255,7 +256,7 @@ const MAX_COLLECTION = [
   "open musicbox",
   "take tiny",
   "take musicbox",
-  "fly grand",
+  "fly grandbr",
   "unlock jewelry with tiny",
   "open jewelry",
   "take ravenblood",
@@ -267,7 +268,7 @@ const MAX_COLLECTION = [
   "fly royal",
 ];
 
-export const CHEAT_PROMPTS = Object.freeze([
+export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::powerup",
     name: "Power Up",
@@ -296,8 +297,8 @@ export const CHEAT_PROMPTS = Object.freeze([
       "close reliquary",
       "ring bell",
       "take bone",
-      "unlock secret with bone",
-      "open secret",
+      "unlock secretd with bone",
+      "open secretd",
       "north",
       "north",
       "take silver",
@@ -357,12 +358,12 @@ export function pathToRoom(game, target) {
   throw new Error(`No available path from ${game.state.room} to ${destination}`);
 }
 
-export function expandCheatPrompt(shortcut, game) {
+export function expandSysopCommand(shortcut, game) {
   const oakRoute = (() => {
     const spyglassLocation = game.roomOf("spyglass");
     if (spyglassLocation === "inventory" || spyglassLocation === "reliquary") return [];
     if (game.getFlag("oakLightAligned")) {
-      return ["fly fort", "take spyglass", "fly garden"];
+      return ["fly fort", "take spyglass", "fly gdn"];
     }
     return OAK_SPYGLASS_ROUTE;
   })();
@@ -379,7 +380,7 @@ export function expandCheatPrompt(shortcut, game) {
     if (!command) return false;
     const take = /^(?:take|get)\s+(.+)$/i.exec(command);
     if (take && game.find(take[1], game.inventory())) return false;
-    const wear = /^(?:wear|don)\s+(.+)$/i.exec(command);
+    const wear = /^(?:wear|don|u)\s+(.+)$/i.exec(command);
     if (wear) {
       const item = game.find(wear[1], game.inventory());
       if (item?.worn) return false;
@@ -388,18 +389,18 @@ export function expandCheatPrompt(shortcut, game) {
   }).join("; ");
 }
 
-export function cheatPrompt(command) {
+export function sysopCommand(command) {
   const normalized = String(command || "").trim().toLowerCase();
-  return CHEAT_PROMPTS.find((entry) => entry.cmd === normalized) || null;
+  return SYSOP_COMMANDS.find((entry) => entry.cmd === normalized) || null;
 }
 
-export function cheatMenu() {
+export function renderSysopMenu() {
   return [
-    "== MAGIC MENU ==",
+    "== SYSOP MENU ==",
     "COMMAND | TITLE / DESCRIPTION",
-    ...CHEAT_PROMPTS.map((entry) =>
+    ...SYSOP_COMMANDS.map((entry) =>
       `${entry.cmd.padEnd(14)} | ${entry.name} / ${entry.description}`),
   ].join("\n");
 }
 
-// end cheat-prompts.js
+// end sysop-menu.js

@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.070:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -50,7 +50,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   toilet: "toilet",
   dreadmaw: "dragon",
   goldDoubloon: "doubloon",
-  dragonVaultDoor: "vaultdoor",
+  dragonVaultDoor: "vaultd",
   caveTroll: "troll",
   dragonHoard: "hoard",
   familyRing: "family",
@@ -64,11 +64,11 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   nightDrawer: "drawer",
   bedsideLamp: "bedlamp",
   xrayGoggles: "goggles",
-  frontDoor: "frontdoor",
+  frontDoor: "frontd",
   candlestick: "candlestick",
   matches: "matches",
   rope: "coil",
-  cellarDoor: "cellardoor",
+  cellarDoor: "cellard",
   lever: "lever",
   grimoire: "grimoire",
   portrait: "profile",
@@ -88,7 +88,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   crystalDecanter: "decanter",
   ancestralPortrait: "ancestral",
   boneKey: "bone",
-  secretDoor: "secret",
+  secretDoor: "secretd",
   spirit: "matriarch",
   silverMirror: "silver",
   backwardsWatch: "woodblack",
@@ -96,7 +96,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
 
 export const ROOM_SHORT_NAMES = Object.freeze({
   gate: "gate",
-  garden: "garden",
+  garden: "gdn",
   hedgeMazeGate: "yewgate",
   hedgeMazeKnot: "thornknot",
   hedgeMazeLoop: "loop",
@@ -120,8 +120,8 @@ export const ROOM_SHORT_NAMES = Object.freeze({
   crypt: "crypt",
   landing: "landing",
   nursery: "nursery",
-  masterBedroom: "grand",
-  hallBedroom: "hallbedroom",
+  masterBedroom: "grandbr",
+  hallBedroom: "hallbr",
   study: "study",
   attic: "attic",
   roof: "roof",
