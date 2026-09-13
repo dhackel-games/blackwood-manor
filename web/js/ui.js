@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -59,6 +59,12 @@ const hud = createHud(document);
 const hudElement = document.getElementById("hud");
 const hudVersion = document.getElementById("hud-version");
 if (hudVersion) hudVersion.textContent = versionText();
+// The launch banner can only stamp a placeholder "Source" — no network fetch has
+// run yet — so it reads "Unavailable" even when the content source is reachable.
+// Now that this module is live, ask the native layer for the real remote content
+// version so the header reflects reality. This is silent: unlike the VERSION
+// command it must not echo the version line into the transcript.
+if (nativeContent) nativeContent.postMessage({ action: "version-banner" });
 
 let game = createGame(world);
 let bugTrace = createBugTrace("page reload");
@@ -575,6 +581,12 @@ window.__contentVersions = (current, remote) => {
   const status = iosVersionText(current, remote);
   if (hudVersion) hudVersion.textContent = status;
   printContentStatus(status);
+};
+// Launch handshake companion to __contentVersions: refresh only the header's
+// "Source" field to the live remote content version (or leave "Unavailable" when
+// offline) WITHOUT printing the version line into the transcript.
+window.__contentBanner = (current, remote) => {
+  if (hudVersion) hudVersion.textContent = iosVersionText(current, remote);
 };
 window.__contentRefreshFailed = (message) => {
   printContentStatus(message || "Content source refresh failed. Local content was left unchanged.");

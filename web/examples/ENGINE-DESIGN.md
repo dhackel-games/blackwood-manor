@@ -70,9 +70,9 @@ office game, or a submarine adventure.
   fail text).
 - **Target:** keyed message table → reskin tone per game (spooky → corporate →
   naval), single place to edit copy, engine ships no game-specific prose.
-- **Status:** subsumed by #9 (content/code split). Prototyped there.
+- **Status:** subsumed by #9 (content/code split). Shipped there (build 74).
 
-### 9. Content/code split — prose in JSON, logic in JS  ✅ PROTOTYPED
+### 9. Content/code split — prose in JSON, logic in JS  ✅ SHIPPED (build 74)
 - **Andy's proposal:** push *all* player-facing text (room/item descriptions,
   messages, banners, achievement lines) into JSON content files (e.g.
   `world.content.json`), leaving the `.js` files holding only structure + logic.
@@ -100,6 +100,13 @@ office game, or a submarine adventure.
   5. **Loader mechanism.** `import … with { type: "json" }` works in Node 22 +
      modern browsers (experimental warning in Node); alternatively inline at
      build time. Decide before wide adoption.
+- **Status:** **SHIPPED in Blackwood (build 74).** All 36 rooms and all 72 items
+  had their static prose (`desc`/`roomDesc`/`text`) moved out of `web/js/world.js`
+  into `web/js/world.content.js`, merged by the now-shared `composeWorld(logic,
+  content)` in `web/js/compose.js`. Only the two template descriptions that
+  interpolate `REQUIRED_FAMILY_ITEM_COUNT` (`reliquary`, `familyCrest`) remain in
+  logic by design. Verified byte-identical (365/365 tests + 165 walkthroughs
+  green); `world.content.js` added to `CONTENT_FILES` so it rides the self-update.
 
 ### 7. HUD slots as per-game config
 - **Today:** `web/js/hud.js` `HUD_SLOT_DEFINITIONS` mixes generic slots (score,
@@ -129,7 +136,7 @@ office game, or a submarine adventure.
 
 ## Sequencing (low → high risk)
 
-1. **#2 achievements** ✅ + **#6 messages** — pure extraction, backward-compatible.
+1. **#2 achievements** ✅ + **#6 messages / #9 content-split** ✅ (shipped build 74) — pure extraction, backward-compatible.
 2. **#3 room auto-compose** — additive, shrinks `world.js`.
 3. **#1 item capabilities + #5 recipes** — heart of the idea; migrate behind a
    compatibility shim so `on:{}` still works mid-migration.

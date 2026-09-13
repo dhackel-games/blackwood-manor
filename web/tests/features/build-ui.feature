@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -103,6 +103,7 @@ Feature: Build metadata and touch-control contract
 
   Scenario: iOS compares persistent and remote numeric web-content versions
     Then Version reports local and source content through the native bridge
+    And the iOS launch banner reports the live content source without a transcript echo
     And Reload seeds the local cache and refreshes differing GitHub.io content
     And a changed app manifest offers an iOS update
 

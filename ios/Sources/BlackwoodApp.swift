@@ -1,4 +1,4 @@
-// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
 
 import SwiftUI
 import WebKit
@@ -142,6 +142,10 @@ final class GameViewController: UIViewController, WKUIDelegate {
             contentUpdater.versionLabels { [weak self] labels in
                 self?.sendVersionLabels(labels)
             }
+        case "version-banner":
+            contentUpdater.versionLabels { [weak self] labels in
+                self?.sendVersionBanner(labels)
+            }
         case "refresh":
             let fromLabel = contentStore.activeLabel()
             guard contentStore.ensureCacheFromBundle() else {
@@ -172,6 +176,12 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private func sendVersionLabels(_ labels: WebContentUpdater.VersionLabels) {
         evaluateContentCallback(
             "window.__contentVersions",
+            values: [labels.current, labels.remote ?? NSNull()])
+    }
+
+    private func sendVersionBanner(_ labels: WebContentUpdater.VersionLabels) {
+        evaluateContentCallback(
+            "window.__contentBanner",
             values: [labels.current, labels.remote ?? NSNull()])
     }
 

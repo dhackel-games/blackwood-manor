@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.075:dhackel.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -716,6 +716,18 @@ Then("Version reports local and source content through the native bridge", funct
   assert.match(app, /window\.__activeBuildLabel =/);
   assert.match(updater, /func versionLabels\(completion:[\s\S]*fetchRemoteRelease/);
   assert.match(updater, /appendingPathComponent\("js\/version\.js"\)/);
+});
+
+Then("the iOS launch banner reports the live content source without a transcript echo", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  // On boot the web layer asks the native side for the real remote source version.
+  assert.match(ui, /nativeContent\.postMessage\(\{ action: "version-banner" \}\)/);
+  // The banner-only callback updates the header but must NOT print to the transcript.
+  assert.match(ui, /window\.__contentBanner = \(current, remote\) => \{\s*if \(hudVersion\) hudVersion\.textContent = iosVersionText\(current, remote\);\s*\};/);
+  // Native routes version-banner through versionLabels to the banner-only callback.
+  assert.match(app, /case "version-banner":[\s\S]*contentUpdater\.versionLabels/);
+  assert.match(app, /"window\.__contentBanner"/);
 });
 
 Then("Reload seeds the local cache and refreshes differing GitHub.io content", function () {
