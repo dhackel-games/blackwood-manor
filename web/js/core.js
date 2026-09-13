@@ -145,8 +145,16 @@ export function createGame(world) {
   game.win = (msg) => {
     state.won = true;
     const badges = typeof world.endBadges === "function" ? (world.endBadges(game) || "") : "";
+    // The end banner is game content, not engine text. Games set config.winBanner
+    // (a string, or a fn(game) => string); Blackwood Manor's original line is the
+    // default so existing behaviour is unchanged.
+    const cfg = world.config || {};
+    const banner = typeof cfg.winBanner === "function"
+      ? cfg.winBanner(game)
+      : (cfg.winBanner
+        ?? `You have escaped Blackwood Manor alive${state.flags.onFire ? " 🔥" : ""}.`);
     return (msg ? msg + "\n\n" : "") +
-      `    ****  You have escaped Blackwood Manor alive${state.flags.onFire ? " 🔥" : ""}.  ****\n\n` +
+      `    ****  ${banner}  ****\n\n` +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
       badges + phoneBillLine();
   };
