@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
 ```
 
 ---
@@ -143,7 +143,8 @@ Classic Infocom style, richer than strict two-word.
   ambiguities remain valid. Generated SYSOP MENU (`::`) command chains use only these compact
   targets; bug reports continue preserving exactly what the player submitted, so
   an expanded sysop command is naturally recorded in its compact form.
-- **Compact grammar:** attached `w/` means WITH (`unlock frontd w/iron`).
+- **Compact grammar:** `w/` means WITH with or without a following space
+  (`unlock frontd w/iron` and `unlock front d w/ iron`).
   Within noun phrases, `d` expands to DOOR and `br` to BEDROOM, while canonical
   one-word compounds such as `frontd`, `secretd`, `grandbr`, and `hallbr` avoid
   ambiguity. Bare `d` remains DOWN.

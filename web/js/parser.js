@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.073:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
@@ -56,7 +56,7 @@ export function splitCommands(input) {
 }
 
 export function parse(input) {
-  const raw = (input || "").trim().toLowerCase().replace(/\bw\/(?=\S)/g, "with ");
+  const raw = (input || "").trim().toLowerCase().replace(/\bw\/\s*/g, "with ");
   if (!raw) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
   if (/^[\d\s-]+$/.test(raw) && /\d/.test(raw)) {
     return { verb: "code", dobj: raw, prep: null, iobj: null };
