@@ -70,7 +70,36 @@ office game, or a submarine adventure.
   fail text).
 - **Target:** keyed message table → reskin tone per game (spooky → corporate →
   naval), single place to edit copy, engine ships no game-specific prose.
-- **Status:** planned (pure extraction, backward-compatible).
+- **Status:** subsumed by #9 (content/code split). Prototyped there.
+
+### 9. Content/code split — prose in JSON, logic in JS  ✅ PROTOTYPED
+- **Andy's proposal:** push *all* player-facing text (room/item descriptions,
+  messages, banners, achievement lines) into JSON content files (e.g.
+  `world.content.json`), leaving the `.js` files holding only structure + logic.
+  The code files "get way way smaller."
+- **Grounded sizing:** in `web/js/world.js`, **111 static string descriptions vs.
+  only 8 dynamic (function) ones** — ~93% of description fields are pure prose
+  that can live in data. The code that stays in JS: 8 dynamic descriptions, 52
+  `on:{}` handler blocks, 113 named handler functions.
+- **Prototype:** `web/examples/spaceport/` now splits into
+  `world.content.json` (all prose) + `world.js` (structure/logic), merged by a
+  tiny `composeWorld(logic, content)`. The engine is unchanged and the game plays
+  identically (example suite green). This is the generalization of #6 (messages)
+  and half of #1 (item data vs. behaviour).
+- **Real-Blackwood migration nuances (before touching `world.js`):**
+  1. **Dynamic text stays code.** The 8 `desc(ctx)`/`searchDesc(ctx)` functions
+     and anything conditional remain in JS (or become small rule tables).
+  2. **Interpolation.** Many strings use template literals (e.g.
+     `${REQUIRED_FAMILY_ITEM_COUNT}`). JSON needs placeholders (`{familyItemCount}`)
+     + a substitution pass at load.
+  3. **Self-update wiring.** Content JSON for the shipped game must be added to
+     Andy's `CONTENT_FILES` / manifest walk (currently `js/**` only) so it rides
+     the self-update and cache-busting. Example files stay outside the bundle.
+  4. **Promote the merger.** `composeWorld` should move from the example into a
+     shared engine util once Blackwood adopts it.
+  5. **Loader mechanism.** `import … with { type: "json" }` works in Node 22 +
+     modern browsers (experimental warning in Node); alternatively inline at
+     build time. Decide before wide adoption.
 
 ### 7. HUD slots as per-game config
 - **Today:** `web/js/hud.js` `HUD_SLOT_DEFINITIONS` mixes generic slots (score,
