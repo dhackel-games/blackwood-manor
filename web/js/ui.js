@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -53,8 +53,8 @@ const nativeContent = window.webkit?.messageHandlers?.content;
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
-const appInstalledVersion = window.__appInstalledVersion || null;
-const appInstalledBuild = window.__appInstalledBuild || null;
+let appInstalledVersion = window.__appInstalledVersion;
+let appInstalledBuild = window.__appInstalledBuild;
 let contentLocal = CONTENT_VERSION;
 let contentSource = null;
 let introBannerElement = null;
@@ -576,14 +576,12 @@ window.__contentUpdateNotice = (from, to) => {
   print("Content source: " + (to || "unknown"), "sys");
   print("Running the latest available content.\n", "sys");
 };
-// Compatibility with build 66's native callback while cached web content transitions.
-window.__appUpdateNotice = window.__contentUpdateNotice;
 function printContentStatus(message) {
   if (game.state.flags.onCall) printToPhone(message, "sys");
   else print(message, "sys");
 }
-window.__contentVersions = (contentLocalValue, contentSourceValue) => {
-  setContentVersions(contentLocalValue, contentSourceValue);
+window.__contentVersions = (appVersion, appBuild, contentLocalValue, contentSourceValue) => {
+  setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
   const status = iosVersionText(contentLocalValue, contentSourceValue);
   refreshIntroBanner();
   printContentStatus(status);
@@ -591,8 +589,8 @@ window.__contentVersions = (contentLocalValue, contentSourceValue) => {
 // Launch handshake companion to __contentVersions: refresh only the intro's
 // "Source" field to the live remote content version (or leave "Unavailable" when
 // offline) WITHOUT printing the version line into the transcript.
-window.__contentBanner = (contentLocalValue, contentSourceValue) => {
-  setContentVersions(contentLocalValue, contentSourceValue);
+window.__contentBanner = (appVersion, appBuild, contentLocalValue, contentSourceValue) => {
+  setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue);
   refreshIntroBanner();
 };
 window.__contentRefreshFailed = (message) => {
@@ -1027,14 +1025,13 @@ export function versionText() {
 }
 
 function iosVersionText(contentLocalValue, contentSourceValue) {
-  const appIdentity = appInstalledVersion && appInstalledBuild
-    ? `iOS ${appInstalledVersion} (Build ${appInstalledBuild}).`
-    : "iOS App Unavailable.";
-  return `${COPYRIGHT} ${appIdentity} ` +
+  return `${COPYRIGHT} iOS ${appInstalledVersion} (Build ${appInstalledBuild}). ` +
     `Content: Local ${contentLocalValue || CONTENT_VERSION}. Source ${contentSourceValue || "Unavailable"}.`;
 }
 
-function setContentVersions(contentLocalValue, contentSourceValue) {
+function setContentVersions(appVersion, appBuild, contentLocalValue, contentSourceValue) {
+  appInstalledVersion = appVersion;
+  appInstalledBuild = appBuild;
   contentLocal = contentLocalValue || CONTENT_VERSION;
   contentSource = contentSourceValue || null;
 }
