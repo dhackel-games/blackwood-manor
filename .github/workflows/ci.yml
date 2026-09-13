@@ -1,0 +1,30 @@
+# ci.yml. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:dhackel.
+name: CI (web tests)
+
+# Gate every pull request (and manual runs) on the Cucumber suite so that
+# auto-fix PRs — and any human PR — can only merge when the game still passes.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run Cucumber suite
+        run: npm test
