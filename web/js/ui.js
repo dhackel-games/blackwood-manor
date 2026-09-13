@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit/again), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -23,19 +23,21 @@ import {
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js?v=source";
-import { cheatMenu, expandCheatPrompt, magicMenuAction } from "./cheat-prompts.js?v=source";
+import { expandSysopCommand, renderSysopMenu, sysopMenuAction } from "./sysop-menu.js?v=source";
 import { splitCommands } from "./parser.js?v=source";
 
 const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
 const mainGo = document.getElementById("go");
 const bugReport = document.getElementById("bug-report");
-const MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
-let magicMenuUnlocked = false;
+const SYSOP_MENU_UNLOCK_KEY = "blackwood-sysop-menu-unlocked-v1";
+const LEGACY_MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
+let sysopMenuUnlocked = false;
 try {
-  magicMenuUnlocked = localStorage.getItem(MAGIC_MENU_UNLOCK_KEY) === "true";
+  sysopMenuUnlocked = localStorage.getItem(SYSOP_MENU_UNLOCK_KEY) === "true"
+    || localStorage.getItem(LEGACY_MAGIC_MENU_UNLOCK_KEY) === "true";
 } catch (error) {
-  console.warn("[magic-menu] could not read unlock state", error);
+  console.warn("[sysop-menu] could not read unlock state", error);
 }
 
 // phone-call screen elements
@@ -764,21 +766,21 @@ function handle(raw) {
   else if (!game.state.dead) saveGame(game);
 }
 
-function applyCheatPrompt(raw) {
+function applySysopCommand(raw) {
   const command = String(raw || "").trim();
-  const action = magicMenuAction(command, magicMenuUnlocked);
+  const action = sysopMenuAction(command, sysopMenuUnlocked);
   if (!action.handled) return false;
   recordBugCommand(bugTrace, command);
-  if (action.unlocked && !magicMenuUnlocked) {
+  if (action.unlocked && !sysopMenuUnlocked) {
     try {
-      localStorage.setItem(MAGIC_MENU_UNLOCK_KEY, "true");
+      localStorage.setItem(SYSOP_MENU_UNLOCK_KEY, "true");
     } catch (error) {
-      console.warn("[magic-menu] could not save unlock state", error);
+      console.warn("[sysop-menu] could not save unlock state", error);
     }
   }
-  magicMenuUnlocked = action.unlocked;
+  sysopMenuUnlocked = action.unlocked;
   if (action.showMenu) {
-    print(cheatMenu(), "sys");
+    print(renderSysopMenu(), "sys");
     mainEntry.clear();
     return true;
   }
@@ -788,7 +790,7 @@ function applyCheatPrompt(raw) {
     return true;
   }
   try {
-    mainEntry.setValue(expandCheatPrompt(action.shortcut, game));
+    mainEntry.setValue(expandSysopCommand(action.shortcut, game));
   } catch (error) {
     print(error.message, "sys");
     return true;
@@ -802,13 +804,13 @@ function applyCheatPrompt(raw) {
 input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") {
     e.preventDefault();
-    if (!applyCheatPrompt(input.value)) { handle(input.value); mainEntry.clear(); }
+    if (!applySysopCommand(input.value)) { handle(input.value); mainEntry.clear(); }
   }
   else if (e.key === "ArrowUp") { if (hi > 0) { hi--; mainEntry.setValue(history[hi] || ""); } e.preventDefault(); }
   else if (e.key === "ArrowDown") { if (hi < history.length) { hi++; mainEntry.setValue(history[hi] || ""); } e.preventDefault(); }
 });
 mainGo.addEventListener("click", () => {
-  if (!applyCheatPrompt(input.value)) { handle(input.value); mainEntry.clear(); }
+  if (!applySysopCommand(input.value)) { handle(input.value); mainEntry.clear(); }
   if (canType) input.focus();
 });
 

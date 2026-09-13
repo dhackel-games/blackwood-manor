@@ -1,7 +1,7 @@
-# cheat-prompts.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 
 @unit
-Feature: Hidden compound prompt shortcuts
+Feature: Sysop compound command shortcuts
   Double-colon shortcuts prepare editable command chains without appearing in
   public HELP or executing until the player submits the replacement. The menu
   remains locked until its owner password is entered once.
@@ -10,15 +10,15 @@ Feature: Hidden compound prompt shortcuts
     Given a fresh manor game
 
   Scenario: The hidden menu is generated from the prompt catalog
-    Then the hidden cheat menu command is "::"
-    And the magic menu unlock passwords are "werdna,evad"
-    And the hidden cheat catalog defines "::powerup,::winquick,::garycliff,::winmax"
-    And the magic menu uses the shared command title description format
+    Then the sysop menu command is "::"
+    And the sysop menu unlock passwords are "werdna,evad"
+    And the sysop command catalog defines "::powerup,::winquick,::garycliff,::winmax"
+    And the sysop menu uses the shared command title description format
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
     And hidden shortcuts replace the editable command prompt without executing
-    And public HELP does not reveal hidden cheat commands
-    And no hidden cheat prompt uses the removed su command
+    And public HELP does not reveal sysop commands
+    And no sysop command uses the removed su command
 
   Scenario: Dynamic path tokens resolve from the current room
     Then the path from the current room to "PRIVY" is "e; e"
@@ -33,10 +33,11 @@ Feature: Hidden compound prompt shortcuts
       | open mailbox            | o mailbox            |
       | close reliquary         | c reliquary          |
       | take family crest       | get family crest     |
-      | wear winged shoes       | don winged shoes     |
+      | wear winged shoes       | u winged shoes        |
       | remove talisman         | doff talisman        |
       | offer apple to dragon   | give apple to dragon |
       | place ruby gem in panel | put ruby gem in panel |
+      | unlock front door with iron key | unlock front door w/iron key |
       | enter platform          | in platform          |
       | wait                    | z                    |
 
@@ -44,17 +45,17 @@ Feature: Hidden compound prompt shortcuts
     Given item "backpack" is carried
     And item "wingedShoes" is carried
     When I send "wear winged shoes"
-    Then hidden cheat "::powerup" omits "take backpack"
-    And hidden cheat "::powerup" includes "don backpack"
-    And hidden cheat "::powerup" omits "don shoes"
+    Then sysop command "::powerup" omits "take backpack"
+    And sysop command "::powerup" includes "u backpack"
+    And sysop command "::powerup" omits "u shoes"
 
   Scenario: Powerup equips a backpack that is already carried but not worn
     Given item "backpack" is carried
-    When I execute hidden cheat "::powerup"
+    When I execute sysop command "::powerup"
     Then item "backpack" is worn in slot "back"
 
   Scenario: Powerup collects and equips every reusable power item
-    When I execute hidden cheat "::powerup"
+    When I execute sysop command "::powerup"
     And item "backpack" is worn in slot "back"
     And item "headlamp" is worn in slot "head"
     And item "xrayGoggles" is worn in slot "eyes"
@@ -65,7 +66,7 @@ Feature: Hidden compound prompt shortcuts
     And the game is not won
 
   Scenario: Quick win deposits only required heirlooms
-    When I execute hidden cheat "::winquick"
+    When I execute sysop command "::winquick"
     Then the game is won
     And every required family item is in the reliquary
 
@@ -77,14 +78,14 @@ Feature: Hidden compound prompt shortcuts
     And I send "put emerald gem in middle slot"
     And I send "put sapphire gem in top slot"
     And I send "wait"
-    And I execute hidden cheat "::winquick"
+    And I execute sysop command "::winquick"
     Then the game is won
     And every required family item is in the reliquary
 
   Scenario: An already-solved oak still uses its one-word room alias
     Given flag "oakLightAligned" is set
-    Then hidden cheat "::winquick" includes "fly fort"
-    And hidden cheat "::winquick" omits "fly tree fort"
+    Then sysop command "::winquick" includes "fly fort"
+    And sysop command "::winquick" omits "fly tree fort"
 
   Scenario: Quick win skips the crypt after its heirlooms are deposited
     Given item "goldLocket" is carried
@@ -92,13 +93,13 @@ Feature: Hidden compound prompt shortcuts
     And the player is in room "grandHall"
     When I send "put gold locket in reliquary"
     And I send "put talisman in reliquary"
-    And I execute hidden cheat "::winquick"
+    And I execute sysop command "::winquick"
     Then the game is won
     And the game is alive
     And every required family item is in the reliquary
 
   Scenario: Gary cliffhanger collects the minimum heirlooms and descends
-    When I execute hidden cheat "::garycliff"
+    When I execute sysop command "::garycliff"
     Then the game is won
     And the current room is "garysLair"
     And the output contains "FREEDOM"
@@ -106,7 +107,7 @@ Feature: Hidden compound prompt shortcuts
     And every required family item is in the reliquary
 
   Scenario: Maximum win earns every deterministic scoring reward
-    When I execute hidden cheat "::winmax"
+    When I execute sysop command "::winmax"
     Then the game is won
     And flag "progressAward:trollRiddleSolved" is set
     And flag "progressAward:oakPanelAligned" is set
@@ -115,4 +116,4 @@ Feature: Hidden compound prompt shortcuts
     And item "mysteryPackage" is in "grandHall"
     And the game score is 485
 
-# end cheat-prompts.feature
+# end sysop-menu.feature

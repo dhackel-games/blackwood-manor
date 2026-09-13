@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.068:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
 
 @unit
 Feature: Player command parsing
@@ -13,9 +13,13 @@ Feature: Player command parsing
       | northwest                           | go      | nw        | [none]      | [none]    |
       | southeast                           | go      | se        | [none]      | [none]    |
       | southwest                           | go      | sw        | [none]      | [none]    |
+      | u                                   | go      | up        | [none]      | [none]    |
+      | u talisman                          | use     | talisman  | [none]      | [none]    |
       | take the brass key                  | take    | brass key | [none]      | [none]    |
       | grab brass key                      | take    | brass key | [none]      | [none]    |
       | unlock the oak door with the brass key | unlock | oak door | with      | brass key |
+      | unlock front d w/iron               | unlock | front door | with       | iron       |
+      | fly grand br                        | go      | grand bedroom | [none]   | [none]     |
       | look                                | look    | [none]    | [none]      | [none]    |
       | look at brass key                   | examine | brass key | [none]      | [none]    |
       | look brass key                      | examine | brass key | [none]      | [none]    |
@@ -36,6 +40,7 @@ Feature: Player command parsing
       | put apple on dragon                 | put     | apple     | on          | dragon    |
       | place emerald gem in middle slot    | put     | emerald gem | in        | middle slot |
       | say "foo"                           | say     | "foo"     | [none]      | [none]    |
+      | say d                               | say     | d         | [none]      | [none]    |
       | yell foo                            | say     | foo       | [none]      | [none]    |
       | leave                               | go      | out       | [none]      | [none]    |
       | exit                                | go      | out       | [none]      | [none]    |
