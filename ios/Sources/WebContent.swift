@@ -1,4 +1,4 @@
-// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
+// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 
 import Foundation
 import WebKit
@@ -176,10 +176,6 @@ final class WebContentStore {
         contentRelease(at: activeRoot())?.label ?? "unknown"
     }
 
-    func bundledManifestData() -> Data? {
-        try? Data(contentsOf: bundleRoot.appendingPathComponent("manifest.json"))
-    }
-
     @discardableResult
     func ensureCacheFromBundle() -> Bool {
         guard let bundled = bundleRelease else {
@@ -251,9 +247,8 @@ final class WebContentUpdater {
     // 3. CONTENT SOURCE: the CONTENT_VERSION currently published remotely.
     //    It is nil when the source cannot be reached.
     //
-    // manifest.json is compared separately to offer an installed-app update.
-    // It does not select local content and must not be substituted for any of
-    // these values.
+    // Native-app availability is checked separately against Apple's App Store
+    // catalog. Web manifests never imply that a native binary is available.
     struct VersionLabels: Equatable {
         let contentLocal: String
         let contentSource: String?
@@ -318,13 +313,6 @@ final class WebContentUpdater {
             completion(VersionLabels(
                 contentLocal: contentLocal,
                 contentSource: remote.map { String($0.contentVersion) }))
-        }
-    }
-
-    func checkForAppManifestChange(completion: @escaping (Bool) -> Void) {
-        let installed = store.bundledManifestData()
-        fetchRemoteFile("manifest.json", cacheKey: UUID().uuidString) { remote in
-            completion(installed != nil && remote != nil && installed != remote)
         }
     }
 

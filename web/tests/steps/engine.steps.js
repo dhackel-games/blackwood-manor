@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -834,15 +834,23 @@ Then("Reload seeds the local cache and refreshes differing GitHub.io content", f
   assert.match(app, /schemeHandler = AppSchemeHandler\([\s\S]*contentStore\.cacheRoot/);
 });
 
-Then("a changed app manifest offers an iOS update", function () {
+Then("Apple services decide whether a native iOS update is available", function () {
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
+  const appUpdate = readFileSync(new URL("../../../ios/Sources/AppUpdate.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
-  assert.match(updater, /func checkForAppManifestChange/);
-  assert.match(updater, /installed != remote/);
-  assert.match(app, /A new version of Blackwood Manor is available! Download now\?/);
-  assert.match(app, /UIAlertAction\(title: "Okay"/);
-  assert.match(app, /UIAlertAction\(title: "Cancel"/);
-  assert.match(app, /URL\(string: "itms-beta:\/\/"\)/);
+  assert.doesNotMatch(updater, /checkForAppManifestChange|bundledManifestData/);
+  assert.match(appUpdate, /https:\/\/itunes\.apple\.com\/lookup/);
+  assert.match(appUpdate,
+    /result\.version\.compare\(installedVersion, options: \.numeric\) == \.orderedDescending/);
+  assert.match(app,
+    /appUpdateChecker\.check\(receiptURL: Bundle\.main\.appStoreReceiptURL\)/);
+  assert.match(appUpdate,
+    /guard !AppDistribution\.isTestFlight\(receiptURL: receiptURL\)/);
+  assert.match(app, /AppUpdatePromptPolicy\.shouldPresent/);
+  assert.match(app, /UIAlertAction\(title: "View in App Store"/);
+  assert.match(app, /UIAlertAction\(title: "Not Now"/);
+  assert.match(app, /UIApplication\.shared\.open\(update\.storeURL\)/);
+  assert.doesNotMatch(app, /itms-beta:|manifest\.json/);
 });
 
 Then("local daemon status is announced in the transcript without console noise", function () {

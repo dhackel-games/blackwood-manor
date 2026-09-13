@@ -1,4 +1,4 @@
-// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.079:acoven.
+// BlackwoodApp.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 
 import SwiftUI
 import WebKit
@@ -36,6 +36,7 @@ final class GameViewController: UIViewController, WKUIDelegate {
     private var pendingContentUpdateNotice: (from: String, to: String)?
     private var pendingContentStatus: String?
     private var appUpdatePresented = false
+    private static let appUpdatePromptedVersionKey = "blackwood-app-update-prompted-version"
     // INSTALLED APP IDENTITY — always read from this installed binary. Never
     // derive either value from downloaded/cached web content. See the three-way
     // version contract beside WebContentUpdater.VersionLabels.
@@ -48,6 +49,10 @@ final class GameViewController: UIViewController, WKUIDelegate {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
             ?? "Unavailable"
     }
+    private lazy var appUpdateChecker = AppStoreUpdateChecker(
+        bundleIdentifier: Bundle.main.bundleIdentifier ?? "com.dhackel.BlackwoodManor",
+        installedVersion: appInstalledVersion,
+        countryCode: Locale.current.region?.identifier)
 
     private static func javaScriptString(_ value: String) -> String {
         (try? JSONEncoder().encode(value))
@@ -153,9 +158,12 @@ final class GameViewController: UIViewController, WKUIDelegate {
             guard let self, case .updated(let toLabel) = result else { return }
             self.activateDownloadedContent(from: fromLabel, to: toLabel)
         }
-        contentUpdater.checkForAppManifestChange { [weak self] changed in
-            guard changed else { return }
-            self?.presentAppUpdate()
+        // TestFlight already owns beta availability and update presentation. For
+        // App Store installs, ask Apple's catalog rather than mistaking a newer
+        // downloadable web-content manifest for a newer native binary.
+        appUpdateChecker.check(receiptURL: Bundle.main.appStoreReceiptURL) { [weak self] update in
+            guard let update else { return }
+            self?.presentAppUpdate(update)
         }
     }
 
@@ -252,18 +260,26 @@ final class GameViewController: UIViewController, WKUIDelegate {
         }
     }
 
-    private func presentAppUpdate() {
+    private func presentAppUpdate(_ update: AppStoreUpdate) {
         DispatchQueue.main.async {
-            guard !self.appUpdatePresented else { return }
+            let defaults = UserDefaults.standard
+            let lastPromptedVersion = defaults.string(
+                forKey: Self.appUpdatePromptedVersionKey)
+            guard !self.appUpdatePresented,
+                  AppUpdatePromptPolicy.shouldPresent(
+                      availableVersion: update.version,
+                      lastPromptedVersion: lastPromptedVersion) else {
+                return
+            }
             self.appUpdatePresented = true
+            defaults.set(update.version, forKey: Self.appUpdatePromptedVersionKey)
             let alert = UIAlertController(
                 title: "Update Available",
-                message: "A new version of Blackwood Manor is available! Download now?",
+                message: "Blackwood Manor \(update.version) is available on the App Store.",
                 preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            alert.addAction(UIAlertAction(title: "Okay", style: .default) { _ in
-                guard let testFlight = URL(string: "itms-beta://") else { return }
-                UIApplication.shared.open(testFlight)
+            alert.addAction(UIAlertAction(title: "Not Now", style: .cancel))
+            alert.addAction(UIAlertAction(title: "View in App Store", style: .default) { _ in
+                UIApplication.shared.open(update.storeURL)
             })
             self.present(alert, animated: true)
         }

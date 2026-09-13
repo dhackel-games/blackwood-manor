@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven. -->
 
 # Blackwood Manor
 
@@ -109,8 +109,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
   remote content source; RELOAD still puts the greatest content version into
-  persistent cache. A changed
-  `manifest.json` independently offers an iOS app update through TestFlight.
+  persistent cache. Web manifests never imply that a native app update exists.
+  TestFlight owns beta updates; App Store installs query Apple's catalog and
+  offer a published update only when its version is newer than the installed app.
   VERSION prints the numeric content version and browser continuous-update
   status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.

@@ -1,4 +1,4 @@
-// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.078:acoven.
+// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 
 import XCTest
 
@@ -146,39 +146,6 @@ final class WebContentUpdaterTests: XCTestCase {
             XCTAssertEqual(labels, .init(
                 contentLocal: "20260911030",
                 contentSource: "20260911040"))
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 5)
-    }
-
-    func testChangedManifestSignalsAnAppUpdate() {
-        var cacheKey: String?
-        StubURLProtocol.handler = { req in
-            guard req.url!.lastPathComponent == "manifest.json" else { return nil }
-            cacheKey = URLComponents(url: req.url!, resolvingAgainstBaseURL: false)?
-                .queryItems?.first(where: { $0.name == "v" })?.value
-            return (200, self.manifestJSON(
-                version: 2000, label: "different-app", files: ["index.html"]))
-        }
-        let exp = expectation(description: "manifest differs")
-        makeUpdater().checkForAppManifestChange { changed in
-            XCTAssertTrue(changed)
-            XCTAssertFalse(cacheKey?.isEmpty ?? true)
-            exp.fulfill()
-        }
-        wait(for: [exp], timeout: 5)
-    }
-
-    func testMatchingManifestDoesNotSignalAnAppUpdate() {
-        let installed = manifestJSON(
-            version: 1000, label: "2026.9.11 build 10", files: ["index.html"])
-        StubURLProtocol.handler = { req in
-            guard req.url!.lastPathComponent == "manifest.json" else { return nil }
-            return (200, installed)
-        }
-        let exp = expectation(description: "manifest matches")
-        makeUpdater().checkForAppManifestChange { changed in
-            XCTAssertFalse(changed)
             exp.fulfill()
         }
         wait(for: [exp], timeout: 5)

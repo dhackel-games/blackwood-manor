@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 ```
 
 ---
@@ -925,13 +925,15 @@ web view always serves `app://local/` from that cache. Thus an older cache canno
 hide newer content delivered in a new app, while a newer downloaded cache
 survives an app update. Offline startup chooses between bundle and cache only.
 
-`manifest.json` is independent of that comparison. A byte-for-byte difference
-between the bundled and GitHub.io manifests prompts: “A new version of Blackwood
-Manor is available! Download now?” with Okay/Cancel; Okay opens TestFlight. If
-remote content wins, `CONTENT_FILES` supplies the individual static paths to
-download. Native metadata checks use one-time query keys, and every winning
+`manifest.json` is independent of native-app availability. TestFlight builds
+delegate update discovery and installation to TestFlight itself. App Store
+installs query Apple's public lookup service by bundle identifier and offer an
+update only when the published marketing version is newer than the installed
+`CFBundleShortVersionString`; each published version is prompted at most once.
+If remote content wins, `CONTENT_FILES` supplies the individual static paths to
+download. Native content checks use one-time query keys, and every winning
 release file uses its `CONTENT_VERSION` query key so CDN cache ages cannot mix
-generations. No manifest field selects or downloads web content.
+generations. No web manifest field claims that a native binary exists.
 
 The native `content` bridge exposes `VER` / `VERSION` / `BUILD` to print the
 installed app version/build from the native Info.plist, the locally selected

@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -109,7 +109,7 @@ Feature: Build metadata and touch-control contract
     Then Version reports local and source content through the native bridge
     And the iOS launch banner reports the live content source without a transcript echo
     And Reload seeds the local cache and refreshes differing GitHub.io content
-    And a changed app manifest offers an iOS update
+    And Apple services decide whether a native iOS update is available
 
   Scenario: Local Gary model status is visible in-page instead of logged
     Then local daemon status is announced in the transcript without console noise
