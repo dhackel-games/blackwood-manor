@@ -748,7 +748,7 @@ Then("local daemon status is announced in the transcript without console noise",
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(ui, /if \(!s\.nativeApp && s\.provider !== "daemon"\) return;/);
   assert.match(ui, /print\(modelStatusText\(\), garyBrain\.isAvailable\(\) \? "sys ok" : "sys"\)/);
-  assert.match(ui, /Lines he actually generates are marked ◆ AI\./);
+  assert.match(ui, /his lines are marked ◆ AI\./);
   assert.doesNotMatch(ui, /gary scripted|· scripted/);
   assert.doesNotMatch(css, /gary\.scripted|· scripted/);
   assert.doesNotMatch(ui, /console\.log\(p[\s\S]*on-device voice active/);

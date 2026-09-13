@@ -992,12 +992,11 @@ function announceModelCheck() {
 export function modelStatusText() {
   const s = garyBrain.status();
   if (s.available) {
-    return "[AI check] On-device model READY — Gary's phone replies are written live on this device.\n" +
-           "  Lines he actually generates are marked ◆ AI.";
+    return "[AI check] Model READY — Gary's replies are generated live on-device; his lines are marked ◆ AI.";
   }
   const why = s.native ? s.native.detail : s.reason;
   const fix = s.fix || (s.native ? "" : "");
-  return "[AI check] On-device model NOT ACTIVE — Gary is using his scripted lines.\n" +
+  return "[AI check] Model NOT ACTIVE — Gary is using scripted lines.\n" +
          `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
 }
 
