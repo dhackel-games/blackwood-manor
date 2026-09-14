@@ -7,7 +7,7 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 SRC="$HERE/../web"
 DST="$HERE/Resources/www"
 rm -rf "$DST"; mkdir -p "$DST"
-cp "$SRC/index.html" "$DST/"
+cp "$SRC/index.html" "$SRC/versions.json" "$DST/"
 cp -R "$SRC/css" "$SRC/js" "$DST/"
 echo "Copied web game -> $DST"
 

@@ -159,7 +159,7 @@ final class GameViewController: UIViewController, WKUIDelegate {
             guard let self, case .updated(let toLabel) = result else { return }
             self.activateDownloadedContent(from: fromLabel, to: toLabel)
         }
-        // TestFlight availability comes from the release marker written only
+        // TestFlight availability comes from the build number published only
         // after App Store Connect confirms beta distribution. Public installs
         // use Apple's catalog. Web-content manifests never imply an app update.
         appUpdateChecker.check(receiptURL: Bundle.main.appStoreReceiptURL) { [weak self] update in

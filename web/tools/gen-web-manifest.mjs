@@ -2,9 +2,9 @@
 //
 // Stamp one cache key across the ES-module graph, then emit <root>/manifest.json
 // with the runtime file list. This describes downloadable web content only;
-// latest_app_build_available.json separately identifies a distributed native
-// build. CONTENT_VERSION and CONTENT_FILES in js/version.js govern web content
-// selection and downloads. Run for BOTH the bundled copy
+// LATEST_APP_BUILD_AVAILABLE in versions.json separately identifies a distributed
+// native build. CONTENT_VERSION and CONTENT_FILES govern web content selection
+// and downloads. Run for BOTH the bundled copy
 // (ios/copy-web.sh) and Pages deploy (.github/workflows/pages.yml).
 //
 //   node gen-web-manifest.mjs <rootDir> [version] [cacheKey]
@@ -30,24 +30,34 @@ function walk(dir, out) {
 
 export function contentVersionFor(appVersion, build) {
   const parts = String(appVersion).split(".");
-  if (parts.length !== 3 || parts.some((part) => !/^\d+$/.test(part)) || !/^\d+$/.test(String(build))) {
-    throw new Error("gen-web-manifest: APP_VERSION and BUILD must be numeric");
+  const numbers = parts.map(Number);
+  const buildNumber = Number(build);
+  if (parts.length !== 3
+      || parts.some((part) => !/^\d+$/.test(part))
+      || numbers[0] < 1000
+      || numbers[0] > 9999
+      || numbers[1] < 1
+      || numbers[1] > 12
+      || numbers[2] < 1
+      || numbers[2] > 31
+      || !/^\d+$/.test(String(build))
+      || buildNumber > 999) {
+    throw new Error("gen-web-manifest: APP_VERSION and BUILD must fit YYYY.M.D and BBB");
   }
   return Number(`${parts[0].padStart(4, "0")}${parts[1].padStart(2, "0")}` +
     `${parts[2].padStart(2, "0")}${String(build).padStart(3, "0")}`);
 }
 
 export function declaredContentVersion(root) {
-  const source = readFileSync(join(root, "js/version.js"), "utf8");
-  const value = /export const CONTENT_VERSION\s*=\s*(\d+)\s*;/.exec(source)?.[1];
-  if (!value) throw new Error("gen-web-manifest: CONTENT_VERSION is missing");
-  return value;
+  const versions = JSON.parse(readFileSync(join(root, "versions.json"), "utf8"));
+  if (!Number.isSafeInteger(versions.CONTENT_VERSION)) {
+    throw new Error("gen-web-manifest: CONTENT_VERSION is missing");
+  }
+  return versions.CONTENT_VERSION;
 }
 
 export function contentFilesFromVersionSource(source) {
-  const match = /export const CONTENT_FILES\s*=\s*(\[[\s\S]*?\])\s*;/.exec(source);
-  if (!match) throw new Error("gen-web-manifest: version.js must define CONTENT_FILES");
-  const files = JSON.parse(match[1]);
+  const files = JSON.parse(source).CONTENT_FILES;
   if (!Array.isArray(files) || files.some((file) => typeof file !== "string")) {
     throw new Error("gen-web-manifest: CONTENT_FILES must be an array of paths");
   }
@@ -82,6 +92,7 @@ export function stampModuleUrls(root, cacheKey) {
 export function buildManifest(root, version, commit) {
   const files = [];
   files.push(join(root, "index.html"));
+  files.push(join(root, "versions.json"));
   for (const sub of ["css", "js"]) {
     try {
       walk(join(root, sub), files);
@@ -98,20 +109,21 @@ export function buildManifest(root, version, commit) {
   let appVersion = "?";
   let build = "?";
   try {
-    const vjs = readFileSync(join(root, "js", "version.js"), "utf8");
-    appVersion = /APP_VERSION\s*=\s*"([^"]*)"/.exec(vjs)?.[1] ?? appVersion;
-    build = /BUILD\s*=\s*"([^"]*)"/.exec(vjs)?.[1] ?? build;
-    const declaredVersion = Number(/CONTENT_VERSION\s*=\s*(\d+)/.exec(vjs)?.[1]);
+    const source = readFileSync(join(root, "versions.json"), "utf8");
+    const versions = JSON.parse(source);
+    appVersion = versions.APP_VERSION ?? appVersion;
+    build = versions.BUILD ?? build;
+    const declaredVersion = versions.CONTENT_VERSION;
     if (declaredVersion !== contentVersionFor(appVersion, build)) {
       throw new Error("gen-web-manifest: CONTENT_VERSION does not match APP_VERSION and BUILD");
     }
-    const declaredFiles = contentFilesFromVersionSource(vjs).slice().sort();
+    const declaredFiles = contentFilesFromVersionSource(source).slice().sort();
     if (JSON.stringify(declaredFiles) !== JSON.stringify(relFiles)) {
       throw new Error("gen-web-manifest: CONTENT_FILES does not match the runtime bundle");
     }
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("gen-web-manifest:")) throw error;
-    throw new Error("gen-web-manifest: version.js metadata is invalid");
+    throw new Error("gen-web-manifest: versions.json metadata is invalid");
   }
 
   return {

@@ -23,7 +23,17 @@ import {
   pickGaryVoice,
 } from "../../js/gary-voice.js";
 import { parse, splitCommands } from "../../js/parser.js";
-import { VERSION, APP_VERSION, BUILD, CONTENT_VERSION, COPYRIGHT } from "../../js/version.js";
+
+const versionMetadata = JSON.parse(
+  readFileSync(new URL("../../versions.json", import.meta.url), "utf8"));
+const {
+  APP_VERSION,
+  BUILD,
+  CONTENT_VERSION,
+  COPYRIGHT,
+  LATEST_APP_BUILD_AVAILABLE,
+} = versionMetadata;
+const VERSION = `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`;
 
 const NONE = "[none]";
 const EMPTY = "[empty]";
@@ -318,7 +328,6 @@ Then("the following command lines split as:", function (table) {
 
 Then("the copyright-version is exact", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  const versionSource = readFileSync(new URL("../../js/version.js", import.meta.url), "utf8");
   const design = readFileSync(new URL("../../DESIGN.md", import.meta.url), "utf8");
   // The clean number we monitor stays locked to the App Store marketing version.
   assert.equal(APP_VERSION, packageJson.version);
@@ -327,9 +336,7 @@ Then("the copyright-version is exact", function () {
   const [year, month, day] = APP_VERSION.split(".");
   assert.equal(CONTENT_VERSION,
     Number(`${year}${month.padStart(2, "0")}${day.padStart(2, "0")}${BUILD.padStart(3, "0")}`));
-  assert.match(versionSource.split("\n")[0], new RegExp(
-    `^// version\\.js\\. Copyright \\(c\\) dhackel-games\\. All Rights Reserved\\. ` +
-    `2026\\.\\.\\.\\d{4}-\\d{2}-\\d{2}\\.${BUILD.padStart(3, "0")}:[a-z0-9_-]+\\.$`));
+  assert.ok(Array.isArray(versionMetadata.CONTENT_FILES));
   assert.match(design, /### Source-file identity header/);
   assert.match(design, /YYYY-MM-DD\.BBB:\{last editor\}/);
 });
@@ -799,7 +806,7 @@ Then("Version reports local and source content through the native bridge", funct
   assert.match(app, /values:\s*\[\s*appInstalledVersion,\s*appInstalledBuild,\s*labels\.contentLocal,\s*labels\.contentSource/s);
   assert.match(updater,
     /func versionLabels\(completion:[\s\S]*store\.cacheRelease \?\? store\.bundleRelease[\s\S]*fetchRemoteRelease/);
-  assert.match(updater, /appendingPathComponent\("js\/version\.js"\)/);
+  assert.match(updater, /appendingPathComponent\("versions\.json"\)/);
 });
 
 Then("the iOS launch banner reports the live content source without a transcript echo", function () {
@@ -838,14 +845,18 @@ Then("release-channel metadata decides whether a native iOS update is available"
   const app = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   const appUpdate = readFileSync(new URL("../../../ios/Sources/AppUpdate.swift", import.meta.url), "utf8");
   const updater = readFileSync(new URL("../../../ios/Sources/WebContent.swift", import.meta.url), "utf8");
-  const marker = JSON.parse(readFileSync(
-    new URL("../../latest_app_build_available.json", import.meta.url), "utf8"));
+  const versionSource = readFileSync(new URL("../../versions.json", import.meta.url), "utf8");
   assert.doesNotMatch(updater, /checkForAppManifestChange|bundledManifestData/);
   assert.match(appUpdate, /https:\/\/itunes\.apple\.com\/lookup/);
-  assert.match(appUpdate, /latest_app_build_available\.json/);
+  assert.match(appUpdate, /blackwood-manor\/versions\.json/);
+  assert.match(appUpdate, /WebContentRelease\.parse\(data\)/);
   assert.match(appUpdate,
     /version\.compare\(installedVersion, options: \.numeric\)/);
-  assert.match(appUpdate, /\$0 > installedBuild/);
+  assert.match(appUpdate,
+    /static func releaseNumber\(appVersion: String, build: String\)[\s\S]*WebContentRelease\.contentVersion/);
+  assert.match(appUpdate, /release\.latestAppBuildAvailable > installedRelease/);
+  assert.equal(JSON.parse(versionSource).LATEST_APP_BUILD_AVAILABLE,
+    LATEST_APP_BUILD_AVAILABLE);
   assert.match(app,
     /appUpdateChecker\.check\(receiptURL: Bundle\.main\.appStoreReceiptURL\)/);
   assert.match(app, /AppUpdatePromptPolicy\.shouldPresent/);
@@ -854,14 +865,7 @@ Then("release-channel metadata decides whether a native iOS update is available"
   assert.match(app, /UIApplication\.shared\.open\(update\.storeURL\)/);
   assert.match(appUpdate, /URL\(string: "itms-beta:\/\/"\)/);
   assert.doesNotMatch(app, /manifest\.json/);
-  assert.deepEqual(marker, {
-    channel: "testflight",
-    available: false,
-    appVersion: null,
-    appBuild: null,
-    availableAt: null,
-    expiresAt: null,
-  });
+  assert.equal(LATEST_APP_BUILD_AVAILABLE, CONTENT_VERSION);
 });
 
 Then("local daemon status is announced in the transcript without console noise", function () {
@@ -906,12 +910,13 @@ Then("successful TestFlight releases publish verified app availability", functio
   const archiveIndex = script.indexOf("xcodebuild -project");
   const uploadIndex = script.indexOf("xcrun altool --upload-app");
   const verifyIndex = script.lastIndexOf("node tools/testflight-release.mjs");
+  const publishIndex = script.lastIndexOf("versions.LATEST_APP_BUILD_AVAILABLE");
   const finalCommitIndex = script.lastIndexOf('git -C "$REPO_ROOT" commit');
   const finalPushIndex = script.lastIndexOf('git -C "$REPO_ROOT" push origin HEAD:main');
   assert.ok(lockIndex >= 0 && archiveIndex > lockIndex);
   assert.ok(uploadIndex >= 0 && verifyIndex > uploadIndex);
-  assert.ok(finalCommitIndex > verifyIndex && finalPushIndex > finalCommitIndex);
-  assert.match(script, /AVAILABLE_MARKER="\.\.\/web\/latest_app_build_available\.json"/);
+  assert.ok(publishIndex > verifyIndex);
+  assert.ok(finalCommitIndex > publishIndex && finalPushIndex > finalCommitIndex);
   assert.match(script, /LOCK_REF="refs\/heads\/\$LOCK_BRANCH"/);
   assert.match(script, /commit-tree/);
   assert.equal((script.match(
@@ -929,10 +934,10 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.match(verifier, /\/betaTesters/);
   assert.match(verifier, /IN_BETA_TESTING/);
   assert.match(verifier, /hasAccessToAllBuilds/);
-  assert.match(verifier, /expirationDate/);
+  assert.match(verifier, /appBuildVersion/);
   assert.match(verifier, /latestUploadedBuildNumber/);
   assert.ok(verifier.indexOf("await waitForInternalAvailability") <
-    verifier.indexOf("writeMarker(markerPath"));
+    verifier.lastIndexOf("appBuildVersion("));
 });
 
 Then("iOS and Pages derive their deploy identity from CONTENT_VERSION", function () {

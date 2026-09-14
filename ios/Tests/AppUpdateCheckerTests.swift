@@ -28,23 +28,14 @@ final class AppUpdateCheckerTests: XCTestCase {
         """.utf8)
     }
 
-    private func testFlightJSON(
-        available: Bool = true,
-        version: String? = "2026.9.11",
-        build: Int? = 85,
-        expiresAt: String? = "2099-12-12T22:00:00Z"
-    ) -> Data {
-        let versionJSON = version.map { "\"\($0)\"" } ?? "null"
-        let buildJSON = build.map(String.init) ?? "null"
-        let expiresJSON = expiresAt.map { "\"\($0)\"" } ?? "null"
-        return Data("""
+    private func testFlightVersion(_ availableVersion: String = "20260911085") -> Data {
+        Data("""
         {
-          "channel": "testflight",
-          "available": \(available),
-          "appVersion": \(versionJSON),
-          "appBuild": \(buildJSON),
-          "availableAt": "2026-09-13T22:00:00Z",
-          "expiresAt": \(expiresJSON)
+          "APP_VERSION": "2026.9.11",
+          "BUILD": "85",
+          "CONTENT_VERSION": 20260911085,
+          "LATEST_APP_BUILD_AVAILABLE": \(availableVersion),
+          "CONTENT_FILES": ["index.html", "versions.json"]
         }
         """.utf8)
     }
@@ -60,7 +51,7 @@ final class AppUpdateCheckerTests: XCTestCase {
             countryCode: "US",
             appStoreLookupURL: URL(string: "https://itunes.apple.com/lookup")!,
             testFlightReleaseURL: URL(
-                string: "https://example.test/latest_app_build_available.json")!,
+                string: "https://example.test/versions.json")!,
             session: StubURLProtocol.makeSession())
     }
 
@@ -125,17 +116,17 @@ final class AppUpdateCheckerTests: XCTestCase {
         var requestURL: URL?
         StubURLProtocol.handler = { request in
             requestURL = request.url
-            return (200, self.testFlightJSON())
+            return (200, self.testFlightVersion())
         }
 
-        let exp = expectation(description: "TestFlight marker")
+        let exp = expectation(description: "TestFlight build")
         checker().check(receiptURL: testFlightReceipt) { update in
             XCTAssertEqual(update, AppUpdate(
                 version: "2026.9.11",
                 build: 85,
                 channel: .testFlight,
                 storeURL: URL(string: "itms-beta://")!))
-            XCTAssertEqual(requestURL?.lastPathComponent, "latest_app_build_available.json")
+            XCTAssertEqual(requestURL?.lastPathComponent, "versions.json")
             XCTAssertFalse(URLComponents(
                 url: requestURL!, resolvingAgainstBaseURL: false)?
                 .queryItems?.first(where: { $0.name == "v" })?.value?.isEmpty ?? true)
@@ -144,12 +135,11 @@ final class AppUpdateCheckerTests: XCTestCase {
         wait(for: [exp], timeout: 5)
     }
 
-    func testUnavailableMatchingOrOlderTestFlightBuildDoesNotOfferUpdate() {
+    func testInvalidMatchingOrOlderTestFlightBuildDoesNotOfferUpdate() {
         let releases = [
-            testFlightJSON(available: false),
-            testFlightJSON(build: 84),
-            testFlightJSON(build: 83),
-            testFlightJSON(build: 85, expiresAt: "2020-01-01T00:00:00Z"),
+            testFlightVersion("not-a-number"),
+            testFlightVersion("20260911084"),
+            testFlightVersion("20260911083"),
         ]
         for (index, release) in releases.enumerated() {
             StubURLProtocol.handler = { _ in (200, release) }
@@ -157,6 +147,19 @@ final class AppUpdateCheckerTests: XCTestCase {
             checker().check(receiptURL: testFlightReceipt) { update in
                 XCTAssertNil(update)
                 exp.fulfill()
+            }
+
+            func testInstalledInfoPlistIdentityUsesExactYYYYMMDDBBBFormat() {
+                XCTAssertEqual(
+                    AppUpdateChecker.releaseNumber(appVersion: "2026.9.11", build: "85"),
+                    20260911085)
+                XCTAssertEqual(
+                    AppUpdateChecker.releaseNumber(appVersion: "2026.10.1", build: "7"),
+                    20261001007)
+                XCTAssertNil(
+                    AppUpdateChecker.releaseNumber(appVersion: "2026.13.1", build: "85"))
+                XCTAssertNil(
+                    AppUpdateChecker.releaseNumber(appVersion: "2026.9.11", build: "1000"))
             }
             wait(for: [exp], timeout: 5)
         }

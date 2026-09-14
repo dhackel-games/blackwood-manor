@@ -15,7 +15,7 @@
 #
 # Usage:
 #   cd <blackwood-manor-repo>/ios
-#   ./release-testflight.sh              # build, upload, distribute, publish marker
+#   ./release-testflight.sh              # build, upload, distribute, publish availability
 #   ./release-testflight.sh --no-upload  # build + export only (dry run, no creds needed)
 #
 set -euo pipefail
@@ -28,7 +28,6 @@ BUILD_ROOT="build"
 DERIVED_DATA="$BUILD_ROOT/DerivedData"
 ARCHIVE="$BUILD_ROOT/BlackwoodManor.xcarchive"
 EXPORT_DIR="$BUILD_ROOT/export"
-AVAILABLE_MARKER="../web/latest_app_build_available.json"
 LOCK_BRANCH="testflight-release-lock"
 LOCK_REF="refs/heads/$LOCK_BRANCH"
 LOCK_COMMIT=""
@@ -154,9 +153,11 @@ fi
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
 AVAILABLE_BUILD=$(node -e '
   const fs = require("fs");
-  const marker = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-  console.log(Number.isInteger(marker.appBuild) ? marker.appBuild : 0);
-' "$AVAILABLE_MARKER")
+  const versions = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+  const version = versions.LATEST_APP_BUILD_AVAILABLE;
+  if (!Number.isInteger(version) || version <= 0) process.exit(1);
+  console.log(version % 1000);
+' ../web/versions.json)
 ASC_LATEST_BUILD=0
 if [[ "$UPLOAD" -eq 1 ]]; then
   ASC_LATEST_BUILD=$(node tools/testflight-release.mjs \
@@ -169,19 +170,29 @@ if (( CUR > LATEST_BUILD )); then
 else
   NEXT=$((LATEST_BUILD + 1))
 fi
+if (( NEXT > 999 )); then
+  echo "Build ${NEXT} does not fit the required three-digit BBB release identity." >&2
+  exit 1
+fi
 echo "==> Releasing version ${MARKETING_VERSION} build ${NEXT}"
 
-# Stamp the on-screen build badge (web/js/version.js) so the browser and the app
+# Stamp versions.json so the browser and the app
 # always report the same version + build number. Done BEFORE copy-web.sh so the
 # stamped file is the copy that lands in the app bundle.
 echo "==> Stamping build badge (v${MARKETING_VERSION} build ${NEXT})"
-sed -i '' -E "s/(export const APP_VERSION = \")[^\"]*(\";)/\1${MARKETING_VERSION}\2/" ../web/js/version.js
-sed -i '' -E "s/(export const BUILD = \")[^\"]*(\";)/\1${NEXT}\2/" ../web/js/version.js
 CONTENT_VERSION=$(node -e '
   const [y, m, d] = process.argv[1].split(".").map(Number);
   console.log(`${String(y).padStart(4, "0")}${String(m).padStart(2, "0")}${String(d).padStart(2, "0")}${String(process.argv[2]).padStart(3, "0")}`);
 ' "$MARKETING_VERSION" "$NEXT")
-sed -i '' -E "s/(export const CONTENT_VERSION = )[0-9]+;/\1${CONTENT_VERSION};/" ../web/js/version.js
+node -e '
+  const fs = require("fs");
+  const path = process.argv[1];
+  const versions = JSON.parse(fs.readFileSync(path, "utf8"));
+  versions.APP_VERSION = process.argv[2];
+  versions.BUILD = process.argv[3];
+  versions.CONTENT_VERSION = Number(process.argv[4]);
+  fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
+' ../web/versions.json "$MARKETING_VERSION" "$NEXT" "$CONTENT_VERSION"
 
 echo "==> Refreshing bundled web game"
 ./copy-web.sh
@@ -194,7 +205,7 @@ STAMP_BUILD=$(printf "%03d" "$NEXT")
 RELEASE_EDITOR="${RELEASE_EDITOR:-dhackel}"
 sed -i '' -E \
   "1s/[0-9]{4}-[0-9]{2}-[0-9]{2}\\.[0-9]{3}:[A-Za-z0-9_-]+/${STAMP_DATE}.${STAMP_BUILD}:${RELEASE_EDITOR}/" \
-  ../web/js/version.js project.yml
+  project.yml
 
 echo "==> Regenerating project (xcodegen)"
 xcodegen generate
@@ -237,24 +248,34 @@ echo "==> Waiting for App Store Connect processing and internal distribution"
 node tools/testflight-release.mjs \
   --bundle-id "$BUNDLE_ID" \
   --version "$MARKETING_VERSION" \
-  --build "$NEXT" \
-  --marker "$AVAILABLE_MARKER"
+  --build "$NEXT"
 
-echo "==> Publishing the verified TestFlight availability marker"
+node -e '
+  const fs = require("fs");
+  const path = process.argv[1];
+  const versions = JSON.parse(fs.readFileSync(path, "utf8"));
+  versions.LATEST_APP_BUILD_AVAILABLE = Number(process.argv[2]);
+  fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
+' ../web/versions.json "$CONTENT_VERSION"
+
+echo "==> Publishing the verified TestFlight build number"
 git -C "$REPO_ROOT" fetch origin main
 if [[ "$(git -C "$REPO_ROOT" rev-parse HEAD)" != "$START_HEAD" ]] \
     || [[ "$(git -C "$REPO_ROOT" rev-parse origin/main)" != "$START_HEAD" ]]; then
-  echo "main changed during the release. The verified marker is left uncommitted; rebase it before publishing." >&2
+  echo "main changed during the release. The verified build number is left uncommitted; rebase it before publishing." >&2
   exit 1
 fi
 git -C "$REPO_ROOT" add \
   ios/project.yml \
-  web/js/version.js \
-  web/latest_app_build_available.json
-git -C "$REPO_ROOT" commit \
-  -m "build(ios): publish TestFlight build ${NEXT}" \
-  -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
-git -C "$REPO_ROOT" push origin HEAD:main
+  web/versions.json
+if git -C "$REPO_ROOT" diff --cached --quiet; then
+  echo "==> Release metadata already identifies build ${NEXT}"
+else
+  git -C "$REPO_ROOT" commit \
+    -m "build(ios): publish TestFlight build ${NEXT}" \
+    -m "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+  git -C "$REPO_ROOT" push origin HEAD:main
+fi
 
 echo "==> Done. Version ${MARKETING_VERSION} build ${NEXT} is available to the configured internal TestFlight group."
-echo "    latest_app_build_available.json is committed and publishing through GitHub Pages."
+echo "    LATEST_APP_BUILD_AVAILABLE is committed in web/versions.json."

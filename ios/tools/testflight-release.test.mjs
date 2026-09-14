@@ -5,7 +5,7 @@ import { generateKeyPairSync } from "node:crypto";
 import test from "node:test";
 
 import {
-  availableBuildMarker,
+  appBuildVersion,
   createAppStoreConnectClient,
   createAppStoreConnectToken,
   latestUploadedBuildNumber,
@@ -173,27 +173,14 @@ test("all-builds internal groups do not require an explicit relationship", async
   assert.equal(result.group.attributes.hasAccessToAllBuilds, true);
 });
 
-test("availability marker records the verified TestFlight build", () => {
-  const availableAt = new Date("2026-09-13T22:00:00Z");
-  assert.deepEqual(availableBuildMarker(
-    "2026.9.11", "85", "2026-12-12T22:00:00Z", availableAt), {
-    channel: "testflight",
-    available: true,
-    appVersion: "2026.9.11",
-    appBuild: 85,
-    availableAt: "2026-09-13T22:00:00.000Z",
-    expiresAt: "2026-12-12T22:00:00.000Z",
-  });
+test("availability value uses the manifest-style app build version", () => {
+  assert.equal(appBuildVersion("2026.9.11", "85"), 20260911085);
 });
 
-test("availability marker rejects missing or expired build dates", () => {
-  const availableAt = new Date("2026-09-13T22:00:00Z");
-  assert.throws(
-    () => availableBuildMarker("2026.9.11", "85", null, availableAt),
-    /no valid expiration date/);
-  assert.throws(
-    () => availableBuildMarker("2026.9.11", "85", "2026-09-12T22:00:00Z", availableAt),
-    /missing or expired/);
+test("availability version rejects malformed or oversized values", () => {
+  assert.throws(() => appBuildVersion("2026.9", "85"), /YYYY\.M\.D/);
+  assert.throws(() => appBuildVersion("2026.13.1", "85"), /YYYY\.M\.D/);
+  assert.throws(() => appBuildVersion("2026.9.11", "1000"), /fit BBB/);
 });
 
 test("latest build selection includes failed and processing uploads", async () => {

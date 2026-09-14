@@ -41,17 +41,9 @@ final class AppUpdateChecker {
         let trackViewUrl: URL?
     }
 
-    private struct TestFlightRelease: Decodable {
-        let channel: String
-        let available: Bool
-        let appVersion: String?
-        let appBuild: Int?
-        let expiresAt: String?
-    }
-
     private let bundleIdentifier: String
     private let installedVersion: String
-    private let installedBuild: Int
+    private let installedBuild: String
     private let countryCode: String?
     private let appStoreLookupURL: URL
     private let testFlightReleaseURL: URL
@@ -65,13 +57,13 @@ final class AppUpdateChecker {
         countryCode: String? = nil,
         appStoreLookupURL: URL = URL(string: "https://itunes.apple.com/lookup")!,
         testFlightReleaseURL: URL = URL(
-            string: "https://dhackel-games.github.io/blackwood-manor/latest_app_build_available.json")!,
+            string: "https://dhackel-games.github.io/blackwood-manor/versions.json")!,
         session: URLSession? = nil,
         now: @escaping () -> Date = Date.init
     ) {
         self.bundleIdentifier = bundleIdentifier
         self.installedVersion = installedVersion
-        self.installedBuild = Int(installedBuild) ?? 0
+        self.installedBuild = installedBuild
         self.countryCode = countryCode
         self.appStoreLookupURL = appStoreLookupURL
         self.testFlightReleaseURL = testFlightReleaseURL
@@ -99,10 +91,46 @@ final class AppUpdateChecker {
         case .orderedDescending:
             return true
         case .orderedSame:
-            return build.map { $0 > installedBuild } ?? false
+            guard let installedBuildNumber = Int(installedBuild) else { return false }
+            return build.map { $0 > installedBuildNumber } ?? false
         case .orderedAscending:
             return false
         }
+    }
+
+    static func releaseNumber(appVersion: String, build: String) -> Int64? {
+        guard let buildNumber = Int(build) else { return nil }
+        return WebContentRelease.contentVersion(
+            appVersion: appVersion, build: buildNumber)
+    }
+
+    private static func releaseIdentity(
+        _ release: Int64
+    ) -> (version: String, build: Int, releaseDate: Date)? {
+        guard release > 0 else { return nil }
+        let build = Int(release % 1_000)
+        let date = release / 1_000
+        let day = date % 100
+        let month = (date / 100) % 100
+        let year = date / 10_000
+        guard year > 0, (1...12).contains(month), (1...31).contains(day) else {
+            return nil
+        }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let components = DateComponents(
+            calendar: calendar,
+            timeZone: calendar.timeZone,
+            year: Int(year),
+            month: Int(month),
+            day: Int(day))
+        guard let releaseDate = calendar.date(from: components),
+              calendar.component(.year, from: releaseDate) == Int(year),
+              calendar.component(.month, from: releaseDate) == Int(month),
+              calendar.component(.day, from: releaseDate) == Int(day) else {
+            return nil
+        }
+        return ("\(year).\(month).\(day)", build, releaseDate)
     }
 
     private func checkTestFlight(completion: @escaping (AppUpdate?) -> Void) {
@@ -117,23 +145,23 @@ final class AppUpdateChecker {
             return
         }
         fetch(url) { data in
-            guard let data,
-                  let release = try? JSONDecoder().decode(TestFlightRelease.self, from: data),
-                  release.channel == "testflight",
-                  release.available,
-                  let version = release.appVersion,
-                  let build = release.appBuild,
-                  let expiresAt = release.expiresAt,
-                  let expiration = Self.iso8601Date(expiresAt),
-                  expiration > self.now(),
-                  self.isNewer(version: version, build: build),
-                  let testFlightURL = URL(string: "itms-beta://") else {
+            guard             let data,
+            let release = WebContentRelease.parse(data),
+            let installedRelease = Self.releaseNumber(
+                appVersion: self.installedVersion,
+                build: self.installedBuild),
+            release.latestAppBuildAvailable > installedRelease,
+            let identity = Self.releaseIdentity(release.latestAppBuildAvailable),
+            let expires = Calendar(identifier: .gregorian).date(
+                byAdding: .day, value: 90, to: identity.releaseDate),
+            self.now() < expires,
+            let testFlightURL = URL(string: "itms-beta://") else {
                 completion(nil)
                 return
             }
             completion(AppUpdate(
-                version: version,
-                build: build,
+                version: identity.version,
+                build: identity.build,
                 channel: .testFlight,
                 storeURL: testFlightURL))
         }
@@ -186,12 +214,6 @@ final class AppUpdateChecker {
         }.resume()
     }
 
-    private static func iso8601Date(_ value: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        if let date = formatter.date(from: value) { return date }
-        formatter.formatOptions.insert(.withFractionalSeconds)
-        return formatter.date(from: value)
-    }
 }
 
 // end AppUpdate.swift

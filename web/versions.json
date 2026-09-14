@@ -1,0 +1,28 @@
+{
+  "APP_VERSION": "2026.9.11",
+  "BUILD": "85",
+  "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
+  "CONTENT_VERSION": 20260911085,
+  "LATEST_APP_BUILD_AVAILABLE": 20260911085,
+  "CONTENT_FILES": [
+    "css/style.css",
+    "index.html",
+    "js/sysop-menu.js",
+    "js/commands.js",
+    "js/compose.js",
+    "js/core.js",
+    "js/gary-brain.js",
+    "js/gary-profile.js",
+    "js/gary-voice.js",
+    "js/hud.js",
+    "js/issue-report.js",
+    "js/map.js",
+    "js/native.js",
+    "js/parser.js",
+    "js/save.js",
+    "js/ui.js",
+    "js/world.content.js",
+    "js/world.js",
+    "versions.json"
+  ]
+}

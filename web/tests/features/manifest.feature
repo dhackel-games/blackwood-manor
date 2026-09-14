@@ -2,7 +2,7 @@
 
 @unit
 Feature: iOS self-update manifest generation
-  The iOS app compares numeric CONTENT_VERSION values from js/version.js.
+  The iOS app compares numeric CONTENT_VERSION values from versions.json.
   CONTENT_FILES supplies the atomic content-download list. Native app
   availability is published separately from this content manifest.
 
@@ -16,18 +16,16 @@ Feature: iOS self-update manifest generation
       | index.html    |
       | js/core.js    |
       | js/ui.js      |
-      | js/version.js |
+      | versions.json |
 
   Scenario: Non-runtime files are excluded from the manifest
     Given the scratch root also contains "manifest.json"
-    And the scratch root also contains "latest_app_build_available.json"
     And the scratch root also contains "package.json"
     And the scratch root also contains "tests/world.test.js"
     And the scratch root also contains "assets/icon.png"
     And the scratch root also contains "DESIGN.md"
     When I build a manifest with version "1000" and commit "abc1234"
     Then the manifest does not list "manifest.json"
-    And the manifest does not list "latest_app_build_available.json"
     And the manifest does not list "package.json"
     And the manifest does not list "tests/world.test.js"
     And the manifest does not list "assets/icon.png"
@@ -41,12 +39,16 @@ Feature: iOS self-update manifest generation
     When I build a manifest with version "not-a-number" and commit "abc1234"
     Then the manifest version is the number 0
 
-  Scenario: The label is human-readable and pulled from version.js
+  Scenario: The label is human-readable and pulled from versions.json
     When I build a manifest with version "1000" and commit "abc1234"
     Then the manifest label is "2026.9.11 build 77 · abc1234"
     And content version "2026.9.11" build 77 composes to 20260911077
 
-  Scenario: The version.js file list must match the runtime bundle
+  Scenario: Content identity enforces the YYYYMMDDBBB format
+    Then content version "2026.13.1" build 77 is rejected
+    And content version "2026.9.11" build 1000 is rejected
+
+  Scenario: The versions.json file list must match the runtime bundle
     Given the scratch root also contains "js/unlisted.js"
     When I build a manifest expecting failure
     Then building the manifest threw an error mentioning "CONTENT_FILES"

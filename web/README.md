@@ -111,9 +111,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   remote content source; RELOAD still puts the greatest content version into
   persistent cache. Web manifests never imply that a native app update exists.
   TestFlight installs compare their installed Info.plist version/build against
-  `latest_app_build_available.json`, published only after App Store Connect
-  confirms internal availability and carrying Apple's build-expiration timestamp.
-  App Store installs query Apple's catalog.
+  the `LATEST_APP_BUILD_AVAILABLE` `YYYYMMDDBBB` number in `versions.json`,
+  advanced only after App Store Connect confirms internal availability. App
+  Store installs query Apple's catalog.
   VERSION prints the numeric content version and browser continuous-update
   status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.

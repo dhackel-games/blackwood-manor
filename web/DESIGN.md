@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// version.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 ```
 
 ---
@@ -296,7 +296,7 @@ the mansion.
   use SSH and are unaffected). (Alternative that avoids switching accounts:
   `git -c credential.helper='!f() { echo username=dhackel-games; echo password=$T; }; f' push`
   with `T=$(gh auth token -u dhackel-games)`.)
-- **Copyright-version stamp:** `web/js/version.js` is the single source of truth (`VERSION`).
+- **Copyright-version stamp:** `web/versions.json` is the single source of truth.
   The platform-aware app/content version renders in the intro banner, VERSION
   command, and bug diagnostics; the compact HUD intentionally omits it. Its source-file format is
   `Copyright (c) dhackel-games. All Rights Reserved. 2026...YYYY-MM-DD.0aNN:username` where
@@ -453,7 +453,7 @@ and `core.js` runs each fragment through `runOne()` in order. So
 - `game.send()` stays **synchronous** so the engine and tests are unaffected.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
-`js/version.js` is the single source of truth for the exact copyright-version shown in the intro,
+`versions.json` is the single source of truth for the exact copyright-version shown in the intro,
 VERSION command, and bug diagnostics. The HUD contains gameplay state only. The current source-header
 format combines owner, copyright range, build date, same-day
 alphanumeric sequence, acting GitHub username, and rights notice. `package.json` carries the date-only SemVer
@@ -665,12 +665,13 @@ generating the Xcode project, so an archive cannot silently contain stale game f
 TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
 `web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
 integer build number. The script reuses a checked-in build only when it is newer than both
-the published marker and every build already uploaded to App Store Connect; otherwise it
+the published TestFlight build and every build already uploaded to App Store Connect; otherwise it
 increments beyond them. A temporary remote Git release-lock branch serializes publishers
 without changing public version metadata before availability. With upload enabled it validates and uploads,
 polls App Store Connect until the exact build is valid, assigns it to a configured internal
 beta group, verifies the group has testers and the build reaches `IN_BETA_TESTING`, then
-atomically writes `web/latest_app_build_available.json` and commits and pushes the release
+atomically writes the manifest-style `YYYYMMDDBBB` number to
+`LATEST_APP_BUILD_AVAILABLE` in `web/versions.json` and commits and pushes the release
 metadata. Each run removes the previous repository-local `ios/build/`, places DerivedData
 under that same directory, and leaves only the current run's artifacts; global/shared Xcode
 DerivedData is untouched.
@@ -922,7 +923,7 @@ ends and an explicit omission marker.
 
 ### 12.34 Persistent iOS web-content updates
 
-`version.js` owns content updates. Its `CONTENT_VERSION` is the numeric
+`versions.json` owns content updates. Its `CONTENT_VERSION` is the numeric
 `YYYYMMDDBBB` composition of `APP_VERSION` and zero-padded `BUILD`, followed by
 `CONTENT_FILES` as the final declaration. iOS parses that stable data and chooses
 the greatest `CONTENT_VERSION` among the bundled copy, persistent cache, and
@@ -932,12 +933,12 @@ hide newer content delivered in a new app, while a newer downloaded cache
 survives an app update. Offline startup chooses between bundle and cache only.
 
 `manifest.json` is independent of native-app availability. TestFlight installs
-fetch `latest_app_build_available.json`, which release automation publishes only
-after App Store Connect confirms that the exact version/build is available to an
-internal beta group. The app compares both values against its installed Info.plist
-identity, rejects expired markers, and prompts once per available build. App Store
-installs query Apple's public lookup service by bundle identifier and compare
-marketing versions.
+read `LATEST_APP_BUILD_AVAILABLE` from the same cache-busted remote `versions.json`
+already used for content identity. Release automation advances that numeric
+`YYYYMMDDBBB` value only after App Store Connect confirms that the exact
+version/build is available to an internal beta group. The app compares it against
+the installed Info.plist version/build and prompts once per newer build. App Store
+installs query Apple's public lookup service by bundle identifier.
 If remote content wins, `CONTENT_FILES` supplies the individual static paths to
 download. Native content checks use one-time query keys, and every winning
 release file uses its `CONTENT_VERSION` query key so CDN cache ages cannot mix

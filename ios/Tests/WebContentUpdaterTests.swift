@@ -1,4 +1,4 @@
-// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
+// WebContentUpdaterTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 import XCTest
 
@@ -17,8 +17,8 @@ final class WebContentUpdaterTests: XCTestCase {
             .write(to: bundle.appendingPathComponent("manifest.json"))
         try FileManager.default.createDirectory(
             at: bundle.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try versionJS(build: 10).write(
-            to: bundle.appendingPathComponent("js/version.js"))
+        try versionsJSON(build: 10).write(
+            to: bundle.appendingPathComponent("versions.json"))
         try Data("<html>bundled</html>".utf8)
             .write(to: bundle.appendingPathComponent("index.html"))
     }
@@ -28,18 +28,18 @@ final class WebContentUpdaterTests: XCTestCase {
         try? FileManager.default.removeItem(at: tmp)
     }
 
-    private func versionJS(appVersion: String = "2026.9.11", build: Int,
-                           files: [String] = ["index.html", "js/version.js"]) -> Data {
+    private func versionsJSON(appVersion: String = "2026.9.11", build: Int,
+                              files: [String] = ["index.html", "versions.json"]) -> Data {
         let parts = appVersion.split(separator: ".").map(String.init)
-        let contentVersion = parts[0] + parts[1].leftPadded(to: 2) +
-            parts[2].leftPadded(to: 2) + String(build).leftPadded(to: 3)
-        let fileList = files.map { "\"\($0)\"" }.joined(separator: ",")
-        return Data("""
-        export const APP_VERSION = "\(appVersion)";
-        export const BUILD = "\(build)";
-        export const CONTENT_VERSION = \(contentVersion);
-        export const CONTENT_FILES = [\(fileList)];
-        """.utf8)
+        let contentVersion = Int64(parts[0] + parts[1].leftPadded(to: 2) +
+            parts[2].leftPadded(to: 2) + String(build).leftPadded(to: 3))!
+        return try! JSONSerialization.data(withJSONObject: [
+            "APP_VERSION": appVersion,
+            "BUILD": String(build),
+            "CONTENT_VERSION": contentVersion,
+            "LATEST_APP_BUILD_AVAILABLE": contentVersion,
+            "CONTENT_FILES": files,
+        ], options: [.sortedKeys])
     }
 
     private func manifestJSON(version: Int, label: String, files: [String]) -> Data {
@@ -55,8 +55,8 @@ final class WebContentUpdaterTests: XCTestCase {
 
     func testUpToDateWhenRemoteNotNewer() {
         StubURLProtocol.handler = { req in
-            if req.url!.lastPathComponent == "version.js" {
-                return (200, self.versionJS(build: 10))
+            if req.url!.lastPathComponent == "versions.json" {
+                return (200, self.versionsJSON(build: 10))
             }
             return nil
         }
@@ -72,7 +72,7 @@ final class WebContentUpdaterTests: XCTestCase {
 
     func testDownloadsAndSwapsWhenNewer() {
         let remoteManifest = manifestJSON(version: 2000, label: "remote-2000",
-                                          files: ["index.html", "js/core.js", "js/version.js"])
+                                          files: ["index.html", "js/core.js", "versions.json"])
         let lock = NSLock()
         var cacheKeys: [String: String] = [:]
         StubURLProtocol.handler = { req in
@@ -86,8 +86,8 @@ final class WebContentUpdaterTests: XCTestCase {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>v2</html>".utf8))
             case "core.js":       return (200, Data("core-v2".utf8))
-            case "version.js":    return (200, self.versionJS(
-                build: 20, files: ["index.html", "js/core.js", "js/version.js"]))
+            case "versions.json": return (200, self.versionsJSON(
+                build: 20, files: ["index.html", "js/core.js", "versions.json"]))
             default:              return nil
             }
         }
@@ -104,7 +104,7 @@ final class WebContentUpdaterTests: XCTestCase {
             lock.lock()
             let observedKeys = cacheKeys
             lock.unlock()
-            XCTAssertFalse(observedKeys["version.js", default: ""].isEmpty)
+            XCTAssertFalse(observedKeys["versions.json", default: ""].isEmpty)
             XCTAssertEqual(observedKeys["index.html"], "20260911020")
             XCTAssertEqual(observedKeys["core.js"], "20260911020")
             exp.fulfill()
@@ -114,8 +114,8 @@ final class WebContentUpdaterTests: XCTestCase {
 
     func testReportsCurrentAndRemoteVersionLabelsWithoutDownloading() {
         StubURLProtocol.handler = { req in
-            guard req.url!.lastPathComponent == "version.js" else { return nil }
-            return (200, self.versionJS(build: 20))
+            guard req.url!.lastPathComponent == "versions.json" else { return nil }
+            return (200, self.versionsJSON(build: 20))
         }
         let exp = expectation(description: "versions")
         let updater = makeUpdater()
@@ -132,13 +132,13 @@ final class WebContentUpdaterTests: XCTestCase {
     func testVersionLabelsReportNewerDownloadedCache() throws {
         try FileManager.default.createDirectory(
             at: cache.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try versionJS(build: 30).write(
-            to: cache.appendingPathComponent("js/version.js"))
+        try versionsJSON(build: 30).write(
+            to: cache.appendingPathComponent("versions.json"))
         try Data("<html>cached</html>".utf8)
             .write(to: cache.appendingPathComponent("index.html"))
         StubURLProtocol.handler = { req in
-            guard req.url!.lastPathComponent == "version.js" else { return nil }
-            return (200, self.versionJS(build: 40))
+            guard req.url!.lastPathComponent == "versions.json" else { return nil }
+            return (200, self.versionsJSON(build: 40))
         }
 
         let exp = expectation(description: "content versions")
@@ -156,12 +156,12 @@ final class WebContentUpdaterTests: XCTestCase {
             .write(to: bundle.appendingPathComponent("manifest.json"))
         let remoteManifest = manifestJSON(
             version: 1000, label: "remote-1000",
-            files: ["index.html", "js/version.js"])
+            files: ["index.html", "versions.json"])
         StubURLProtocol.handler = { req in
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html": return (200, Data("<html>different</html>".utf8))
-            case "version.js": return (200, self.versionJS(build: 20))
+            case "versions.json": return (200, self.versionsJSON(build: 20))
             default: return nil
             }
         }
@@ -180,12 +180,12 @@ final class WebContentUpdaterTests: XCTestCase {
 
     func testOverlappingRefreshesCompleteWithAValidCache() {
         let remoteManifest = manifestJSON(version: 2000, label: "remote-2000",
-                                          files: ["index.html", "js/version.js"])
+                                          files: ["index.html", "versions.json"])
         StubURLProtocol.handler = { req in
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>serialized</html>".utf8))
-            case "version.js":    return (200, self.versionJS(build: 20))
+            case "versions.json": return (200, self.versionsJSON(build: 20))
             default:              return nil
             }
         }
@@ -209,13 +209,13 @@ final class WebContentUpdaterTests: XCTestCase {
 
     func testPartialFailureLeavesCacheUntouched() {
         let remoteManifest = manifestJSON(version: 2000, label: "remote-2000",
-                                          files: ["index.html", "js/version.js", "js/missing.js"])
+                                          files: ["index.html", "versions.json", "js/missing.js"])
         StubURLProtocol.handler = { req in
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>v2</html>".utf8))
-            case "version.js":    return (200, self.versionJS(
-                build: 20, files: ["index.html", "js/version.js", "js/missing.js"]))
+            case "versions.json": return (200, self.versionsJSON(
+                build: 20, files: ["index.html", "versions.json", "js/missing.js"]))
             default:              return nil   // js/missing.js -> 404
             }
 
@@ -240,16 +240,16 @@ final class WebContentUpdaterTests: XCTestCase {
             .write(to: cache.appendingPathComponent("index.html"))
         try? FileManager.default.createDirectory(
             at: cache.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try? versionJS(build: 9).write(
-            to: cache.appendingPathComponent("js/version.js"))
+        try? versionsJSON(build: 9).write(
+            to: cache.appendingPathComponent("versions.json"))
         let remoteManifest = manifestJSON(version: 1000, label: "remote-1000",
-                                          files: ["index.html", "js/version.js", "js/missing.js"])
+                                          files: ["index.html", "versions.json", "js/missing.js"])
         StubURLProtocol.handler = { req in
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>remote</html>".utf8))
-            case "version.js":    return (200, self.versionJS(
-                build: 20, files: ["index.html", "js/version.js", "js/missing.js"]))
+            case "versions.json": return (200, self.versionsJSON(
+                build: 20, files: ["index.html", "versions.json", "js/missing.js"]))
             default:              return nil
             }
         }

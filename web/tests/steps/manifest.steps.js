@@ -1,4 +1,4 @@
-// manifest.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// manifest.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 import assert from "node:assert";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -27,10 +27,16 @@ Given("a scratch web root that mirrors the real bundle", function () {
   this.saved = {};
   put(this.root, "index.html", "<!doctype html><title>bm</title>");
   put(this.root, "css/style.css", "body{}");
-  put(this.root, "js/version.js",
-    'export const APP_VERSION = "2026.9.11";\nexport const BUILD = "77";\n' +
-    'export const CONTENT_VERSION = 20260911077;\n' +
-    'export const CONTENT_FILES = ["css/style.css","index.html","js/core.js","js/ui.js","js/version.js"];\n');
+  put(this.root, "versions.json", JSON.stringify({
+    APP_VERSION: "2026.9.11",
+    BUILD: "77",
+    COPYRIGHT: "Copyright test",
+    CONTENT_VERSION: 20260911077,
+    LATEST_APP_BUILD_AVAILABLE: 20260911077,
+    CONTENT_FILES: [
+      "css/style.css", "index.html", "js/core.js", "js/ui.js", "versions.json",
+    ],
+  }));
   put(this.root, "js/core.js", "export const x = 1;");
   put(this.root, "js/ui.js", "export const y = 2;");
 });
@@ -101,6 +107,10 @@ Then("the manifest label is {string}", function (label) {
 
 Then("content version {string} build {int} composes to {int}", function (version, build, expected) {
   assert.equal(contentVersionFor(version, build), expected);
+});
+
+Then("content version {string} build {int} is rejected", function (version, build) {
+  assert.throws(() => contentVersionFor(version, build), /YYYY\.M\.D and BBB/);
 });
 
 Then("manifest {string} is newer than manifest {string}", function (a, b) {

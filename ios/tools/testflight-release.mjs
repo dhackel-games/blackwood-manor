@@ -1,7 +1,7 @@
 // testflight-release.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 import { createPrivateKey, sign } from "node:crypto";
-import { readFileSync, renameSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -257,24 +257,24 @@ async function waitForInternalAvailability(
   });
 }
 
-export function availableBuildMarker(
-  marketingVersion, buildNumber, expiresAt, availableAt = new Date()
-) {
-  if (typeof expiresAt !== "string" || !expiresAt.trim()) {
-    throw new Error("The verified TestFlight build has no valid expiration date.");
+export function appBuildVersion(marketingVersion, buildNumber) {
+  const parts = String(marketingVersion).split(".");
+  const numbers = parts.map(Number);
+  if (parts.length !== 3
+      || parts.some((part) => !/^\d+$/.test(part))
+      || numbers[0] < 1000
+      || numbers[0] > 9999
+      || numbers[1] < 1
+      || numbers[1] > 12
+      || numbers[2] < 1
+      || numbers[2] > 31
+      || !/^\d+$/.test(String(buildNumber))
+      || Number(buildNumber) > 999) {
+    throw new Error("App version must be YYYY.M.D and build must fit BBB.");
   }
-  const expiration = new Date(expiresAt);
-  if (Number.isNaN(expiration.getTime()) || expiration <= availableAt) {
-    throw new Error("The verified TestFlight build expiration date is missing or expired.");
-  }
-  return {
-    channel: "testflight",
-    available: true,
-    appVersion: marketingVersion,
-    appBuild: Number(buildNumber),
-    availableAt: availableAt.toISOString(),
-    expiresAt: expiration.toISOString(),
-  };
+  return Number(
+    `${parts[0].padStart(4, "0")}${parts[1].padStart(2, "0")}` +
+    `${parts[2].padStart(2, "0")}${String(buildNumber).padStart(3, "0")}`);
 }
 
 export async function verifyTestFlightAvailability({
@@ -343,12 +343,6 @@ export async function latestUploadedBuildNumber(request, bundleIdentifier) {
     .filter(Number.isInteger));
 }
 
-function writeMarker(path, marker) {
-  const temporary = `${path}.tmp`;
-  writeFileSync(temporary, `${JSON.stringify(marker, null, 2)}\n`);
-  renameSync(temporary, path);
-}
-
 function argument(name) {
   const index = process.argv.indexOf(name);
   return index >= 0 ? process.argv[index + 1] : null;
@@ -358,11 +352,9 @@ async function main() {
   const bundleIdentifier = argument("--bundle-id");
   const marketingVersion = argument("--version");
   const buildNumber = argument("--build");
-  const markerPath = argument("--marker");
   if (!bundleIdentifier) {
     throw new Error(
-      "usage: node testflight-release.mjs --bundle-id ID --version VERSION " +
-      "--build BUILD --marker PATH");
+      "usage: node testflight-release.mjs --bundle-id ID --version VERSION --build BUILD");
   }
 
   const keyId = process.env.ASC_KEY_ID;
@@ -379,14 +371,13 @@ async function main() {
     console.log(await latestUploadedBuildNumber(request, bundleIdentifier));
     return;
   }
-  if (!marketingVersion || !buildNumber || !markerPath) {
+  if (!marketingVersion || !buildNumber) {
     throw new Error(
-      "usage: node testflight-release.mjs --bundle-id ID --version VERSION " +
-      "--build BUILD --marker PATH");
+      "usage: node testflight-release.mjs --bundle-id ID --version VERSION --build BUILD");
   }
 
   console.log(`==> Resolving ${bundleIdentifier} in App Store Connect`);
-  const verified = await verifyTestFlightAvailability({
+  await verifyTestFlightAvailability({
     request,
     bundleIdentifier,
     marketingVersion,
@@ -397,11 +388,9 @@ async function main() {
     intervalSeconds,
   });
 
-  writeMarker(markerPath, availableBuildMarker(
-    marketingVersion,
-    buildNumber,
-    verified.build.attributes?.expirationDate));
-  console.log(`==> TestFlight build ${buildNumber} is available; wrote ${markerPath}`);
+  console.log(
+    `==> TestFlight build ${buildNumber} is available (${appBuildVersion(
+      marketingVersion, buildNumber)})`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] || "").href) {

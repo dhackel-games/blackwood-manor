@@ -83,6 +83,6 @@ refactors that turn this into a genre-neutral engine). Quick status:
 - **HUD slots** — `hud.js` `HUD_SLOT_DEFINITIONS` mixes generic slots (score,
   inventory) with Blackwood-specific ones (reliquary, bowel pressure, mushroom,
   vision…). Move content slots into the game.
-- **Branding/config** — `issue-report.js` (repo URL), `version.js`, and the iOS
+- **Branding/config** — `issue-report.js` (repo URL), `versions.json`, and the iOS
   harness (`remoteBase`, bundle id, display name) hardcode Blackwood/`dhackel-games`.
   Lift into a per-game config so the studio identity is set in one place.

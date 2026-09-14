@@ -1,4 +1,4 @@
-// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.084:acoven.
+// WebContent.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 import Foundation
 import WebKit
@@ -57,10 +57,27 @@ struct WebContentRelease: Equatable {
     let appVersion: String
     let build: Int
     let contentVersion: Int64
+    let latestAppBuildAvailable: Int64
     let files: [String]
 
     var label: String { "\(appVersion) build \(build)" }
     var sortKey: Int64 { contentVersion }
+
+    private struct VersionDocument: Decodable {
+        let appVersion: String
+        let build: String
+        let contentVersion: Int64
+        let latestAppBuildAvailable: Int64
+        let contentFiles: [String]
+
+        enum CodingKeys: String, CodingKey {
+            case appVersion = "APP_VERSION"
+            case build = "BUILD"
+            case contentVersion = "CONTENT_VERSION"
+            case latestAppBuildAvailable = "LATEST_APP_BUILD_AVAILABLE"
+            case contentFiles = "CONTENT_FILES"
+        }
+    }
 
     static func isSafeRelativePath(_ path: String) -> Bool {
         guard !path.isEmpty,
@@ -75,55 +92,37 @@ struct WebContentRelease: Equatable {
     }
 
     static func contentVersion(appVersion: String, build: Int) -> Int64? {
-        let parts = appVersion.split(separator: ".").compactMap { Int($0) }
-        guard parts.count == 3 else { return nil }
+        let rawParts = appVersion.split(separator: ".")
+        guard rawParts.count == 3 else { return nil }
+        let parsedParts = rawParts.map { Int($0) }
+        guard parsedParts.allSatisfy({ $0 != nil }) else { return nil }
+        let parts = parsedParts.map { $0! }
+        guard (1000...9999).contains(parts[0]),
+              (1...12).contains(parts[1]),
+              (1...31).contains(parts[2]),
+              (0...999).contains(build) else {
+            return nil
+        }
         return Int64(String(format: "%04d%02d%02d%03d",
                             parts[0], parts[1], parts[2], build))
     }
 
     static func parse(_ data: Data) -> WebContentRelease? {
-        guard let source = String(data: data, encoding: .utf8) else { return nil }
-        func capture(_ name: String) -> String? {
-            let pattern = "export const \(name)\\s*=\\s*\"([^\"]+)\""
-            guard let regex = try? NSRegularExpression(pattern: pattern),
-                  let match = regex.firstMatch(
-                    in: source, range: NSRange(source.startIndex..., in: source)),
-                  let range = Range(match.range(at: 1), in: source) else {
-                return nil
-            }
-            return String(source[range])
-        }
-        let filesPattern = "export const CONTENT_FILES\\s*=\\s*(\\[[\\s\\S]*?\\])\\s*;"
-        guard let appVersion = capture("APP_VERSION"),
-              let buildText = capture("BUILD"),
-              let build = Int(buildText),
-              let contentVersionText = { () -> String? in
-                  let pattern = "export const CONTENT_VERSION\\s*=\\s*(\\d+)"
-                  guard let regex = try? NSRegularExpression(pattern: pattern),
-                        let match = regex.firstMatch(
-                            in: source, range: NSRange(source.startIndex..., in: source)),
-                        let range = Range(match.range(at: 1), in: source) else {
-                      return nil
-                  }
-                  return String(source[range])
-              }(),
-              let contentVersion = Int64(contentVersionText),
-              contentVersion == Self.contentVersion(appVersion: appVersion, build: build),
-              let filesRegex = try? NSRegularExpression(pattern: filesPattern),
-              let filesMatch = filesRegex.firstMatch(
-                in: source, range: NSRange(source.startIndex..., in: source)),
-              let filesRange = Range(filesMatch.range(at: 1), in: source),
-              let filesData = String(source[filesRange]).data(using: .utf8),
-              let files = try? JSONDecoder().decode([String].self, from: filesData),
-              files.contains("index.html"),
-              files.contains("js/version.js"),
-              files.allSatisfy(Self.isSafeRelativePath),
-              Set(files).count == files.count else {
+        guard let document = try? JSONDecoder().decode(VersionDocument.self, from: data),
+              let build = Int(document.build),
+              document.contentVersion == Self.contentVersion(
+                  appVersion: document.appVersion, build: build),
+              document.contentFiles.contains("index.html"),
+              document.contentFiles.contains("versions.json"),
+              document.contentFiles.allSatisfy(Self.isSafeRelativePath),
+              Set(document.contentFiles).count == document.contentFiles.count else {
             return nil
         }
         return WebContentRelease(
-            appVersion: appVersion, build: build,
-            contentVersion: contentVersion, files: files)
+            appVersion: document.appVersion, build: build,
+            contentVersion: document.contentVersion,
+            latestAppBuildAvailable: document.latestAppBuildAvailable,
+            files: document.contentFiles)
     }
 }
 
@@ -147,7 +146,7 @@ final class WebContentStore {
     }
 
     func contentRelease(at root: URL) -> WebContentRelease? {
-        let file = root.appendingPathComponent("js/version.js")
+        let file = root.appendingPathComponent("versions.json")
         guard let data = try? Data(contentsOf: file),
               let release = WebContentRelease.parse(data) else {
             return nil
@@ -247,8 +246,9 @@ final class WebContentUpdater {
     // 3. CONTENT SOURCE: the CONTENT_VERSION currently published remotely.
     //    It is nil when the source cannot be reached.
     //
-    // Native-app availability is checked separately against Apple's App Store
-    // catalog. Web manifests never imply that a native binary is available.
+    // Native-app availability is checked separately through
+    // LATEST_APP_BUILD_AVAILABLE (TestFlight) or Apple's catalog (App Store).
+    // Web manifests never imply that a native binary is available.
     struct VersionLabels: Equatable {
         let contentLocal: String
         let contentSource: String?
@@ -297,7 +297,7 @@ final class WebContentUpdater {
     private func fetchRemoteRelease(
         completion: @escaping (WebContentRelease?, Data?) -> Void
     ) {
-        fetchRemoteFile("js/version.js", cacheKey: UUID().uuidString) { data in
+        fetchRemoteFile("versions.json", cacheKey: UUID().uuidString) { data in
             guard let data else {
                 completion(nil, nil)
                 return
@@ -381,7 +381,7 @@ final class WebContentUpdater {
                 ok = false
                 continue
             }
-            if relativePath == "js/version.js" {
+            if relativePath == "versions.json" {
                 let destination = staging.appendingPathComponent(relativePath)
                 do {
                     try fileManager.createDirectory(

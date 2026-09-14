@@ -1,4 +1,4 @@
-// WebContentStoreTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.067:acoven.
+// WebContentStoreTests.swift. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
 
 import XCTest
 
@@ -22,12 +22,14 @@ final class WebContentStoreTests: XCTestCase {
     }
 
     private func versionData(appVersion: String = "2026.9.11", build: Int) -> Data {
-        Data("""
-        export const APP_VERSION = "\(appVersion)";
-        export const BUILD = "\(build)";
-        export const CONTENT_VERSION = \(contentVersion(appVersion, build));
-        export const CONTENT_FILES = ["index.html", "js/version.js"];
-        """.utf8)
+        let version = contentVersion(appVersion, build)
+        return try! JSONSerialization.data(withJSONObject: [
+            "APP_VERSION": appVersion,
+            "BUILD": String(build),
+            "CONTENT_VERSION": version,
+            "LATEST_APP_BUILD_AVAILABLE": version,
+            "CONTENT_FILES": ["index.html", "versions.json"],
+        ], options: [.sortedKeys])
     }
 
     private func contentVersion(_ appVersion: String, _ build: Int) -> Int64 {
@@ -37,10 +39,8 @@ final class WebContentStoreTests: XCTestCase {
     }
 
     private func writeRelease(appVersion: String = "2026.9.11", build: Int, at root: URL) {
-        let js = root.appendingPathComponent("js", isDirectory: true)
-        try? FileManager.default.createDirectory(at: js, withIntermediateDirectories: true)
         try? versionData(appVersion: appVersion, build: build)
-            .write(to: js.appendingPathComponent("version.js"))
+            .write(to: root.appendingPathComponent("versions.json"))
         try? Data("<html></html>".utf8).write(to: root.appendingPathComponent("index.html"))
         try? Data("{\"files\":[]}".utf8).write(to: root.appendingPathComponent("manifest.json"))
     }
@@ -49,6 +49,11 @@ final class WebContentStoreTests: XCTestCase {
         XCTAssertEqual(
             WebContentRelease.contentVersion(appVersion: "2026.9.11", build: 67),
             20260911067)
+    }
+
+    func testNumericContentVersionRejectsValuesOutsideYYYYMMDDBBB() {
+        XCTAssertNil(WebContentRelease.contentVersion(appVersion: "2026.13.1", build: 67))
+        XCTAssertNil(WebContentRelease.contentVersion(appVersion: "2026.9.11", build: 1000))
     }
 
     func testBundleSeedsPersistentCacheWhenCacheIsMissing() {
@@ -91,7 +96,7 @@ final class WebContentStoreTests: XCTestCase {
         let cache = root("cache")
         writeRelease(build: 10, at: bundle)
         try? Data("not version metadata".utf8)
-            .write(to: cache.appendingPathComponent("version.js"))
+            .write(to: cache.appendingPathComponent("versions.json"))
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         XCTAssertTrue(store.ensureCacheFromBundle())
         XCTAssertEqual(store.cacheRelease?.build, 10)
