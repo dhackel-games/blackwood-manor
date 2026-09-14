@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -726,7 +726,7 @@ Then("touch-capable movement controls are twenty-five percent larger without wid
     /#controls \.verb-row button\s*\{[^}]*width:\s*2\.96875rem/s);
 });
 
-Then("the navigation size selector controls sizes one through three", function () {
+Then("the navigation selector sits left of a persistent disclosure control", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
@@ -736,6 +736,10 @@ Then("the navigation size selector controls sizes one through three", function (
     ["3", "2", "1"]);
   assert.match(picker, /role=["']radiogroup["']/);
   assert.equal((picker.match(/role=["']radio["']/g) || []).length, 3);
+  assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
+  assert.match(html,
+    /id=["']controls["'][^>]+data-collapsed=["']false["'][\s\S]*id=["']nav-disclosure["'][^>]+aria-controls=["']controls-content["'][^>]+aria-expanded=["']true["'][\s\S]*>\s*<span[^>]*>\s*▾\s*<\/span>/);
+  assert.ok(html.indexOf('id="nav-disclosure"') < html.indexOf('id="controls-content"'));
   assert.match(css, /#controls\[data-nav-size=["']1["']\][^}]*--nav-button-size:\s*1\.7rem/s);
   assert.match(css, /#controls\[data-nav-size=["']2["']\][^}]*--nav-button-size:\s*2\.375rem/s);
   assert.match(css, /#controls\[data-nav-size=["']3["']\][^}]*--nav-button-size:\s*2\.96875rem/s);
@@ -743,14 +747,25 @@ Then("the navigation size selector controls sizes one through three", function (
   assert.match(css, /\.nav-size-picker button\s*\{[^}]*background:\s*transparent[^}]*border:\s*0/s);
   assert.match(css, /\.nav-size-picker::before\s*\{[^}]*width:\s*1px[^}]*background:\s*var\(--dim\)/s);
   assert.match(css, /button\[aria-checked=["']true["']\] \.nav-size-swatch\s*\{[^}]*background:\s*currentColor/s);
+  assert.match(css, /#controls\s*\{[^}]*border-top:\s*1px solid var\(--dim\)/s);
+  assert.match(css,
+    /#controls > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*-0\.72rem[^}]*background:\s*var\(--bg\)/s);
+  assert.match(css,
+    /#controls\[data-collapsed=["']true["']\] \.controls-content\s*\{\s*display:\s*none/s);
   assert.match(ui, /localStorage\.getItem\(NAV_SIZE_KEY\)/);
+  assert.match(ui, /localStorage\.getItem\(NAV_COLLAPSED_KEY\) === "true"/);
   assert.match(ui, /localStorage\.setItem\(NAV_SIZE_KEY, selected\)/);
+  assert.match(ui, /localStorage\.setItem\(NAV_COLLAPSED_KEY, String\(isCollapsed\)\)/);
+  assert.match(ui, /controls\.dataset\.collapsed = String\(isCollapsed\)/);
+  assert.match(ui, /navDisclosureIcon\.textContent = isCollapsed \? "▸" : "▾"/);
+  assert.match(ui,
+    /navDisclosure\.addEventListener\("click", \(\) => \{[\s\S]*applyNavCollapsed\(controls\.dataset\.collapsed !== "true", true\)/s);
   assert.match(ui, /matchMedia\?\.\("\(any-pointer: coarse\)"\)/);
   assert.match(ui, /const prefersLargeNav = Native\.isMobileApp\(\) \|\| coarsePointer/);
-  assert.match(ui, /prefersLargeNav \? "3" : "1"/);
+  assert.match(ui, /const defaultNavSize = prefersLargeNav \? "3" : "1"/);
   assert.match(ui, /setAttribute\("aria-checked", String\(button\.dataset\.navSize === selected\)\)/);
   assert.match(css,
-    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*28rem\)/);
+    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*2\.25rem minmax\(0,\s*28rem\)/);
   assert.match(css,
     /#controls \.movement-controls,[\s\S]*#controls \.action-controls\s*\{[^}]*justify-self:\s*center/s);
 });
@@ -762,8 +777,9 @@ Then("action shortcuts occupy two equally wide rows beside movement", function (
   assert.equal(rows.length, 2);
   assert.deepEqual(rows.map((row) => (row[1].match(/<button\b/g) || []).length), [4, 5]);
   assert.match(rows[1][1], /data-cmd=["']inventory["'][\s\S]*data-cmd=["']map["'][\s\S]*data-cmd=["']call["']/);
+  assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
-  assert.match(css, /#controls\s*\{[^}]*grid-template-columns:\s*auto minmax\(0, 28rem\)/s);
+  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*2\.25rem auto minmax\(0, 28rem\)/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);
   assert.match(css, /#controls \.verb-row\s*\{[^}]*grid-template-columns:\s*repeat\(8,/s);
   assert.match(css, /#controls \.verb-row button\s*\{[^}]*grid-column:\s*span 2/s);

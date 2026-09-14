@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven.
 ```
 
 ---
@@ -629,14 +629,16 @@ transcript. Every art line is capped at 32 characters for the mobile layout.
 
 ## 12.19 Persistent touch controls
 
-The control tray is a fixed layout child and never enters a hidden state. A 3×3
-eight-arrow compass sits beside a 2×2 level/portal block (`⇧`, `⇩`, and
-center-anchored In/Out SVG arrows). To its right, two equal-width action rows
-hold four regular-width units apiece; `?` and 🪲 each occupy half a regular slot.
-At the far right, a two-row-height three-square picker selects navigation size
-1, 2, or 3 and persists it. `Native.isMobileApp()` or an `any-pointer: coarse`
-media match defaults to size 3; other browsers default to size 1. On narrow
-touch screens the movement and action groups stack so enlarged navigation
+The control tray is a fixed layout child. Its existing top rule carries a
+left-edge disclosure: `▾` while open and `▸` while collapsed. Collapsing hides
+the complete movement/action area but leaves the rule, disclosure, and command
+typeahead; that preference persists. Within the open tray, a far-left
+three-square picker selects navigation size 1, 2, or 3, followed by a 3×3
+eight-arrow compass, a 2×2 level/portal block (`⇧`, `⇩`, and center-anchored
+In/Out SVG arrows), and two equal-width action rows. `?` and 🪲 each occupy half
+a regular slot. `Native.isMobileApp()` or an `any-pointer: coarse` media match
+defaults to size 3; other browsers default to size 1. On narrow touch screens
+the movement and action groups stack beside the picker so enlarged navigation
 cannot collapse action-button widths.
 The transcript carries `min-height: 0` so additional room art and inspection
 text scroll inside its allotted space rather than pushing controls below the

@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -76,7 +76,10 @@ const canType = !!(window.matchMedia && window.matchMedia("(hover: hover) and (p
 const controls = document.getElementById("controls");
 const navSizePicker = document.getElementById("nav-size-picker");
 const navSizeButtons = [...document.querySelectorAll("#nav-size-picker [data-nav-size]")];
+const navDisclosure = document.getElementById("nav-disclosure");
+const navDisclosureIcon = navDisclosure.querySelector("[aria-hidden]");
 const NAV_SIZE_KEY = "blackwood-nav-size";
+const NAV_COLLAPSED_KEY = "blackwood-nav-collapsed";
 
 function applyNavSize(size, persist = false) {
   const selected = ["1", "2", "3"].includes(String(size)) ? String(size) : "1";
@@ -95,17 +98,42 @@ function applyNavSize(size, persist = false) {
 }
 
 let savedNavSize = null;
+let savedNavCollapsed = false;
 try {
   savedNavSize = localStorage.getItem(NAV_SIZE_KEY);
+  savedNavCollapsed = localStorage.getItem(NAV_COLLAPSED_KEY) === "true";
 } catch (error) {
-  console.warn("[controls] could not read navigation size", error);
+  console.warn("[controls] could not read navigation preferences", error);
 }
 const coarsePointer = !!window.matchMedia?.("(any-pointer: coarse)").matches;
 const prefersLargeNav = Native.isMobileApp() || coarsePointer;
-applyNavSize(["1", "2", "3"].includes(savedNavSize) ? savedNavSize : (prefersLargeNav ? "3" : "1"));
+const defaultNavSize = prefersLargeNav ? "3" : "1";
+applyNavSize(["1", "2", "3"].includes(savedNavSize) ? savedNavSize : defaultNavSize);
 for (const button of navSizeButtons) {
   button.addEventListener("click", () => applyNavSize(button.dataset.navSize, true));
 }
+
+function applyNavCollapsed(collapsed, persist = false) {
+  const isCollapsed = !!collapsed;
+  controls.dataset.collapsed = String(isCollapsed);
+  navDisclosure.setAttribute("aria-expanded", String(!isCollapsed));
+  navDisclosure.setAttribute(
+    "aria-label", isCollapsed ? "show navigation controls" : "hide navigation controls");
+  navDisclosure.title = isCollapsed ? "Show navigation controls" : "Hide navigation controls";
+  navDisclosureIcon.textContent = isCollapsed ? "▸" : "▾";
+  if (persist) {
+    try {
+      localStorage.setItem(NAV_COLLAPSED_KEY, String(isCollapsed));
+    } catch (error) {
+      console.warn("[controls] could not save navigation disclosure", error);
+    }
+  }
+}
+
+applyNavCollapsed(savedNavCollapsed);
+navDisclosure.addEventListener("click", () => {
+  applyNavCollapsed(controls.dataset.collapsed !== "true", true);
+});
 
 function createChatEntry({ field, submit, starterText }) {
   field.placeholder = starterText;

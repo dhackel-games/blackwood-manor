@@ -1,4 +1,4 @@
-<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven. -->
+<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -26,8 +26,23 @@
     <div id="transcript" aria-live="polite"></div>
 
     <!-- Touch controls: tap to run common commands (typing still works) -->
-    <div id="controls">
-      <div class="movement-controls">
+    <div id="controls" data-collapsed="false">
+      <button id="nav-disclosure" class="nav-disclosure" type="button"
+              aria-label="hide navigation controls" aria-controls="controls-content"
+              aria-expanded="true" title="Hide navigation controls">
+        <span aria-hidden="true">▾</span>
+      </button>
+      <div id="controls-content" class="controls-content">
+        <div id="nav-size-picker" class="nav-size-picker" role="radiogroup"
+             aria-label="navigation button size">
+          <button type="button" data-nav-size="3" aria-label="large navigation buttons"
+                  title="Large navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
+          <button type="button" data-nav-size="2" aria-label="medium navigation buttons"
+                  title="Medium navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
+          <button type="button" data-nav-size="1" aria-label="small navigation buttons"
+                  title="Small navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
+        </div>
+        <div class="movement-controls">
         <div class="dpad" aria-label="compass directions">
           <button class="northwest" data-cmd="northwest" aria-label="northwest" title="nw">↖</button>
           <button class="north" data-cmd="north" aria-label="north" title="n">↑</button>
@@ -55,8 +70,8 @@
             </svg>
           </button>
         </div>
-      </div>
-      <div class="action-controls">
+        </div>
+        <div class="action-controls">
         <div class="verbs">
           <div class="verb-row">
             <button data-cmd="look">Look</button>
@@ -73,14 +88,6 @@
                     aria-label="report a bug on GitHub">🪲</button>
           </div>
         </div>
-        <div id="nav-size-picker" class="nav-size-picker" role="radiogroup"
-             aria-label="navigation button size">
-          <button type="button" data-nav-size="3" aria-label="large navigation buttons"
-                  title="Large navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
-          <button type="button" data-nav-size="2" aria-label="medium navigation buttons"
-                  title="Medium navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
-          <button type="button" data-nav-size="1" aria-label="small navigation buttons"
-                  title="Small navigation buttons" role="radio"><span class="nav-size-swatch"></span></button>
         </div>
       </div>
     </div>
