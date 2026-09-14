@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 
 @unit
 Feature: Sysop compound command shortcuts
@@ -34,6 +34,7 @@ Feature: Sysop compound command shortcuts
       | close reliquary         | c reliquary          |
       | take family crest       | t family crest       |
       | wear winged shoes       | u winged shoes        |
+      | don talisman            | u talisman            |
       | remove talisman         | doff talisman        |
       | offer apple to dragon   | give apple to dragon |
       | place ruby gem in panel | put ruby gem in panel |
@@ -62,6 +63,10 @@ Feature: Sysop compound command shortcuts
     And sysop command "::winmax" includes "u fresh"
     And sysop command "::winmax" omits "t shoes"
     And sysop command "::winmax" omits "t crest"
+    And sysop command "::winquick" includes "put crest in rq"
+    And sysop command "::winquick" omits "put crest in reliquary"
+    And sysop command "::garycliff" includes "c rq"
+    And sysop command "::winmax" includes "c rq"
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: Powerup targets fresh mushrooms when both varieties are carried

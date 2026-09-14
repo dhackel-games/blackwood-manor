@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven. -->
 
 # Blackwood Manor
 
@@ -87,7 +87,7 @@ when it is newer than the published TestFlight build number, otherwise increment
 After upload, it waits for App Store Connect processing, assigns the build to an
 internal beta group, verifies that testers can receive it, writes
 `LATEST_APP_BUILD_AVAILABLE` in `web/versions.json`, and commits and pushes that
-version. Set
-`ASC_BETA_GROUP_ID` or `ASC_BETA_GROUP_NAME` when the app has multiple internal
-groups. A temporary remote Git release lock serializes publishers without
+version. It targets the internal **BM Testers** group by default; no group ID is
+needed. `ASC_BETA_GROUP_ID` or `ASC_BETA_GROUP_NAME` can override that default.
+A temporary remote Git release lock serializes publishers without
 changing the public availability value before a build is actually available.

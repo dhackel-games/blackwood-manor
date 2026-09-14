@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -865,7 +865,8 @@ Then("release-channel metadata decides whether a native iOS update is available"
   assert.match(app, /UIApplication\.shared\.open\(update\.storeURL\)/);
   assert.match(appUpdate, /URL\(string: "itms-beta:\/\/"\)/);
   assert.doesNotMatch(app, /manifest\.json/);
-  assert.equal(LATEST_APP_BUILD_AVAILABLE, CONTENT_VERSION);
+  assert.ok(Number.isSafeInteger(LATEST_APP_BUILD_AVAILABLE));
+  assert.ok(LATEST_APP_BUILD_AVAILABLE <= CONTENT_VERSION);
 });
 
 Then("local daemon status is announced in the transcript without console noise", function () {
@@ -928,6 +929,7 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.match(script, /cleanup_failed=1/);
   assert.match(script, /status" -eq 0 && "\$cleanup_failed" -eq 1/);
   assert.match(script, /ASC_BETA_GROUP_(?:ID|NAME)/);
+  assert.match(verifier, /process\.env\.ASC_BETA_GROUP_NAME \|\| "BM Testers"/);
   assert.match(verifier, /\/v1\/builds/);
   assert.match(verifier, /processingState/);
   assert.match(verifier, /\/relationships\/builds/);

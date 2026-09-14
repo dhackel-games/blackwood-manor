@@ -1,4 +1,4 @@
-// testflight-release.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+// testflight-release.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 
 import { createPrivateKey, sign } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -383,7 +383,7 @@ async function main() {
     marketingVersion,
     buildNumber,
     groupId: process.env.ASC_BETA_GROUP_ID,
-    groupName: process.env.ASC_BETA_GROUP_NAME,
+    groupName: process.env.ASC_BETA_GROUP_NAME || "BM Testers",
     timeoutSeconds,
     intervalSeconds,
   });

@@ -1,4 +1,4 @@
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 
 const versionsURL = new URL("../versions.json", import.meta.url);
 let versions;
@@ -16,7 +16,9 @@ if (versionsURL.protocol === "file:") {
 if (typeof versions.APP_VERSION !== "string"
     || typeof versions.BUILD !== "string"
     || typeof versions.COPYRIGHT !== "string"
-    || !Number.isSafeInteger(versions.CONTENT_VERSION)) {
+    || !Number.isSafeInteger(versions.CONTENT_VERSION)
+    || !Number.isSafeInteger(versions.LATEST_APP_BUILD_AVAILABLE)
+    || !Array.isArray(versions.CONTENT_FILES)) {
   throw new Error("Version metadata is invalid.");
 }
 
@@ -25,6 +27,8 @@ export const {
   BUILD,
   CONTENT_VERSION,
   COPYRIGHT,
+  LATEST_APP_BUILD_AVAILABLE,
+  CONTENT_FILES,
 } = versions;
 export const VERSION = `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`;
 

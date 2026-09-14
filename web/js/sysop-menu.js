@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -162,23 +162,23 @@ const QUICK_COLLECTION = [
 ];
 
 const REQUIRED_DEPOSITS = [
-  "put crest in reliquary",
-  "put family in reliquary",
-  "put spyglass in reliquary",
-  "put candlestick in reliquary",
-  "put grimoire in reliquary",
-  "put musicbox in reliquary",
-  "put ravenblood in reliquary",
-  "put locket in reliquary",
-  "put talisman in reliquary",
-  "put ancient in reliquary",
-  "put decanter in reliquary",
-  "put ancestral in reliquary",
-  "put woodblack in reliquary",
+  "put crest in rq",
+  "put family in rq",
+  "put spyglass in rq",
+  "put candlestick in rq",
+  "put grimoire in rq",
+  "put musicbox in rq",
+  "put ravenblood in rq",
+  "put locket in rq",
+  "put talisman in rq",
+  "put ancient in rq",
+  "put decanter in rq",
+  "put ancestral in rq",
+  "put woodblack in rq",
 ];
 
 const DAWN_ENDING = [
-  "close reliquary",
+  "close rq",
   "ring bell",
   "take bone",
   "open secretd with bone",
@@ -279,7 +279,7 @@ export const SYSOP_COMMANDS = Object.freeze([
     cmd: "::garycliff",
     name: "Gary Cliffhanger",
     description: "Collect the minimum required heirlooms and descend to Gary's call-cave.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close reliquary", "down"]),
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq", "down"]),
   }),
   Object.freeze({
     cmd: "::winmax",
@@ -288,7 +288,7 @@ export const SYSOP_COMMANDS = Object.freeze([
     compoundPrompt: join([
       ...MAX_COLLECTION,
       ...REQUIRED_DEPOSITS,
-      "close reliquary",
+      "close rq",
       "ring bell",
       "take bone",
       "open secretd with bone",

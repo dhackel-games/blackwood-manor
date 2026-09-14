@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 ```
 
 ---
@@ -145,7 +145,7 @@ Classic Infocom style, richer than strict two-word.
   object and room one globally unique token. Exact canonical tokens win before
   ordinary noun matching, while familiar multiword names and intentional
   ambiguities remain valid. Generated SYSOP MENU (`::`) command chains use only these compact
-  targets; bug reports continue preserving exactly what the player submitted, so
+  targets, including `rq` for the RELIQUARY; bug reports continue preserving exactly what the player submitted, so
   an expanded sysop command is naturally recorded in its compact form.
 - **Compact grammar:** `w/` means WITH with or without a following space
   (`unlock frontd w/iron` and `unlock front d w/ iron`).

@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.083:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -22,7 +22,7 @@ import { content } from "./world.content.js?v=source";
 export const REQUIRED_FAMILY_ITEM_COUNT = 13;
 
 export const ITEM_SHORT_NAMES = Object.freeze({
-  reliquary: "reliquary",
+  reliquary: "rq",
   bell: "bell",
   mysteryPackage: "package",
   lightningBolt: "lightning",

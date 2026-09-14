@@ -1,5 +1,5 @@
 #!/bin/bash
-# release-testflight.sh. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.085:acoven.
+# release-testflight.sh. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
 # release-testflight.sh — build, archive, export, and upload Blackwood Manor to TestFlight.
 #
 # One-time prerequisites (see notes at bottom):
@@ -9,9 +9,10 @@
 #      and these env vars are available from your private shell environment:
 #        export ASC_KEY_ID=XXXXXXXXXX
 #        export ASC_ISSUER_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-#      If more than one internal beta group exists, also set one of:
+#      Releases target the internal "BM Testers" group by default. To override
+#      it, set either the stable group ID or an exact group name (not both):
 #        export ASC_BETA_GROUP_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-#        export ASC_BETA_GROUP_NAME="Internal Testers"
+#        export ASC_BETA_GROUP_NAME="Another Internal Group"
 #
 # Usage:
 #   cd <blackwood-manor-repo>/ios
