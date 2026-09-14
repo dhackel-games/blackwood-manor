@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -2604,7 +2604,7 @@ function answerTrollRiddle(ctx, cmd) {
   if (!ctx.getFlag("trollAskedRiddle")) {
     if (TROLL_RHYMES.has(answer)) return openTrollVault(ctx, answer, true);
     if (addressed?.id === "caveTroll") {
-      return `(talk to TROLL)\n\n${talkToTroll(ctx)}`;
+      return `(talk to CAVE TROLL)\n\n${talkToTroll(ctx)}`;
     }
     return "The TROLL folds his arms across the VAULT DOOR. Perhaps TALK TO TROLL before shouting answers.";
   }

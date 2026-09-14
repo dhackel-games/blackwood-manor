@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -110,7 +110,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "open drawer"
     Then the output contains "GOGGLES"
     When I send "wear goggles"
-    Then the output contains "(get goggles, wear goggles)"
+    Then the output contains "(get XRAY GOGGLES; wear XRAY GOGGLES)"
     And item "xrayGoggles" is worn in slot "eyes"
     And vision status is permanent
     When the player moves directly to room "garden"
@@ -219,12 +219,12 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Given item "talisman" is carried
     When I send "use talisman"
     Then item "talisman" is worn in slot "neck"
-    And the output contains "(wear talisman)"
+    And the output contains "(wear SILVER TALISMAN)"
 
   Scenario: U implicitly takes and wears unique visible equipment
     Given the player is in room "dreadmawVault"
     When I send "u shoes"
-    Then the output contains "(get shoes, wear shoes)"
+    Then the output contains "(get WINGED SHOES; wear WINGED SHOES)"
     And item "wingedShoes" is worn in slot "feet"
 
   Scenario: Wearing the vault shoes first leaves room to take everything else
@@ -243,12 +243,12 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Given item "rope" is carried
     And the player is in room "grandHall"
     When I send "put rope in reliquary"
-    Then the output contains "(open reliquary, put rope in reliquary)"
+    Then the output contains "(open GLASS RELIQUARY; put STOUT ROPE in GLASS RELIQUARY)"
     And item "reliquary" is open
     And item "rope" is in "reliquary"
     When I send "close reliquary"
     And I send "take rope from reliquary"
-    Then the output contains "(open reliquary, take rope from reliquary)"
+    Then the output contains "(open GLASS RELIQUARY; take STOUT ROPE from GLASS RELIQUARY)"
     And item "reliquary" is open
     And item "rope" is carried
 

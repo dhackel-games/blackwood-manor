@@ -1,4 +1,4 @@
-# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# dragon-maze.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @walkthrough @dragon
 Feature: Dreadmaw's hedge maze and hoard
@@ -201,7 +201,7 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is unset
     And flag "trollAskedRiddle" is set
     And flag "trollWrongGuesses" is unset
-    And the output contains "(talk to TROLL)"
+    And the output contains "(talk to CAVE TROLL)"
     And the output contains "Past this door lie gold and ore"
 
   Scenario: Anticipating the troll's rhyme opens the vault immediately
@@ -216,7 +216,7 @@ Feature: Dreadmaw's hedge maze and hoard
   Scenario: TALK infers the troll when he is the only conversational target
     Given the player is in room "trollGate"
     When I send "talk"
-    Then the output contains "(talk to TROLL)"
+    Then the output contains "(talk to CAVE TROLL)"
     And the output contains "Past this door lie gold and ore"
     And the troll riddle uses real line breaks
     And flag "trollAskedRiddle" is set

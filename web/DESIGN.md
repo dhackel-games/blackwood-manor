@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 ```
 
 ---
@@ -152,6 +152,9 @@ Classic Infocom style, richer than strict two-word.
   Within noun phrases, `d` expands to DOOR and `br` to BEDROOM, while canonical
   one-word compounds such as `frontd`, `secretd`, `grandbr`, and `hallbr` avoid
   ambiguity. Bare `d` remains DOWN.
+- **Derived-action display:** inferred steps render full uppercase item titles and
+  use semicolons, e.g. `(unlock FRONT DOOR; open FRONT DOOR)`, regardless of the
+  shorthand used to request them.
 
 ---
 

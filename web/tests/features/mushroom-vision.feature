@@ -1,4 +1,4 @@
-# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @walkthrough
 Feature: The mushroom trip's third eye
@@ -82,7 +82,7 @@ Feature: The mushroom trip's third eye
     Then item "obsidianEye" is worn in slot "forehead"
     And flag "obsidianEyeClaimed" is set
     And the game score is 15
-    And the output contains "(get obsidian eye, wear eye)"
+    And the output contains "(get OBSIDIAN EYE; wear OBSIDIAN EYE)"
 
   Scenario: The Obsidian Eye and XRAY GOGGLES can be worn together
     Given item "obsidianEye" is carried

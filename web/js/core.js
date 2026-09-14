@@ -1,4 +1,4 @@
-// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 // Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler
@@ -117,6 +117,56 @@ export function createGame(world) {
   };
   game.findItem = (phrase, scope) => game.findItems(phrase, scope)?.[0] || null;
   game.find = (phrase, scope) => game.findItem(phrase, scope);
+
+  function itemTitle(item) {
+    const primary = item.names[0];
+    const adjective = item.adjectives?.[0];
+    const words = primary.toLowerCase().split(/\s+/);
+    return adjective && !words.includes(adjective.toLowerCase())
+      ? `${adjective} ${primary}`.toUpperCase()
+      : primary.toUpperCase();
+  }
+
+  function displayItem(phrase, scope) {
+    const item = (scope ? game.find(phrase, scope) : null)
+      || game.find(phrase)
+      || game.find(phrase, Object.values(state.items));
+    return item ? itemTitle(item) : String(phrase || "").toUpperCase();
+  }
+
+  function displayCommand(cmd, { omitIndirect = false } = {}) {
+    const parts = [cmd.verb];
+    if (cmd.dobj) {
+      if (cmd.verb === "talk" && !cmd.prep) parts.push("to");
+      const source = cmd.verb === "take" && cmd.prep === "from" && cmd.iobj
+        ? game.find(cmd.iobj)
+        : null;
+      parts.push(displayItem(cmd.dobj, source ? game.itemsIn(source.id) : null));
+    }
+    if (!omitIndirect && cmd.prep) {
+      parts.push(cmd.prep);
+      if (cmd.iobj) {
+        const reachTarget = cmd.verb === "reach" && cmd.prep === "into"
+          ? /^(.+?)\s+for\s+(.+)$/i.exec(cmd.iobj)
+          : null;
+        if (reachTarget) {
+          parts.push(displayItem(reachTarget[1]), "for", displayItem(reachTarget[2]));
+        } else {
+          parts.push(displayItem(cmd.iobj));
+        }
+      }
+    }
+    return parts.join(" ");
+  }
+
+  function displayDerivedStep(step) {
+    const text = String(step || "").trim();
+    const lookIn = /^look in (.+)$/i.exec(text);
+    if (lookIn) return `look in ${displayItem(lookIn[1])}`;
+    const parsed = parse(text);
+    if (parsed.error || !parsed.verb) return text;
+    return displayCommand(parsed, { omitIndirect: parsed.verb === "unlock" });
+  }
 
   // --- ctx API for content handlers -----------------------------------------
   game.getFlag = (f) => state.flags[f]; // raw value (numbers/strings/booleans), not coerced
@@ -358,14 +408,14 @@ export function createGame(world) {
         const keyName = key.names[0];
         const unlock = { verb: "unlock", dobj: target.names[0], prep: "with", iobj: keyName };
         const result = dispatchWithoutTick(unlock);
-        derivedSteps.push(`unlock ${target.names[0]} with ${keyName}`);
+        derivedSteps.push(`unlock ${itemTitle(target)}`);
         if (target.locked) return result;
       }
     }
 
     const open = { verb: "open", dobj: target.names[0], prep: null, iobj: null };
     const result = dispatchWithoutTick(open);
-    derivedSteps.push(`open ${target.names[0]}`);
+    derivedSteps.push(`open ${itemTitle(target)}`);
     return target.open ? null : result;
   }
 
@@ -375,7 +425,7 @@ export function createGame(world) {
     if (!target?.locked || !target.keyId) return null;
     const unlock = { verb: "unlock", dobj: cmd.dobj, prep: "with", iobj: cmd.iobj };
     const result = dispatchWithoutTick(unlock);
-    derivedSteps.push(`unlock ${cmd.dobj} with ${cmd.iobj}`);
+    derivedSteps.push(`unlock ${itemTitle(target)}`);
     return target.locked ? result : null;
   }
 
@@ -390,7 +440,7 @@ export function createGame(world) {
       prep: null,
       iobj: null,
     });
-    derivedSteps.push(`open ${container.names[0]}`);
+    derivedSteps.push(`open ${itemTitle(container)}`);
     return container.open ? null : result;
   }
 
@@ -399,11 +449,11 @@ export function createGame(world) {
     const item = game.find(cmd.dobj);
     if (!item || !item.takeable || game.has(item.id)) return null;
     const blocked = game.acquisitionBlock(item);
-    if (blocked) return { blocked, step: `get ${item.names[0]}` };
+    if (blocked) return { blocked, step: `get ${itemTitle(item)}` };
     if (game.inventoryLoad() >= Math.max(game.inventoryCapacity(), item.carryCapacity || 0)) {
       return {
         blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
-        step: `get ${item.names[0]}`,
+        step: `get ${itemTitle(item)}`,
       };
     }
     const takeCommand = {
@@ -427,9 +477,9 @@ export function createGame(world) {
       }
     }
     if (game.has(item.id)) result = (result || "Taken.") + game.awardPickup(item);
-    if (!game.has(item.id)) return { blocked: result, step: `get ${item.names[0]}` };
+    if (!game.has(item.id)) return { blocked: result, step: `get ${itemTitle(item)}` };
     return {
-      step: `get ${item.names[0]}`,
+      step: `get ${itemTitle(item)}`,
       completed: cmd.verb === "wear" && game.item(item.id)?.worn ? result : null,
     };
   }
@@ -440,7 +490,7 @@ export function createGame(world) {
       typeof world.items[item.id]?.on?.talk === "function");
     if (talkable.length !== 1) return null;
     cmd.dobj = talkable[0].names[0];
-    return `talk to ${talkable[0].names[0].toUpperCase()}`;
+    return `talk to ${itemTitle(talkable[0])}`;
   }
 
   function inferGoEntryTarget(cmd) {
@@ -448,7 +498,7 @@ export function createGame(world) {
     const target = game.find(cmd.dobj);
     if (!target?.enterTo) return null;
     cmd.verb = "enter";
-    return `enter ${target.names[0]}`;
+    return `enter ${itemTitle(target)}`;
   }
 
   function inferUseAction(cmd) {
@@ -472,7 +522,7 @@ export function createGame(world) {
     else if (item.edible) cmd.verb = "eat";
     else if (item.drinkable) cmd.verb = "drink";
     else return null;
-    return { label: `${cmd.verb} ${cmd.dobj}` };
+    return { label: displayCommand(cmd) };
   }
 
   function resolvePendingUse(input) {
@@ -545,13 +595,12 @@ export function createGame(world) {
     const implicitEntry = inferGoEntryTarget(cmd);
     const implicitTalk = inferSoleTalkTarget(cmd);
     const derivedSteps = typeof world.deriveCommand === "function"
-      ? (world.deriveCommand(game, cmd) || [])
+      ? (world.deriveCommand(game, cmd) || []).map(displayDerivedStep)
       : [];
     const useInference = inferUseAction(cmd);
     if (useInference?.prompt) return { text: useInference.prompt, stop: true };
     const implicitUse = useInference?.label || null;
-    const executionLabel = implicitNavigation || implicitEntry || implicitTalk || implicitUse
-      || input.trim().toLowerCase();
+    const executionLabel = implicitUse || displayCommand(cmd);
 
     const acquisition = implicitlyAcquire(cmd);
     if (acquisition) derivedSteps.push(acquisition.step);
@@ -583,10 +632,10 @@ export function createGame(world) {
     if (derivedSteps.length) {
       let finalStep = executionLabel;
       if (cmd.verb === "open" && derivedSteps.some((step) => step.startsWith("unlock "))) {
-        finalStep = `open ${cmd.dobj}`;
+        finalStep = `open ${displayItem(cmd.dobj)}`;
       }
       const sequence = acquisitionBlocked ? derivedSteps : [...derivedSteps, finalStep];
-      text = `(${sequence.join(", ")})\n\n${text}`;
+      text = `(${sequence.join("; ")})\n\n${text}`;
     } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {
       text = `(${executionLabel})\n\n${text}`;
     }

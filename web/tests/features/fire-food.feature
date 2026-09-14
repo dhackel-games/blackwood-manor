@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.072:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -184,14 +184,14 @@ Feature: Fire and food consequences
     Given the player is in room "kitchen"
     When I send "use mushrooms"
     Then flag "high" is positive
-    And the output contains "(get mushrooms, eat mushrooms)"
+    And the output contains "(get DRIED MUSHROOMS; eat DRIED MUSHROOMS)"
     Given a fresh manor game
     And the player is in room "kitchen"
     And flag "sick" is 10
     When I send "use milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true
-    And the output contains "(get milk, drink milk)"
+    And the output contains "(get COLD MILK; drink COLD MILK)"
 
   Scenario: USE prefers inventory and disambiguates two carried mushroom types
     Given a fresh manor game

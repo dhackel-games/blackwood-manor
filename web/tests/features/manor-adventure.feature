@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -266,14 +266,14 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "in door"
-    Then the output contains "(unlock door with key, open door, in door)"
+    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
     And the current room is "grandHall"
 
   Scenario: Opening a locked door with its key derives unlock then open
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "o frontd w/iron"
-    Then the output contains "(unlock frontd with iron, open frontd)"
+    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR)"
     And item "frontDoor" is open
     And item "frontKey" is destroyed
     And the current room is "porch"
@@ -290,7 +290,7 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "go door"
-    Then the output contains "(unlock door with key, open door, enter door)"
+    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
     And item "frontDoor" is open
     And the current room is "grandHall"
 
@@ -298,7 +298,7 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "in"
-    Then the output contains "(unlock door with key, open door, enter door)"
+    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
     And the current room is "grandHall"
     When I send "out"
     Then the current room is "porch"
@@ -394,7 +394,7 @@ Feature: Blackwood Manor adventure
   Scenario: Reading a nearby diary implicitly gets it first
     Given the player is in room "study"
     When I send "read diary"
-    Then the output contains "(get diary, read diary)"
+    Then the output contains "(get LEATHER DIARY; read LEATHER DIARY)"
     And item "diary" is in "inventory"
     And flag "knowsCombo" is true
 

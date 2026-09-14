@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven. -->
 
 # Blackwood Manor
 
@@ -121,6 +121,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   one-word name (for example `rq`, `frontd`, `grandbr`, `ravenblood`, and `dreadvault`).
   Existing full names remain accepted, while generated SYSOP MENU (`::`) routes use the
   compact forms so command and bug histories stay readable.
+- **Derived actions:** inferred command sequences use semicolons and full uppercase
+  item titles, such as `(unlock FRONT DOOR; open FRONT DOOR)`.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
   MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid

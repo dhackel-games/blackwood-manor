@@ -1,4 +1,4 @@
-# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# mushroom-flight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
 
 @walkthrough @mushroom
 Feature: Mushroom vision and flight
@@ -22,7 +22,7 @@ Feature: Mushroom vision and flight
     Then the output contains "TOILET HOLE"
     And the output contains "purple glimmer"
     When I send "eat mushrooms"
-    Then the output contains "(look in toilet, get mushrooms, eat mushrooms)"
+    Then the output contains "(look in OUTHOUSE TOILET; get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
     Then the output contains "literal crap and piss"
     And the output contains "actual human waste"
     And flag "high" equals 12
@@ -33,7 +33,7 @@ Feature: Mushroom vision and flight
     Given a fresh manor game
     And the player is in room "privy"
     When I send "use mushrooms"
-    Then the output contains "(look in toilet, get mushrooms, eat mushrooms)"
+    Then the output contains "(look in OUTHOUSE TOILET; get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
     And flag "high" is positive
     And item "outhouseMushrooms" is destroyed
 
@@ -65,7 +65,7 @@ Feature: Mushroom vision and flight
     Given a fresh manor game
     And the player is in room "privy"
     When I send "<command>"
-    Then the output contains "(look in toilet"
+    Then the output contains "(look in OUTHOUSE TOILET"
     Then the output contains "coated in literal crap and piss"
     And item "outhouseMushrooms" is in "inventory"
 
