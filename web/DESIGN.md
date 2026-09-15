@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
 ```
 
 ---
@@ -237,9 +237,10 @@ award; deliberately igniting yourself again after that first survival costs 5
 points.
 
 The BRAZIER awards +10 when lit patiently with the CANDLESTICK or +30 when the
-player transfers their own flames. DREADMAW'S apple remains +10. `::winmax`
+player transfers their own flames. Reading the mailbox LETTER awards +5.
+DREADMAW'S apple remains +10. `::winmax`
 performs every deterministic scoring challenge and leaves the MYSTERY PACKAGE
-untouched because its outcome is random. The deterministic maximum is 485,
+untouched because its outcome is random. The deterministic maximum is 490,
 including the +45 combined end-game self-reliance awards and optional SILVER
 MIRROR; a lucky package can push an organic game beyond that benchmark.
 

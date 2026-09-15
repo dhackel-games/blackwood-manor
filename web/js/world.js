@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -290,6 +290,7 @@ function suResolveItem(ctx, phrase) {
 const PROGRESS_AWARDS = Object.freeze({
   statueKeyRevealed: 5,
   frontDoorOpened: 5,
+  letterRead: 5,
   wellLooted: 5,
   cellarOpened: 5,
   libraryPassageOpened: 5,
@@ -1126,6 +1127,12 @@ function descendWell(ctx) {
 }
 
 // ---------------------- Andy's "light self on fire" gag ----------------------
+function readLetter(ctx) {
+  const letter = ctx.item("letter");
+  const points = awardProgress(ctx, "letterRead");
+  return (letter?.text || "It's blank.") + awardSuffix(points);
+}
+
 // Burning the letter (Zork's leaflet, but arson).
 function burnLetter(ctx) {
   const l = ctx.item("letter");
@@ -3641,7 +3648,7 @@ const logicWorld = {
     },
     letter: {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
-      on: { burn: burnLetter },
+      on: { read: readLetter, burn: burnLetter },
     },
 
     // --- the ceremonial brazier + its reward (garden) ---

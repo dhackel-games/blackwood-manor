@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
 
 @unit
 Feature: Sysop compound command shortcuts
@@ -60,6 +60,7 @@ Feature: Sysop compound command shortcuts
     And sysop command "::winmax" includes "t all"
     And sysop command "::winmax" includes "u shoes"
     And sysop command "::winmax" contains sequence "u shoes; t all"
+    And sysop command "::winmax" contains sequence "o mailbox; read letter"
     And sysop command "::winmax" includes "u fresh"
     And sysop command "::winmax" omits "t shoes"
     And sysop command "::winmax" omits "t crest"
@@ -188,7 +189,8 @@ Feature: Sysop compound command shortcuts
     And flag "progressAward:oakPanelAligned" is set
     And flag "progressAward:burritoSurvived" is set
     And flag "progressAward:selfFireSurvived" is set
+    And flag "progressAward:letterRead" is set
     And item "mysteryPackage" is in "grandHall"
-    And the game score is 485
+    And the game score is 490
 
 # end sysop-menu.feature

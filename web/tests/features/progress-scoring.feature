@@ -27,6 +27,16 @@ Feature: One-time rewards for meaningful progress
     And I send "open front door"
     Then the game score is 15
 
+  Scenario: Reading the mailbox letter rewards its warning once
+    Given the player is in room "porch"
+    When I send "open mailbox"
+    And I send "read letter"
+    Then the output contains "(+5)"
+    And the game score is 5
+    And item "letter" is carried
+    When I send "read letter"
+    Then the game score is 5
+
   Scenario: Implicitly taking an intermediate key still awards its progress points
     Given the player is in room "garden"
     When I send "move statue"

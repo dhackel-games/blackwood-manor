@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven. -->
 
 # Blackwood Manor
 
@@ -77,7 +77,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
   one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
-  one-time progress points; `::winmax` performs every deterministic scoring
+  one-time progress points, including +5 for reading the mailbox letter;
+  `::winmax` performs every deterministic scoring
   challenge and intentionally leaves the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.

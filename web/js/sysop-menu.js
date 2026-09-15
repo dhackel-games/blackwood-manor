@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.086:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -193,6 +193,8 @@ const MAX_COLLECTION = [
   "take iron",
   "west",
   "north",
+  "open mailbox",
+  "read letter",
   "open frontd with iron",
   "south",
   "east",
