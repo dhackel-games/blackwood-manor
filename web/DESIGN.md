@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
 ```
 
 ---
@@ -358,8 +358,9 @@ the mansion.
   onto the same voice when only one Australian system voice is installed.
 - **Speech-to-text:** browsers use `webkitSpeechRecognition`; the iOS app uses a native
   `SFSpeechRecognizer` bridge exposed as `window.webkit.messageHandlers.speech`.
-  Both stay active across natural pauses and submit the accumulated phrase only
-  when the MIC is tapped again.
+  Both stay active across natural pauses. Tapping MIC again stops recording and
+  leaves the accumulated phrase editable; only the normal submit arrow/Enter
+  executes it.
 - Ending a call keeps Gary's final line on screen, disables END CALL, fills that
   button as a speech-progress indicator, and dismisses the phone only after
   speech completion (or a bounded safety timeout).
@@ -457,6 +458,9 @@ and `core.js` runs each fragment through `runOne()` in order. So
 - **Never splits while `onCall`** — Gary is a conversation and commas belong to him.
 - Capped at `MAX_CHAIN = 256`; `g`/`again` repeats the previous command.
 - `game.send()` stays **synchronous** so the engine and tests are unaffected.
+- Page load, RESTART, and successful RESTORE append unique local-time
+  `#YYYYMMDD_HHMMSS` anchors. The win prompt links “top” to the latest anchor,
+  rather than assuming the current session began at the document top.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
 `versions.json` is the single source of truth for the exact copyright-version shown in the intro,

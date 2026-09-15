@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -632,7 +632,7 @@ Then("both entry rows place the microphone left of the text field and submit arr
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(html, /id=["']inputline["'][\s\S]*id=["']mic["'][\s\S]*id=["']prompt["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
   assert.match(html, /class=["']phone-inputline["'][\s\S]*id=["']phone-mic["'][\s\S]*id=["']phone-cmd["'][\s\S]*id=["']phone-go["']/);
-  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-2ch/s);
+  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-1\.5ch/s);
 });
 
 Then("both entry rows share text-aware submit styling with custom starter text", function () {
@@ -646,6 +646,25 @@ Then("both entry rows share text-aware submit styling with custom starter text",
   assert.match(ui, /submit\.classList\.toggle\("has-text", field\.value\.trim\(\)\.length > 0\)/);
   assert.match(ui, /starterText: "type command \/ tap button"/);
   assert.match(ui, /starterText: "say something to Gary…"/);
+});
+
+Then("game-over restart text links to the latest session start", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  assert.match(ui, /let currentSessionAnchorId = ""/);
+  assert.match(ui,
+    /function sessionAnchorId\(date\)[\s\S]*date\.getFullYear\(\)[\s\S]*date\.getMonth\(\) \+ 1[\s\S]*date\.getDate\(\)[\s\S]*_` \+[\s\S]*date\.getHours\(\)[\s\S]*date\.getMinutes\(\)[\s\S]*date\.getSeconds\(\)/s);
+  assert.match(ui, /anchor\.id = id/);
+  assert.match(ui, /currentSessionAnchorId = id/);
+  assert.match(ui, /link\.href = `#\$\{currentSessionAnchorId\}`/);
+  assert.match(ui, /line\.append\("Type RESTART to play again\. \(Jump to the "\)/);
+  assert.match(ui, /link\.textContent = "top"/);
+  assert.match(ui, /line\.append\(link, "\.\)"\)/);
+  assert.match(ui, /function newGame[\s\S]*markSessionStart\(\)[\s\S]*game\.describeRoom/s);
+  assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
+  assert.match(ui, /\/\/ --- boot ---\s*markSessionStart\(\);\s*introBannerElement/s);
+  assert.match(ui, /if \(game\.state\.won\) printRestartPrompt\(\)/);
+  assert.match(css, /\.session-restart a\s*\{[^}]*color:\s*var\(--green-bright\)[^}]*text-decoration:\s*underline/s);
 });
 
 Then("Gary offers robot and human voice icons", function () {
@@ -709,11 +728,18 @@ Then("Australian presets remain distinct when only the female accent is installe
 
 Then("browser speech accumulates finalized phrases until explicit submission", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(ui, /recognition\.continuous = true/);
   assert.match(ui, /webTranscript \+= text\.trim\(\) \+ " "/);
   assert.match(ui, /webTranscript \+= webPartial\.trim\(\) \+ " "/);
   assert.match(ui, /if \(listening\) webRestartTimer = setTimeout\(beginWebRecognition, 100\)/);
   assert.match(ui, /const text = \(webTranscript \+ webPartial\)\.trim\(\)/);
+  assert.match(ui, /targetInput\.placeholder = "listening… tap mic to stop"/);
+  assert.match(ui, /function finishListening\(text\)[\s\S]*setEntryValue\(speechTarget, t\)/);
+  assert.doesNotMatch(ui, /function finishListening\(text\)[\s\S]{0,220}handle\(t\)/);
+  assert.match(css,
+    /\.iconbtn\.listening\s*\{[^}]*background:\s*var\(--green\)[^}]*border-color:\s*var\(--green-bright\)[^}]*color:\s*var\(--bg\)/s);
+  assert.match(css, /@keyframes micpulse[^}]*rgba\(67,255,122,0\.5\)/s);
 });
 
 Then("END CALL disables and stays visible 1.5 times longer while Gary finishes", function () {
@@ -803,7 +829,7 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(css,
     /#inputline > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*transform:\s*translateY\(-50%\)[^}]*width:\s*2rem[^}]*height:\s*2rem[^}]*background:\s*var\(--bg\)[^}]*border:\s*0[^}]*color:\s*var\(--green-bright\)[^}]*font-size:\s*2rem/s);
   assert.match(css,
-    /#inputline > \.nav-disclosure span\s*\{[^}]*transform:\s*translateY\(-4px\)/s);
+    /#inputline > \.nav-disclosure span\s*\{[^}]*transform:\s*translateY\(-3\.5px\)/s);
   assert.match(css,
     /#command-panel\[data-collapsed=["']true["']\] #controls\s*\{\s*display:\s*none/s);
   assert.match(css,

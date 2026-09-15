@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -55,6 +55,7 @@ let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
 let introBannerElement = null;
+let currentSessionAnchorId = "";
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
 const hud = createHud(document);
@@ -216,6 +217,41 @@ function emit(container, text, cls, prefix = "") {
 function print(text, cls) {
   if (text == null) return null;
   return emit(transcript, text, cls);
+}
+
+function sessionAnchorId(date) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_` +
+    `${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+}
+
+function markSessionStart(now = new Date()) {
+  let date = new Date(now);
+  let id = sessionAnchorId(date);
+  while (document.getElementById(id)) {
+    date = new Date(date.getTime() + 1000);
+    id = sessionAnchorId(date);
+  }
+  const anchor = document.createElement("span");
+  anchor.id = id;
+  anchor.className = "session-anchor";
+  anchor.tabIndex = -1;
+  anchor.setAttribute("aria-label", "Beginning of current session");
+  transcript.appendChild(anchor);
+  currentSessionAnchorId = id;
+  return id;
+}
+
+function printRestartPrompt() {
+  const line = document.createElement("div");
+  line.className = "over session-restart";
+  line.append("Type RESTART to play again. (Jump to the ");
+  const link = document.createElement("a");
+  link.href = `#${currentSessionAnchorId}`;
+  link.textContent = "top";
+  line.append(link, ".)");
+  transcript.appendChild(line);
+  transcript.scrollTop = transcript.scrollHeight;
 }
 
 // --- phone-call screen ---
@@ -588,7 +624,7 @@ function startListening(targetInput, micBtn) {
   stopSpeaking();                 // don't record Gary's own voice
   targetInput.dataset.ph = targetInput.getAttribute("placeholder") || "";
   setEntryValue(targetInput, ""); // start clean so nothing stale is appended
-  targetInput.placeholder = "listening… tap mic to send";
+  targetInput.placeholder = "listening… tap mic to stop";
   setListening(true);
   if (nativeSpeech) {
     Native.post("speech", { action: "start" });
@@ -615,9 +651,7 @@ function finishListening(text) {
   setListening(false);
   const t = (text || "").trim();
   if (!t) return;
-  const el = speechTarget;
-  setEntryValue(el, "");
-  handle(t);                      // voice command auto-runs
+  setEntryValue(speechTarget, t);
 }
 // Called by the native bridge (evaluateJavaScript).
 window.__speech = (text, isFinal) => {
@@ -664,6 +698,7 @@ function newGame(origin = "restart") {
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
+  markSessionStart();
   print("\n" + game.describeRoom(true));
   updateHud();
 }
@@ -770,6 +805,7 @@ function handle(raw) {
       if (restored) {
         game.setFlag("usedSaveRestore", true);
         saveGame(game);
+        markSessionStart();
       }
       print(restored ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
       if (restored) updateHud();
@@ -832,7 +868,7 @@ function handle(raw) {
   if (sfxKind) playSfx(sfxKind);       // noise cue, not Gary talking
   const reaction = garyReacts(prevFlags, game.state.flags);
   if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
-  if (game.state.won) print("\nType RESTART to play again.", "over");
+  if (game.state.won) printRestartPrompt();
   else if (!game.state.dead) saveGame(game);
 }
 
@@ -1012,6 +1048,7 @@ document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
 // --- boot ---
+markSessionStart();
 introBannerElement = print(bannerText(), "banner");
 if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
 print("\n" + game.describeRoom(true));

@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. -->
 
 # Blackwood Manor
 
@@ -70,7 +70,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Gary's voice:** tap the speaker circle or voice-status line to unmute him.
   The adjacent icon selector offers robot male/female and Australian
   male/female presets and remembers your choice. MIC stays active across pauses
-  until tapped again to submit.
+  until tapped again to stop; recognized text remains editable and submits only
+  through the normal arrow/Enter control.
 - **Gary's hints:** a bare HINT remains progression-aware; asking for a hint
   about a subject such as the dragon searches the complete authored hint catalog.
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
@@ -127,6 +128,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   VERSION prints the numeric content version and browser continuous-update
   status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
+  Page load, RESTART, and successful RESTORE mark timestamped transcript session
+  anchors; the end-game “Jump to the top” link returns to the latest one.
 - **One-word targeting:** every room and item has a globally unique canonical
   one-word name (for example `rq`, `frontd`, `grandbr`, `ravenblood`, and `dreadvault`).
   Existing full names remain accepted, while generated SYSOP MENU (`::`) routes use the

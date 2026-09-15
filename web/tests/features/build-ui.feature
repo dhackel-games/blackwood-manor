@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -60,6 +60,7 @@ Feature: Build metadata and touch-control contract
     And Gary's circular voice toggle contains a speaker icon
     And both entry rows place the microphone left of the text field and submit arrow
     And both entry rows share text-aware submit styling with custom starter text
+    And game-over restart text links to the latest session start
 
   Scenario: Gary offers persistent icon-only computer and Australian voice presets
     Then Gary offers robot and human voice icons

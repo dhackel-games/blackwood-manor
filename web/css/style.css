@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -121,6 +121,19 @@ body { -webkit-text-size-adjust: 100%; }
 #transcript .echo { color: var(--green-bright); opacity: 0.85; }
 #transcript .over { color: var(--green-bright); font-weight: bold; }
 #transcript div { margin: 0 0 0.15rem; }
+.session-anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: 0.5rem;
+}
+.session-anchor:focus { outline: none; }
+.session-restart { margin-top: 0.5rem; }
+.session-restart a {
+  color: var(--green-bright);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.session-restart a:active { color: var(--green); }
 
 /* --- touch controls --- */
 #command-panel {
@@ -180,7 +193,7 @@ body { -webkit-text-size-adjust: 100%; }
 #inputline > .nav-disclosure:active { background: rgba(67,255,122,0.22); }
 #inputline > .nav-disclosure span {
   display: block;
-  transform: translateY(-4px);
+  transform: translateY(-3.5px);
 }
 #controls .movement-controls {
   flex: 0 0 auto;
@@ -360,7 +373,7 @@ body { -webkit-text-size-adjust: 100%; }
 #cmd {
   flex: 1;
   min-width: 0;                      /* let it shrink instead of overflowing */
-  margin-left: -2ch;
+  margin-left: -1.5ch;
   background: transparent; border: none;
   color: var(--green-bright);
   font: inherit; font-size: 16px;   /* >=16px keeps iOS from zooming on focus */
@@ -462,10 +475,11 @@ body { -webkit-text-size-adjust: 100%; }
 .iconbtn:active { background: rgba(67, 255, 122, 0.25); }
 #sound-toggle.on { background: rgba(67, 255, 122, 0.28); border-color: var(--green); }
 .iconbtn.listening {
-  background: #b0322a; border-color: #e0483c; color: #fff;
+  background: var(--green); border-color: var(--green-bright); color: var(--bg);
+  text-shadow: none;
   animation: micpulse 1s ease-in-out infinite;
 }
-@keyframes micpulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(224,72,60,0.5);} 50%{ box-shadow: 0 0 0 7px rgba(224,72,60,0);} }
+@keyframes micpulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(67,255,122,0.5);} 50%{ box-shadow: 0 0 0 7px rgba(67,255,122,0);} }
 @media (prefers-reduced-motion: reduce) { .iconbtn.listening { animation: none; } }
 
 .linkbtn {
