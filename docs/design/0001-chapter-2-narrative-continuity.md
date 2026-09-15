@@ -1,5 +1,13 @@
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
+> **➡️ UPDATE 2026-09-14 — see [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md).**
+> Major evolution of this doc: the **13-hour clock**, a reworked **BM1 ending** (ring →
+> heirlooms vanish + clock appears + front door opens; **walk out = win**, **leave with the
+> talisman = extra points**, **use the talisman in the reliquary = down to Gary = phase 2**),
+> and **BM2 as a 13-time-period ouroboros** (scatter each heirloom in time; at clock 13→1 you
+> *become* Gary). 0002 resolves several open dials below (incl. the "two candidate BM2 designs"
+> and the presentation lean). Read 0002 for the current direction.
+
 - **Status:** **scatter + Ravenblood framing, BM2=sequel, reliquary=prison, tone=tragic-but-funny,
   Gary=disowned-heir-in-self-preservation (completing the rite kills him) all RATIFIED
   (2026-09-13).** BM2 = the SEQUEL documented in `web/DESIGN.md` §12.30 (you = the HELD tenant
@@ -326,6 +334,12 @@ world-save before curiosity sent them down the stairs.)
 ---
 
 ## IMPORTANT — there are now TWO candidate BM2 designs (reconcile before building)
+
+> **➡️ RESOLVED in [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md)
+> (2026-09-14):** the prequel and the sequel are **fused into one ouroboros** — you scatter the
+> 13 heirlooms across **13 time periods** (the prequel verb), and finishing **turns you into
+> Gary** for the next tenant's run (the sequel frame). The phone-line sequel of §12.30 is
+> superseded by the scatter-in-time loop. The section below is kept for history.
 
 Discovered 2026-09-13: **BM2 is already spec'd in `web/DESIGN.md` §12.30** (and grows from the
 Gary hint-line tech in §12.3). That documented BM2 is a **sequel**, not the prequel the

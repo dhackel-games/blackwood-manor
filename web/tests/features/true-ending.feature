@@ -20,7 +20,7 @@ Feature: The secret Gary cliffhanger ending
     When I send "look"
     Then the output contains line "Directions you can go: east, south, west, up, down"
 
-  Scenario: Descending the floor stair triggers the Gary cliffhanger ending
+  Scenario: Descending the floor stair now carries you seamlessly into Part II
     Given a fresh manor game
     And flag "frontDoorOpen" is set
     And the player is in room "grandHall"
@@ -28,11 +28,11 @@ Feature: The secret Gary cliffhanger ending
     When I send "put family crest in reliquary"
     And I send "close reliquary"
     And I send "down"
-    Then the current room is "garysLair"
-    And the output contains "GARY"
+    Then the output contains "GARY"
     And the output contains "FREEDOM"
-    And the output contains "TO BE CONTINUED"
-    And the game is won
+    And the output contains "CLOCK"
+    And the current room is "p2_awakening"
+    And the game is not won
 
   Scenario: The floor stays shut until every required heirloom is deposited
     Given a fresh manor game

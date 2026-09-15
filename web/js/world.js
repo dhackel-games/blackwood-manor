@@ -94,6 +94,10 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   spirit: "matriarch",
   silverMirror: "silver",
   backwardsWatch: "woodblack",
+  clockTalisman: "gclock",
+  emeraldOfTheQueen: "qemerald",
+  queenPetrified: "medusa",
+  gardenPool: "gpool",
 });
 
 export const ROOM_SHORT_NAMES = Object.freeze({
@@ -133,6 +137,8 @@ export const ROOM_SHORT_NAMES = Object.freeze({
   hollowSanctum: "sanctum",
   garysLair: "gary",
   betweenWalls: "between",
+  p2_awakening: "nowhere",
+  t13_medusaGarden: "hour13",
 });
 
 function depositedFamilyItemCount(ctx) {
@@ -207,12 +213,160 @@ function garyEnding(ctx) {
     "at a time toward the front door of Blackwood Manor, howling one word into the dark:\n\n" +
     MAP_MARK + GARY_LAIR_ART + MAP_MARK + "\n\n" +
     "\"FREEEEDOMMM!\"";
-  const result = ctx.finish(scene,
-    "    ****  TO BE CONTINUED in BLACKWOOD MANOR II: HELD  ****\n\n" +
-    "You came to loot a haunted house. You leave as its newest tenant — and the phone is already ringing.\n" +
-    "(Your final score has been saved. In BM2, Gary profits when you fail. Sleep on that.)");
   saveBm2Seed(ctx);
-  return result;
+  // ONE GAME: the blow no longer ends the story — it knocks you loose in time.
+  // Blackwood Manor II begins right here, in the same session, same page.
+  return scene + "\n\n" + beginPartII(ctx);
+}
+
+// =============================================================================
+// BLACKWOOD MANOR II — THE THIRTEEN-HOUR CLOCK  (Part II: one continuous game)
+// -----------------------------------------------------------------------------
+// Gary's blow knocks you OUT of your body. You wake a ghost, cradling a grand
+// clock with THIRTEEN numbers ticking backward, and must carry the family
+// heirlooms back through time to where they belong. Part II reuses the SAME
+// manor as Part I (you walk the real rooms as a ghost); only the time-scenes
+// are new. This BUILD SLICE implements the thirteenth hour: recover the QUEEN'S
+// EMERALD from the petrifying queen, then return it to the present-day GARDEN.
+// Placing it ticks the clock 13 -> 12. (Hours XII..I and the closing of the
+// ouroboros are still to be built.)
+// =============================================================================
+const P2_ROMAN = { 13: "XIII", 12: "XII", 11: "XI", 10: "X", 9: "IX", 8: "VIII",
+  7: "VII", 6: "VI", 5: "V", 4: "IV", 3: "III", 2: "II", 1: "I", 0: "—" };
+function p2Roman(n) { return P2_ROMAN[n] || String(n); }
+function p2Hour(ctx) { const h = ctx.getFlag("clockHour"); return h == null ? 13 : h; }
+
+// The hinge: called from garyEnding. Reveal the clock, become the ghost, and
+// drop into "Nowhere" to be named. The game stays ALIVE (never finish/kill).
+function beginPartII(ctx) {
+  ctx.setFlag("partII", true);
+  if (ctx.getFlag("clockHour") == null) ctx.setFlag("clockHour", 13);
+  ctx.moveItem("clockTalisman", "inventory");
+  ctx.state.room = "p2_awakening";
+  return describeAwakening(ctx);
+}
+
+function describeAwakening(ctx) {
+  const name = ctx.getFlag("ghostName");
+  return "· · · · ·\n\n" +
+    "...and then you are somewhere else. Somewhere cold, and lightless, and NOWHERE.\n\n" +
+    "You look down at hands you can see straight through. Cradled in them is a small grand CLOCK — THIRTEEN " +
+    "numbers on its face, one slender hand already ticking backward from XIII. You understand it the way you " +
+    "understand things in dreams: you are a ghost now, loose in the manor's own time, and the heirlooms you spent " +
+    "all night gathering have been scattered back through thirteen hours. Carry each one home, and the loop closes.\n\n" +
+    (name
+      ? `USE the CLOCK to fall into the thirteenth hour, ${name}.`
+      : "But the clock will not turn until it knows you. SAY the name you wish to be known by.");
+}
+
+function nameGhost(ctx, cmd) {
+  if (ctx.state.room !== "p2_awakening") return null;
+  const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "").trim();
+  if (!raw) return "SAY a name — for instance, SAY David.";
+  const first = raw.replace(/^(my name is|i am|i'm|call me)\s+/i, "").split(/\s+/)[0];
+  const name = first.charAt(0).toUpperCase() + first.slice(1);
+  ctx.setFlag("ghostName", name);
+  return `The cold takes the name and turns it over. "${name}," it agrees, and the clock's hand steadies.\n\n` +
+    "USE the CLOCK to fall into the thirteenth hour.";
+}
+
+function clockTalismanText(ctx) {
+  return "A grand clock small enough to cradle in both hands. THIRTEEN numbers instead of twelve; its single " +
+    `hand rests on hour ${p2Roman(p2Hour(ctx))}, ticking slowly, stubbornly backward.`;
+}
+
+// The clock is the only way in or out of an hour.
+//   * Nowhere / present-day manor, not holding the emerald -> FALL into hour XIII.
+//   * Inside hour XIII holding the emerald -> SURFACE in the present-day hall.
+//   * Present-day manor, already holding it -> nudge you to walk it to the garden.
+function useClockTalisman(ctx) {
+  if (!ctx.getFlag("partII")) return null;
+  const room = ctx.state.room;
+  if (p2Hour(ctx) <= 12) {
+    return "The clock's hand has slipped past the thirteenth hour and rests on XII. Beyond here the road through " +
+      "time isn't built yet — this is the end of the current slice. (Hours XII..I are still to come.)";
+  }
+  if (room === "p2_awakening") {
+    if (!ctx.getFlag("ghostName")) return "The clock will not turn until it knows you. SAY your name first.";
+    ctx.state.room = "t13_medusaGarden";
+    return "You tip forward into the clock face, and FALL —\n\n" + describeMedusaGarden(ctx);
+  }
+  if (room === "t13_medusaGarden") {
+    if (ctx.has("emeraldOfTheQueen")) {
+      ctx.state.room = "grandHall";
+      return "You fold your hand around the EMERALD and let the clock reel you home —\n\n" +
+        "You surface in the ROYAL HALL of the present-day manor, the emerald cold and heavy in your grip. The " +
+        "sealed reliquary stands silent; the great BELL is spent.\n\n" +
+        ctx.describeRoom(true) + "\n\n" +
+        "The emerald belongs where it once fell — out in the GARDEN, deep in the bush beneath the leaning STATUE. " +
+        "Make your way there and PUT it.";
+    }
+    return "The clock's hand shudders but will not turn. The EMERALD is still at the queen's throat — free it first.";
+  }
+  if (ctx.has("emeraldOfTheQueen")) {
+    return "You already carry the EMERALD. It belongs out in the GARDEN, in the bush beneath the leaning STATUE. " +
+      "Make your way there and PUT it.";
+  }
+  ctx.state.room = "t13_medusaGarden";
+  return "You tip into the clock face, and FALL —\n\n" + describeMedusaGarden(ctx);
+}
+
+function describeMedusaGarden(ctx) {
+  if (ctx.getFlag("emeraldFreed")) {
+    return "THE THIRTEENTH HOUR — after.\n\n" +
+      "The garden of centuries past, gone silent. Where the queen stood there is now only a grey STATUE, caught " +
+      "mid-turn, an empty setting at its throat. There is nothing left to do here. USE the CLOCK to return.";
+  }
+  return "THE THIRTEENTH HOUR.\n\n" +
+    "You stand where the manor GARDEN will be — drenched in the green-gold light of an afternoon centuries gone. " +
+    "At the garden's heart, where in your own time a marble STATUE of a woman keeps its vigil, the roses are " +
+    "already greying and hardening to STONE, inch by creeping inch. Whatever casts that curse is near — and if it " +
+    "is what you suspect, you must not simply walk up and let it look at you.\n\n" +
+    "Beside you a garden POOL lies mirror-still. EXAMINE the STATUE's place to find who waits there.";
+}
+
+function wailAtQueen(ctx) {
+  if (ctx.state.room !== "t13_medusaGarden") return null;
+  if (ctx.getFlag("emeraldFreed")) return "The queen is stone and the garden is still. USE the CLOCK to return.";
+  if (!ctx.getFlag("queenFound")) {
+    return "You loose a wail into the rose-maze — but you haven't even found her, and the sound only scatters a " +
+      "flock of stone-grey birds. In your own time a STATUE of a woman stands at the garden's heart; EXAMINE that " +
+      "place to find her first.";
+  }
+  if (!ctx.getFlag("poolKnown")) {
+    return ctx.kill(
+      "You gather the whole of your death into a WAIL. The queen spins toward the sound — but you have set nothing " +
+      "between you, and her petrifying gaze finds YOU square on before you can flinch. The cold climbs your " +
+      "see-through limbs and sets them fast; the last thing you understand is that you should have made her look " +
+      "at the still WATER instead of at you.");
+  }
+  ctx.setFlag("emeraldFreed", true);
+  ctx.moveItem("emeraldOfTheQueen", "inventory");
+  return "You gather the whole of your death into a single WAIL, and loose it across the garden.\n\n" +
+    "The queen startles and spins toward the sound — but you have set yourself so the mirror-still POOL lies " +
+    "between you. Her own petrifying gaze rakes across the water and rebounds full into her face. She freezes " +
+    "mid-turn, emerald silk and pale skin greying to STONE. The great EMERALD tears loose from her throat and " +
+    "drops; you catch it out of the air before it can shatter.\n\n" +
+    "You hold the QUEEN'S EMERALD. USE the CLOCK to carry it back to the present.";
+}
+
+// Item-scoped PUT/DROP on the emerald: only the present-day GARDEN accepts it.
+function placeEmeraldInGarden(ctx) {
+  if (!ctx.getFlag("partII")) return null;
+  if (ctx.state.room !== "garden") {
+    return "Not here. The QUEEN'S EMERALD belongs out in the GARDEN, in the bush beneath the leaning STATUE — the " +
+      "very stone the queen became. Make your way there, then PUT it.";
+  }
+  ctx.moveItem("emeraldOfTheQueen", "garden");
+  ctx.setFlag("clockHour", 12);
+  ctx.setFlag("hour13Done", true);
+  ctx.addScore(25);
+  return "You press the QUEEN'S EMERALD deep into the bush beneath the leaning STATUE — the petrified queen " +
+    "herself, you understand now — where, centuries on, a treasure-hunter will dig it out by lantern-light and " +
+    "carry it inside. The circle draws that much tighter.\n\n" +
+    "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XIII to XII.\n\n" +
+    MAP_MARK + " HOUR XIII CLOSED — the emerald is home. Twelve hours remain. " + MAP_MARK + "\n\n" +
+    "(End of the current build slice: Hours XII..I and the closing of the loop are still to come.)";
 }
 
 // ---- Super-user / debug console ---------------------------------------------
@@ -2121,6 +2275,7 @@ function discoverBetweenWalls(ctx) {
 function teleportRandom(ctx, flavor, exclude) {
   const ids = Object.keys(ctx.world.rooms).filter(
     (id) => id !== ctx.state.room && !(exclude && exclude.has(id))
+      && ctx.world.rooms[id].phase !== 2 // Part II hours are reachable only via the clock
   );
   const roomId = ids[Math.floor(Math.random() * ids.length)];
   ctx.state.room = roomId;
@@ -2277,6 +2432,7 @@ const LIGHTNING_ART = [
 ].join("\n");
 function lightningTick(ctx) {
   if (ctx.getFlag("__noChaos")) return null; // deterministic test harness kill-switch
+  if (ctx.getFlag("partII")) return null; // Part II (the ghost loop) plays by its own rules — no manor lightning
   if (!ctx.getFlag("frontDoorOpen")) return null; // the manor's lightning only hunts you once you're inside
   const boltRoom = ctx.getFlag("lightningBoltRoom");
   if (boltRoom) {
@@ -2840,6 +2996,8 @@ const ROOM_ART = {
 };
 
 const IMPLICIT_NAVIGATION = Object.freeze({
+  p2_awakening: { in: "use clock", out: "use clock" },
+  t13_medusaGarden: { in: "use clock", out: "use clock" },
   gate: { in: "north", out: null },
   garden: { in: "enter well", out: "west" },
   hedgeMazeGate: { in: "west", out: "east" },
@@ -3576,6 +3734,47 @@ const logicWorld = {
       art: ROOM_ART.betweenWalls,
       exits: { out: "grandHall" },
     },
+
+    // ===== BLACKWOOD MANOR II — the thirteen-hour clock (Part II) =============
+    // "Nowhere": the ghost's staging point. You leave only by USING the clock.
+    p2_awakening: {
+      name: "Nowhere",
+      desc: "Cold, lightless nowhere. A grand CLOCK ticks backward in your see-through hands.",
+      phase: 2,
+      art: [
+        "    .------.",
+        "   / 13  12 \\",
+        "  |    ||    |",
+        "   \\ backward/",
+        "    '------'",
+      ].join("\n"),
+      searchDesc: "There is nothing here but you, the cold, and the CLOCK. USE it to fall into the hour.",
+      exits: {},
+      on: {
+        look: (ctx) => describeAwakening(ctx),
+        say: (ctx, cmd) => nameGhost(ctx, cmd),
+      },
+    },
+    // HOUR XIII time-scene: the manor garden long ago, the queen still alive.
+    t13_medusaGarden: {
+      name: "The Thirteenth Hour",
+      desc: "The manor garden, drenched in the green-gold afternoon light of centuries past.",
+      phase: 2,
+      art: [
+        "    ((@))  __",
+        "     /||\\ (  )",
+        "    / || \\ ~~",
+        "  ~~~~~~~~~~~~~",
+      ].join("\n"),
+      searchDesc: (ctx) => ctx.getFlag("emeraldFreed")
+        ? "Only grey STONE and an empty setting remain where the queen stood."
+        : "The QUEEN's gaze creeps across the roses; the still POOL throws the light back.",
+      exits: {},
+      on: {
+        look: (ctx) => describeMedusaGarden(ctx),
+        say: (ctx) => wailAtQueen(ctx),
+      },
+    },
   },
 
   items: {
@@ -4071,6 +4270,64 @@ const logicWorld = {
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
       depositScoreFlag: "heirloomScore:backwardsWatch",
       on: { examine: inspectWoodblackWatch, read: inspectWoodblackWatch },
+    },
+
+    // ===== BLACKWOOD MANOR II — Part II items (the thirteen-hour clock) =======
+    // The carried talisman. Hidden ("__void") until Gary's blow makes you a
+    // ghost; from then on it rides in your hands and USE-ing it moves you in time.
+    clockTalisman: {
+      names: ["clock", "grand clock", "thirteen-hour clock", "thirteen hour clock", "time clock"],
+      adjectives: ["grand", "thirteen-hour", "backward", "ghostly"],
+      loc: "__void", takeable: false, scenery: true,
+      on: {
+        examine: (ctx) => clockTalismanText(ctx),
+        read: (ctx) => clockTalismanText(ctx),
+        use: (ctx) => useClockTalisman(ctx),
+        enter: (ctx) => useClockTalisman(ctx),
+        take: () => "The clock is already yours. It always was.",
+      },
+    },
+    // Recovered in hour XIII; PUT/DROP it only in the present-day GARDEN.
+    emeraldOfTheQueen: {
+      names: ["emerald", "queen's emerald", "queens emerald", "gem"],
+      adjectives: ["great", "vast", "green", "queen's"],
+      loc: "__void", takeable: true,
+      on: {
+        examine: () => "A great green emerald the size of a plum, still warm from the throat it was torn from an age ago.",
+        put: (ctx) => placeEmeraldInGarden(ctx),
+        drop: (ctx) => placeEmeraldInGarden(ctx),
+      },
+    },
+    // Scenery for the hour-XIII scene.
+    queenPetrified: {
+      names: ["queen", "woman", "medusa", "statue"],
+      adjectives: ["petrifying", "emerald", "stone", "grey"],
+      loc: "t13_medusaGarden", takeable: false, fixed: true, scenery: true,
+      on: {
+        examine: (ctx) => {
+          if (ctx.getFlag("emeraldFreed")) {
+            return "Grey stone now — the queen caught mid-turn, an empty setting at her throat where the emerald blazed.";
+          }
+          ctx.setFlag("queenFound");
+          return "You steal to the statue's place and find her alive: a QUEEN in emerald silk, walking the roses, " +
+            "and everywhere her gaze falls the garden hardens to STONE. At her throat burns a vast EMERALD. Let her " +
+            "eyes meet yours and you are stone with the roses — but the still POOL at your side throws the light " +
+            "back like a mirror. Make her look THERE, not at you. A ghost has one instrument to make her turn: YELL.";
+        },
+      },
+    },
+    gardenPool: {
+      names: ["pool", "water", "reflection"],
+      adjectives: ["still", "dark", "glassy"],
+      loc: "t13_medusaGarden", takeable: false, fixed: true, scenery: true,
+      on: {
+        examine: (ctx) => {
+          if (!ctx.getFlag("emeraldFreed")) ctx.setFlag("poolKnown");
+          return "A still garden pool, dark as glass. It throws the light back — and any gaze cast into it — with " +
+            "perfect, mirror-flat indifference. If her petrifying stare struck this water instead of you, it would " +
+            "rebound into her own face.";
+        },
+      },
     },
   },
 };

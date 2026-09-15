@@ -12,7 +12,7 @@ Feature: Sysop compound command shortcuts
   Scenario: The hidden menu is generated from the prompt catalog
     Then the sysop menu command is "::"
     And the sysop menu unlock passwords are "werdna,evad"
-    And the sysop command catalog defines "::powerup,::winquick,::garycliff,::winmax"
+    And the sysop command catalog defines "::powerup,::winquick,::brink,::garycliff,::ringbell,::winmax"
     And the sysop menu uses the shared command title description format
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
@@ -99,7 +99,7 @@ Feature: Sysop compound command shortcuts
       | command     | room           |
       | ::powerup   | hiddenVault    |
       | ::winquick  | hollowSanctum  |
-      | ::garycliff | garysLair      |
+      | ::garycliff | p2_awakening   |
       | ::winmax    | hollowSanctum  |
 
   Scenario Outline: Shoes-only flight acquires dark vision before entering the shaft
@@ -115,7 +115,7 @@ Feature: Sysop compound command shortcuts
       | command     | room          |
       | ::powerup   | hiddenVault   |
       | ::winquick  | hollowSanctum |
-      | ::garycliff | garysLair     |
+      | ::garycliff | p2_awakening  |
 
   Scenario: Prompt expansion skips items already carried or worn
     Given item "backpack" is carried
@@ -174,13 +174,40 @@ Feature: Sysop compound command shortcuts
     And the game is alive
     And every required family item is in the reliquary
 
-  Scenario: Gary cliffhanger collects the minimum heirlooms and descends
+  Scenario: Gary cliffhanger collects the minimum heirlooms and drops into Part II
     When I execute sysop command "::garycliff"
-    Then the game is won
-    And the current room is "garysLair"
+    Then the game is not won
+    And the current room is "p2_awakening"
     And the output contains "FREEDOM"
-    And the output contains "TO BE CONTINUED"
+    And the output contains "CLOCK"
     And every required family item is in the reliquary
+
+  Scenario: Brink shortcut seals the reliquary and stops in the Royal Hall with the bell unrung
+    When I execute sysop command "::brink"
+    Then the game is alive
+    And the game is not won
+    And flag "reliquarySealed" is true
+    And flag "bellRung" is unset
+    And the current room is "grandHall"
+    And every required family item is in the reliquary
+
+  Scenario: From the brink the player can descend seamlessly into Part II
+    When I execute sysop command "::brink"
+    And I send "go down"
+    Then the game is not won
+    And the current room is "p2_awakening"
+    And the output contains "FREEDOM"
+    And the output contains "CLOCK"
+
+  Scenario: Ring-bell shortcut stops at the end of Part 1 without leaving or descending
+    When I execute sysop command "::ringbell"
+    Then the game is alive
+    And the game is not won
+    And flag "bellRung" is set
+    And the current room is "grandHall"
+    And every required family item is in the reliquary
+    And the output contains "ring the great bell"
+    And the output contains "SECRET DOOR"
 
   Scenario: Maximum win earns every deterministic scoring reward
     When I execute sysop command "::winmax"

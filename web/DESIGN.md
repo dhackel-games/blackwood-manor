@@ -896,6 +896,12 @@ not a single scripted finish.
   freedom, with inverted scoring) is BM2 proper — a separate genre shift — not built
   into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
   the engine is the seed it will grow from.
+  - **➡️ UPDATE 2026-09-14 — `docs/design/0002-thirteen-hour-clock-and-ouroboros.md`.** BM2's
+    direction has evolved from this phone-line sequel to a **13-time-period scatter-in-time
+    ouroboros**, and this secret ending changes: ringing over the sealed reliquary makes the 13
+    heirlooms **vanish** and a **13-hour clock** appear, the **front door opens** (walk out =
+    win; leave *with the talisman* = extra points), and **using the talisman in the reliquary**
+    is what opens the trapdoor down to Gary (into phase 2). Not yet built — see 0002.
 
 ### 12.31 The GREAT OAK gem-panel lift and TREE FORT
 

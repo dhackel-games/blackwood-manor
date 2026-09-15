@@ -68,6 +68,7 @@ Given("the random number generator returns {float} then {float}", function (firs
 Given("the mystery package teleport selects room {string}", function (room) {
   const destinations = Object.keys(this.game.world.rooms).filter((id) =>
     id !== this.game.state.room
+    && this.game.world.rooms[id].phase !== 2
     && (this.game.getFlag("oakLightAligned") || id !== "treeFort"));
   const index = destinations.indexOf(room);
   assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);

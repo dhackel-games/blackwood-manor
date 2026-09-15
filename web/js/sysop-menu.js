@@ -278,10 +278,22 @@ export const SYSOP_COMMANDS = Object.freeze([
     compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, ...DAWN_ENDING]),
   }),
   Object.freeze({
+    cmd: "::brink",
+    name: "Brink of Part II",
+    description: "Collect and deposit every required heirloom and seal the reliquary — then STOP in the Royal Hall, bell unrung, poised to choose: RING BELL for the dawn ending, or go DOWN to cross into Part II.",
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq"]),
+  }),
+  Object.freeze({
     cmd: "::garycliff",
     name: "Gary Cliffhanger",
     description: "Collect the minimum required heirlooms and descend to Gary's call-cave.",
     compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq", "down"]),
+  }),
+  Object.freeze({
+    cmd: "::ringbell",
+    name: "Ring the Bell",
+    description: "Collect and deposit every required heirloom, close the reliquary, and ring the bell — then stop, at the end of Part 1, before leaving or descending.",
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq", "ring bell"]),
   }),
   Object.freeze({
     cmd: "::winmax",
