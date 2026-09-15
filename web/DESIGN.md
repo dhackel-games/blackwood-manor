@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.091:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.091:acoven.
 ```
 
 ---
@@ -629,8 +629,8 @@ transcript. Every art line is capped at 32 characters for the mobile layout.
 
 ## 12.19 Persistent touch controls
 
-The controls and typeahead share one outer frame. The typeahead's top edge
-carries a left disclosure: `▴` while navigation is open and `▾` while collapsed.
+The controls and typeahead share one outer frame. The typeahead's left edge
+carries a disclosure: `▴` while navigation is open and `▾` while collapsed.
 Open, the frame encloses navigation and typeahead with that edge as their
 divider; collapsed, the same frame encloses typeahead alone. The preference
 persists. Within the open navigation area, a far-left
