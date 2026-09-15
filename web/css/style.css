@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -146,6 +146,8 @@ body { -webkit-text-size-adjust: 100%; }
   position: relative;
   display: grid;
   grid-template-columns: var(--nav-picker-width) auto minmax(0, 1fr);
+  width: calc(100% + 1px);
+  margin-top: -1px;
   gap: 0.5rem;
   align-items: center;
   justify-content: stretch;
@@ -274,8 +276,8 @@ body { -webkit-text-size-adjust: 100%; }
   grid-column: 1;
   align-self: start;
   width: var(--nav-picker-width);
-  height: calc(var(--action-button-height) + var(--action-button-height) + 0.2rem);
-  margin-top: -1px;
+  height: calc(var(--nav-button-size) + var(--nav-button-size) + var(--nav-button-size) + 0.24rem);
+  margin-top: 0;
   margin-left: -1px;
   display: grid;
   grid-template-rows: repeat(3, minmax(0, 1fr));
@@ -403,17 +405,17 @@ body { -webkit-text-size-adjust: 100%; }
   }
   #controls .nav-size-picker {
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
     margin-top: 0;
   }
   #controls .movement-controls,
   #controls .action-controls { justify-self: center; }
   #controls .movement-controls {
-    grid-column: 1 / span 2;
+    grid-column: 2;
     grid-row: 1;
   }
   #controls .action-controls {
-    grid-column: 2;
+    grid-column: 1 / span 2;
     grid-row: 2;
   }
 }

@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -747,7 +747,7 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(css,
     /#controls \.nav-size-picker button\s*\{[^}]*width:\s*var\(--nav-picker-width\)[^}]*min-width:\s*var\(--nav-picker-width\)/s);
   assert.match(css,
-    /#controls \.nav-size-picker\s*\{[^}]*position:\s*relative[^}]*grid-column:\s*1[^}]*width:\s*var\(--nav-picker-width\)[^}]*height:\s*calc\(var\(--action-button-height\) \+ var\(--action-button-height\) \+ 0\.2rem\)[^}]*margin-top:\s*-1px[^}]*margin-left:\s*-1px/s);
+    /#controls \.nav-size-picker\s*\{[^}]*position:\s*relative[^}]*grid-column:\s*1[^}]*width:\s*var\(--nav-picker-width\)[^}]*height:\s*calc\(var\(--nav-button-size\) \+ var\(--nav-button-size\) \+ var\(--nav-button-size\) \+ 0\.24rem\)[^}]*margin-top:\s*0[^}]*margin-left:\s*-1px/s);
   assert.match(css, /\.nav-size-picker\s*\{[^}]*border:\s*1px solid var\(--dim\)[^}]*border-radius:\s*6px/s);
   assert.match(css, /\.nav-size-picker button\s*\{[^}]*background:\s*transparent[^}]*border:\s*0/s);
   assert.match(css, /\.nav-size-picker::before\s*\{[^}]*width:\s*1px[^}]*background:\s*var\(--dim\)/s);
@@ -792,9 +792,11 @@ Then("action shortcuts occupy two equally wide rows beside movement", function (
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
   assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) auto minmax\(0, 1fr\)/s);
+  assert.match(css,
+    /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*margin-top:\s*-1px/s);
   assert.match(css, /#controls \.controls-content\s*\{[^}]*justify-content:\s*stretch/s);
   assert.match(css,
-    /@media \(max-width:\s*600px\)[\s\S]*#controls \.movement-controls\s*\{[^}]*grid-column:\s*1 \/ span 2[^}]*grid-row:\s*1/s);
+    /@media \(max-width:\s*600px\)[\s\S]*#controls \.nav-size-picker\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*1[\s\S]*#controls \.movement-controls\s*\{[^}]*grid-column:\s*2[^}]*grid-row:\s*1[\s\S]*#controls \.action-controls\s*\{[^}]*grid-column:\s*1 \/ span 2[^}]*grid-row:\s*2/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);
   assert.match(css, /#controls \.verb-row\s*\{[^}]*grid-template-columns:\s*repeat\(8,/s);
   assert.match(css, /#controls \.verb-row button\s*\{[^}]*grid-column:\s*span 2/s);

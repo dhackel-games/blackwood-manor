@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. -->
 
 # Blackwood Manor
 
@@ -29,7 +29,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   and portal movement. A green `▴`/`▾` disclosure on the typeahead's top edge
   collapses or restores navigation. Open, one frame encloses navigation and
   typeahead; collapsed, that frame encloses typeahead alone. The compact L/M/S
-  selector shares the frame's upper-left corner without displacing centered navigation.
+  selector shares the frame's upper-left border and ends flush with the 9-grid.
   `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.

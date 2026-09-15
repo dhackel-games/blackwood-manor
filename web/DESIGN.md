@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven.
 ```
 
 ---
@@ -638,9 +638,9 @@ three-square picker selects navigation size 1, 2, or 3, followed by a 3×3
 eight-arrow compass, a 2×2 level/portal block (`⇧`, `⇩`, and center-anchored
 In/Out SVG arrows), and two equal-width action rows. The detached L/M/S picker
 shares the outer frame's upper-left border and ends exactly at the bottom of the
-second action row, while navigation/actions use the remaining width. On narrow
-screens movement snaps to a full-width row above the picker/action row before
-the two can collide.
+9-grid, while navigation/actions use the remaining width and the rightmost
+controls overlay the outer frame's right border. On narrow screens L/M/S remains
+beside the 9-grid and the action rows snap below them before anything can collide.
 `?` and 🪲 each occupy half
 a regular slot. `Native.isMobileApp()` or an `any-pointer: coarse` media match
 defaults to size 3; other browsers default to size 1. On narrow touch screens
