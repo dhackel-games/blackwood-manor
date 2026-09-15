@@ -878,10 +878,10 @@ Then("action shortcuts occupy two equally wide rows beside movement", function (
   assert.match(rows[1][1], /data-cmd=["']inventory["'][\s\S]*data-cmd=["']map["'][\s\S]*data-cmd=["']call["']/);
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
-  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) auto minmax\(0, 1fr\)/s);
+  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) auto minmax\(0, 28rem\)/s);
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*margin-top:\s*-1px/s);
-  assert.match(css, /#controls \.controls-content\s*\{[^}]*justify-content:\s*stretch/s);
+  assert.match(css, /#controls \.controls-content\s*\{[^}]*justify-content:\s*center/s);
   assert.match(css,
     /@media \(max-width:\s*600px\)[\s\S]*#controls \.nav-size-picker\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*1[\s\S]*#controls \.movement-controls\s*\{[^}]*grid-column:\s*2[^}]*grid-row:\s*1[\s\S]*#controls \.action-controls\s*\{[^}]*grid-column:\s*1 \/ span 2[^}]*grid-row:\s*2/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);

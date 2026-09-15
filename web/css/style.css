@@ -158,12 +158,12 @@ body { -webkit-text-size-adjust: 100%; }
 #controls .controls-content {
   position: relative;
   display: grid;
-  grid-template-columns: var(--nav-picker-width) auto minmax(0, 1fr);
+  grid-template-columns: var(--nav-picker-width) auto minmax(0, 28rem);
   width: calc(100% + 1px);
   margin-top: -1px;
   gap: 0.5rem;
   align-items: center;
-  justify-content: stretch;
+  justify-content: center;
 }
 #inputline > .nav-disclosure {
   position: absolute;
