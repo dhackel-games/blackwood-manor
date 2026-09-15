@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.089:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -743,13 +743,16 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(css, /#controls\[data-nav-size=["']1["']\][^}]*--nav-button-size:\s*1\.7rem/s);
   assert.match(css, /#controls\[data-nav-size=["']2["']\][^}]*--nav-button-size:\s*2\.375rem/s);
   assert.match(css, /#controls\[data-nav-size=["']3["']\][^}]*--nav-button-size:\s*2\.96875rem/s);
+  assert.match(css, /#controls\s*\{[^}]*--nav-picker-width:\s*1\.6875rem/s);
+  assert.match(css,
+    /#controls \.nav-size-picker button\s*\{[^}]*width:\s*var\(--nav-picker-width\)[^}]*min-width:\s*var\(--nav-picker-width\)/s);
   assert.match(css, /\.nav-size-picker\s*\{[^}]*border:\s*1px solid var\(--dim\)[^}]*border-radius:\s*6px/s);
   assert.match(css, /\.nav-size-picker button\s*\{[^}]*background:\s*transparent[^}]*border:\s*0/s);
   assert.match(css, /\.nav-size-picker::before\s*\{[^}]*width:\s*1px[^}]*background:\s*var\(--dim\)/s);
   assert.match(css, /button\[aria-checked=["']true["']\] \.nav-size-swatch\s*\{[^}]*background:\s*currentColor/s);
   assert.match(css, /#controls\s*\{[^}]*border-top:\s*1px solid var\(--dim\)/s);
   assert.match(css,
-    /#controls > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*-0\.72rem[^}]*background:\s*var\(--bg\)/s);
+    /#controls > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*-1\.5rem[^}]*width:\s*3rem[^}]*height:\s*3rem[^}]*font-size:\s*2rem/s);
   assert.match(css,
     /#controls\[data-collapsed=["']true["']\] \.controls-content\s*\{\s*display:\s*none/s);
   assert.match(ui, /localStorage\.getItem\(NAV_SIZE_KEY\)/);
@@ -765,7 +768,7 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(ui, /const defaultNavSize = prefersLargeNav \? "3" : "1"/);
   assert.match(ui, /setAttribute\("aria-checked", String\(button\.dataset\.navSize === selected\)\)/);
   assert.match(css,
-    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*2\.25rem minmax\(0,\s*28rem\)/);
+    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) minmax\(0,\s*28rem\)/);
   assert.match(css,
     /#controls \.movement-controls,[\s\S]*#controls \.action-controls\s*\{[^}]*justify-self:\s*center/s);
 });
@@ -779,7 +782,7 @@ Then("action shortcuts occupy two equally wide rows beside movement", function (
   assert.match(rows[1][1], /data-cmd=["']inventory["'][\s\S]*data-cmd=["']map["'][\s\S]*data-cmd=["']call["']/);
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
-  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*2\.25rem auto minmax\(0, 28rem\)/s);
+  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) auto minmax\(0, 28rem\)/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);
   assert.match(css, /#controls \.verb-row\s*\{[^}]*grid-template-columns:\s*repeat\(8,/s);
   assert.match(css, /#controls \.verb-row button\s*\{[^}]*grid-column:\s*span 2/s);
