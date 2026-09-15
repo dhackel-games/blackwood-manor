@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -501,9 +501,13 @@ Then("bug reports include the current room in the issue title", function () {
 });
 
 Then("clicking the Bug button uses the default issue description", function () {
-  const body = bugReportBody({ description: DEFAULT_ISSUE_DESCRIPTION });
+  const body = bugReportBody({
+    version: "Copyright test 1.2.3",
+    description: DEFAULT_ISSUE_DESCRIPTION,
+  });
   const url = new URL(bugReportUrl("Hall Bedroom", body));
-  assert.equal(url.searchParams.get("body").split("\n")[0], "Describe issue here");
+  assert.equal(url.searchParams.get("body").split("\n")[0], "Copyright test 1.2.3");
+  assert.equal(url.searchParams.get("body").split("\n")[1], "Describe issue here");
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /openBugReport\(DEFAULT_ISSUE_DESCRIPTION\)/);
 });
@@ -513,10 +517,11 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.equal(bugReportDescription(`bug ${description}`), description);
   assert.equal(bugReportDescription("bug"), "");
   assert.equal(bugReportDescription("buggy"), null);
-  const body = bugReportBody({ description });
+  const body = bugReportBody({ version: "Copyright test 1.2.3", description });
   const url = new URL(bugReportUrl("Hall Bedroom", body));
   assert.equal(url.searchParams.get("title"), 'Room "Hall Bedroom" Blackwood Manor issue');
-  assert.equal(url.searchParams.get("body").split("\n")[0], description);
+  assert.equal(url.searchParams.get("body").split("\n")[0], "Copyright test 1.2.3");
+  assert.equal(url.searchParams.get("body").split("\n")[1], description);
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
 });
@@ -531,6 +536,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   const game = createGame(fixture());
   const hud = hudStateSummary({ game, world: fixture() });
   const body = bugReportBody({
+    version: "Copyright test 1.2.3",
     description: "the mirror shows two of me",
     turns: trace.turns,
     origin: trace.origin,
@@ -539,7 +545,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
     inventory: ["BRASS KEY", "CANDLE (WORN)"],
   });
   assert.match(body,
-    /^the mirror shows two of me\n\n2 turns from page reload: east; take rope; again; bug the mirror shows two of me/m);
+    /^Copyright test 1\.2\.3\nthe mirror shows two of me\n\n2 turns from page reload: east; take rope; again; bug the mirror shows two of me/m);
   assert.match(body, /\nHUD: Score\/turns: 🏆 0\/0;/);
   assert.match(body, /\nInv: BRASS KEY, CANDLE \(WORN\)$/);
   const decoded = new URL(bugReportUrl("Hall Bedroom", body)).searchParams.get("body");
@@ -557,7 +563,8 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
   assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
   assert.match(ui, /inventoryForBugReport\(\)/);
-  assert.match(ui, /`Version: \$\{Native\.version\(\)\}`/);
+  assert.match(ui, /version: Native\.version\(\)/);
+  assert.doesNotMatch(ui, /`Version: \$\{Native\.version\(\)\}`/);
 });
 
 Then("overlong bug histories preserve both ends and mark the omission", function () {
@@ -630,9 +637,11 @@ Then("Gary's circular voice toggle contains a speaker icon", function () {
 Then("both entry rows place the microphone left of the text field and submit arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
-  assert.match(html, /id=["']inputline["'][\s\S]*id=["']mic["'][\s\S]*id=["']prompt["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
+  assert.match(html, /id=["']inputline["'][\s\S]*id=["']mic["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
+  assert.doesNotMatch(html, /id=["']prompt["']/);
   assert.match(html, /class=["']phone-inputline["'][\s\S]*id=["']phone-mic["'][\s\S]*id=["']phone-cmd["'][\s\S]*id=["']phone-go["']/);
-  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-1\.5ch/s);
+  assert.match(css, /#inputline\s*\{[^}]*gap:\s*0\.2rem/s);
+  assert.match(css, /\.phone-inputline\s*\{[^}]*gap:\s*0\.2rem/s);
 });
 
 Then("both entry rows share text-aware submit styling with custom starter text", function () {
@@ -659,6 +668,10 @@ Then("game-over restart text links to the latest session start", function () {
   assert.match(ui, /link\.href = `#\$\{currentSessionAnchorId\}`/);
   assert.match(ui, /line\.append\("Type RESTART to play again\. \(Jump to the "\)/);
   assert.match(ui, /link\.textContent = "top"/);
+  assert.match(ui,
+    /function jumpToSessionStart\(id\)[\s\S]*anchor\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.scrollTop \+= anchorTop - transcriptTop/s);
+  assert.match(ui,
+    /link\.addEventListener\("click", \(event\) => \{[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(currentSessionAnchorId\)/s);
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
   assert.match(ui, /function newGame[\s\S]*markSessionStart\(\)[\s\S]*game\.describeRoom/s);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
@@ -837,7 +850,7 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(css,
     /#command-panel\[data-collapsed=["']true["']\] #inputline\s*\{\s*border-top:\s*0/s);
   assert.match(css, /#controls\s*\{[^}]*padding:\s*0 0 1\.1rem/s);
-  assert.match(css, /#inputline\s*\{[^}]*padding:\s*1\.1rem 0\.7rem 0\.55rem/s);
+  assert.match(css, /#inputline\s*\{[^}]*padding:\s*1\.1rem 0\.4rem 0\.55rem/s);
   assert.match(ui, /localStorage\.getItem\(NAV_SIZE_KEY\)/);
   assert.match(ui, /localStorage\.getItem\(NAV_COLLAPSED_KEY\) === "true"/);
   assert.match(ui, /localStorage\.setItem\(NAV_SIZE_KEY, selected\)/);

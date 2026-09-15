@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -360,20 +360,18 @@ body { -webkit-text-size-adjust: 100%; }
 #inputline {
   position: relative; z-index: 1;
   flex: 0 0 auto;
-  display: flex; gap: 0.5rem; align-items: center;
+  display: flex; gap: 0.2rem; align-items: center;
   margin: 0;
-  padding: 1.1rem 0.7rem 0.55rem;
+  padding: 1.1rem 0.4rem 0.55rem;
   border: 0;
   border-top: 1px solid var(--dim);
   border-radius: 0;
   background: transparent;
 }
 #command-panel[data-collapsed="true"] #inputline { border-top: 0; }
-#prompt { color: var(--green-bright); }
 #cmd {
   flex: 1;
   min-width: 0;                      /* let it shrink instead of overflowing */
-  margin-left: -1.5ch;
   background: transparent; border: none;
   color: var(--green-bright);
   font: inherit; font-size: 16px;   /* >=16px keeps iOS from zooming on focus */
@@ -606,9 +604,9 @@ body { -webkit-text-size-adjust: 100%; }
 #phone-transcript .sys { color: var(--dim); }
 
 .phone-inputline {
-  display: flex; gap: 0.5rem; align-items: center;
+  display: flex; gap: 0.2rem; align-items: center;
   border: 1px solid var(--dim); border-radius: 8px;
-  padding: 0.5rem 0.6rem; background: rgba(67, 255, 122, 0.05);
+  padding: 0.5rem 0.35rem; background: rgba(67, 255, 122, 0.05);
 }
 #phone-cmd {
   flex: 1; min-width: 0; background: transparent; border: none;

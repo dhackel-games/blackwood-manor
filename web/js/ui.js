@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -242,6 +242,15 @@ function markSessionStart(now = new Date()) {
   return id;
 }
 
+function jumpToSessionStart(id) {
+  const anchor = document.getElementById(id);
+  if (!anchor) return;
+  const anchorTop = anchor.getBoundingClientRect().top;
+  const transcriptTop = transcript.getBoundingClientRect().top;
+  transcript.scrollTop += anchorTop - transcriptTop;
+  anchor.focus({ preventScroll: true });
+}
+
 function printRestartPrompt() {
   const line = document.createElement("div");
   line.className = "over session-restart";
@@ -249,6 +258,15 @@ function printRestartPrompt() {
   const link = document.createElement("a");
   link.href = `#${currentSessionAnchorId}`;
   link.textContent = "top";
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (window.location.hash === link.hash) {
+      window.history.replaceState(null, "", link.hash);
+    } else {
+      window.history.pushState(null, "", link.hash);
+    }
+    jumpToSessionStart(currentSessionAnchorId);
+  });
   line.append(link, ".)");
   transcript.appendChild(line);
   transcript.scrollTop = transcript.scrollHeight;
@@ -334,11 +352,11 @@ function inventoryForBugReport() {
 
 function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
   const hudState = [
-    `Version: ${Native.version()}`,
     `SFX: ${sfxMuted ? "off" : "on"}`,
     hudStateSummary({ game, world }),
   ].join("; ");
   const body = bugReportBody({
+    version: Native.version(),
     description,
     turns: bugTrace.turns,
     origin: bugTrace.origin,

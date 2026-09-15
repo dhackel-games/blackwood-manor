@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
 ```
 
 ---
@@ -933,8 +933,9 @@ than being mistaken for repeatable flavor.
 The browser keeps an in-memory command trail and actual turn count beginning at
 page reload, or resets both with origin `restart` when RESTART starts a new game.
 Both `BUG <description>` and the 🪲 button append the trail, every HUD slot
-(including inactive states), version/SFX state, and a comma-separated `Inv:`
-line to the prefilled GitHub issue body. If the hint line was opened, the report
+(including inactive states), SFX state, and a comma-separated `Inv:` line to the
+prefilled GitHub issue body. The full copyright/version string is always the
+first line, followed immediately by the reporter's description. If the hint line was opened, the report
 also includes the chronological Gary/user exchange: Gary turns are numbered,
 first speaker labels are written out, and later labels use the shortest unique
 prefix (including caller names learned from `my name is` or `call me`).

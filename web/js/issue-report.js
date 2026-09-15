@@ -1,4 +1,4 @@
-// issue-report.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+// issue-report.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
 
 export const ISSUE_URL = "https://github.com/dhackel-games/blackwood-manor/issues/new";
 export const DEFAULT_ISSUE_DESCRIPTION = "Describe issue here";
@@ -85,6 +85,7 @@ export function formatCommandHistory(commands, maxLength = MAX_BUG_HISTORY_CHARS
 }
 
 export function bugReportBody({
+  version = "Version unavailable",
   description = DEFAULT_ISSUE_DESCRIPTION,
   turns = 0,
   origin = "page reload",
@@ -98,6 +99,7 @@ export function bugReportBody({
   const turnLabel = `${turns} turn${turns === 1 ? "" : "s"}`;
   const dialogueText = formatGaryDialogue(dialogue, userName);
   return [
+    String(version || "").trim() || "Version unavailable",
     reportDescription,
     "",
     `${turnLabel} from ${origin}: ${formatCommandHistory(commands)}`,

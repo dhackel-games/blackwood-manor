@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. -->
 
 # Blackwood Manor
 
@@ -62,7 +62,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   repository's new-issue form in a separate browser window and prefills its
   title with the current room and its body with `Describe issue here`. Typing
   `bug <description>` instead puts that text into the issue body without
-  advancing the game turn. Both paths append turns and commands since the latest
+  advancing the game turn. The first body line is the complete copyright/version
+  string; HUD diagnostics no longer duplicate it. Both paths append turns and commands since the latest
   page reload or restart, every HUD value, and `Inv: ...`. Newlines are URL-encoded;
   exceptionally long histories retain both ends and mark the omitted middle. If
   Gary was called, the report also includes numbered Gary/user dialogue with
