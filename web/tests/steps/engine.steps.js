@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.089:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -738,8 +738,8 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.equal((picker.match(/role=["']radio["']/g) || []).length, 3);
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.match(html,
-    /id=["']controls["'][^>]+data-collapsed=["']false["'][\s\S]*id=["']nav-disclosure["'][^>]+aria-controls=["']controls-content["'][^>]+aria-expanded=["']true["'][\s\S]*>\s*<span[^>]*>\s*▾\s*<\/span>/);
-  assert.ok(html.indexOf('id="nav-disclosure"') < html.indexOf('id="controls-content"'));
+    /id=["']command-panel["'][^>]+data-collapsed=["']false["'][\s\S]*id=["']controls-content["'][\s\S]*id=["']inputline["'][\s\S]*id=["']nav-disclosure["'][^>]+aria-controls=["']controls-content["'][^>]+aria-expanded=["']true["'][\s\S]*>\s*<span[^>]*>\s*▴\s*<\/span>/);
+  assert.ok(html.indexOf('id="controls-content"') < html.indexOf('id="nav-disclosure"'));
   assert.match(css, /#controls\[data-nav-size=["']1["']\][^}]*--nav-button-size:\s*1\.7rem/s);
   assert.match(css, /#controls\[data-nav-size=["']2["']\][^}]*--nav-button-size:\s*2\.375rem/s);
   assert.match(css, /#controls\[data-nav-size=["']3["']\][^}]*--nav-button-size:\s*2\.96875rem/s);
@@ -750,19 +750,24 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(css, /\.nav-size-picker button\s*\{[^}]*background:\s*transparent[^}]*border:\s*0/s);
   assert.match(css, /\.nav-size-picker::before\s*\{[^}]*width:\s*1px[^}]*background:\s*var\(--dim\)/s);
   assert.match(css, /button\[aria-checked=["']true["']\] \.nav-size-swatch\s*\{[^}]*background:\s*currentColor/s);
-  assert.match(css, /#controls\s*\{[^}]*border-top:\s*1px solid var\(--dim\)/s);
   assert.match(css,
-    /#controls > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*-1\.5rem[^}]*width:\s*3rem[^}]*height:\s*3rem[^}]*font-size:\s*2rem/s);
+    /#command-panel\s*\{[^}]*border:\s*1px solid var\(--dim\)[^}]*border-radius:\s*8px/s);
   assert.match(css,
-    /#controls\[data-collapsed=["']true["']\] \.controls-content\s*\{\s*display:\s*none/s);
+    /#inputline > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*-1\.5rem[^}]*width:\s*3rem[^}]*height:\s*3rem[^}]*font-size:\s*2rem/s);
+  assert.match(css,
+    /#command-panel\[data-collapsed=["']true["']\] #controls\s*\{\s*display:\s*none/s);
+  assert.match(css,
+    /#inputline\s*\{[^}]*border-top:\s*1px solid var\(--dim\)/s);
+  assert.match(css,
+    /#command-panel\[data-collapsed=["']true["']\] #inputline\s*\{\s*border-top:\s*0/s);
   assert.match(ui, /localStorage\.getItem\(NAV_SIZE_KEY\)/);
   assert.match(ui, /localStorage\.getItem\(NAV_COLLAPSED_KEY\) === "true"/);
   assert.match(ui, /localStorage\.setItem\(NAV_SIZE_KEY, selected\)/);
   assert.match(ui, /localStorage\.setItem\(NAV_COLLAPSED_KEY, String\(isCollapsed\)\)/);
-  assert.match(ui, /controls\.dataset\.collapsed = String\(isCollapsed\)/);
-  assert.match(ui, /navDisclosureIcon\.textContent = isCollapsed \? "▸" : "▾"/);
+  assert.match(ui, /commandPanel\.dataset\.collapsed = String\(isCollapsed\)/);
+  assert.match(ui, /navDisclosureIcon\.textContent = isCollapsed \? "▾" : "▴"/);
   assert.match(ui,
-    /navDisclosure\.addEventListener\("click", \(\) => \{[\s\S]*applyNavCollapsed\(controls\.dataset\.collapsed !== "true", true\)/s);
+    /navDisclosure\.addEventListener\("click", \(\) => \{[\s\S]*applyNavCollapsed\(commandPanel\.dataset\.collapsed !== "true", true\)/s);
   assert.match(ui, /matchMedia\?\.\("\(any-pointer: coarse\)"\)/);
   assert.match(ui, /const prefersLargeNav = Native\.isMobileApp\(\) \|\| coarsePointer/);
   assert.match(ui, /const defaultNavSize = prefersLargeNav \? "3" : "1"/);

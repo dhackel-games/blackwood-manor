@@ -1,4 +1,4 @@
-<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven. -->
+<!-- index.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -25,14 +25,10 @@
 
     <div id="transcript" aria-live="polite"></div>
 
-    <!-- Touch controls: tap to run common commands (typing still works) -->
-    <div id="controls" data-collapsed="false">
-      <button id="nav-disclosure" class="nav-disclosure" type="button"
-              aria-label="hide navigation controls" aria-controls="controls-content"
-              aria-expanded="true" title="Hide navigation controls">
-        <span aria-hidden="true">▾</span>
-      </button>
-      <div id="controls-content" class="controls-content">
+    <div id="command-panel" data-collapsed="false">
+      <!-- Touch controls: tap to run common commands (typing still works) -->
+      <div id="controls">
+        <div id="controls-content" class="controls-content">
         <div id="nav-size-picker" class="nav-size-picker" role="radiogroup"
              aria-label="navigation button size">
           <button type="button" data-nav-size="3" aria-label="large navigation buttons"
@@ -89,20 +85,26 @@
           </div>
         </div>
         </div>
+        </div>
       </div>
-    </div>
 
-    <div id="inputline">
-      <button id="mic" class="iconbtn" aria-label="speak a command" hidden>&#127908;</button>
-      <span id="prompt">&gt;</span>
-      <input id="cmd" autocomplete="off" autocapitalize="off"
-             autocorrect="off" spellcheck="false" enterkeyhint="send"
-             placeholder="type command / tap button" aria-label="command input" />
-      <button id="go" class="entry-submit" aria-label="submit command">
-        <svg class="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 2 3 12h5v10h8V12h5L12 2z"></path>
-        </svg>
-      </button>
+      <div id="inputline">
+        <button id="nav-disclosure" class="nav-disclosure" type="button"
+                aria-label="hide navigation controls" aria-controls="controls-content"
+                aria-expanded="true" title="Hide navigation controls">
+          <span aria-hidden="true">▴</span>
+        </button>
+        <button id="mic" class="iconbtn" aria-label="speak a command" hidden>&#127908;</button>
+        <span id="prompt">&gt;</span>
+        <input id="cmd" autocomplete="off" autocapitalize="off"
+               autocorrect="off" spellcheck="false" enterkeyhint="send"
+               placeholder="type command / tap button" aria-label="command input" />
+        <button id="go" class="entry-submit" aria-label="submit command">
+          <svg class="submit-arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2 3 12h5v10h8V12h5L12 2z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 

@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven. -->
 
 # Blackwood Manor
 
@@ -26,8 +26,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   `northeast` / `ne`, `northwest` / `nw`, `southeast` / `se`,
   `southwest` / `sw`, `up` / `u`, `down` / `d`, `in`, `out`. The touch
   controls use an eight-arrow compass plus `⇧`/`⇩` and `→□`/`□→` for vertical
-  and portal movement. A `▾`/`▸` disclosure on the tray's existing top rule
-  collapses or restores the complete navigation area while leaving typeahead.
+  and portal movement. A `▴`/`▾` disclosure on the typeahead's top edge
+  collapses or restores navigation. Open, one frame encloses navigation and
+  typeahead; collapsed, that frame encloses typeahead alone.
   `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.

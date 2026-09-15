@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.089:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -123,15 +123,23 @@ body { -webkit-text-size-adjust: 100%; }
 #transcript div { margin: 0 0 0.15rem; }
 
 /* --- touch controls --- */
+#command-panel {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  margin-top: 0.4rem;
+  border: 1px solid var(--dim);
+  border-radius: 8px;
+  background: rgba(67,255,122,0.05);
+}
+#command-panel[data-collapsed="true"] #controls { display: none; }
 #controls {
   --nav-button-size: 1.7rem;
   --action-button-height: 1.7rem;
   --nav-picker-width: 1.6875rem;
-  position: relative; z-index: 1;
+  position: relative;
   flex: 0 0 auto;
-  padding: 1.6rem 0 0.4rem;
-  border-top: 1px solid var(--dim);
-  margin-top: 0.4rem;
+  padding: 0.5rem 0 0.4rem;
 }
 #controls .controls-content {
   display: grid;
@@ -140,12 +148,7 @@ body { -webkit-text-size-adjust: 100%; }
   align-items: center;
   justify-content: center;
 }
-#controls[data-collapsed="true"] {
-  min-height: 1.5rem;
-  padding: 1.5rem 0 0;
-}
-#controls[data-collapsed="true"] .controls-content { display: none; }
-#controls > .nav-disclosure {
+#inputline > .nav-disclosure {
   position: absolute;
   top: -1.5rem;
   left: 0;
@@ -322,12 +325,14 @@ body { -webkit-text-size-adjust: 100%; }
   position: relative; z-index: 1;
   flex: 0 0 auto;
   display: flex; gap: 0.5rem; align-items: center;
-  margin-top: 0.5rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--dim);
-  border-radius: 8px;
-  background: rgba(67, 255, 122, 0.05);
+  margin: 0;
+  padding: 0.55rem 0.7rem 0.55rem 3.4rem;
+  border: 0;
+  border-top: 1px solid var(--dim);
+  border-radius: 0;
+  background: transparent;
 }
+#command-panel[data-collapsed="true"] #inputline { border-top: 0; }
 #prompt { color: var(--green-bright); }
 #cmd {
   flex: 1;
