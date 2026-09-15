@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.095:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -756,6 +756,8 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
     /#command-panel\s*\{[^}]*border:\s*1px solid var\(--dim\)[^}]*border-radius:\s*8px/s);
   assert.match(css,
     /#inputline > \.nav-disclosure\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*transform:\s*translateY\(-50%\)[^}]*width:\s*2rem[^}]*height:\s*2rem[^}]*background:\s*var\(--bg\)[^}]*border:\s*0[^}]*color:\s*var\(--green-bright\)[^}]*font-size:\s*2rem/s);
+  assert.match(css,
+    /#inputline > \.nav-disclosure span\s*\{[^}]*transform:\s*translateY\(-2px\)/s);
   assert.match(css,
     /#command-panel\[data-collapsed=["']true["']\] #controls\s*\{\s*display:\s*none/s);
   assert.match(css,

@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.095:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -178,6 +178,10 @@ body { -webkit-text-size-adjust: 100%; }
   -webkit-tap-highlight-color: transparent;
 }
 #inputline > .nav-disclosure:active { background: rgba(67,255,122,0.22); }
+#inputline > .nav-disclosure span {
+  display: block;
+  transform: translateY(-2px);
+}
 #controls .movement-controls {
   flex: 0 0 auto;
   display: flex;
