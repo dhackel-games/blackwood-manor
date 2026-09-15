@@ -3,7 +3,7 @@
   "BUILD": "100",
   "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
   "CONTENT_VERSION": 20260911100,
-  "LATEST_APP_BUILD_AVAILABLE": 20260911086,
+  "LATEST_APP_BUILD_AVAILABLE": 20260911100,
   "CONTENT_FILES": [
     "css/style.css",
     "index.html",
