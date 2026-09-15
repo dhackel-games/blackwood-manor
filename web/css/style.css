@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.092:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.093:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -132,7 +132,7 @@ body { -webkit-text-size-adjust: 100%; }
   border-radius: 8px;
   background: rgba(67,255,122,0.05);
 }
-#command-panel[data-collapsed="true"] { margin-top: 1.5rem; }
+#command-panel[data-collapsed="true"] { margin-top: 1rem; }
 #command-panel[data-collapsed="true"] #controls { display: none; }
 #controls {
   --nav-button-size: 1.7rem;
@@ -140,26 +140,26 @@ body { -webkit-text-size-adjust: 100%; }
   --nav-picker-width: 1.6875rem;
   position: relative;
   flex: 0 0 auto;
-  padding: 0.5rem 0 1.6rem;
+  padding: 0 0 1.1rem;
 }
 #controls .controls-content {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 28rem);
+  grid-template-columns: var(--nav-picker-width) auto minmax(0, 1fr);
   gap: 0.5rem;
   align-items: center;
-  justify-content: center;
+  justify-content: stretch;
 }
 #inputline > .nav-disclosure {
   position: absolute;
   top: 0;
-  left: 0.15rem;
+  left: 0.3rem;
   z-index: 2;
   transform: translateY(-50%);
-  width: 3rem;
-  min-width: 3rem;
-  height: 3rem;
-  min-height: 3rem;
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
   padding: 0;
   appearance: none;
   -webkit-appearance: none;
@@ -270,11 +270,13 @@ body { -webkit-text-size-adjust: 100%; }
 }
 #controls .verb-row .compact-action { grid-column: span 1; }
 #controls .nav-size-picker {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  position: relative;
+  grid-column: 1;
+  align-self: start;
   width: var(--nav-picker-width);
+  height: calc(var(--action-button-height) + var(--action-button-height) + 0.2rem);
+  margin-top: -1px;
+  margin-left: -1px;
   display: grid;
   grid-template-rows: repeat(3, minmax(0, 1fr));
   overflow: hidden;
@@ -341,7 +343,7 @@ body { -webkit-text-size-adjust: 100%; }
   flex: 0 0 auto;
   display: flex; gap: 0.5rem; align-items: center;
   margin: 0;
-  padding: 0.55rem 0.7rem 0.55rem 3.4rem;
+  padding: 1.1rem 0.7rem 0.55rem;
   border: 0;
   border-top: 1px solid var(--dim);
   border-radius: 0;
@@ -397,10 +399,23 @@ body { -webkit-text-size-adjust: 100%; }
   #controls .verb-row { gap: 0.2rem; }
   #controls .verb-row button { padding: 0.3rem 0.1rem; font-size: 0.8rem; }
   #controls .controls-content {
-    grid-template-columns: minmax(0, 28rem);
+    grid-template-columns: var(--nav-picker-width) minmax(0, 1fr);
+  }
+  #controls .nav-size-picker {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: 0;
   }
   #controls .movement-controls,
-  #controls .action-controls { grid-column: 1; justify-self: center; }
+  #controls .action-controls { justify-self: center; }
+  #controls .movement-controls {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+  }
+  #controls .action-controls {
+    grid-column: 2;
+    grid-row: 2;
+  }
 }
 
 @media (any-pointer: coarse) {
@@ -414,7 +429,7 @@ body { -webkit-text-size-adjust: 100%; }
 }
 @media (any-pointer: coarse) and (max-width: 600px) {
   #controls .controls-content {
-    grid-template-columns: minmax(0, 28rem);
+    grid-template-columns: var(--nav-picker-width) minmax(0, 1fr);
   }
 }
 #controls[data-nav-size="1"] {
