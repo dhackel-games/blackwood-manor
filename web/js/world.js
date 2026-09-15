@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -509,95 +509,105 @@ function superUser(ctx, argString) {
 
 // --- The Blackwood Manor Hint Line (1-900-BLACKWOOD, 99c/min) -----------------
 // Gary: underpaid, starving, furious — but his hints are genuinely useful.
-// Returns the single most relevant next-step hint for the current game state.
-function nextHint(ctx) {
+function hintEntries(ctx) {
   const dep = (id) => ctx.roomOf(id) === "reliquary";
   const inside = ctx.getFlag("frontDoorOpen");
   const candle = ctx.item("candlestick");
   const lit = candle && candle.lit;
+  const frontDoorHint = ctx.getFlag("statueMoved") || ctx.has("frontKey")
+    || ctx.roomOf("frontKey") === "garden"
+    ? "You've got the iron key — or it's sitting right there in the garden. TAKE it, go to the PORCH, then UNLOCK DOOR WITH IRON KEY, OPEN DOOR, and go NORTH. That's the entire trick."
+    : "The front door's locked, shocker. Some genius buried the key under that leaning STATUE in the garden. MOVE the statue, grab the key, then unlock the front door. In you go. Riveting.";
+  const lightHint = ctx.roomOf("matches") === null
+    ? "You burned your only match already, didn't you. DIDN'T YOU. The CANDLESTICK is still in the DINING ROOM, but without that match it is now an extremely expensive paperweight. Next time don't waste the match, pal."
+    : "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
+  const coinHint = ctx.has("rope")
+    ? "You've got the rope, congratulations. Go to the garden and ENTER WELL — or just go DOWN. Coin's at the bottom. Try not to end up down there permanently."
+    : "There's a coin down the garden WELL. Go down without a ROPE and you SPLATTER — dead, instantly, no do-overs. There's a rope in the KITCHEN. Get it FIRST. I cannot stress this enough.";
+  const dragonHint = !ctx.getFlag("dragonMoved")
+    ? "A family heirloom, the BLACKWOOD FAMILY CREST, waits in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON."
+    : !ctx.getFlag("dragonVaultOpen")
+      ? "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE."
+      : "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
+  const oakHint = !ctx.getFlag("brazierLit")
+    ? "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first."
+    : !ctx.getFlag("oakLightAligned")
+      ? "TAKE the EMERALD GEM, then follow the path EAST through the PRIVY to the GREAT OAK. EXAMINE the PANEL and PLACE the gems into its BOTTOM, MIDDLE, and TOP SLOTS until the mirrored sunlight converges."
+      : ctx.roomOf("spyglass") === "treeFort"
+        ? "The oak's PLATFORM alternates between the roots and TREE FORT. ENTER PLATFORM while it's beside you, WAIT for it to rise, then TAKE the BM SPYGLASS."
+        : "The BM SPYGLASS from the TREE FORT is the heirloom. PUT SPYGLASS IN RELIQUARY.";
+  const watchHint = !ctx.getFlag("wallGapFound")
+    ? "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER, go IN, and TAKE the WOODBLACK WATCH bearing a Blackwood family inscription."
+    : ctx.roomOf("backwardsWatch") === "betweenWalls"
+      ? "Go IN through the NURSERY wall-gap and TAKE the WOODBLACK WATCH. The inscription on its back makes it a family heirloom, however badly time behaves around it."
+      : "The WOODBLACK WATCH is a Blackwood heirloom, not pocket clutter. PUT WOODBLACK IN TROPHY CASE.";
 
-  if (!inside) {
-    if (ctx.getFlag("statueMoved") || ctx.has("frontKey") || ctx.roomOf("frontKey") === "garden") {
-      return "You've got the iron key — or it's sitting right there in the garden. TAKE it, go to the PORCH, then UNLOCK DOOR WITH IRON KEY, OPEN DOOR, and go NORTH. That's the entire trick.";
+  return [
+    { topics: ["front", "door", "key", "statue", "garden", "porch"], done: inside, text: frontDoorHint },
+    { topics: ["light", "dark", "candle", "candlestick", "match", "matches"], done: !!lit, text: lightHint },
+    { topics: ["ravenblood", "signet", "ring", "jewelry", "tiny", "key"], done: dep("rubyRing"),
+      text: "The RAVENBLOOD SIGNET is locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY." },
+    { topics: ["music", "box", "musicbox", "heirloom"], done: dep("musicBox"),
+      text: "Don't leave the JEWELED MUSIC BOX behind — the box ITSELF is a Blackwood heirloom, not just the tiny key's shell. Once you've got the tiny key out, TAKE the music box and PUT it in the RELIQUARY too." },
+    { topics: ["coin", "well", "rope", "garden"], done: dep("ancientCoin"), text: coinHint },
+    { topics: ["grimoire", "library", "lever", "bookcase", "chamber"], done: dep("grimoire"),
+      text: "In the LIBRARY there's a brass LEVER where a book should be. PULL it — a bookcase swings open onto a stair DOWN to a hidden chamber. The grimoire's there. Bring your lit candle; it's black as pitch." },
+    { topics: ["decanter", "wine", "cellar", "trapdoor"], done: dep("crystalDecanter"),
+      text: "Crystal decanter's in the WINE CELLAR. OPEN the CELLAR trap-door in the KITCHEN, go DOWN. Pitch dark — candle had better be lit or you're a grue's dinner. Unlike me, who has eaten NOTHING." },
+    { topics: ["portrait", "attic", "ladder", "cord", "landing"], done: dep("ancestralPortrait"),
+      text: "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first." },
+    { topics: ["locket", "crypt", "wraith", "diary", "safe", "talisman"], done: dep("goldLocket"),
+      text: "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down." },
+    { topics: ["talisman", "amulet", "wraith", "locket"], done: dep("talisman"),
+      text: "The TALISMAN that protected you from the WRAITH bears the BM crest on its back. Once the GOLD LOCKET is safely recovered, REMOVE TALISMAN and PUT it in the RELIQUARY as another family heirloom." },
+    { topics: ["family", "ring", "cart", "antechamber"], done: dep("familyRing"),
+      text: "You missed the dusty BLACKWOOD FAMILY RING marked BM in an abandoned ore cart in the DRAGON CAVE ANTECHAMBER. TAKE it and PUT it in the RELIQUARY." },
+    { topics: ["dragon", "dreadmaw", "apple", "maze", "troll", "vault", "crest", "cave"], done: dep("familyCrest"), text: dragonHint },
+    { topics: ["oak", "tree", "fort", "spyglass", "gem", "panel", "brazier", "platform"], done: dep("spyglass"), text: oakHint },
+    { topics: ["candlestick", "candle", "dining", "light"], done: dep("candlestick"),
+      text: "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall." },
+    { topics: ["watch", "woodblack", "wallpaper", "nursery", "wall", "gap"], done: dep("backwardsWatch"), text: watchHint },
+    { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
+      text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
+    { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
+      text: "Everything's in the reliquary. CLOSE RELIQUARY, then RING THE BELL in the hall. And then — I mean this warmly — never call me again." },
+  ];
+}
+
+// Returns the single most relevant next-step hint for the current game state.
+function nextHint(ctx) {
+  return hintEntries(ctx).find((hint) => !hint.done).text;
+}
+
+const HINT_QUERY_STOP_WORDS = new Set([
+  "a", "about", "advice", "am", "an", "can", "clue", "do", "for", "help",
+  "hint", "how", "i", "is", "me", "my", "next", "on", "please", "stuck",
+  "tell", "the", "tip", "to", "what", "where", "with", "you",
+]);
+
+function hintForQuestion(ctx, question) {
+  const tokens = [...new Set(String(question || "").toLowerCase()
+    .match(/[a-z0-9]+/g) || [])]
+    .map((token) => token.length > 3 && token.endsWith("s") ? token.slice(0, -1) : token)
+    .filter((token) => token.length > 1 && !HINT_QUERY_STOP_WORDS.has(token));
+  if (!tokens.length) return nextHint(ctx);
+
+  let best = null;
+  let bestScore = 0;
+  for (const hint of hintEntries(ctx)) {
+    const topics = hint.topics.map((topic) => topic.toLowerCase());
+    const text = hint.text.toLowerCase();
+    const topicScore = tokens.reduce((score, token) =>
+      score + (topics.some((topic) => topic === token) ? 3 : 0), 0);
+    const textScore = tokens.reduce((score, token) =>
+      score + (text.includes(token) ? 1 : 0), 0);
+    const score = topicScore + textScore + (hint.done ? 0 : 0.25);
+    if (score > bestScore) {
+      best = hint;
+      bestScore = score;
     }
-    return "The front door's locked, shocker. Some genius buried the key under that leaning STATUE in the garden. MOVE the statue, grab the key, then unlock the front door. In you go. Riveting.";
   }
-  if (!lit) {
-    if (ctx.roomOf("matches") === null) {
-      return "You burned your only match already, didn't you. DIDN'T YOU. The CANDLESTICK is still in the DINING ROOM, " +
-        "but without that match it is now an extremely expensive paperweight. Next time don't waste the match, pal.";
-    }
-    return "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
-  }
-  if (!dep("rubyRing")) {
-    return "The RAVENBLOOD SIGNET is locked in a jewelry box in the GRAND BEDROOM. The little key's inside the MUSIC BOX in the NURSERY — OPEN the music box, take the tiny key, then UNLOCK JEWELRY BOX WITH TINY KEY.";
-  }
-  if (!dep("musicBox")) {
-    return "Don't leave the JEWELED MUSIC BOX behind — the box ITSELF is a Blackwood heirloom, not just the tiny key's shell. Once you've got the tiny key out, TAKE the music box and PUT it in the RELIQUARY too.";
-  }
-  if (!dep("ancientCoin")) {
-    return ctx.has("rope")
-      ? "You've got the rope, congratulations. Go to the garden and ENTER WELL — or just go DOWN. Coin's at the bottom. Try not to end up down there permanently."
-      : "There's a coin down the garden WELL. Go down without a ROPE and you SPLATTER — dead, instantly, no do-overs. There's a rope in the KITCHEN. Get it FIRST. I cannot stress this enough.";
-  }
-  if (!dep("grimoire")) {
-    return "In the LIBRARY there's a brass LEVER where a book should be. PULL it — a bookcase swings open onto a stair DOWN to a hidden chamber. The grimoire's there. Bring your lit candle; it's black as pitch.";
-  }
-  if (!dep("crystalDecanter")) {
-    return "Crystal decanter's in the WINE CELLAR. OPEN the CELLAR trap-door in the KITCHEN, go DOWN. Pitch dark — candle had better be lit or you're a grue's dinner. Unlike me, who has eaten NOTHING.";
-  }
-  if (!dep("ancestralPortrait")) {
-    return "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first.";
-  }
-  if (!dep("goldLocket")) {
-    return "The gold locket's in the CRYPT, past the WINE CELLAR — guarded by a WRAITH that kills you on sight. So: READ the DIARY in the STUDY for the safe combo, MOVE the PROFILE PAINTING in the PARLOR, OPEN the SAFE, take the TALISMAN, WEAR it, THEN walk into the CRYPT. In that order. Write it down.";
-  }
-  if (!dep("talisman")) {
-    return "The TALISMAN that protected you from the WRAITH bears the BM crest on its back. Once the GOLD LOCKET " +
-      "is safely recovered, REMOVE TALISMAN and PUT it in the RELIQUARY as another family heirloom.";
-  }
-  if (!dep("familyRing")) {
-    return "You missed the dusty BLACKWOOD FAMILY RING marked BM in an abandoned ore cart in the DRAGON CAVE ANTECHAMBER. TAKE it and PUT it in the RELIQUARY.";
-  }
-  if (!dep("familyCrest")) {
-    if (!ctx.getFlag("dragonMoved")) {
-      return "A family heirloom, the BLACKWOOD FAMILY CREST, waits in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON.";
-    }
-    if (!ctx.getFlag("dragonVaultOpen")) {
-      return "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE.";
-    }
-    return "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
-  }
-  if (!dep("spyglass")) {
-    if (!ctx.getFlag("brazierLit")) {
-      return "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first.";
-    }
-    if (!ctx.getFlag("oakLightAligned")) {
-      return "TAKE the EMERALD GEM, then follow the path EAST through the PRIVY to the GREAT OAK. EXAMINE the PANEL and PLACE the gems into its BOTTOM, MIDDLE, and TOP SLOTS until the mirrored sunlight converges.";
-    }
-    if (ctx.roomOf("spyglass") === "treeFort") {
-      return "The oak's PLATFORM alternates between the roots and TREE FORT. ENTER PLATFORM while it's beside you, WAIT for it to rise, then TAKE the BM SPYGLASS.";
-    }
-    return "The BM SPYGLASS from the TREE FORT is the heirloom. PUT SPYGLASS IN RELIQUARY.";
-  }
-  if (!dep("candlestick")) {
-    return "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall.";
-  }
-  if (!dep("backwardsWatch")) {
-    if (!ctx.getFlag("wallGapFound")) {
-      return "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER, go IN, and TAKE the " +
-        "WOODBLACK WATCH bearing a Blackwood family inscription.";
-    }
-    if (ctx.roomOf("backwardsWatch") === "betweenWalls") {
-      return "Go IN through the NURSERY wall-gap and TAKE the WOODBLACK WATCH. The inscription on its back " +
-        "makes it a family heirloom, however badly time behaves around it.";
-    }
-    return "The WOODBLACK WATCH is a Blackwood heirloom, not pocket clutter. PUT WOODBLACK IN TROPHY CASE.";
-  }
-  if (!allTreasuresDeposited(ctx)) {
-    return "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets.";
-  }
-  return "Everything's in the reliquary. CLOSE RELIQUARY, then RING THE BELL in the hall. And then — I mean this warmly — never call me again.";
+  return bestScore > 0 ? best.text : nextHint(ctx);
 }
 
 function cycleFlavor(ctx, poolName) {
@@ -970,7 +980,7 @@ function hotlineTalk(ctx, text) {
   }
   if (/\b(hint|help|stuck|clue|next|where|advice|tip)\b/.test(t) || /how (do|to|the heck|am i)/.test(t) || /what.*(do|now|next)/.test(t)) {
     ctx.addScore(-1);
-    return frameHint(ctx, nextHint(ctx)) + "\n\n" + meter(ctx) + billAside(ctx);
+    return frameHint(ctx, hintForQuestion(ctx, t)) + "\n\n" + meter(ctx) + billAside(ctx);
   }
   if (/\b(who|you gary)\b/.test(t) || /(your|whats|what'?s) name/.test(t)) {
     return say(ctx, [

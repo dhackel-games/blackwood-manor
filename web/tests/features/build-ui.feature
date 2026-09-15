@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.088:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -51,6 +51,7 @@ Feature: Build metadata and touch-control contract
     And clicking the Bug button uses the default issue description
     And a Bug command uses its phrase as the issue description
     And bug reports include the full session trail, HUD state, and inventory
+    And bug reports include numbered Gary dialogue with compact speaker labels
     And overlong bug histories preserve both ends and mark the omission
     And the iOS wrapper opens new-window web links externally
 

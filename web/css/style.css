@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.095:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -360,6 +360,7 @@ body { -webkit-text-size-adjust: 100%; }
 #cmd {
   flex: 1;
   min-width: 0;                      /* let it shrink instead of overflowing */
+  margin-left: -1ch;
   background: transparent; border: none;
   color: var(--green-bright);
   font: inherit; font-size: 16px;   /* >=16px keeps iOS from zooming on focus */

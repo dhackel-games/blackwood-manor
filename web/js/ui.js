@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.090:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -16,6 +16,8 @@ import {
   createBugTrace,
   DEFAULT_ISSUE_DESCRIPTION,
   recordBugCommand,
+  recordBugDialogue,
+  updateBugDialogue,
 } from "./issue-report.js?v=source";
 import {
   DEFAULT_GARY_VOICE_PRESET,
@@ -305,6 +307,8 @@ function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
     turns: bugTrace.turns,
     origin: bugTrace.origin,
     commands: bugTrace.commands,
+    dialogue: bugTrace.dialogue,
+    userName: bugTrace.userName,
     hud: hudState,
     inventory: inventoryForBugReport(),
   });
@@ -773,6 +777,7 @@ function handle(raw) {
     }
   }
 
+  if (onCall) recordBugDialogue(bugTrace, "user", submitted);
   const prevFlags = { ...game.state.flags };
   const turnsBefore = game.state.turns;
   const out = game.send(cmd);
@@ -781,6 +786,7 @@ function handle(raw) {
 
   if (nowOnCall) {
     if (!onCall) showPhone();          // the call just connected → switch to the phone screen
+    const dialogueEntry = recordBugDialogue(bugTrace, "gary", out);
     // If an on-device model is available and this turn is pure conversation,
     // let Gary actually think. The canned line is kept as the fallback and the
     // mechanical tail (meter / bill milestone) is preserved either way.
@@ -796,6 +802,7 @@ function handle(raw) {
       updateHud();
       garyBrain.speak(info).then((line) => {
         const spoken = line ? line + (info.tail || "") : out;
+        updateBugDialogue(dialogueEntry, spoken);
         // Only model-written lines get a marker. Scripted fallbacks remain
         // unmarked rather than adding a second status label to every response.
         if (el) { el.className = line ? "gary llm" : "gary"; el.textContent = spoken; }
@@ -812,6 +819,7 @@ function handle(raw) {
   }
 
   if (onCall) {                        // the call just ended → switch back to the game
+    recordBugDialogue(bugTrace, "gary", out);
     finishPhoneCall(out);
     return;
   }

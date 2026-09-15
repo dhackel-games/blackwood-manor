@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -41,6 +41,17 @@ Feature: Gary's hint line
     And flag "onCall" is false
     When I send "east"
     Then the output contains "GARDEN"
+
+  Scenario: A topic-specific hint searches Gary's full hint catalog
+    Given flag "frontDoorOpen" is set
+    And item "candlestick" is carried
+    And item "matches" is carried
+    When I send "light candle"
+    And I send "call"
+    And I send "give me a hint about the dragon"
+    Then the output contains "DREADMAW"
+    And the output contains "APPLE"
+    And the output does not contain "RAVENBLOOD"
 
   Scenario: A finished game hangs up the phone so you are never stranded on the call screen
     Given the player is on fire

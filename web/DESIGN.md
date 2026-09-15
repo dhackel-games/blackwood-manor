@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 ```
 
 ---
@@ -334,7 +334,9 @@ the mansion.
 ## 12.3 Gary, the 1-900 hint line (the centerpiece)
 - `call`/`dial`/`hint` opens a **conversation** (`onCall` routes all input to
   `world.hotlineTalk` until you `hang up`). Grumpy, starving, underpaid operator who gives
-  genuinely progress-aware hints (`nextHint`) but needles you.
+  genuinely progress-aware hints (`nextHint`) but needles you. Topic-bearing
+  requests such as `hint about dragon` search every authored hint's keywords and
+  return the strongest match; unmatched or bare requests fall back to normal progression.
 - **Billing:** 99¢/min meter (`phoneBill`), milestone jabs at $5/$10/$20/$35/$50, and a
   **Hall-of-Shame rank** on the end screen (`phoneRank`): Frugal → Chatty → Best Customer →
   Funding the Hint Line → Worst Caller of All Time.
@@ -927,7 +929,11 @@ The browser keeps an in-memory command trail and actual turn count beginning at
 page reload, or resets both with origin `restart` when RESTART starts a new game.
 Both `BUG <description>` and the 🪲 button append the trail, every HUD slot
 (including inactive states), version/SFX state, and a comma-separated `Inv:`
-line to the prefilled GitHub issue body. `URLSearchParams` safely encodes the
+line to the prefilled GitHub issue body. If the hint line was opened, the report
+also includes the chronological Gary/user exchange: Gary turns are numbered,
+first speaker labels are written out, and later labels use the shortest unique
+prefix (including caller names learned from `my name is` or `call me`).
+`URLSearchParams` safely encodes the
 line breaks. The full trail remains in memory; only exceptionally long issue
 URLs compact command history to a 6,000-character budget while retaining both
 ends and an explicit omission marker.

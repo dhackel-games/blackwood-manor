@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.095:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -12,9 +12,12 @@ import {
   bugReportUrl,
   createBugTrace,
   DEFAULT_ISSUE_DESCRIPTION,
+  formatGaryDialogue,
   formatCommandHistory,
   MAX_BUG_HISTORY_CHARS,
   recordBugCommand,
+  recordBugDialogue,
+  updateBugDialogue,
 } from "../../js/issue-report.js";
 import {
   GARY_VOICE_PRESETS,
@@ -566,6 +569,47 @@ Then("overlong bug histories preserve both ends and mark the omission", function
   assert.match(formatted, /command-999$/);
 });
 
+Then("bug reports include numbered Gary dialogue with compact speaker labels", function () {
+  const trace = createBugTrace();
+  recordBugDialogue(trace, "gary", "foo");
+  recordBugDialogue(trace, "user", "what they asked");
+  const response = recordBugDialogue(trace, "gary", "draft response");
+  updateBugDialogue(response, "response");
+  recordBugDialogue(trace, "user", "additional question");
+  recordBugDialogue(trace, "gary", "etc");
+  assert.equal(formatGaryDialogue(trace.dialogue, trace.userName),
+    "1. gary: foo\n" +
+    "user: what they asked\n" +
+    "2. g: response\n" +
+    "u: additional question\n" +
+    "3. g: etc");
+
+  const named = createBugTrace();
+  recordBugDialogue(named, "gary", "hello");
+  recordBugDialogue(named, "user", "my name is Grace");
+  recordBugDialogue(named, "gary", "hello Grace");
+  recordBugDialogue(named, "user", "dragon hint please");
+  assert.equal(formatGaryDialogue(named.dialogue, named.userName),
+    "1. gary: hello\n" +
+    "Grace: my name is Grace\n" +
+    "2. ga: hello Grace\n" +
+    "gr: dragon hint please");
+
+  const body = bugReportBody({
+    dialogue: trace.dialogue,
+    userName: trace.userName,
+  });
+  assert.match(body,
+    /\n\nGary dialogue:\n1\. gary: foo\nuser: what they asked\n2\. g: response/);
+
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /if \(onCall\) recordBugDialogue\(bugTrace, "user", submitted\)/);
+  assert.match(ui, /const dialogueEntry = recordBugDialogue\(bugTrace, "gary", out\)/);
+  assert.match(ui, /updateBugDialogue\(dialogueEntry, spoken\)/);
+  assert.match(ui, /dialogue: bugTrace\.dialogue/);
+  assert.match(ui, /userName: bugTrace\.userName/);
+});
+
 Then("both submit controls use the same extra-thick SVG arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
@@ -585,8 +629,10 @@ Then("Gary's circular voice toggle contains a speaker icon", function () {
 
 Then("both entry rows place the microphone left of the text field and submit arrow", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(html, /id=["']inputline["'][\s\S]*id=["']mic["'][\s\S]*id=["']prompt["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
   assert.match(html, /class=["']phone-inputline["'][\s\S]*id=["']phone-mic["'][\s\S]*id=["']phone-cmd["'][\s\S]*id=["']phone-go["']/);
+  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-1ch/s);
 });
 
 Then("both entry rows share text-aware submit styling with custom starter text", function () {

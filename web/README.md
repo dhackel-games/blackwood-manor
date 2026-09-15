@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.094:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven. -->
 
 # Blackwood Manor
 
@@ -54,8 +54,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   things you can act on. Room art also appears the first time you enter each room.
   With an object, `search <thing>`, `ex <thing>`, `examine <thing>`, `look <thing>`,
   and `look at <thing>` all show its deeper details.
-- **Touch controls:** direction and action buttons remain visible and usable at all
-  times, including while the software keyboard is open. The three-square picker
+- **Touch controls:** direction and action buttons remain usable while the
+  software keyboard is open and can be collapsed with the chat-box disclosure.
+  The three-square picker
   selects small, medium, or large navigation buttons and remembers the choice;
   touch-capable browsers and the native app default to large. **🪲** opens the
   repository's new-issue form in a separate browser window and prefills its
@@ -63,11 +64,15 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   `bug <description>` instead puts that text into the issue body without
   advancing the game turn. Both paths append turns and commands since the latest
   page reload or restart, every HUD value, and `Inv: ...`. Newlines are URL-encoded;
-  exceptionally long histories retain both ends and mark the omitted middle.
+  exceptionally long histories retain both ends and mark the omitted middle. If
+  Gary was called, the report also includes numbered Gary/user dialogue with
+  compact unambiguous speaker labels.
 - **Gary's voice:** tap the speaker circle or voice-status line to unmute him.
   The adjacent icon selector offers robot male/female and Australian
   male/female presets and remembers your choice. MIC stays active across pauses
   until tapped again to submit.
+- **Gary's hints:** a bare HINT remains progression-aware; asking for a hint
+  about a subject such as the dragon searches the complete authored hint catalog.
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
