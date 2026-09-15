@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.091:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.092:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.091:acoven.
+// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.092:acoven.
 ```
 
 ---
@@ -629,14 +629,16 @@ transcript. Every art line is capped at 32 characters for the mobile layout.
 
 ## 12.19 Persistent touch controls
 
-The controls and typeahead share one outer frame. The typeahead's left edge
-carries a disclosure: `▴` while navigation is open and `▾` while collapsed.
+The controls and typeahead share one outer frame. The typeahead's top edge
+carries a green disclosure: `▴` while navigation is open and `▾` while collapsed.
 Open, the frame encloses navigation and typeahead with that edge as their
 divider; collapsed, the same frame encloses typeahead alone. The preference
 persists. Within the open navigation area, a far-left
 three-square picker selects navigation size 1, 2, or 3, followed by a 3×3
 eight-arrow compass, a 2×2 level/portal block (`⇧`, `⇩`, and center-anchored
-In/Out SVG arrows), and two equal-width action rows. `?` and 🪲 each occupy half
+In/Out SVG arrows), and two equal-width action rows. The detached L/M/S picker
+stays flush left while that navigation/action bundle centers independently.
+`?` and 🪲 each occupy half
 a regular slot. `Native.isMobileApp()` or an `any-pointer: coarse` media match
 defaults to size 3; other browsers default to size 1. On narrow touch screens
 the movement and action groups stack beside the picker so enlarged navigation
