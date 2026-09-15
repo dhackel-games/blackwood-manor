@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.097:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -632,7 +632,7 @@ Then("both entry rows place the microphone left of the text field and submit arr
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(html, /id=["']inputline["'][\s\S]*id=["']mic["'][\s\S]*id=["']prompt["'][\s\S]*id=["']cmd["'][\s\S]*id=["']go["']/);
   assert.match(html, /class=["']phone-inputline["'][\s\S]*id=["']phone-mic["'][\s\S]*id=["']phone-cmd["'][\s\S]*id=["']phone-go["']/);
-  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-1ch/s);
+  assert.match(css, /#cmd\s*\{[^}]*margin-left:\s*-2ch/s);
 });
 
 Then("both entry rows share text-aware submit styling with custom starter text", function () {
