@@ -1,8 +1,8 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
-import { createGame } from "../../js/core.js";
+import { createGame, parseRestartTarget } from "../../js/core.js";
 import { HELP_TEXT } from "../../js/commands.js";
 import { clean as garyClean, isLocalPage } from "../../js/gary-brain.js";
 import { HUD_SLOT_DEFINITIONS, HudSlot, hudStateSummary } from "../../js/hud.js";
@@ -329,6 +329,42 @@ Then("the following command lines split as:", function (table) {
   }
 });
 
+Then("restart command {string} selects Part {int}", function (input, part) {
+  assert.equal(parseRestartTarget(input), part);
+});
+
+Then("browser boot asks for the name before rendering the title", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const boot = ui.slice(ui.indexOf("// --- boot ---"));
+  const prompt = boot.indexOf('print("\\n" + game.startMessage())');
+  const banner = boot.indexOf("showIntroBanner()");
+  assert.ok(prompt >= 0, "boot must print the name-gated start message");
+  assert.equal(banner, -1, "boot must not render the title before the name is accepted");
+  assert.match(ui,
+    /const wasNaming = game\.needsPlayerName\(\)[\s\S]*game\.send\(cmd\)[\s\S]*if \(wasNaming && !game\.needsPlayerName\(\)\) \{[\s\S]*showIntroBanner\(\)/s);
+  assert.match(ui, /input\.placeholder = naming \? "What should we call you\?" : "type command \/ tap button"/);
+  assert.match(ui, /hudElement\.hidden = naming/);
+  assert.match(ui, /controls\.hidden = naming/);
+  assert.match(ui, /navDisclosure\.hidden = naming/);
+  assert.match(html, /id=["']hud["'] hidden/);
+  assert.match(html, /id=["']controls["'] hidden/);
+  assert.match(html, /id=["']nav-disclosure["'][^>]*hidden/);
+  assert.match(css, /#hud\[hidden\], #controls\[hidden\], #nav-disclosure\[hidden\]\s*\{\s*display:\s*none/);
+  assert.match(ui,
+    /function announceModelCheck\(\) \{[\s\S]*game\.needsPlayerName\(\)[\s\S]*return/s);
+});
+
+Then("browser restart handling supports both game parts", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /const restartTarget = parseRestartTarget\(cmd\)/);
+  assert.match(ui,
+    /if \(restartTarget\) \{[\s\S]*if \(restartTarget === 2\) restartPartTwo\(\)[\s\S]*else \{[\s\S]*newGame\(\)/s);
+  assert.match(ui,
+    /function restartPartTwo\(\) \{[\s\S]*game\.restoreCheckpoint\("partII"\)[\s\S]*Restarting Part II/s);
+});
+
 Then("the copyright-version is exact", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
   const design = readFileSync(new URL("../../DESIGN.md", import.meta.url), "utf8");
@@ -443,7 +479,7 @@ Then("the static control boxes are half size with readable text", function () {
 Then("a successful restore updates the HUD before returning", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui,
-    /if \(low === "restore"\)[\s\S]*?const restored = loadGame\(game\)[\s\S]*?if \(restored\) updateHud\(\)/);
+    /if \(low === "restore"\)[\s\S]*?const restored = loadGame\(game\)[\s\S]*?if \(restored\) \{[\s\S]*?updateHud\(\)/);
 });
 
 Then("Save and Restore mark the no-takebacks disqualifier", function () {
@@ -673,9 +709,10 @@ Then("game-over restart text links to the latest session start", function () {
   assert.match(ui,
     /link\.addEventListener\("click", \(event\) => \{[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(currentSessionAnchorId\)/s);
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
-  assert.match(ui, /function newGame[\s\S]*markSessionStart\(\)[\s\S]*game\.describeRoom/s);
+  assert.match(ui, /function newGame[\s\S]*markSessionStart\(\)[\s\S]*game\.startMessage/s);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
-  assert.match(ui, /\/\/ --- boot ---\s*markSessionStart\(\);\s*introBannerElement/s);
+  assert.match(ui,
+    /\/\/ --- boot ---\s*markSessionStart\(\);\s*print\("\\n" \+ game\.startMessage\(\)\)/s);
   assert.match(ui, /if \(game\.state\.won\) printRestartPrompt\(\)/);
   assert.match(css, /\.session-restart a\s*\{[^}]*color:\s*var\(--green-bright\)[^}]*text-decoration:\s*underline/s);
 });
@@ -745,7 +782,7 @@ Then("browser speech accumulates finalized phrases until explicit submission", f
   assert.match(ui, /recognition\.continuous = true/);
   assert.match(ui, /webTranscript \+= text\.trim\(\) \+ " "/);
   assert.match(ui, /webTranscript \+= webPartial\.trim\(\) \+ " "/);
-  assert.match(ui, /if \(listening\) webRestartTimer = setTimeout\(beginWebRecognition, 100\)/);
+  assert.match(ui, /if \(listening\) scheduleWebRecognition\(\)/);
   assert.match(ui, /const text = \(webTranscript \+ webPartial\)\.trim\(\)/);
   assert.match(ui, /targetInput\.placeholder = "listening… tap mic to stop"/);
   assert.match(ui, /function finishListening\(text\)[\s\S]*setEntryValue\(speechTarget, t\)/);
@@ -753,6 +790,22 @@ Then("browser speech accumulates finalized phrases until explicit submission", f
   assert.match(css,
     /\.iconbtn\.listening\s*\{[^}]*background:\s*var\(--green\)[^}]*border-color:\s*var\(--green-bright\)[^}]*color:\s*var\(--bg\)/s);
   assert.match(css, /@keyframes micpulse[^}]*rgba\(67,255,122,0\.5\)/s);
+});
+
+Then("browser speech retries transient network interruptions", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /const WEB_NETWORK_RETRY_INITIAL_MS = 1000/);
+  assert.match(ui, /const WEB_NETWORK_RETRY_MAX_MS = 8000/);
+  assert.match(ui,
+    /if \(event\.error === "network"\) \{[\s\S]*Math\.min\(webNetworkRetryDelay \* 2, WEB_NETWORK_RETRY_MAX_MS\)[\s\S]*WEB_NETWORK_RETRY_INITIAL_MS[\s\S]*speechTarget\.placeholder = "speech network interrupted… retrying"[\s\S]*return;/s);
+  assert.match(ui,
+    /function scheduleWebRecognition\(\) \{[\s\S]*const delay = webNetworkRetryDelay \|\| WEB_RECOGNITION_RESTART_MS[\s\S]*webRestartTimer = setTimeout\(\(\) => \{[\s\S]*beginWebRecognition\(\)[\s\S]*\}, delay\)/s);
+  assert.match(ui,
+    /recognition\.onresult = \(event\) => \{[\s\S]*webNetworkRetryDelay = 0/s);
+  assert.match(ui,
+    /function stopListening\(\) \{[\s\S]*clearWebRestartTimer\(\)[\s\S]*webNetworkRetryDelay = 0/s);
+  assert.doesNotMatch(ui,
+    /if \(event\.error === "network"\) \{[^}]*speechRecognitionFailed/s);
 });
 
 Then("END CALL disables and stays visible 1.5 times longer while Gary finishes", function () {
@@ -864,12 +917,10 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
   assert.match(ui, /const defaultNavSize = prefersLargeNav \? "3" : "1"/);
   assert.match(ui, /setAttribute\("aria-checked", String\(button\.dataset\.navSize === selected\)\)/);
   assert.match(css,
-    /@media \(any-pointer:\s*coarse\) and \(max-width:\s*600px\)[\s\S]*#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) minmax\(0,\s*1fr\)/);
-  assert.match(css,
-    /#controls \.movement-controls,[\s\S]*#controls \.action-controls\s*\{[^}]*justify-self:\s*center/s);
+    /@media \(max-width:\s*600px\)[\s\S]*#controls \.nav-size-picker\s*\{[^}]*margin-top:\s*0/s);
 });
 
-Then("action shortcuts occupy two equally wide rows beside movement", function () {
+Then("the compass centers responsively beside edge-aligned action shortcuts", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   const rows = [...html.matchAll(/<div class=["']verb-row["']>([\s\S]*?)<\/div>/g)];
@@ -878,12 +929,18 @@ Then("action shortcuts occupy two equally wide rows beside movement", function (
   assert.match(rows[1][1], /data-cmd=["']inventory["'][\s\S]*data-cmd=["']map["'][\s\S]*data-cmd=["']call["']/);
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
-  assert.match(css, /#controls \.controls-content\s*\{[^}]*grid-template-columns:\s*var\(--nav-picker-width\) auto minmax\(0, 28rem\)/s);
+  assert.match(css,
+    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--action-controls-min-width:\s*17rem[^}]*--action-controls-max-width:\s*28rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\) -[\s\S]*var\(--action-controls-min-width\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
+  assert.match(css,
+    /#controls \.controls-content\s*\{[^}]*display:\s*block/s);
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*margin-top:\s*-1px/s);
-  assert.match(css, /#controls \.controls-content\s*\{[^}]*justify-content:\s*center/s);
   assert.match(css,
-    /@media \(max-width:\s*600px\)[\s\S]*#controls \.nav-size-picker\s*\{[^}]*grid-column:\s*1[^}]*grid-row:\s*1[\s\S]*#controls \.movement-controls\s*\{[^}]*grid-column:\s*2[^}]*grid-row:\s*1[\s\S]*#controls \.action-controls\s*\{[^}]*grid-column:\s*1 \/ span 2[^}]*grid-row:\s*2/s);
+    /#controls \.movement-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*left:\s*var\(--dpad-left\)/s);
+  assert.match(css,
+    /#controls \.action-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*50%[^}]*right:\s*0[^}]*left:\s*auto[^}]*width:\s*min\([\s\S]*var\(--action-controls-max-width\)[\s\S]*100% - var\(--dpad-left\) - var\(--movement-controls-width\) - var\(--movement-to-action-gap\)[\s\S]*max-width:\s*var\(--action-controls-max-width\)[^}]*transform:\s*translateY\(-50%\)/s);
+  assert.match(css,
+    /@media \(max-width:\s*600px\)[\s\S]*#controls\s*\{[^}]*--dpad-max-left:\s*calc\(100% - var\(--movement-controls-width\)\)[\s\S]*#controls \.action-controls\s*\{[^}]*position:\s*static[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*margin-top:\s*0\.5rem[^}]*transform:\s*none/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);
   assert.match(css, /#controls \.verb-row\s*\{[^}]*grid-template-columns:\s*repeat\(8,/s);
   assert.match(css, /#controls \.verb-row button\s*\{[^}]*grid-column:\s*span 2/s);

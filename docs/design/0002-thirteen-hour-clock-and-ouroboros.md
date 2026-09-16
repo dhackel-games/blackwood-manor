@@ -1,34 +1,42 @@
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
+> **UPDATE 2026-09-15 — the simplified reliquary/clock seam is implemented.**
+> The game asks `What should we call you?` before the first room and accepts a
+> bare name, SAY, or CALL ME response. Authored `{{player_name}}` tokens are
+> resolved through one output renderer. In BM1, put all thirteen heirlooms in
+> the RELIQUARY, CLOSE it, OPEN the BELL CLOSET beside the front door, and PULL
+> its lower rope. The remote belfry bell tolls, magical light consumes the
+> separate items, the FRONT DOOR slams shut and then opens wide, and the floor
+> trapdoor opens. EXAMINE the
+> RELIQUARY to learn that the heirlooms became the COUNTDOWN CLOCK. Leaving
+> through the front door wins; taking the clock opens the stair DOWN. Gary is
+> alone beside a silent phone, surprised and excited; he knocks you out and
+> escapes. You wake as a ghost still holding the clock, and only EXAMINE CLOCK
+> explains its purpose. A Part-II death offers RESTART 1 for a fresh Part I or
+> RESTART 2 for the serialized ghost-awakening checkpoint. The bone-key/Hollow
+> Sanctum/spirit/silver-mirror branch and the separate Part-II naming prompt are
+> retired.
+>
 > **➡️ UPDATE 2026-09-14 (evening) — Hour XIII is now integrated INLINE into the shipped
 > game.** The seam and the first hour of the loop are built directly into `web/js/world.js`
 > (not a separate page): finish BM1, seal the reliquary, `go down` → the Gary cliffhanger now
 > *continues* into Part II — you wake a ghost holding the 13-hour clock, dive into the
 > Thirteenth Hour, **find** the living queen at the statue, learn the mirror **pool**, and
 > `yell` to petrify her (yelling without the pool trick now **kills** you) — then return the
-> emerald to the garden to tick the clock XIII→XII. Jump there with the new **`::brink`** sysop
-> command (poised at end of BM1, bell unrung) then `go down`, or `::garycliff` to drop straight
-> in. Covered by `web/tests/features/part-two.feature`. The isolated `web/examples/bm2/`
+> emerald to the garden to tick the clock XIII→XII. `::winmax2bell` performs
+> every deterministic reward and stops before the lower bell rope; pull it,
+> take the clock, and go down. Covered by `web/tests/features/part-two.feature`.
+> The isolated `web/examples/bm2/`
 > prototype referenced below is a **superseded scratch draft** (kept out of the repo); the
 > inline `world.js` implementation is the source of truth. Hours XII–I and the ouroboros close
 > remain to be built on this same pattern.
 
-- **Status:** **PROPOSED (2026-09-14, David + Andy — verbal working session); BM2 FULL
-  13-period loop BUILT & playable to the ouroboros 2026-09-14.** Major evolution of the
-  RATIFIED Chapter-2 canon in
-  [`0001-chapter-2-narrative-continuity.md`](./0001-chapter-2-narrative-continuity.md).
-  This doc *supersedes the open BM2 dials* in 0001 (it resolves "two candidate BM2 designs"
-  and the "8-bit room + video screen" presentation lean) and **proposes concrete changes to
-  BM1's shipped ending.** A runnable BM2 prototype now lives at
-  [`web/examples/bm2/`](../../web/examples/bm2/) (`world.js` + a headless `play.mjs` smoke
-  test): it plays **all thirteen hours 13 → 0 to the become-Gary ouroboros**, with two hard
-  hero scenes (Medusa/emerald + the dragon/RING peeled from a painting), the try-over retry
-  mechanic, the name-at-boot identity, and the clock-back text map. It is **fully isolated
-  from BM1** (under `examples/`, not the shipped `js/` bundle; all 384 cucumber scenarios still
-  pass; 30/30 BM2 smoke checks pass). **David was away when the loop was built, so Q4/Q5 (and
-  the hour order + try-over count) are baked in PROVISIONALLY — see "Provisionally decided"
-  below.** **BM1-touching changes remain UNBUILT and need David's explicit go — they hit
-  `web/js/world.js` and the 383-scenario test suite.**
+- **Status:** **IMPLEMENTED through Hour XIII inline in `web/js/world.js`.**
+  The name-at-boot flow, reliquary-to-clock transformation, front-door ending,
+  clock-key staircase, revised Gary encounter, ghost awakening, and first
+  thirteen-hour scene are part of the continuous shipped game. Hours XII–I and
+  the ouroboros close remain unbuilt. The excluded `web/examples/bm2/`
+  prototype is superseded and is not the source of truth.
 - **Date:** 2026-09-14
 - **Source:** Verbal notes, David + Andy (transcribed). "We know exactly what we want."
 - **Why it matters:** This is the piece 0001 left open. It (a) collapses the prequel/sequel
@@ -45,11 +53,11 @@
 |---|---|---|
 | BM2 shape | Sequel: you work Gary's **phone line** watching a guest gather | Ghost **scatter-in-time**: you replay **13 time periods**, place each heirloom where BM1 will find it |
 | Prequel vs sequel | Two rival designs; sequel = "proper," prequel demoted to backstory | **Fused into one loop** — the scatter IS the sequel, because finishing it turns you into Gary for the next cycle. **BM2 = BM1 + BM(−1), all one.** |
-| BM1 ring payoff | Ring bell → **BONE KEY** + north **SECRET DOOR** → HOLLOW SANCTUM "dawn" ending | Ring bell → heirlooms **vanish**, a **13-hour clock** appears in the reliquary; **front door flings open** |
-| BM1 clean win | Dawn / HOLLOW SANCTUM | **Walk out the open front door** to end the game; **leave *with the talisman* = extra points** (best clean score). |
-| BM1 → Gary hand-off | Deposit + **CLOSE** reliquary opens the stair; go DOWN | **USE the TALISMAN in the reliquary** → trapdoor opens → go DOWN into phase 2 (you carry the clock). *Leaving with the talisman instead = extra points but no phase 2.* |
+| BM1 ring payoff | Ring bell → **BONE KEY** + north **SECRET DOOR** → HOLLOW SANCTUM "dawn" ending | Pull the entry-closet rope → remote belfry toll, heirlooms vanish, front door slams then opens wide, floor trapdoor opens |
+| BM1 clean win | Dawn / HOLLOW SANCTUM | **Walk out the open front door** after ringing the bell. |
+| BM1 → Gary hand-off | Deposit + **CLOSE** reliquary opens the stair; go DOWN | EXAMINE the transformed reliquary, TAKE the COUNTDOWN CLOCK, then use the already-open stair DOWN. |
 | Presentation | Open dial: "8-bit room + video screen of the castle" | The **screen is the back of the clock** (Marauder's-Map). **Text-first now; 8-bit later.** |
-| Identity | Gary = disowned heir; "it's you" implied | **Explicit:** ask the player's name at boot; call the protagonist **"Gary"** throughout; **pay it off at the become-Gary moment** (clock 13 → 1) with the player's own name. You were Gary all along. |
+| Identity | Gary = disowned heir; "it's you" implied | Ask `What should we call you?` before BM1 and carry the answer through authored `{{player_name}}` tokens. |
 
 **Unchanged / still canon (from 0001):** reliquary = **prison/containment** (bell *imprisons*,
 doesn't destroy — now literalized: the heirlooms disappear); tone = **tragic but funny**;
@@ -58,50 +66,26 @@ Gary = disowned heir acting in **self-preservation** because completing the rite
 
 ---
 
-## Part A — BM1 ending changes (touches the shipped game)
+## Part A — BM1 ending implementation
 
-Grounded in `web/js/world.js` (current state machine): depositing all
-`REQUIRED_FAMILY_ITEM_COUNT = 13` sets `curseLiftable` + `floorDoorOpen`; an explicit
-**CLOSE** sets `reliquarySealed`; **RING** (needs sealed + liftable) sets `bellRung` and drops
-the `boneKey` + north `secretDoor`; **GO DOWN** (needs `floorDoorOpen` + `reliquarySealed`,
-*not* `bellRung`) runs `garyEnding()` and `saveBm2Seed()`.
-
-Proposed new flow:
-
-1. **Talisman stays simple.** The BM-crested TALISMAN is just another deposit; the **CLOSE**
-   is the load-bearing ritual gate. *(Already true in code — no change; David: "just one extra
-   thing, it goes into the reliquary, you close the reliquary… you have to close the reliquary
-   or it will not work.")* Keep it that way.
-
-2. **Pull the cord / ring the bell → the transformation.** Over a **full + sealed** reliquary,
-   ringing triggers a bright light; **the 13 heirlooms disappear** and in their place sits a
-   **beautiful mini grand clock, holdable, with 13 numbers, its hand on 13, ticking
-   *backwards*.** The prose is **deliberately understated** — something like *"…and something in
-   the RELIQUARY has changed"* — we do **not** describe the clock fully yet. (Mystery box.)
-
-3. **The FRONT DOOR flings wide open.** The same beat announces the front door standing open.
-   This is the **new nudge to leave**. Set `frontDoorOpen` (it already exists) at ring time.
-
-4. **Leaving = the quick win.** Walking OUT through the open front door ends the game via
-   `game.finish(...)` with your score. **Leaving *with the TALISMAN* grants extra points** — the
-   best *clean* score. Restart offered. *(Replaces the HOLLOW-SANCTUM "dawn" walk as the
-   canonical clean win — see Open Questions on whether dawn survives as an alternate.)*
-
-5. **Using the talisman is the doorway to phase 2 (the fun part).** If instead you **USE the
-   TALISMAN in the RELIQUARY**, the **trapdoor to Gary's cave opens** (`floorDoorOpen`). Go
-   **DOWN** and it plays as today: Gary clubs you with the receiver ("puncture in the head, you
-   pass out"), grabs the loot, and bolts howling **"FREEDOM!"** — and you drop into **BM2, back
-   in time**, carrying the **13-hour clock**. David: *"the more fun part is going downstairs to
-   start the 2nd phase — back in time!"*
-
-   > Net changes from shipped code: (a) the trapdoor opens on **USE TALISMAN in reliquary** (not
-   > on deposit/seal); (b) **leaving with the talisman** scores extra; (c) `saveBm2Seed()` must
-   > persist that **you carry the 13-hour clock** into BM2.
-
-**Scoring shape (proposed):** plain walk-out = a win; **walk out holding the TALISMAN = extra
-points** (best clean score); **USE talisman → go DOWN** = the cliffhanger into BM2 (score saved
-as the BM2 seed). The downstairs path forfeits the talisman-points but unlocks phase 2 — the
-intended "more fun" route. Keep the inverted-scoring intent ("Gary profits when you fail").
+1. Put all thirteen heirlooms in the RELIQUARY. The last deposit only confirms
+   that the set is complete; it does not open the floor.
+2. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside the FRONT DOOR, and PULL its
+   lower rope. The remote belfry toll flashes magical light, transforms the
+   heirlooms into the COUNTDOWN CLOCK, slams the FRONT DOOR shut and then wide
+   open, and opens the floor trapdoor.
+3. EXAMINE the RELIQUARY to discover the clock. Its purpose is not explained in
+   BM1.
+4. Leave SOUTH/OUT through the open front door for the clean ending.
+5. Alternatively, OPEN the RELIQUARY and TAKE the CLOCK. The staircase is
+   already open, but DOWN requires the clock and then reaches Gary.
+6. Gary is alone beside a silent phone. He recognizes `{{player_name}}`, reacts
+   with surprise and excitement, clubs the player with the receiver, and exits.
+7. The player wakes alone as a ghost holding the clock. EXAMINE CLOCK explains
+   the thirteen-hour loop; USE CLOCK enters Hour XIII.
+8. Entering Part II captures the ghost awakening as a serialized checkpoint.
+   Part-II deaths offer RESTART 1 (fresh Part I and naming) or RESTART 2 (same
+   player name, score, and Part-I carry-over at the awakening).
 
 ---
 
@@ -187,12 +171,11 @@ worked out; the rest are seeds to fill.
 **Design law:** *the object's BM1 location must be earned by its origin.* Don't place things
 randomly — invent the moment that logically strands each heirloom exactly where BM1 finds it.
 
-**Worked example 1 — the dragon / the RING (BM1: dragon antechamber).**
-Travel to a time/realm to find a **dragon** and bring it back to the antechamber, where it must
-end up **asleep** (as BM1 encounters it). A small chain of challenges: the dragon lives **inside
-a painting**; you **pull it out of the painting**. You **meet the painter in the woods**, and
-**the painter has magic** (the pull-from-canvas verb comes from him). No new rooms — the woods +
-a manor painting we already have.
+**Worked example 1 — the bats / the BAT SIGHT MIRROR (BM1: belfry).**
+The great bell's rope runs from the BELFRY through the house to a closet beside
+the front door. Pulling either end rings **DONG... DONG...**, scatters the bats,
+and drops their silver mirror onto the belfry floor. Its black glass can scry any
+named Part-I room.
 
 **Worked example 2 — the emerald / the garden STATUE (BM1: emerald gem + the leaning garden
 statue that hides the front-door key).**
@@ -211,10 +194,10 @@ grounds set-piece when we lock the 13-row table.*
 | # | Heirloom | BM1 hiding spot (from 0001) | Proposed origin-scene seed |
 |---|---|---|---|
 | 13 | (opening item — TBD) | — | The scene that first sets the clock ticking; likely the RING or GRIMOIRE. |
-| — | Family RING | Dragon antechamber | **Worked ex. 1** — pulled from a painting; the sleeping dragon guards it. |
+| — | BAT SIGHT MIRROR | Belfry | Pulling either bell rope scatters the bats and drops it from their roost. |
 | — | Family CREST | Dreadmaw's vault | Lost/sealed during the working; Dreadmaw set as its warden. |
 | — | GRIMOIRE | Secret chamber | The family's assembly-rite book — hidden behind the wall as the working began. |
-| — | RAVENBLOOD SIGNET | Jewelry box | The line's seal — set aside by a family member in an ordinary moment. |
+| — | RAVENBLOOD RING | Jewelry box | The line's ring — set aside by a family member in an ordinary moment. |
 | — | TALISMAN (BM-crested) | Locked safe | Locked away for safekeeping the night it all went wrong. |
 | — | MUSIC BOX | Nursery | Belonged to the Blackwood child — never leaves the nursery. |
 | — | LOCKET | Crypt | Buried with someone; the crypt is its true home. |
@@ -276,30 +259,29 @@ entry is swapped out to keep the count at 13. Which one is still open, Q5.)*
 
 ---
 
-## Implementation plan (when greenlit)
+## Implementation status
 
-**BM1 edits (in `web/js/world.js`; will touch the 383-scenario suite — do only on David's go):**
-1. In the `ring` handler (over sealed + `curseLiftable`): spawn a new `thirteenHourClock` item
-   **in the reliquary**, remove/hide the 13 deposited heirlooms, set `frontDoorOpen`, and print
-   the understated "something has changed" line. Decide fate of `boneKey`/`secretDoor`/dawn path.
-2. Front-door **leave** handler → `game.finish(maxEnding, banner)`.
-3. **USE TALISMAN in reliquary** → set `floorDoorOpen`; **GO DOWN** → `garyEnding()` carrying the
-   clock; `saveBm2Seed()` records `{score, turns, holdsClock:true}`. **Leaving with the talisman**
-   → `game.finish()` with a bonus. (Reliquary EXAMINE can mention the clock obliquely.)
-4. Update/annotate the affected walkthrough scenarios deliberately (don't just make tests pass —
-   the ending genuinely changed).
+**BM1 and seam work completed 2026-09-15:**
+1. The opening name prompt and `{{player_name}}` rendering pipeline are live.
+2. The full, closed reliquary transforms into the COUNTDOWN CLOCK when the bell
+   rings; the front door opens and the floor rumbles.
+3. The front door is the clean ending. The bone key, secret north door, Hollow
+   Sanctum, robed spirit, and silver mirror are removed.
+4. Taking the clock opens DOWN; Gary is alone beside a silent phone and knocks
+   the player into Part II.
+5. The ghost must EXAMINE CLOCK before USE CLOCK enters Hour XIII.
 
 **BM2 new scaffolding (new module(s); does *not* touch BM1 tests):**
 5. `bm2/` engine seam that boots from the BM2 seed (score + `holdsClock`). **[slice: BUILT as a
    standalone world at `web/examples/bm2/world.js` on the generic engine; boot-from-seed wiring
    still TODO — the slice reads `flags.playerName` and starts fresh.]**
-6. **Name-at-boot identity**: capture the player's name, display **"Gary"** through play, reveal
-   at the **13 → 1** become-Gary beat. **[slice: BUILT — `SAY <name>` at the awakening sets
-   `flags.playerName`; the ending renders "`<name> = GARY`". A real boot page can set the flag
-   instead of the `SAY` capture.]**
+6. **Name-at-boot identity**: **[BUILT]** capture the player's name before BM1
+   with bare-name, SAY, or CALL ME syntax; carry it through explicit
+   `{{player_name}}` templates. There is no second naming prompt after Gary's blow.
 7. **13 time-period scenes**: map + time-overlay + cast-overlay; one findable heirloom each +
-   clue stubs. **[BUILT — all 13 hours playable. TWO hard hero scenes (hour XIII Medusa/emerald;
-   hour II dragon/RING peeled from a painting) + 11 lighter "find-and-place" beats. The 11 easy
+   clue stubs. **[SUPERSEDED PROTOTYPE — all 13 hours were sketched, including hour XIII
+   Medusa/emerald and an obsolete hour-II dragon/ring scene. Current hour II is the Bat Sight Mirror
+   in the belfry; Hours XII–I remain unbuilt inline. The 11 easy
    origins are first-draft flavor.]**
 8. **Clock timer**: 13 → 1, gated on correct placement; return-and-place step per item.
    **[BUILT — fixed reverse order 13 → 0. NAVIGATE-TO-PLACE (Model A, David 2026-09-14): after
@@ -317,17 +299,16 @@ entry is swapped out to keep the count at 13. Which one is still open, Q5.)*
     spends one and rewinds the scene; at 0, SAVE/RESTORE/RESTART. **[BUILT — shared across both
     hard scenes: grabbing the queen or pulling the dragon early spends a try-over and rewinds.]**
 
-**Run the loop:** `node web/examples/bm2/play.mjs` (full 13-hour transcript + 30 asserts),
-`--quiet` (asserts only), or `--repl` (interactive). **Zero engine changes; zero BM1 changes.**
+The excluded `web/examples/bm2/` prototype is superseded. The inline
+`web/js/world.js` implementation and Cucumber features are authoritative.
 
 ---
 
 ## Open questions (bring to David/Andy)
 
 **Answered by David 2026-09-14** (folded into the design above):
-- **Q1 — Dawn / HOLLOW SANCTUM ending:** effectively **retired** (it hangs off the bone key). The
-  front door is the clean win. *(Say if you want dawn kept as a hidden alternate.)*
-- **Q2 — Bone key / north secret door:** **retire it.**
+- **Q1 — Dawn / HOLLOW SANCTUM ending:** **retired.** The front door is the clean win.
+- **Q2 — Bone key / north secret door:** **retired.**
 - **Q3 — Time-period order:** **backwards, 13 → 1** ("jumping through time").
 - **Q6 — Identity in BM2:** render the protagonist as **"`<your name> = Gary`"** (or a funny variant).
 - **Q7 — Show vs imply:** **all 13** periods playable — **many easy, several hard.**
@@ -362,11 +343,11 @@ confirm or override):**
 | IX | MUSIC BOX (`musicBox`) | nursery | the Blackwood child's; never leaves |
 | VIII | LOCKET (`goldLocket`) | crypt | lowered into the earth with its owner |
 | VII | GRIMOIRE (`grimoire`) | secret chamber | the assembly-rite, hidden behind the wall |
-| VI | RAVENBLOOD SIGNET (`rubyRing`) | jewelry box | slipped off and set aside |
+| VI | RAVENBLOOD RING (`rubyRing`) | jewelry box | slipped off and set aside |
 | V | WOODBLACK WATCH (`backwardsWatch`) | between the walls | dropped in a chase |
 | IV | PORTRAIT (`ancestralPortrait`) | attic | painted, then exiled (painter tie-in) |
 | III | FAMILY CREST (`familyCrest`) | Dreadmaw's vault | sealed in as Dreadmaw is made its warden |
-| II | FAMILY RING (`familyRing`) | dragon antechamber | **HARD** — peel the sleeping dragon (ring on claw) from a painting; the painter teaches the trick |
+| II | BAT SIGHT MIRROR (`batSightMirror`) | belfry | **HARD** — ring the bell, scatter the bats, and recover the mirror dropped from their roost |
 | I | TALISMAN (`talisman`) | locked safe | locked away the night it all broke — the final placement triggers the ouroboros |
 
 *(The eleven lighter origins are FIRST-DRAFT flavor — provisional, trivially editable in
@@ -374,9 +355,8 @@ confirm or override):**
 
 **Still genuinely open (need David/Andy):**
 - **Confirm or override Q4 / Q5** and the eleven lighter origins above.
-- **Fate of the dawn / bone-key ending** (Q1–Q2): the plan retires it; say if you want it kept as a
-  hidden alternate.
-- **The BM1 ending rework** (Part A) — still unbuilt; needs your go before touching `world.js`.
+- **Hours XII–I and the ouroboros close:** implement them inline after the
+  validated Hour-XIII pattern.
 
 ---
 
@@ -387,10 +367,9 @@ confirm or override):**
 - [x] Text-first clock-back **map** (EXAMINE/READ the clock). *(8-bit pass still scheduled off the
       tilemap spike.)*
 - [x] **Try-overs** retry mechanic (spend-and-rewind on a failed challenge).
-- [x] **Wire the full 13-period loop** end-to-end: all thirteen hours 13 → 0, the **navigable
-      present-day manor** (Model A, navigate-to-place), a **second** hard hero scene (dragon/RING
-      peeled from a painting), and the **become-Gary ouroboros** close. *(Q5 baked in
-      PROVISIONALLY — David was away; Q4 reworked to Model A per David's later navigate-to-place note.)*
+- [ ] **Wire Hours XII–I inline** using the validated Hour-XIII seam. Hour II now
+      returns the BAT SIGHT MIRROR to the BELFRY; the excluded dragon/ring
+      prototype scene is retired.
 - [ ] **David to confirm/override Q4 (navigate-to-place manor), Q5 (canon-13 swap), the hour order,
       the try-over count, and the 11 lighter origins.** Hours/spots are one-file edits in `HOURS`;
       the manor map is the `MANOR`/`SPOTS` tables in the same file.

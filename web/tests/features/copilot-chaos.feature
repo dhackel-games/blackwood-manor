@@ -186,8 +186,6 @@ Feature: Copilot's mystery package and lightning jumps
     And the current room is not "crypt"
     And the current room is not "betweenWalls"
     And the current room is not "hiddenVault"
-    And the current room is not "hollowSanctum"
-    And the current room is not "hollowPassage"
     And the current room is not "secretChamber"
     And the current room is not "treeFort"
 

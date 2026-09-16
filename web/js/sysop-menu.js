@@ -120,8 +120,9 @@ const QUICK_COLLECTION = [
   "fly dreadvault",
   "wear shoes",
   "take all",
-  "fly antechamber",
-  "take all",
+  "fly belfry",
+  "pull upperrope",
+  "take batsight",
   "fly hallbr",
   "open drawer",
   "wear goggles",
@@ -163,7 +164,7 @@ const QUICK_COLLECTION = [
 
 const REQUIRED_DEPOSITS = [
   "put crest in rq",
-  "put family in rq",
+  "put batsight in rq",
   "put spyglass in rq",
   "put candlestick in rq",
   "put grimoire in rq",
@@ -177,14 +178,10 @@ const REQUIRED_DEPOSITS = [
   "put woodblack in rq",
 ];
 
-const DAWN_ENDING = [
+const QUICK_TO_BELL = [
   "close rq",
-  "ring bell",
-  "take bone",
-  "open secretd with bone",
-  "north",
-  "north",
-  "north",
+  "open bellcloset",
+  "pull bellrope",
 ];
 
 const MAX_COLLECTION = [
@@ -216,6 +213,9 @@ const MAX_COLLECTION = [
   "east",
   "wear shoes",
   "take all",
+  "fly belfry",
+  "pull upperrope",
+  "take batsight",
   "fly kitchen",
   "take rope",
   "open cellard",
@@ -272,44 +272,19 @@ export const SYSOP_COMMANDS = Object.freeze([
     compoundPrompt: join(POWERUP),
   }),
   Object.freeze({
-    cmd: "::winquick",
-    name: "Quick Win",
-    description: "Collect the minimum required heirlooms and take the dawn ending.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, ...DAWN_ENDING]),
+    cmd: "::winquick1",
+    name: "Quick Part I",
+    description: "Collect all 13 heirlooms and pull the closet bell rope, then stop before walking out the front door.",
+    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, ...QUICK_TO_BELL]),
   }),
   Object.freeze({
-    cmd: "::brink",
-    name: "Brink of Part II",
-    description: "Collect and deposit every required heirloom and seal the reliquary — then STOP in the Royal Hall, bell unrung, poised to choose: RING BELL for the dawn ending, or go DOWN to cross into Part II.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq"]),
-  }),
-  Object.freeze({
-    cmd: "::garycliff",
-    name: "Gary Cliffhanger",
-    description: "Collect the minimum required heirlooms and descend to Gary's call-cave.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq", "down"]),
-  }),
-  Object.freeze({
-    cmd: "::ringbell",
-    name: "Ring the Bell",
-    description: "Collect and deposit every required heirloom, close the reliquary, and ring the bell — then stop, at the end of Part 1, before leaving or descending.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, "close rq", "ring bell"]),
-  }),
-  Object.freeze({
-    cmd: "::winmax",
-    name: "Maximum Win",
-    description: "Collect every deterministic scoring reward and take the dawn ending with the mirror.",
+    cmd: "::winmax2bell",
+    name: "Maximum to Bell",
+    description: "Collect every deterministic reward and all 13 heirlooms, seal the reliquary, and stop before pulling the closet bell rope.",
     compoundPrompt: join([
       ...MAX_COLLECTION,
       ...REQUIRED_DEPOSITS,
       "close rq",
-      "ring bell",
-      "take bone",
-      "open secretd with bone",
-      "north",
-      "north",
-      "take all",
-      "north",
     ]),
   }),
 ]);

@@ -220,6 +220,9 @@ function buildPrompt(turn, nudge) {
   const lines = [];
   const s = turn.situation || {};
   const facts = [
+    s.playerName
+      ? `The caller's name token is ${s.playerName}; use that exact token when addressing them by name.`
+      : null,
     s.room ? `The caller is in: ${s.room}.` : null,
     typeof s.turns === "number" ? `They have played ${s.turns} turns.` : null,
     s.bill ? `Their phone bill so far is ${s.bill}.` : null,

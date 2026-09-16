@@ -16,8 +16,11 @@ that self-updates its web content **over-the-air** from GitHub Pages.
 - Serve (`file://` fails — ES-module CORS): `cd web && python3 -m http.server 8817` → http://localhost:8817/
 - Tests: `cd web && npm test` (cucumber-js). One feature:
   `npx cucumber-js "tests/features/X.feature" --import "tests/steps/**/*.js"`.
-- Sysop menu: type `::` in-game → password `evad`. `::brink` seals the reliquary and stops
-  at the bell (the BM1→BM2 seam).
+- Sysop menu: type `::` in-game → password `evad`. Maintained shortcuts:
+  `::powerup`, `::winquick1`, and `::winmax2bell`. `::winquick1` stops after
+  the bell ritual but before walking out. The last earns every
+  deterministic reward, deposits all 13 heirlooms, closes the reliquary, and
+  stops before pulling the main-floor bell rope.
 
 ## ⚠️ The two facts that always cause confusion
 
@@ -56,18 +59,33 @@ gh auth switch --user dhackel_adobe
 The agent **can** do a credential-free dry run (build+archive+export, no upload/creds) via plain
 `bash`/`zsh -c`: `cd ios && ./release-testflight.sh --no-upload`.
 
-Last published TestFlight build: **86** (2026-09-14; source of truth = `LATEST_APP_BUILD_AVAILABLE`
+Last published TestFlight build: **100** (2026-09-15; source of truth = `LATEST_APP_BUILD_AVAILABLE`
 in `web/versions.json`).
 
 ## BM2 (Part II — the Thirteen-Hour Clock)
-Integrated inline in `web/js/world.js` as one continuous game: play BM1 → seal reliquary →
-`go down` → Part II ghost-loop. Hour-13 slice: arrival clue → `examine statue` (find the living
-queen) → `examine pool` → `yell` (she turns to stone by the water; yelling after finding her but
-before knowing the pool = death) → carry emerald to the garden bush → clock ticks 13→12. Design:
+Integrated inline in `web/js/world.js` as one continuous game: name the player → put all 13
+heirlooms in the reliquary → close it → open the bell closet beside the front door → pull the
+lower rope. The remote belfry bell toll transforms the heirlooms into the countdown clock,
+slams the front door shut and then wide open, and opens the floor trapdoor. Leaving ends BM1.
+Examining the reliquary, taking the clock, and going down reaches Gary; he is alone beside a
+silent phone, knocks the player out, and leaves them as a ghost holding the clock.
+`examine clock` explains the loop.
+Part-II death offers `RESTART 1` for a fresh Part I (including naming) or `RESTART 2` for the
+serialized ghost-awakening checkpoint with the same player name and Part-I state.
+Hour-13 slice: `use clock` → `examine statue` (find the living queen) → `examine pool` → `yell`
+(she turns to stone by the water; yelling after finding her but before knowing the pool = death)
+→ carry emerald to the garden bush → clock ticks 13→12. Design:
 `docs/design/0002-thirteen-hour-clock-and-ouroboros.md`. `web/examples/bm2/` is a superseded broken
 prototype — kept locally per David, excluded via `.git/info/exclude` (do not delete).
+
+The Bat Sight Mirror replaces the removed Family Ring as a required heirloom.
+Pulling either bell rope scatters the belfry bats (+5) and drops the mirror;
+`LOOK IN MIRROR AT <room>` scries any Part-I room. The former Ravenblood Signet
+is now the Ravenblood Ring.
 
 ## Engine invariants (enforced by tests)
 Every room needs `art` + `searchDesc` + `IMPLICIT_NAVIGATION` + `ROOM_SHORT_NAMES`; every item needs
 `ITEM_SHORT_NAMES`; short-names globally unique matching `/^[a-z0-9]+$/`. Part II rooms are `phase:2`
-and excluded from `teleportRandom`.
+and excluded from `teleportRandom`. Player-facing prose uses explicit `{{player_name}}` tokens;
+all display and speech output passes through `game.showMessage()` before it reaches the player.
+The name question is the first transcript output; title, HUD, controls, and AI-status output wait.

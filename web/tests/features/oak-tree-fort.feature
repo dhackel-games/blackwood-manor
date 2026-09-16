@@ -146,7 +146,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "does not contribute"
     When I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
-    And the output contains "releases the non-contributing"
+    And the output contains "take the emerald gem from the RELIQUARY"
 
   Scenario: A gem nested in a deposited heirloom remains retrievable
     Given item "musicBox" is carried
@@ -158,7 +158,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And item "musicBox" is in "reliquary"
-    And the output contains "releases the non-contributing"
+    And the output contains "take the emerald gem from the RELIQUARY"
 
   Scenario: A nested family heirloom can be recovered until it occupies its own recess
     Given item "musicBox" is carried
@@ -171,7 +171,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And I send "take ruby ring from reliquary"
     Then item "rubyRing" is carried
     And item "musicBox" is in "reliquary"
-    And the output contains "releases the non-contributing"
+    And the output contains "take the ravenblood ring from the RELIQUARY"
 
   Scenario: Legacy saves gain the new oak objects and preserve completed heirloom progress
     Given a legacy pre-oak save with the ember deposited is restored

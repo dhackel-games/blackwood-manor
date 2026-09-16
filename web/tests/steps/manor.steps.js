@@ -44,10 +44,18 @@ function playSequence(context, docString, allowDeath) {
 
 Given("a fresh manor game", function () {
   this.game = createGame(world);
+  this.game.send("Jeb");
   this.output = "";
   this.accumulatedOutput = "";
   // Lightning Jumps are a random per-turn hazard; scripted scenarios need
   // deterministic turns, so chaos is off unless a scenario explicitly re-enables it.
+  this.game.setFlag("__noChaos", true);
+});
+
+Given("a fresh unnamed manor game", function () {
+  this.game = createGame(world);
+  this.output = this.game.startMessage();
+  this.accumulatedOutput = "";
   this.game.setFlag("__noChaos", true);
 });
 
@@ -108,6 +116,10 @@ Given("the player is on fire", function () {
 
 Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
+  if (item === "batSightMirror") {
+    this.game.destroy("belfryBats");
+    this.game.setFlag("belfryBatsScattered", true);
+  }
 });
 
 Given("item {string} has been destroyed", function (item) {
@@ -176,6 +188,8 @@ Given("every treasure but the {string} is already in the reliquary", function (i
     }
   }
   this.game.moveItem(itemId, "inventory");
+  this.game.destroy("belfryBats");
+  this.game.setFlag("belfryBatsScattered", true);
 });
 
 Given("item {string} uses wear slot {string}", function (item, slot) {
@@ -198,6 +212,13 @@ When("I execute sysop command {string}", function (command) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
   this.output = this.game.send(expandSysopCommand(shortcut, this.game));
+});
+
+When("I fast-forward into Part II", function () {
+  const shortcut = sysopCommand("::winmax2bell");
+  this.game.send(expandSysopCommand(shortcut, this.game));
+  this.output = this.game.send(
+    "open bell closet; pull bell rope; open reliquary; take clock; down");
 });
 
 When("I play until death:", function (docString) {
@@ -251,6 +272,18 @@ When("I call Gary and say {string}", function (line) {
   this.output = this.game.send(line);
 });
 
+When("I round-trip the game snapshot", function () {
+  const restored = createGame(world);
+  restored.restore(this.game.snapshot());
+  this.game = restored;
+});
+
+When("I restart from checkpoint {string}", function (name) {
+  const restored = this.game.restoreCheckpoint(name);
+  assert.ok(restored, `Missing checkpoint: ${name}`);
+  this.output = restored.message;
+});
+
 Then("the game is won", function () {
   const context = Array.isArray(this.log) ? this.log.slice(-6).join("\n\n") : (this.output || "");
   assert.equal(this.game.state.won, true, context);
@@ -258,6 +291,10 @@ Then("the game is won", function () {
 
 Then("the game is not won", function () {
   assert.equal(this.game.state.won, false);
+});
+
+Then("checkpoint {string} exists", function (name) {
+  assert.equal(this.game.hasCheckpoint(name), true);
 });
 
 Then("the game score is {int}", function (score) {
@@ -313,7 +350,7 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
-  assert.deepEqual(sysopMenuAction("::powerup", false), {
+  assert.deepEqual(sysopMenuAction("::winmax2bell", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
   assert.deepEqual(sysopMenuAction("::werdna", false), {
@@ -322,7 +359,7 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", true), {
     handled: true, unlocked: true, showMenu: true,
   });
-  assert.equal(sysopMenuAction("::powerup", true).shortcut?.cmd, "::powerup");
+  assert.equal(sysopMenuAction("::winmax2bell", true).shortcut?.cmd, "::winmax2bell");
   assert.deepEqual(sysopMenuAction(":powerup", true), { handled: false, unlocked: true });
 });
 
@@ -382,6 +419,7 @@ Then("every hidden prompt uses globally unique one-word targets", function () {
   }
   for (const [id, alias] of Object.entries(world.roomShortNames)) {
     const game = createGame(world);
+    game.send("Jeb");
     game.setFlag("__noChaos");
     game.setFlag("oakLightAligned");
     game.moveItem("wingedShoes", "inventory");
@@ -460,6 +498,26 @@ Then("every required family item is in the reliquary", function () {
   }
 });
 
+Then("every required family item is inside the countdown clock", function () {
+  for (const [id, definition] of Object.entries(world.items)) {
+    if (definition.treasure) assert.equal(this.game.roomOf(id), "clockTalisman", id);
+  }
+});
+
+Then("the Bat Sight Mirror can view every Part I room", function () {
+  this.game.moveItem("batSightMirror", "inventory");
+  const originalRoom = this.game.state.room;
+  for (const [id, room] of Object.entries(world.rooms)) {
+    if (room.phase === 2) continue;
+    const seenBefore = this.game.getFlag(`seen:${id}`);
+    const output = this.game.send(`look in mirror at ${world.roomShortNames[id]}`);
+    assert.match(output, /BAT SIGHT/i, id);
+    assert.match(output, new RegExp(room.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), id);
+    assert.equal(this.game.state.room, originalRoom, id);
+    assert.equal(this.game.getFlag(`seen:${id}`), seenBefore, id);
+  }
+});
+
 Then("the required family item count is {int}", function (count) {
   assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
   assert.equal(this.game.world.config.requiredFamilyItemCount, count);
@@ -503,6 +561,10 @@ Then("flag {string} is unset", function (flag) {
 });
 
 Then("flag {string} equals {int}", function (flag, expected) {
+  assert.equal(this.game.getFlag(flag), expected);
+});
+
+Then("flag {string} equals {string}", function (flag, expected) {
   assert.equal(this.game.getFlag(flag), expected);
 });
 

@@ -1,4 +1,4 @@
-/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. */
+/* style.css. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.101:acoven. */
 
 :root {
   --green: #43ff7a;
@@ -49,6 +49,7 @@ body { -webkit-text-size-adjust: 100%; }
   padding-bottom: 0.15rem; margin-bottom: 0.2rem;
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
+#hud[hidden], #controls[hidden], #nav-disclosure[hidden] { display: none; }
 #hud-slots {
   display: flex;
   flex: 1 1 auto;
@@ -151,19 +152,37 @@ body { -webkit-text-size-adjust: 100%; }
   --nav-button-size: 1.7rem;
   --action-button-height: 1.7rem;
   --nav-picker-width: 1.6875rem;
+  --dpad-width: calc(
+    var(--nav-button-size) + var(--nav-button-size) + var(--nav-button-size) + 0.24rem
+  );
+  --dpad-half-width: 2.67rem;
+  --vertical-directions-width: calc(
+    var(--nav-button-size) + var(--nav-button-size) + 0.2rem
+  );
+  --movement-controls-gap: 0.25rem;
+  --movement-controls-width: calc(
+    var(--dpad-width) + var(--vertical-directions-width) + var(--movement-controls-gap)
+  );
+  --picker-to-dpad-gap: 0.2rem;
+  --movement-to-action-gap: 0.5rem;
+  --action-controls-min-width: 17rem;
+  --action-controls-max-width: 28rem;
+  --dpad-min-left: calc(var(--nav-picker-width) + var(--picker-to-dpad-gap));
+  --dpad-centered-left: calc(50% - var(--dpad-half-width));
+  --dpad-max-left: calc(
+    100% - var(--movement-controls-width) - var(--movement-to-action-gap) -
+      var(--action-controls-min-width)
+  );
+  --dpad-left: clamp(var(--dpad-min-left), var(--dpad-centered-left), var(--dpad-max-left));
   position: relative;
   flex: 0 0 auto;
   padding: 0 0 1.1rem;
 }
 #controls .controls-content {
   position: relative;
-  display: grid;
-  grid-template-columns: var(--nav-picker-width) auto minmax(0, 28rem);
+  display: block;
   width: calc(100% + 1px);
   margin-top: -1px;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
 }
 #inputline > .nav-disclosure {
   position: absolute;
@@ -196,9 +215,12 @@ body { -webkit-text-size-adjust: 100%; }
   transform: translateY(-3.5px);
 }
 #controls .movement-controls {
+  position: absolute;
+  top: 0;
+  left: var(--dpad-left);
   flex: 0 0 auto;
   display: flex;
-  gap: 0.25rem;
+  gap: var(--movement-controls-gap);
   align-items: center;
 }
 #controls .dpad {
@@ -265,9 +287,18 @@ body { -webkit-text-size-adjust: 100%; }
   stroke-linejoin: round;
 }
 #controls .action-controls {
-  width: 100%;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: auto;
+  width: min(
+    var(--action-controls-max-width),
+    calc(100% - var(--dpad-left) - var(--movement-controls-width) - var(--movement-to-action-gap))
+  );
+  max-width: var(--action-controls-max-width);
   min-width: 0;
   display: block;
+  transform: translateY(-50%);
 }
 #controls .verbs {
   width: 100%;
@@ -412,27 +443,21 @@ body { -webkit-text-size-adjust: 100%; }
   #crt { padding: 0.6rem 0.75rem; }
   #transcript { font-size: 14px; }        /* transcript can shrink; input stays 16px */
   #controls button { font-size: 0.82rem; }
-  #controls { gap: 0.3rem; }
-  #controls .movement-controls { gap: 0.2rem; }
+  #controls {
+    --dpad-max-left: calc(100% - var(--movement-controls-width));
+    --movement-controls-gap: 0.2rem;
+  }
   #controls .verb-row { gap: 0.2rem; }
   #controls .verb-row button { padding: 0.3rem 0.1rem; font-size: 0.8rem; }
-  #controls .controls-content {
-    grid-template-columns: var(--nav-picker-width) minmax(0, 1fr);
-  }
   #controls .nav-size-picker {
-    grid-column: 1;
-    grid-row: 1;
     margin-top: 0;
   }
-  #controls .movement-controls,
-  #controls .action-controls { justify-self: center; }
-  #controls .movement-controls {
-    grid-column: 2;
-    grid-row: 1;
-  }
   #controls .action-controls {
-    grid-column: 1 / span 2;
-    grid-row: 2;
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin-top: 0.5rem;
+    transform: none;
   }
 }
 
@@ -440,27 +465,26 @@ body { -webkit-text-size-adjust: 100%; }
   #controls {
     --nav-button-size: 2.96875rem;
     --action-button-height: 2.96875rem;
+    --dpad-half-width: 4.573125rem;
   }
   #controls .dpad button {
     font-size: 1.35rem;
   }
 }
-@media (any-pointer: coarse) and (max-width: 600px) {
-  #controls .controls-content {
-    grid-template-columns: var(--nav-picker-width) minmax(0, 1fr);
-  }
-}
 #controls[data-nav-size="1"] {
   --nav-button-size: 1.7rem;
   --action-button-height: 1.7rem;
+  --dpad-half-width: 2.67rem;
 }
 #controls[data-nav-size="2"] {
   --nav-button-size: 2.375rem;
   --action-button-height: 2.375rem;
+  --dpad-half-width: 3.6825rem;
 }
 #controls[data-nav-size="3"] {
   --nav-button-size: 2.96875rem;
   --action-button-height: 2.96875rem;
+  --dpad-half-width: 4.573125rem;
 }
 
 /* mic / small icon buttons */

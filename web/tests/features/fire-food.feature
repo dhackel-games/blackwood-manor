@@ -231,19 +231,6 @@ Feature: Fire and food consequences
     Then item "outhouseMushrooms" is destroyed
     And item "mushrooms" is carried
 
-  Scenario: A USE clarification remembers non-mushroom choices
-    Given a fresh manor game
-    And item "familyRing" is carried
-    And item "rubyRing" is carried
-    When I send "use ring"
-    Then the output contains "(which RING? DUSTY or RAVENBLOOD?)"
-    And the turn count is 0
-    When I send "neither"
-    Then the output contains "(which RING? DUSTY or RAVENBLOOD?)"
-    And the turn count is 0
-    When I send "ravenblood"
-    Then item "rubyRing" is worn in slot "finger"
-
   Scenario: Carrying match and foil requires an explicit source choice
     Given the player is in room "kitchen"
     When I send "take matches"

@@ -22,15 +22,6 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the inventory load is 0
     And the inventory HUD shows "👜" with "0/20"
 
-  Scenario: A dusty Blackwood family ring waits in an ore cart
-    Given the player is in room "dragonAntechamber"
-    When I send "take family ring"
-    Then item "familyRing" is in "inventory"
-    When the player moves directly to room "grandHall"
-    And I send "put family ring in reliquary"
-    Then item "familyRing" is in "reliquary"
-    And the game score is 20
-
   Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set
     And the player is in room "dragonCaveMouth"
@@ -80,7 +71,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the inventory load is 0
     When the player moves directly to room "grandHall"
     And I send "put ring in reliquary"
-    Then the output contains "Remove the ravenblood signet"
+    Then the output contains "Remove the ravenblood ring"
     And item "rubyRing" is worn in slot "finger"
 
   Scenario: Only one item can occupy an equipment slot
@@ -228,7 +219,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "wingedShoes" is worn in slot "feet"
 
   Scenario: Wearing the vault shoes first leaves room to take everything else
-    Given item "boneKey" is carried
+    Given item "goldDoubloon" is carried
     And item "ironKey" is carried
     And item "candlestick" is carried
     And item "matches" is carried
@@ -252,17 +243,17 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "reliquary" is open
     And item "rope" is carried
 
-  Scenario: TAKE ALL cannot withdraw seated heirlooms from an open reliquary
+  Scenario: TAKE ALL can withdraw ordinary deposits from an open reliquary
     Given item "familyCrest" is carried
     And item "rope" is carried
     And the player is in room "grandHall"
     When I send "put family crest in reliquary"
     And I send "put rope in reliquary"
     And I send "take all"
-    Then item "familyCrest" is in "reliquary"
+    Then item "familyCrest" is carried
     And item "rope" is carried
 
-  Scenario: Item handlers and implicit actions cannot withdraw seated heirlooms
+  Scenario: Withdrawn heirlooms keep their one-time deposit score
     Given item "goldLocket" is carried
     And item "talisman" is carried
     And item "grimoire" is carried
@@ -272,13 +263,18 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And I send "put grimoire in reliquary"
     And I send "put spyglass in reliquary"
     And I send "take spyglass from reliquary"
-    Then item "spyglass" is in "reliquary"
+    Then item "spyglass" is carried
+    And the game score is 38
+    When I send "put spyglass in reliquary"
+    Then the game score is 38
     When I send "take all"
-    Then item "spyglass" is in "reliquary"
+    Then item "spyglass" is carried
+    Then item "talisman" is carried
+    And item "grimoire" is carried
     When I send "wear talisman"
-    Then item "talisman" is in "reliquary"
+    Then item "talisman" is worn in slot "neck"
     When I send "read grimoire"
-    Then item "grimoire" is in "reliquary"
+    Then item "grimoire" is carried
     And the game score is 38
 
   Scenario: Winged shoes float up through the shut attic trap-door

@@ -27,7 +27,7 @@ Feature: The mushroom trip's third eye
     And the player moves directly to room "masterBedroom"
     When I send "look"
     Then the output contains "THIRD EYE (👁️ 11 turns left)"
-    And the output contains "RAVENBLOOD SIGNET"
+    And the output contains "RAVENBLOOD RING"
     And vision status has 11 turns
     And flight status has 11 turns
     When I send "look"

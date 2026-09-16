@@ -1,5 +1,12 @@
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
+> **UPDATE 2026-09-15:** The Family Ring has been removed. The Bat Sight Mirror
+> in the BELFRY replaces it in the thirteen required heirlooms, and the former
+> Ravenblood Signet is now the Ravenblood Ring. Pulling either bell rope scatters
+> the bats and drops the mirror. The completed ritual is performed from the
+> BELL CLOSET beside the front door; older Family Ring/Signet/hall-bell passages
+> below are retained only as design history.
+>
 > **➡️ UPDATE 2026-09-14 — see [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md).**
 > Major evolution of this doc: the **13-hour clock**, a reworked **BM1 ending** (ring →
 > heirlooms vanish + clock appears + front door opens; **walk out = win**, **leave with the

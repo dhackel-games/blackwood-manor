@@ -131,7 +131,7 @@ Feature: One-time rewards for meaningful progress
     And I send "south"
     Then the game score is 5
 
-  Scenario: Sealing the collection and using both final keys rewards each step
+  Scenario: Sealing the collection and pulling the closet rope reward each step
     Given every treasure but the "ancestralPortrait" is already in the reliquary
     And the player is in room "grandHall"
     When I send "put ancestral portrait in reliquary"
@@ -142,18 +142,13 @@ Feature: One-time rewards for meaningful progress
     When I send "open reliquary"
     And I send "close reliquary"
     Then the game score is 25
-    When I send "ring bell"
+    When I send "open bell closet"
+    And I send "pull bell rope"
     Then the output contains "(+5)"
     And the game score is 30
-    When I send "take bone key"
-    Then the output contains "(+5)"
-    And the game score is 35
-    When I send "unlock secret door with bone key"
-    And I send "open secret door"
-    Then the output contains "(+5)"
-    And the game score is 40
-    When I send "close secret door"
-    And I send "open secret door"
-    Then the game score is 40
+    When I send "open reliquary"
+    And I send "take clock"
+    Then flag "floorDoorOpen" is set
+    And the game score is 30
 
 # end progress-scoring.feature

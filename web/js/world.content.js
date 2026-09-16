@@ -18,7 +18,7 @@ export const content = {
     gate: {
       name: "Front Gate",
       desc:
-        "You stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains " +
+        "{{player_name}}, you stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains " +
         "from the sky. The MANOR looms beyond a dead lawn, its windows like sockets. A " +
         "gravel path leads NORTH to the PORCH. A low wall gives way EAST to the OVERGROWN " +
         "GARDEN, while a black yew opening enters the HEDGE MAZE to the WEST.",
@@ -73,10 +73,10 @@ export const content = {
     dragonAntechamber: {
       name: "Dragon Cave Antechamber",
       desc:
-        "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM " +
-        "lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
+        "The outer CAVE widens around rusted mine rails and abandoned ore carts. Splintered timbers and drifts " +
+        "of black dust fill the carts. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
       searchDesc:
-        "The initials BM remain visible beneath the dust on the FAMILY RING. The rails vanish EAST beneath old timber braces.",
+        "Every ore cart has been picked clean. The rails vanish EAST beneath old timber braces.",
     },
 
     mineGallery: {
@@ -152,7 +152,7 @@ export const content = {
     porch: {
       name: "Front Porch",
       desc:
-        "The PORCH boards sag underfoot. A brass MAILBOX is bolted beside a great oak " +
+        "The PORCH boards sag under {{player_name}}'s weight. A brass MAILBOX is bolted beside a great oak " +
         "FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
     },
 
@@ -161,8 +161,9 @@ export const content = {
       desc:
         "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal " +
         "staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and " +
-        "above it hangs a great brass BELL on a frayed rope. Doorways lead EAST to the " +
-        "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
+        "beside the great FRONT DOOR is a narrow wooden BELL CLOSET. Doorways lead EAST to the " +
+        "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH. The hall repeats " +
+        "{{player_name}}'s smallest movement half a beat late.",
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
     },
 
@@ -170,7 +171,7 @@ export const content = {
       name: "Parlor",
       desc:
         "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
+        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track {{player_name}}. An archway " +
         "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
       highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
     },
@@ -228,7 +229,7 @@ export const content = {
       name: "Crypt",
       desc:
         "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
-        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
+        "at {{player_name}}'s breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
         "LOCKET. The only way out is NORTH to the WINE CELLAR.",
       searchDesc:
         "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
@@ -246,7 +247,7 @@ export const content = {
       name: "Nursery",
       desc:
         "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
-        "with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
+        "with one glass eye fixed on {{player_name}}. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
       searchDesc:
         "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
         "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
@@ -260,7 +261,7 @@ export const content = {
         "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
       searchDesc:
         "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD SIGNET inside the locked JEWELRY BOX.",
+      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD RING inside the locked JEWELRY BOX.",
     },
 
     study: {
@@ -285,7 +286,8 @@ export const content = {
       name: "Attic",
       desc:
         "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
-        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
+        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. Its painted eyes find " +
+        "{{player_name}} immediately. The ladder leads DOWN.",
       searchDesc:
         "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
     },
@@ -302,10 +304,12 @@ export const content = {
     belfry: {
       name: "Belfry",
       desc:
-        "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. " +
-        "A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
+        "The BELFRY crouches above the roofline around a weather-blackened BELL. The rafters vanish into " +
+        "layers of restless shadow. A thick ROPE hangs from the bell's wheel and passes through a fitted HOLE in the floor, " +
+        "continuing down through the house. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN " +
+        "into the ASTRAL CHAMBER.",
       searchDesc:
-        "The hatch bypasses the sealed ATTIC gable entirely. Its iron ladder drops directly beside the OBSIDIAN EYE.",
+        "The BELL ROPE is worn smooth where hands have pulled it. The hatch ladder drops directly beside the OBSIDIAN EYE.",
     },
 
     hiddenVault: {
@@ -318,32 +322,13 @@ export const content = {
         "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
     },
 
-    hollowPassage: {
-      name: "Hollow Passage",
-      desc:
-        "A narrow HOLLOW PASSAGE of pale stone the MANOR kept hidden all this time. It is oddly warm, " +
-        "and lit by no lamp you can find — as if the walls themselves remember daylight. The ROYAL HALL " +
-        "lies back to the SOUTH; the PASSAGE runs NORTH.",
-      searchDesc:
-        "No mechanism or side PASSAGE interrupts the pale stone. The warmth and faint light both strengthen toward the NORTH.",
-    },
-
-    hollowSanctum: {
-      name: "The Hollow Sanctum",
-      desc:
-        "A round, domed HOLLOW SANCTUM at the MANOR'S secret heart, filled with a soft grey light. The pale " +
-        "SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. " +
-        "Beyond her, an archway opens NORTH onto a growing dawn.",
-      searchDesc:
-        "The SPIRIT guards nothing now. The SILVER MIRROR lifts freely from its pedestal, and the NORTHERN dawn feels like an ending.",
-    },
-
     garysLair: {
       name: "Gary's Call-Cave",
       desc:
         "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
         "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
-      searchDesc: "Whoever worked down here left in a violent hurry — and took your heirlooms with them.",
+      searchDesc:
+        "Gary left in a violent hurry. The ROTARY PHONE hangs silent, and the COUNTDOWN CLOCK remains with you.",
     },
 
     betweenWalls: {
@@ -361,15 +346,34 @@ export const content = {
 
   items: {
     bell: {
-      desc: "A great brass bell hung above the RELIQUARY, a frayed pull-rope trailing from it.",
+      desc: "A weather-blackened brass BELL filling most of the BELFRY. Its wheel holds the thick rope that " +
+        "drops through a fitted hole in the floor.",
+    },
+    belfryBellRope: {
+      desc: "A thick BELL ROPE descending from the great bell's wheel through a fitted HOLE in the belfry floor.",
+    },
+    belfryBats: {
+      roomDesc: "Hundreds of black BATS crowd the rafters. Something silver glints inside their roost.",
+      desc: "Hundreds of black BATS hang in tight folds from the rafters. Something silver is hidden among them.",
+    },
+    batSightMirror: {
+      roomDesc: "A silver BAT SIGHT MIRROR lies on the belfry boards beneath the abandoned roost.",
+      desc: "A silver hand mirror embossed with tiny flying bats and the initials BM. Its black glass can look " +
+        "into any room in Blackwood Manor. Try LOOK IN MIRROR AT KITCHEN.",
+    },
+    bellCloset: {
+      desc: "A narrow wooden BELL CLOSET beside the FRONT DOOR. A small brass bat is nailed above its handle.",
+    },
+    closetBellRope: {
+      desc: "The lower end of the BELFRY'S thick pull-rope. It descends from a fitted hole in the closet ceiling.",
     },
     mysteryPackage: {
       roomDesc: "A suspiciously nice, ribbon-tied PACKAGE sits on the floor, propped against the wall.",
       desc: "A beautifully wrapped package, ribbon and all, entirely out of place in this cobwebbed ruin. A " +
         "small card is tucked under the bow. It reads:\n\n" +
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+        "\"{{player_name}}: DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
       text:
-        "\"DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
+        "\"{{player_name}}: DO NOT OPEN ME. NOPE NOPE NOPE. You are going to regert it! That's right — regert, not regret.\"",
     },
     lightningBolt: {
       roomDesc: "A jagged bolt of LIGHTNING is speared into the floor here, hissing and crackling, scorch " +
@@ -394,7 +398,7 @@ export const content = {
     letter: {
       desc: "A single sheet of good paper, water-stained.",
       text:
-        "The letter reads: \"To whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
+        "The letter reads: \"To {{player_name}}, whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
         "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +
         "Do not linger in the dark. And God help you in the CRYPT.\"",
     },
@@ -456,7 +460,7 @@ export const content = {
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
       desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
         "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
-        "It does not produce light.",
+        "It does not produce light. Inside it, something already knows {{player_name}}.",
     },
     burritoWrapper: {
       roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
@@ -492,10 +496,6 @@ export const content = {
     dragonHoard: {
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
-    familyRing: {
-      roomDesc: "A DUSTY FAMILY RING marked BM glints through the grit of an ore cart.",
-      desc: "A heavy BLACKWOOD FAMILY RING filmed with mine dust. The raised initials BM remain sharp beneath the grime.",
-    },
     backpack: {
       roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
       desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
@@ -515,7 +515,8 @@ export const content = {
       desc: "A narrow BED made with yellowed but carefully tucked linen.",
     },
     hallMirror: {
-      desc: "A tarnished MIRROR that makes every reflection look slightly farther away than it should.",
+      desc:
+        "A tarnished MIRROR that gives {{player_name}} back as a reflection standing slightly farther away than it should.",
     },
     nightTable: {
       desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
@@ -565,7 +566,7 @@ export const content = {
       desc: "A great oak desk, its drawers swollen shut.",
     },
     diary: {
-      desc: "A leather-bound diary in a spidery hand.",
+      desc: "A leather-bound diary in a spidery hand. The ink feathers around {{player_name}} as though freshly written.",
     },
     wallpaper: {
       desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
@@ -581,7 +582,7 @@ export const content = {
       desc: "A dark walnut jewelry box with a tiny keyhole.",
     },
     rubyRing: {
-      desc: "The RAVENBLOOD SIGNET: a heavy gold ring set with a dark red garnet like a suspended drop of blood. " +
+      desc: "The RAVENBLOOD RING: a heavy gold band set with a dark red garnet like a suspended drop of blood. " +
         "The initials BM are embossed inside the band, marking it as a Blackwood family heirloom.",
     },
     wraith: {
@@ -601,26 +602,13 @@ export const content = {
     },
     ancestralPortrait: {
       desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
-        "unsettlingly like the STATUE in the GARDEN.",
-    },
-    boneKey: {
-      desc: "A slender key carved from old bone, still faintly warm to the touch. It looks too brittle to turn twice.",
-    },
-    secretDoor: {
-      desc: "A door of black wood where no door was, fitted with a keyhole shaped like a tooth.",
-    },
-    spirit: {
-      desc: "The pale spirit of a robed woman — the face from the GARDEN STATUE and the little portrait. " +
-        "She was weeping, but her eyes are kind now.",
-    },
-    silverMirror: {
-      desc: "An age-clouded silver hand-mirror. In it, for just a moment, you see BLACKWOOD MANOR whole and " +
-        "bright and full of the living.",
+        "unsettlingly like the STATUE in the GARDEN. Her gaze settles on {{player_name}}.",
     },
     backwardsWatch: {
       roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
       desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
-        "On the back, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+        "On the back, beneath {{player_name}}'s reflection, a family inscription reads: " +
+        "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
     },
   },
 };

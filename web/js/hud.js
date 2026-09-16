@@ -69,6 +69,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     calculate: ({ game, world }) => {
       const status = world.reliquaryStatus?.(game);
       if (!status) return null;
+      if (status.transformed) return "CLOCK";
       return `${status.contributing}/${status.required} +${status.nonContributing}`;
     },
   },

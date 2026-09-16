@@ -53,14 +53,8 @@
   },
   "dragonAntechamber": {
     "name": "Dragon Cave Antechamber",
-    "desc": "The outer CAVE widens around rusted mine rails and abandoned ore carts. A DUSTY FAMILY RING marked BM lies in the grit of one cart. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
-    "items": [
-      {
-        "id": "familyRing",
-        "label": "ring",
-        "kind": "takeable"
-      }
-    ]
+    "desc": "The outer CAVE widens around rusted mine rails and abandoned ore carts. Splintered timbers and drifts of black dust fill the carts. DREADMAW'S CAVE MOUTH is WEST; the tunnel continues EAST into a MINING GALLERY.",
+    "items": []
   },
   "mineGallery": {
     "name": "Mining Gallery",
@@ -207,7 +201,7 @@
   },
   "grandHall": {
     "name": "Royal Hall",
-    "desc": "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and above it hangs a great brass BELL on a frayed rope. Doorways lead EAST to the PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
+    "desc": "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and beside the great FRONT DOOR is a narrow wooden BELL CLOSET. Doorways lead EAST to the PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
     "items": [
       {
         "id": "mysteryPackage",
@@ -220,9 +214,9 @@
         "kind": "container"
       },
       {
-        "id": "bell",
-        "label": "bell",
-        "kind": "scenery"
+        "id": "bellCloset",
+        "label": "bell closet",
+        "kind": "container"
       }
     ]
   },
@@ -376,7 +370,7 @@
     "items": [
       {
         "id": "rubyRing",
-        "label": "ravenblood signet",
+        "label": "ravenblood ring",
         "kind": "takeable"
       },
       {
@@ -456,8 +450,24 @@
   },
   "belfry": {
     "name": "Belfry",
-    "desc": "The BELFRY crouches above the roofline around a weather-blackened bell. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
-    "items": []
+    "desc": "The BELFRY crouches above the roofline around a weather-blackened BELL. A thick ROPE hangs from its wheel and passes through a fitted HOLE in the floor. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
+    "items": [
+      {
+        "id": "bell",
+        "label": "bell",
+        "kind": "scenery"
+      },
+      {
+        "id": "belfryBellRope",
+        "label": "bell rope",
+        "kind": "scenery"
+      },
+      {
+        "id": "belfryBats",
+        "label": "bats",
+        "kind": "scenery"
+      }
+    ]
   },
   "hiddenVault": {
     "name": "Astral Chamber",

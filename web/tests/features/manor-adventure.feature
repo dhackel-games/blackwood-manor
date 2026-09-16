@@ -3,12 +3,12 @@
 @walkthrough
 Feature: Blackwood Manor adventure
   The complete mansion must remain solvable while its deliberate death traps,
-  hidden wing, inspection clues, and alternate movement phrases keep working.
+  inspection clues and alternate movement phrases keep working.
 
   Background:
     Given a fresh manor game
 
-  Scenario: Complete the manor and escape with the hidden mirror
+  Scenario: Complete the manor and leave through the opened front door
     When I play this command sequence:
       """
       east
@@ -42,7 +42,6 @@ Feature: Blackwood Manor adventure
       south
       offer apple to dragon
       east
-      take family ring
       east
       wear headlamp
       down
@@ -51,6 +50,8 @@ Feature: Blackwood Manor adventure
       say lore to troll
       east
       take family crest
+      take winged shoes
+      wear winged shoes
       west
       west
       up
@@ -62,7 +63,6 @@ Feature: Blackwood Manor adventure
       north
       north
       put family crest in reliquary
-      put family ring in reliquary
       drop doubloon
       south
       south
@@ -120,6 +120,12 @@ Feature: Blackwood Manor adventure
       drop wrapper
       up
       take miniature
+      up
+      east
+      pull bell rope
+      take bat sight mirror
+      west
+      down
       down
       take music box
       take ring
@@ -153,39 +159,15 @@ Feature: Blackwood Manor adventure
       remove talisman
       put talisman in reliquary
       put candlestick in reliquary
+      put bat sight mirror in reliquary
       close reliquary
-      ring bell
-      take bone key
-      unlock secret door with bone key
-      open secret door
-      north
-      north
-      take mirror
-      north
+      open bell closet
+      pull bell rope
+      south
       """
     Then the game is won
-    And the game score is 450
+    And the game score is 415
     And the player rank contains "Master of Blackwood Manor"
-
-  Scenario: The silver mirror is an optional thirty-point trophy
-    Given the player is in room "hollowSanctum"
-    And flag "usedHelp" is set
-    And flag "usedInspection" is set
-    And flag "usedSaveRestore" is set
-    When I send "north"
-    Then the game is won
-    And the game score is 0
-    And the output contains "optional 30 points"
-    Given a fresh manor game
-    And the player is in room "hollowSanctum"
-    And item "silverMirror" is carried
-    And flag "usedHelp" is set
-    And flag "usedInspection" is set
-    And flag "usedSaveRestore" is set
-    When I send "north"
-    Then the game is won
-    And the game score is 30
-    And the output contains "optional trophy"
 
   Scenario: Entering the well without a rope is fatal
     When I play until death:
@@ -346,12 +328,15 @@ Feature: Blackwood Manor adventure
     Given a fresh manor game
     And the player is in room "grandHall"
     When I send "look"
-    Then the output does not contain line "Directions you can go: north, east, south, west, up"
-    Given flag "curseLiftable" is set
-    When I send "close reliquary"
-    And I send "ring bell"
+    Then the output does not contain line "Directions you can go: east, south, west, up, down"
+    And every treasure but the "familyCrest" is already in the reliquary
+    And item "familyCrest" is carried
+    When I send "put family crest in reliquary"
+    And I send "close reliquary"
+    And I send "open bell closet"
+    And I send "pull bell rope"
     And I send "look"
-    Then the output contains line "Directions you can go: north, east, south, west, up"
+    Then the output contains line "Directions you can go: east, south, west, up, down"
 
   Scenario: Handler-driven directions appear when available
     Given the player is in room "landing"
@@ -360,36 +345,33 @@ Feature: Blackwood Manor adventure
     When I send "pull cord"
     And I send "look"
     Then the output contains line "Directions you can go: north, east, south, west, up, down"
-    Given a fresh manor game
-    And the player is in room "hollowSanctum"
-    When I send "look"
-    Then the output contains line "Directions you can go: north, south"
 
-  Scenario: Ringing the prepared bell reveals rather than ends the hidden wing
+  Scenario: Pulling the prepared closet rope creates the clock without ending the game
     Given the player is in room "grandHall"
-    And flag "curseLiftable" is set
-    When I send "close reliquary"
-    And I send "ring bell"
-    Then the output matches "BONE KEY|SECRET DOOR"
+    And every treasure but the "familyCrest" is already in the reliquary
+    When I send "put family crest in reliquary"
+    And I send "close reliquary"
+    And I send "open bell closet"
+    And I send "pull bell rope"
+    And I send "examine reliquary"
+    Then the output contains "COUNTDOWN CLOCK"
     And the game is not won
-    And item "boneKey" is in "grandHall"
-    When I send "take bone key"
-    And I send "unlock secret door with bone key"
-    Then item "boneKey" is destroyed
-    And item "secretDoor" is unlocked
+    And item "clockTalisman" is in "reliquary"
 
-  Scenario: The prepared bell remains inert until the reliquary is closed
+  Scenario: The prepared closet rope remains inert until the reliquary is closed
     Given the player is in room "grandHall"
-    And flag "curseLiftable" is set
-    When I send "open reliquary"
-    And I send "ring bell"
-    Then the output contains "CLOSE RELIQUARY"
+    And every treasure but the "familyCrest" is already in the reliquary
+    When I send "put family crest in reliquary"
+    And I send "open bell closet"
+    And I send "open reliquary"
+    And I send "pull bell rope"
+    Then the output contains "CLOSE the doors first"
     And flag "bellRung" is unset
-    And item "boneKey" is destroyed
+    And item "clockTalisman" is in "__void"
     When I send "close reliquary"
-    And I send "ring bell"
+    And I send "pull bell rope"
     Then flag "bellRung" is set
-    And item "boneKey" is in "grandHall"
+    And item "clockTalisman" is in "reliquary"
 
   Scenario: Reading a nearby diary implicitly gets it first
     Given the player is in room "study"
@@ -398,10 +380,10 @@ Feature: Blackwood Manor adventure
     And item "diary" is in "inventory"
     And flag "knowsCombo" is true
 
-  Scenario: The Ravenblood Signet is visibly a family heirloom
+  Scenario: The Ravenblood Ring is visibly a family heirloom
     Given item "rubyRing" is carried
     When I send "examine ruby ring"
-    Then the output contains "RAVENBLOOD SIGNET"
+    Then the output contains "RAVENBLOOD RING"
     Then the output contains "BM"
     And the output contains "Blackwood family heirloom"
 
@@ -455,7 +437,7 @@ Feature: Blackwood Manor adventure
       | garden        | STATUE,WELL,BRAZIER              |
       | privy         | TOILET                           |
       | porch         | MAILBOX,FRONT DOOR               |
-      | grandHall     | RELIQUARY,BELL                   |
+      | grandHall     | RELIQUARY,FRONT DOOR,BELL CLOSET |
       | parlor        | PROFILE PAINTING                 |
       | library       | LEVER                            |
       | diningRoom    | CANDLESTICK                      |
@@ -467,7 +449,6 @@ Feature: Blackwood Manor adventure
       | masterBedroom | JEWELRY BOX                      |
       | study         | DESK,DIARY                       |
       | attic         | ANCESTRAL PORTRAIT               |
-      | hollowSanctum | SPIRIT,SILVER MIRROR             |
 
   Scenario: Portrait and miniature refer to one attic object
     Given the player is in room "attic"

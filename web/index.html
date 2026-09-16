@@ -15,7 +15,7 @@
 <body>
   <div id="crt">
     <!-- Always-visible status: score/turns / phone bill -->
-    <div id="hud">
+    <div id="hud" hidden>
       <span id="hud-slots">
         <button id="sound-toggle" class="iconbtn" type="button" aria-pressed="false"
                 aria-label="sound effects off; click to turn on"
@@ -27,7 +27,7 @@
 
     <div id="command-panel" data-collapsed="false">
       <!-- Touch controls: tap to run common commands (typing still works) -->
-      <div id="controls">
+      <div id="controls" hidden>
         <div id="controls-content" class="controls-content">
         <div id="nav-size-picker" class="nav-size-picker" role="radiogroup"
              aria-label="navigation button size">
@@ -89,7 +89,7 @@
       </div>
 
       <div id="inputline">
-        <button id="nav-disclosure" class="nav-disclosure" type="button"
+        <button id="nav-disclosure" class="nav-disclosure" type="button" hidden
                 aria-label="hide navigation controls" aria-controls="controls-content"
                 aria-expanded="true" title="Hide navigation controls">
           <span aria-hidden="true">▴</span>

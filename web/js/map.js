@@ -9,8 +9,8 @@
 //      house (which is what an actual stuck player needs) without being handed
 //      rooms you were supposed to find.
 //   2. Secret places are not drawn at all until you have stood in them. The
-//      hidden wing and the chamber under the library are the best discoveries
-//      in the game and a map that spoils them is worse than no map.
+//      chamber under the library is one of the best discoveries in the game,
+//      and a map that spoils it is worse than no map.
 
 const W = 14;   // label cell width — every label is padded to this, so the art
 const GAP = 6;  // stays aligned no matter which names are masked
@@ -27,12 +27,11 @@ const LABELS = {
   nursery: "Nursery", masterBedroom: "Grand Bedroom", hallBedroom: "Hall Bedroom", study: "Study",
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
   roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
-  treeFort: "Tree Fort",
-  secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
+  treeFort: "Tree Fort", secretChamber: "Hidden Rm",
 };
 
 // Rooms that must not appear on the map until you have been there.
-const SECRET = new Set(["hollowPassage", "hollowSanctum", "secretChamber", "hiddenVault", "dreadmawVault"]);
+const SECRET = new Set(["secretChamber", "hiddenVault", "dreadmawVault"]);
 
 // Each floor: rooms placed on a grid, plus the links between them. `note` is the
 // little annotation on a connector ("down", "ladder").
@@ -74,8 +73,6 @@ const FLOORS = [
   {
     title: "GROUND FLOOR",
     rooms: [
-      { id: "hollowSanctum", col: 1, row: 0 },
-      { id: "hollowPassage", col: 1, row: 1 },
       { id: "diningRoom", col: 0, row: 2 },
       { id: "grandHall", col: 1, row: 2 },
       { id: "parlor", col: 2, row: 2 },
@@ -84,8 +81,6 @@ const FLOORS = [
       { id: "library", col: 2, row: 3 },
     ],
     links: [
-      { a: "hollowSanctum", b: "hollowPassage" },
-      { a: "hollowPassage", b: "grandHall" },
       { a: "diningRoom", b: "grandHall" },
       { a: "grandHall", b: "parlor" },
       { a: "diningRoom", b: "kitchen" },

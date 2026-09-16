@@ -13,6 +13,36 @@ import { commands } from "./commands.js?v=source";
 
 const DARK_WARNING = "It is pitch black. You are likely to be eaten by a grue.";
 
+export function renderMessage(template, values = {}) {
+  if (template == null) return template;
+  let rendered = String(template);
+  for (const [key, value] of Object.entries(values)) {
+    rendered = rendered.split(`{{${key}}}`).join(String(value ?? ""));
+  }
+  return rendered;
+}
+
+export function parsePlayerNameInput(input) {
+  let name = String(input || "").trim();
+  name = name.replace(/^say\s+/i, "").replace(/^call\s+me\s+/i, "").trim();
+  if ((name.startsWith('"') && name.endsWith('"')) ||
+      (name.startsWith("'") && name.endsWith("'"))) {
+    name = name.slice(1, -1).trim();
+  }
+  name = name.replace(/\s+/g, " ");
+  if (!name || name.length > 40) return null;
+  return /^[\p{L}\p{M}\p{N}][\p{L}\p{M}\p{N} .'\u2019-]{0,39}$/u.test(name)
+    ? name
+    : null;
+}
+
+export function parseRestartTarget(input) {
+  const normalized = String(input || "").trim().toLowerCase().replace(/\s+/g, " ");
+  if (/^restart(?: (?:at )?(?:part )?(?:1|one|beginning|start))?$/.test(normalized)) return 1;
+  if (/^restart (?:at )?(?:part )?(?:2|two)$/.test(normalized)) return 2;
+  return null;
+}
+
 const DIRECTION_ORDER = [
   "north", "northeast", "east", "southeast",
   "south", "southwest", "west", "northwest",
@@ -63,11 +93,18 @@ export function createGame(world) {
   }
 
   const game = { world, state };
+  game.templateValues = () => ({
+    player_name: state.flags.playerName || "",
+    ...(typeof world.templateValues === "function" ? world.templateValues(game) : {}),
+  });
+  game.showMessage = (message) => renderMessage(message, game.templateValues());
+  game.needsPlayerName = () => !!cfg.playerNamePrompt && !state.flags.playerName;
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
   let darkWarningRendered = false;
   let deferStatusBanner = false;
   let describedRoomThisTurn = false;
+  let checkpoints = {};
 
   // --- lookups ---------------------------------------------------------------
   game.room = () => world.rooms[state.room];
@@ -203,20 +240,23 @@ export function createGame(world) {
       ? cfg.winBanner(game)
       : (cfg.winBanner
         ?? `You have escaped Blackwood Manor alive${state.flags.onFire ? " 🔥" : ""}.`);
-    return (msg ? msg + "\n\n" : "") +
+    return game.showMessage((msg ? msg + "\n\n" : "") +
       `    ****  ${banner}  ****\n\n` +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
-      badges + phoneBillLine();
+      badges + phoneBillLine());
   };
   game.kill = (msg) => {
     // Super-user god mode: report what would have happened, but don't die.
     if (state.flags.__godmode) {
-      return `[su] GOD MODE — this would have killed you:\n${msg}`;
+      return game.showMessage(`[su] GOD MODE — this would have killed you:\n${msg}`);
     }
     state.dead = true;
-    return `${msg}\n\n    ****  You have died.  ****\n\n` +
+    const choices = state.flags.partII
+      ? "Type RESTART 1 to begin Part I again, RESTART 2 to return to the beginning of Part II, RESTORE, or QUIT."
+      : "Type RESTART, RESTORE, or QUIT.";
+    return game.showMessage(`${msg}\n\n    ****  You have died.  ****\n\n` +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
-      phoneBillLine() + `\n\nType RESTART, RESTORE, or QUIT.`;
+      phoneBillLine() + `\n\n${choices}`);
   };
   // A THIRD terminal state: not "escaped alive", not "you have died" — a bespoke
   // ending with fully custom framing (used by the secret Gary cliffhanger). It
@@ -225,10 +265,10 @@ export function createGame(world) {
   game.finish = (msg, banner) => {
     state.won = true;
     const badges = typeof world.endBadges === "function" ? (world.endBadges(game) || "") : "";
-    return (msg ? msg + "\n\n" : "") +
+    return game.showMessage((msg ? msg + "\n\n" : "") +
       (banner ? banner + "\n\n" : "") +
       `Your score is ${state.score} in ${state.turns} turns.\nRank: ${game.rank()}` +
-      badges + phoneBillLine();
+      badges + phoneBillLine());
   };
   game.rank = () => {
     const s = state.score;
@@ -325,7 +365,7 @@ export function createGame(world) {
         if (sb) out += "\n" + sb + "\n";
       }
     }
-    return out.trimEnd();
+    return game.showMessage(out.trimEnd());
   };
 
   // --- turn tick (fuel burn + grue) -----------------------------------------
@@ -653,14 +693,16 @@ export function createGame(world) {
   const MAX_CHAIN = 256;
   let previousCommand = null;
 
-  game.send = (input) => {
+  function sendRaw(input) {
     if (state.dead || state.won) {
       // The game's over — you're no longer on the phone. Clearing this keeps a
       // death or win that happened mid-call from stranding the player on the
       // call screen, where the engine refuses every command (so hang-up can't
       // clear the call) and RESTART would be the only way out.
       state.flags.onCall = false;
-      return "The game is over. Type RESTART to play again.";
+      return state.dead && state.flags.partII
+        ? "The game is over. Type RESTART 1 for Part I or RESTART 2 for Part II."
+        : "The game is over. Type RESTART to play again.";
     }
     const pendingUse = resolvePendingUse(input);
     if (pendingUse?.prompt) return pendingUse.prompt;
@@ -705,14 +747,37 @@ export function createGame(world) {
       out.push(`(Only the first ${MAX_CHAIN} commands on that line were carried out.)`);
     }
     return out.join("\n\n");
+  }
+
+  game.startMessage = () => game.needsPlayerName()
+    ? game.showMessage(cfg.playerNamePrompt)
+    : game.describeRoom(true);
+
+  game.send = (input) => {
+    if (game.needsPlayerName()) {
+      const name = parsePlayerNameInput(input);
+      if (!name) {
+        return game.showMessage(
+          cfg.playerNameInvalid ||
+          'Please type a name, SAY "Jeb", or type CALL ME "Jeb".');
+      }
+      state.flags.playerName = name;
+      const accepted = cfg.playerNameAccepted || "Welcome, {{player_name}}.";
+      return game.showMessage(`${accepted}\n\n${game.describeRoom(true)}`);
+    }
+    return game.showMessage(sendRaw(input));
   };
 
   // --- save / restore --------------------------------------------------------
-  game.snapshot = () => ({
+  const captureSnapshot = (includeCheckpoints = true) => ({
     state: JSON.parse(JSON.stringify(state)),
     previousCommand,
+    ...(includeCheckpoints
+      ? { checkpoints: JSON.parse(JSON.stringify(checkpoints)) }
+      : {}),
   });
-  game.restore = (snap) => {
+
+  function restoreSnapshot(snap, restoreCheckpoints) {
     const c = JSON.parse(JSON.stringify(snap.state));
     const savedItems = c.items;
     c.items = restoreItems(world.items || {}, savedItems);
@@ -720,8 +785,28 @@ export function createGame(world) {
     for (const k of Object.keys(state)) delete state[k];
     Object.assign(state, c);
     previousCommand = typeof snap.previousCommand === "string" ? snap.previousCommand : null;
+    if (restoreCheckpoints) {
+      checkpoints = JSON.parse(JSON.stringify(snap.checkpoints || {}));
+    }
     return true;
+  }
+
+  game.setCheckpoint = (name, message = "") => {
+    if (!name) throw new Error("Checkpoint name is required.");
+    checkpoints[name] = {
+      ...captureSnapshot(false),
+      message: String(message || ""),
+    };
   };
+  game.hasCheckpoint = (name) => !!checkpoints[name];
+  game.restoreCheckpoint = (name) => {
+    const checkpoint = checkpoints[name];
+    if (!checkpoint) return null;
+    restoreSnapshot(checkpoint, false);
+    return { message: game.showMessage(checkpoint.message) };
+  };
+  game.snapshot = () => captureSnapshot(true);
+  game.restore = (snap) => restoreSnapshot(snap, true);
 
   return game;
 }

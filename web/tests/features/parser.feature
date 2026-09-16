@@ -28,6 +28,7 @@ Feature: Player command parsing
       | fly grand br                        | go      | grand bedroom | [none]   | [none]     |
       | look                                | look    | [none]    | [none]      | [none]    |
       | look at brass key                   | examine | brass key | [none]      | [none]    |
+      | look in mirror at kitchen           | examine | mirror    | at          | kitchen   |
       | look brass key                      | examine | brass key | [none]      | [none]    |
       | search brass key                    | examine | brass key | [none]      | [none]    |
       | ex brass key                        | examine | brass key | [none]      | [none]    |

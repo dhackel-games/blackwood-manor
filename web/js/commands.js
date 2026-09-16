@@ -102,7 +102,7 @@ reach into <thing> | Reach / Reach into an opening.
 read <thing> | Read / Read visible writing.
 reload/refresh | Reload / Reload web files or force the iOS GitHub.io cache download.
 remove <thing> | Remove / Take off worn equipment.
-restart | Restart / Start a fresh game.
+restart [1|2] | Restart / Start Part I again, or return to Part II after a Part II death.
 restore | Restore / Restore the browser's saved game.
 ring <thing> | Ring / Ring a bell or similar object.
 save | Save / Save the current game in this browser.

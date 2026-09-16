@@ -211,18 +211,20 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
   holds a treasure.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
-  Ravenblood Signet.
+  Ravenblood Ring.
+- **Belfry:** pull either end of the bell rope to scatter the bats and drop the
+  Bat Sight Mirror. Looking into it at a named room scries that room remotely.
 - **Library lever** opens the **secret chamber** → the curse's focus.
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
 **13 required family heirlooms**, each worth points: silver candlestick, gold locket,
-first-edition grimoire, jeweled music box, Ravenblood Signet, ancient coin (well), crystal
-decanter (wine cellar), ancestral portrait, the Blackwood family crest, and a dusty
-Blackwood family ring marked BM, the BM spyglass recovered from the tree fort, and
-the BM-crested protective talisman after it has served against the crypt wraith,
-plus the family-inscribed WOODBLACK WATCH hidden inside the nursery wall.
+first-edition grimoire, jeweled music box, Ravenblood Ring, ancient coin (well), crystal
+decanter (wine cellar), ancestral portrait, the Blackwood family crest, the BM
+spyglass recovered from the tree fort, the BM-crested protective talisman after
+it has served against the crypt wraith, the family-inscribed WOODBLACK WATCH
+hidden inside the nursery wall, and the Bat Sight Mirror dropped by the belfry bats.
 
 ---
 
@@ -238,11 +240,14 @@ points.
 
 The BRAZIER awards +10 when lit patiently with the CANDLESTICK or +30 when the
 player transfers their own flames. Reading the mailbox LETTER awards +5.
-DREADMAW'S apple remains +10. `::winmax`
-performs every deterministic scoring challenge and leaves the MYSTERY PACKAGE
-untouched because its outcome is random. The deterministic maximum is 490,
-including the +45 combined end-game self-reliance awards and optional SILVER
-MIRROR; a lucky package can push an organic game beyond that benchmark.
+DREADMAW'S apple remains +10. Scattering the belfry bats and freeing the Bat
+Sight Mirror awards +5; depositing the mirror awards its 20 heirloom points.
+`::winmax2bell` performs every deterministic scoring challenge, deposits all
+thirteen heirlooms, closes the reliquary, and stops immediately before the
+main-floor bell rope. It leaves the MYSTERY PACKAGE untouched because its
+outcome is random. The only other sysop shortcuts are `::powerup` and
+`::winquick1`, which stops after the bell ritual but before walking out; the
+older Gary/brink/ring-bell/max variants are retired.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*
@@ -365,12 +370,14 @@ the mansion.
   button as a speech-progress indicator, and dismisses the phone only after
   speech completion (or a bounded safety timeout).
 
-## 12.5 Hidden wing / true ending
-- Ringing the bell (once all heirlooms are deposited) no longer ends the game — it lifts the
-  curse, drops a **BONE KEY**, and opens a **secret door** in the Royal Hall → Hollow Passage
-  → Hollow Sanctum, where a **SILVER MIRROR** and the matriarch's spirit wait. The mirror is
-  an optional +30-point trophy: it unlocks no route or ending, and stepping into the dawn
-  without it still wins.
+## 12.5 Reliquary choice / true ending
+- Ringing the bell over the full, closed reliquary transforms all thirteen
+  heirlooms into the **COUNTDOWN CLOCK**, opens the **FRONT DOOR**, and starts a
+  rumble beneath the floor.
+- Leaving through the front door is the clean ending. Examining the reliquary
+  reveals the clock; taking it opens the stair DOWN to Gary and Part II.
+- The former BONE KEY, hidden north wing, matriarch spirit, and SILVER MIRROR
+  ending are retired.
 
 ## 12.6 The fire subsystem (Andy's idea, expanded)
 - **Self-immolation anywhere:** `light self on fire` / `burn self` / `light fire` requires
@@ -783,7 +790,7 @@ contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `eyes`,
 `feet`, `finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
-The existing TALISMAN and RAVENBLOOD SIGNET occupy NECK and FINGER; the new HEADLAMP,
+The existing TALISMAN and RAVENBLOOD RING occupy NECK and FINGER; the new HEADLAMP,
 XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
 
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
@@ -802,17 +809,22 @@ dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light sou
 
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,
-whose ladder descends into the ASTRAL CHAMBER. Both flight sources can also target
+where bats roost above the great BELL and its rope drops through a floor hole to
+the entry closet. Pulling the rope scatters the bats and drops the BAT SIGHT
+MIRROR. The belfry ladder descends into the ASTRAL CHAMBER. Both flight sources can also target
 ROOF, BELFRY, ASTRAL CHAMBER, and every other named room directly. MAP renders the
 HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
 preserving spoiler hiding for both secret destinations.
 
-## 12.28 West-wing payoff and open reliquary deposits
+## 12.28 West-wing payoff, belfry mirror, and open reliquary deposits
 
-- **West-wing payoff.** An ore cart in the CAVE ANTECHAMBER holds the required
-  BLACKWOOD FAMILY RING (+20). DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST
-  (+15) and the wearable WINGED SHOES. The exported `REQUIRED_FAMILY_ITEM_COUNT`
-  is the single source for the win threshold and RELIQUARY recess count.
+- **West-wing payoff.** The CAVE ANTECHAMBER'S ore carts are empty.
+  DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST (+15) and the
+  wearable WINGED SHOES.
+- **Belfry payoff.** The Bat Sight Mirror replaces the removed Family Ring as a
+  required +20 heirloom. Pulling either end of the bell rope awards +5, scatters
+  the bats, and drops the mirror onto the belfry floor. `LOOK IN MIRROR AT
+  <room>` sees any Part-I room without moving or marking it visited.
 - **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
   mirrored PANEL. Seating the RUBY, EMERALD, and SAPPHIRE GEMS in the correct
   named slots opens the route to the required BM SPYGLASS (+8) in the TREE FORT.
@@ -827,7 +839,8 @@ preserving spoiler hiding for both secret destinations.
   explicitly reported as non-contributing. The HUD appears after the first deposit
   in terse `💎 required/13 +extra` form. The RELIQUARY is a glass-fronted cabinet:
   PUT (and explicit retrieval) derives OPEN when needed, but the player must
-  explicitly CLOSE the completed cabinet before RING BELL can finish the ritual.
+  explicitly CLOSE the completed cabinet, OPEN the BELL CLOSET beside the front
+  door, and PULL its lower rope to finish the ritual.
 
 Duplication across the game's several see-in-the-dark and flight mechanisms is a
 known, deliberately-deferred design topic (to be revisited later), not addressed here.
@@ -841,12 +854,11 @@ feeling like a free skeleton key:
   the very next turn, so you must TOUCH it immediately or miss the window.
 - **No special/guarded destinations.** Touching the bolt now teleports only to an
   *ordinary* room. A `LIGHTNING_NO_JUMP` set excludes the secret room
-  (BETWEEN THE WALLS), the hidden vaults (ASTRAL CHAMBER), the win-critical hollow
-  wing (HOLLOW PASSAGE / HOLLOW SANCTUM), the hidden grimoire chamber
-  (SECRET CHAMBER), the wraith CRYPT, and the dragon's treasure vault
-  (DREADMAW'S VAULT). The bolt relocates you; it never skips a puzzle or hands you
-  an endgame/secret. A side effect: lightning can no longer randomly kill you via
-  the crypt wraith.
+  (BETWEEN THE WALLS), the ASTRAL CHAMBER, the hidden grimoire chamber
+  (SECRET CHAMBER), the wraith CRYPT, the dragon's treasure vault
+  (DREADMAW'S VAULT), and Part II rooms. The bolt relocates you; it never skips a
+  puzzle or hands you an endgame/secret. A side effect: lightning can no longer
+  randomly kill you via the crypt wraith.
 - **Mystery package unchanged.** COPILOT'S MYSTERY PACKAGE keeps its full-chaos
   teleport (including THE SPACE BETWEEN THE WALLS and the crypt risk) — that
   unpredictability is its whole point; the exclusion applies to lightning only.
@@ -856,52 +868,38 @@ feeling like a free skeleton key:
 
 ### 12.30 The secret Gary ending: complete the family collection
 
-Blackwood Manor now has two endings, and completing the collection is a *choice*,
-not a single scripted finish.
+Blackwood Manor has one ritual and two immediate choices.
 
-- **The dawn ending (unchanged).** Deposit all `REQUIRED_FAMILY_ITEM_COUNT` core
-  heirlooms, RING THE BELL, take the BONE KEY north through the HOLLOW PASSAGE to
-  the HOLLOW SANCTUM, and step into the dawn. This is the "good" ending and is
-  untouched.
-- **The secret cliffhanger ending.** When every required heirloom is deposited,
-  a hidden STAIRCASE grinds open in the floor of the ROYAL HALL. CLOSE the
-  RELIQUARY to seal the collection; only then does DOWN become available. Go DOWN and you
-  finally meet the voice that's been "helping" you all night: GARY, in the flesh,
-  in his squalid basement call-cave — rotary phone, spicy burrito, mushrooms, and
-  a fridge of milk (recontextualising his hint-line persona). He clubs you with the
-  receiver, grabs your loot, and bolts up the stairs howling "FREEDOM!" This is a
-  deliberate **cliffhanger**, not a death or a clean win — it seeds *Blackwood Manor
-  II: HELD*.
-- **Mechanics.**
-  - `everythingDeposited(ctx)` — every required `treasure` item resting in the
-    RELIQUARY. When the final piece lands, the ROYAL HALL `put` handler sets the
-    `floorDoorOpen` flag and announces the hidden stair. `extraDirections` and
-    the DOWN handler additionally require `reliquarySealed`, set only by an
-    explicit CLOSE; both the BELL and floor stair then become available.
-  - A new terminal state `game.finish(msg, banner)` in `core.js` sits alongside
-    `win`/`kill`: it stops the game via `won` and still prints the score/rank, but
-    with fully custom framing (no "escaped alive" / "you have died" boilerplate).
-  - `saveBm2Seed(ctx)` persists the final `{score, turns}` to `localStorage`
-    (`blackwood-bm2-seed-v1`, browser-only, guarded) as the seed for BM2, where the
-    scoring inverts: Gary profits when the player fails.
-  - The new `garysLair` room is excluded from `LIGHTNING_NO_JUMP` targets so a lucky
-    bolt can never drop you into the ending; it's reached on foot only.
-- **Foreshadowing.** A `foreshadowTick` adds intensifying ambient dread — a dry
-  scritch-scratch early, then faint BELLS and a far-off voice, and finally an
-  insistent telephone RINGING from below once the floor opens. It's gated behind the
-  same `__noChaos` test kill-switch as lightning and stays silent until you've begun
-  filling the reliquary, so the deterministic canonical/early-game tests are
-  unaffected.
-- **The $0.99/min phone-answering economy** (you working Gary's line to buy your
-  freedom, with inverted scoring) is BM2 proper — a separate genre shift — not built
-  into BM1. Note the phone/`onCall`/`phoneBill` hint-line infrastructure already in
-  the engine is the seed it will grow from.
-  - **➡️ UPDATE 2026-09-14 — `docs/design/0002-thirteen-hour-clock-and-ouroboros.md`.** BM2's
-    direction has evolved from this phone-line sequel to a **13-time-period scatter-in-time
-    ouroboros**, and this secret ending changes: ringing over the sealed reliquary makes the 13
-    heirlooms **vanish** and a **13-hour clock** appear, the **front door opens** (walk out =
-    win; leave *with the talisman* = extra points), and **using the talisman in the reliquary**
-    is what opens the trapdoor down to Gary (into phase 2). Not yet built — see 0002.
+- **The ritual.** Put all `REQUIRED_FAMILY_ITEM_COUNT` heirlooms into the
+  RELIQUARY, CLOSE its doors, OPEN the BELL CLOSET beside the FRONT DOOR, and
+  PULL the lower rope. The remote bell toll awards its one-time points, produces
+  magical light, transforms all thirteen heirlooms into the COUNTDOWN CLOCK,
+  slams the FRONT DOOR shut and then wide open, and opens the floor trapdoor.
+  The event only hints at what replaced the heirlooms; EXAMINE RELIQUARY reveals
+  the clock.
+- **The clean ending.** Walk SOUTH/OUT through the opened FRONT DOOR. The game
+  ends immediately with the current score and ending badges. The BONE KEY,
+  HOLLOW PASSAGE, HOLLOW SANCTUM, robed spirit, and SILVER MIRROR branch are
+  retired.
+- **The Part-II choice.** Open the RELIQUARY and TAKE the COUNTDOWN CLOCK. The
+  floor trapdoor is already open, but DOWN refuses the player until the clock is
+  carried. DOWN then reaches Gary's call-cave.
+- **Gary's room.** Gary is not serving another caller. He sits beside a silent
+  ROTARY PHONE, surprised to see `{{player_name}}` and excited by the clock.
+  He clubs the player with the receiver and escapes. The player wakes alone as
+  a ghost, still carrying the clock.
+- **Clock disclosure.** The awakening only says to EXAMINE the CLOCK. That
+  inspection explains the thirteen-hour recovery loop and enables USE CLOCK.
+  `saveBm2Seed(ctx)` persists `{score, turns, playerName, holdsClock}`.
+- **Part-II death recovery.** Entering Part II captures a serialized `partII`
+  checkpoint at the ghost awakening. A death in Part II explicitly offers
+  `RESTART 1` for a fresh game (including the opening name question) and
+  `RESTART 2` for the same named player's Part-II checkpoint.
+- **Player-name templates.** The whole game begins with `What should we call
+  you?` before the title banner; HUD/navigation and asynchronous status output
+  stay gated until it is answered. Bare names, SAY forms, and CALL ME forms are
+  accepted without spending a turn. Authored `{{player_name}}` tokens pass
+  through `game.showMessage()` before terminal display, phone display, or speech.
 
 ### 12.31 The GREAT OAK gem-panel lift and TREE FORT
 

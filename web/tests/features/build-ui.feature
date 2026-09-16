@@ -1,4 +1,4 @@
-# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.099:acoven.
+# build-ui.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
 
 @unit
 Feature: Build metadata and touch-control contract
@@ -61,6 +61,7 @@ Feature: Build metadata and touch-control contract
     And both entry rows place the microphone left of the text field and submit arrow
     And both entry rows share text-aware submit styling with custom starter text
     And game-over restart text links to the latest session start
+    And browser restart handling supports both game parts
 
   Scenario: Gary offers persistent icon-only computer and Australian voice presets
     Then Gary offers robot and human voice icons
@@ -71,6 +72,7 @@ Feature: Build metadata and touch-control contract
 
   Scenario: Browser speech stays active until the microphone is tapped again
     Then browser speech accumulates finalized phrases until explicit submission
+    And browser speech retries transient network interruptions
 
   Scenario: Ending Gary's call leaves extra time for his final line
     Then END CALL disables and stays visible 1.5 times longer while Gary finishes
@@ -80,7 +82,7 @@ Feature: Build metadata and touch-control contract
     And Up, Down, In, and Out use compact directional glyphs
     And touch-capable movement controls are twenty-five percent larger without widening actions
     And the navigation selector sits left of a persistent disclosure control
-    And action shortcuts occupy two equally wide rows beside movement
+    And the compass centers responsively beside edge-aligned action shortcuts
 
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command

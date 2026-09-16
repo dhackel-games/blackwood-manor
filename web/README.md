@@ -1,12 +1,13 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven. -->
 
 # Blackwood Manor
 
 A haunted-mansion text adventure in the classic Zork style — pure static files,
 with no framework, backend, or runtime dependencies. You've inherited a cursed Victorian
 estate; recover the family heirlooms, deposit them in the reliquary in the Royal
-Hall, and ring the bell to lift the curse and escape alive. Linger in the dark,
-and something finds you.
+Hall, close it, open the bell closet beside the front door, and pull its rope.
+Leave through the opened front door to escape, or take the clock the heirlooms
+become and follow it into Part II. Linger in the dark, and something finds you.
 
 ## Play
 
@@ -22,6 +23,13 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 
 ### Commands
 
+- **Your name:** before the first room appears, the game asks `What should we
+  call you?` Respond with a bare name, `say "Jeb"`, `call me Foo`, or
+  `call me "Foo"`. This question appears before the title banner; the HUD,
+  navigation, and asynchronous AI-status message remain gated until it is
+  answered. Authored `{{player_name}}` tokens in rooms, items, Gary dialogue,
+  and endings are resolved by the engine's single `showMessage` renderer before
+  any text is displayed or spoken.
 - **Move:** `north` / `n`, `south` / `s`, `east` / `e`, `west` / `w`,
   `northeast` / `ne`, `northwest` / `nw`, `southeast` / `se`,
   `southwest` / `sw`, `up` / `u`, `down` / `d`, `in`, `out`. The touch
@@ -30,6 +38,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   collapses or restores navigation. Open, one frame encloses navigation and
   typeahead; collapsed, that frame encloses typeahead alone. The compact L/M/S
   selector shares the frame's upper-left border and ends flush with the 9-grid.
+  The 3×3 compass stays centered when space permits and slides toward that
+  selector as the viewport narrows, preserving a readable action area. The nine
+  action shortcuts fill all remaining space through the frame's right edge and
+  stack below navigation on phone-width screens.
   `leave` and `exit` mean `out`.
   First-entry and extended descriptions name every currently usable direction;
   brief revisits show their abbreviations on a separate line.
@@ -71,8 +83,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Gary's voice:** tap the speaker circle or voice-status line to unmute him.
   The adjacent icon selector offers robot male/female and Australian
   male/female presets and remembers your choice. MIC stays active across pauses
-  until tapped again to stop; recognized text remains editable and submits only
-  through the normal arrow/Enter control.
+  and transient browser speech-network interruptions until tapped again to
+  stop; recognized text remains editable and submits only through the normal
+  arrow/Enter control.
 - **Gary's hints:** a bare HINT remains progression-aware; asking for a hint
   about a subject such as the dragon searches the complete authored hint catalog.
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
@@ -80,19 +93,31 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
   one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
   one-time progress points, including +5 for reading the mailbox letter;
-  `::winmax` performs every deterministic scoring
-  challenge and intentionally leaves the random MYSTERY PACKAGE unopened.
+  `::winmax2bell` performs every deterministic scoring challenge, deposits all
+  thirteen heirlooms, closes the reliquary, and stops immediately before the
+  main-floor bell rope. `::powerup` equips reusable powers; `::winquick1`
+  completes the shorter required-heirloom route and stops after the bell but
+  before walking out. These are the only three sysop shortcuts. The maximum route intentionally
+  leaves the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
   `inventory` (`i`). DROP ALL leaves worn equipment equipped.
 - **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
   unworn item can be deposited. PUT auto-opens it; the completed cabinet must
-  be explicitly CLOSED before the BELL will answer. The `💎` HUD appears after
-  the   first deposit as `required/13 +extra`. The BM SPYGLASS in the TREE FORT,
-  the BM-crested protective TALISMAN, and the inscribed WOODBLACK WATCH are
-  required heirlooms; the EMERALD GEM from the GARDEN BRAZIER unlocks the
-  SPYGLASS route.
+  be explicitly CLOSED before the lower BELL ROPE will complete the ritual. The
+  `💎` HUD appears after the first deposit as `required/13 +extra`. Pulling the
+  prepared closet rope rings the remote belfry bell, flashes magical light,
+  transforms the thirteen heirlooms into the COUNTDOWN CLOCK, slams the FRONT
+  DOOR shut and then wide open, and opens the floor trapdoor. EXAMINE the
+  RELIQUARY to discover the clock. Leaving ends the game; carrying the clock is
+  required before descending to Gary.
+- **Belfry and Bat Sight Mirror:** the great BELL and upper ROPE are in the
+  BELFRY, where the rope continues through a hole in the floor. Pulling either
+  end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
+  required BAT SIGHT MIRROR (+20 when deposited). `LOOK IN MIRROR AT <room>`
+  views any Part-I room without moving there. The mirror replaces the removed
+  Family Ring; the Ravenblood Signet is now the **Ravenblood Ring**.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -129,6 +154,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   VERSION prints the numeric content version and browser continuous-update
   status, or the iOS local-cache and content-source versions.
   In a browser, RELOAD/REFRESH reloads the latest content-version-keyed web files.
+  After a Part-II death, `restart 1` starts the entire game over and `restart 2`
+  restores the serialized checkpoint at the ghost awakening.
   Page load, RESTART, and successful RESTORE mark timestamped transcript session
   anchors; the end-game “Jump to the top” link returns to the latest one.
 - **One-word targeting:** every room and item has a globally unique canonical

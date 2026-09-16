@@ -31,11 +31,6 @@ Feature: Spoiler-safe map mode
     And the output does not contain "BELOW"
     And the output does not contain "Hidden Rm"
 
-  Scenario: The secret wing appears after entering it
-    Given the player is in room "hollowPassage"
-    When I send "map"
-    Then the output contains "X Passage"
-
   Scenario: Gary offers the map after repeated fruitless hints only once
     When I send "call"
     And I send "hint"

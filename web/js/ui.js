@@ -1,8 +1,8 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
-import { createGame } from "./core.js?v=source";
+import { createGame, parseRestartTarget } from "./core.js?v=source";
 import { world } from "./world.js?v=source";
 import { saveGame, loadGame, hasSave } from "./save.js?v=source";
 import { createHud, hudStateSummary } from "./hud.js?v=source";
@@ -195,12 +195,25 @@ function bannerText(versionLine = Native.version()) {
   return (window.innerWidth < 640 ? SMALL_BANNER : BIG_BANNER)(versionLine);
 }
 
+function showIntroBanner() {
+  if (!introBannerElement) introBannerElement = print(bannerText(), "banner");
+}
+
+function syncNameGate() {
+  const naming = game.needsPlayerName();
+  input.placeholder = naming ? "What should we call you?" : "type command / tap button";
+  hudElement.hidden = naming;
+  controls.hidden = naming;
+  navDisclosure.hidden = naming;
+}
+
 // --- terminal output ---
 // Text may contain MAP_MARK-delimited ASCII blocks. Those must not word-wrap,
 // so they're emitted as their own `.map` element; everything else wraps normally.
 function emit(container, text, cls, prefix = "") {
   let last = null;
-  const parts = String(text).split(MAP_MARK);
+  const rendered = game?.showMessage ? game.showMessage(text) : String(text);
+  const parts = String(rendered).split(MAP_MARK);
   parts.forEach((part, i) => {
     const isMap = i % 2 === 1;
     if (!isMap && !part.trim()) return;
@@ -418,12 +431,13 @@ if ("speechSynthesis" in window) {
   if (garyVolumeInput) garyVolumeInput.disabled = true;
 }
 function garySpeak(text) {
-  if (ttsMuted || garyVolume <= 0 || !text || !("speechSynthesis" in window)) {
+  const rendered = game.showMessage(text);
+  if (ttsMuted || garyVolume <= 0 || !rendered || !("speechSynthesis" in window)) {
     return Promise.resolve();
   }
   // strip stage directions like *click* / *chewing* so he doesn't read them aloud
   // Drop MAP_MARK blocks entirely — nobody wants the torn edge read aloud.
-  const spoken = text.split(MAP_MARK).filter((_, i) => i % 2 === 0).join(" ")
+  const spoken = rendered.split(MAP_MARK).filter((_, i) => i % 2 === 0).join(" ")
     .replace(/\*[^*]*\*/g, " ").replace(/\s+/g, " ").trim();
   if (!spoken) return Promise.resolve();
   return new Promise((resolve) => {
@@ -564,7 +578,7 @@ if (soundToggleBtn) {
 // the fart/burp/barf/high events are now a sound effect instead (see above),
 // not a line spoken in Gary's voice.
 function garyReacts(prevFlags, flags) {
-  if (flags.onFire && !prevFlags.onFire) return "Whoa! You're on fire!";
+  if (flags.onFire && !prevFlags.onFire) return "{{player_name}}, whoa! You're on fire!";
   return null;
 }
 
@@ -572,12 +586,16 @@ function garyReacts(prevFlags, flags) {
 const nativeSpeech = Native.hasBridge("speech");
 const WebSR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const speechAvailable = !!(nativeSpeech || WebSR);
+const WEB_RECOGNITION_RESTART_MS = 100;
+const WEB_NETWORK_RETRY_INITIAL_MS = 1000;
+const WEB_NETWORK_RETRY_MAX_MS = 8000;
 let listening = false;
 let speechTarget = input;
 let webRec = null;
 let webTranscript = "";
 let webPartial = "";
 let webRestartTimer = null;
+let webNetworkRetryDelay = 0;
 
 let activeMic = null;
 function setListening(on) {
@@ -588,7 +606,23 @@ function setListening(on) {
   }
 }
 
+function clearWebRestartTimer() {
+  if (webRestartTimer) clearTimeout(webRestartTimer);
+  webRestartTimer = null;
+}
+
+function scheduleWebRecognition() {
+  clearWebRestartTimer();
+  const delay = webNetworkRetryDelay || WEB_RECOGNITION_RESTART_MS;
+  webRestartTimer = setTimeout(() => {
+    webRestartTimer = null;
+    beginWebRecognition();
+  }, delay);
+}
+
 function speechRecognitionFailed(error) {
+  clearWebRestartTimer();
+  webNetworkRetryDelay = 0;
   setListening(false);
   const detail = error ? ` (${error})` : "";
   const message = `Speech recognition stopped${detail}. Tap the microphone to try again.`;
@@ -596,14 +630,20 @@ function speechRecognitionFailed(error) {
 }
 
 function beginWebRecognition() {
-  if (!listening || !WebSR) return;
+  if (!listening || !WebSR || webRec) return;
   const recognition = new WebSR();
   webRec = recognition;
   recognition.lang = "en-US";
   recognition.interimResults = true;
   recognition.continuous = true;
+  recognition.onstart = () => {
+    if (listening && webRec === recognition) {
+      speechTarget.placeholder = "listening… tap mic to stop";
+    }
+  };
   recognition.onresult = (event) => {
     if (!listening) return;
+    webNetworkRetryDelay = 0;
     let interim = "";
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const text = event.results[i][0].transcript;
@@ -615,20 +655,30 @@ function beginWebRecognition() {
   };
   recognition.onerror = (event) => {
     if (!listening || event.error === "no-speech" || event.error === "aborted") return;
+    if (event.error === "network") {
+      webNetworkRetryDelay = webNetworkRetryDelay
+        ? Math.min(webNetworkRetryDelay * 2, WEB_NETWORK_RETRY_MAX_MS)
+        : WEB_NETWORK_RETRY_INITIAL_MS;
+      speechTarget.placeholder = "speech network interrupted… retrying";
+      console.warn(`[speech] network interruption; retrying in ${webNetworkRetryDelay}ms`);
+      return;
+    }
     speechRecognitionFailed(event.error);
   };
   recognition.onend = () => {
-    if (webRec === recognition) webRec = null;
+    if (webRec !== recognition) return;
+    webRec = null;
     if (listening && webPartial.trim()) {
       webTranscript += webPartial.trim() + " ";
       webPartial = "";
       setEntryValue(speechTarget, webTranscript.trim());
     }
-    if (listening) webRestartTimer = setTimeout(beginWebRecognition, 100);
+    if (listening) scheduleWebRecognition();
   };
   try {
     recognition.start();
   } catch (error) {
+    if (webRec === recognition) webRec = null;
     speechRecognitionFailed(error?.message || "unavailable");
   }
 }
@@ -639,6 +689,8 @@ function startListening(targetInput, micBtn) {
   activeMic = micBtn;
   webTranscript = "";
   webPartial = "";
+  webNetworkRetryDelay = 0;
+  clearWebRestartTimer();
   stopSpeaking();                 // don't record Gary's own voice
   targetInput.dataset.ph = targetInput.getAttribute("placeholder") || "";
   setEntryValue(targetInput, ""); // start clean so nothing stale is appended
@@ -658,8 +710,8 @@ function stopListening() {
   }
   const text = (webTranscript + webPartial).trim();
   setListening(false);
-  if (webRestartTimer) clearTimeout(webRestartTimer);
-  webRestartTimer = null;
+  clearWebRestartTimer();
+  webNetworkRetryDelay = 0;
   const recognition = webRec;
   webRec = null;
   if (recognition) try { recognition.stop(); } catch {}
@@ -713,12 +765,32 @@ window.__contentStatus = (message) => {
 
 function newGame(origin = "restart") {
   game = createGame(world);
+  introBannerElement = null;
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
   markSessionStart();
-  print("\n" + game.describeRoom(true));
+  print("\n" + game.startMessage());
+  if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
+  syncNameGate();
   updateHud();
+}
+
+function restartPartTwo() {
+  const restored = game.restoreCheckpoint("partII");
+  if (!restored) {
+    print("The Part II restart point is unavailable. Type RESTART 1 to begin again.", "sys");
+    return;
+  }
+  bugTrace = createBugTrace("Part II restart");
+  history.length = 0;
+  hi = 0;
+  markSessionStart();
+  print("Restarting Part II...", "sys");
+  print(restored.message || game.describeRoom(true));
+  syncNameGate();
+  updateHud();
+  saveGame(game);
 }
 
 function finishPhoneCall(message) {
@@ -775,7 +847,16 @@ function handle(raw) {
   // restart/quit are UI meta-verbs and must work from ANYWHERE — including the
   // call screen. Otherwise a game that ends mid-call strands you on the phone,
   // where the engine refuses every command. Tear down the phone overlay first.
-  if (low === "restart") { if (onCall) endCallUI(); print("Restarting..."); newGame(); return; }
+  const restartTarget = parseRestartTarget(cmd);
+  if (restartTarget) {
+    if (onCall) endCallUI();
+    if (restartTarget === 2) restartPartTwo();
+    else {
+      print("Restarting Part I...");
+      newGame();
+    }
+    return;
+  }
   const traceCommands = onCall ? [submitted] : splitCommands(submitted);
   for (const command of traceCommands) recordBugCommand(bugTrace, command);
   if (low === "ver" || low === "version" || low === "build") {
@@ -824,15 +905,21 @@ function handle(raw) {
         game.setFlag("usedSaveRestore", true);
         saveGame(game);
         markSessionStart();
+        if (!game.needsPlayerName()) showIntroBanner();
       }
-      print(restored ? "Restored.\n\n" + game.describeRoom(true) : "Restore failed.");
-      if (restored) updateHud();
+      print(restored ? "Restored.\n\n" + game.startMessage() : "Restore failed.");
+      if (restored) {
+        syncNameGate();
+        updateHud();
+        announceModelCheck();
+      }
       return;
     }
   }
 
   if (onCall) recordBugDialogue(bugTrace, "user", submitted);
   const prevFlags = { ...game.state.flags };
+  const wasNaming = game.needsPlayerName();
   const turnsBefore = game.state.turns;
   const out = game.send(cmd);
   bugTrace.turns += Math.max(0, game.state.turns - turnsBefore);
@@ -855,7 +942,7 @@ function handle(raw) {
       updatePhoneStatus();
       updateHud();
       garyBrain.speak(info).then((line) => {
-        const spoken = line ? line + (info.tail || "") : out;
+        const spoken = game.showMessage(line ? line + (info.tail || "") : out);
         updateBugDialogue(dialogueEntry, spoken);
         // Only model-written lines get a marker. Scripted fallbacks remain
         // unmarked rather than adding a second status label to every response.
@@ -879,6 +966,11 @@ function handle(raw) {
   }
 
   // normal terminal turn
+  if (wasNaming && !game.needsPlayerName()) {
+    showIntroBanner();
+    syncNameGate();
+    announceModelCheck();
+  }
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
@@ -1067,9 +1159,9 @@ if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
 // --- boot ---
 markSessionStart();
-introBannerElement = print(bannerText(), "banner");
+print("\n" + game.startMessage());
 if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
-print("\n" + game.describeRoom(true));
+syncNameGate();
 updateHud();
 if (canType) input.focus();
 
@@ -1077,6 +1169,8 @@ if (canType) input.focus();
 // daemon). Fire-and-forget: if nothing answers, Gary stays canned and nobody
 // ever sees an error.
 const aiBadge = document.getElementById("phone-ai");
+let modelCheckReady = false;
+let modelCheckAnnounced = false;
 export function refreshAiBadge() {
   if (!aiBadge) return;
   const s = garyBrain.status();
@@ -1097,6 +1191,7 @@ if (aiBadge) {
 
 garyBrain.detect().then(() => {
   refreshAiBadge();
+  modelCheckReady = true;
   announceModelCheck();
 });
 
@@ -1108,8 +1203,10 @@ garyBrain.detect().then(() => {
 // the native app and in a local browser whose daemon is active; keep the public
 // scripted site quiet.
 function announceModelCheck() {
+  if (!modelCheckReady || modelCheckAnnounced || game.needsPlayerName()) return;
   const s = garyBrain.status();
   if (!s.nativeApp && s.provider !== "daemon") return;
+  modelCheckAnnounced = true;
   print(modelStatusText(), garyBrain.isAvailable() ? "sys ok" : "sys");
 }
 
