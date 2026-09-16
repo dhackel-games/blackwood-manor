@@ -895,10 +895,12 @@ Blackwood Manor has one ritual and two immediate choices.
   checkpoint at the ghost awakening. A death in Part II explicitly offers
   `RESTART 1` for a fresh game and `RESTART 2` for the Part-II checkpoint.
 - **Player-name templates.** Startup shows the title and initial AI status,
-  assigns Professor Spooky Pants, prints `What should we call you?` as intro
-  text, prefills `call me `, and continues into the first room without waiting.
-  `CALL ME <name>` changes the name later at zero turn cost. `RESTART 2` clears
-  the checkpoint name and repeats the same nonblocking intro before awakening.
+  randomly composes a fallback from three distinct 12-entry pools (title,
+  spooky mood, garment), greets the player, asks them to say another name or
+  type `CALL ME <name>`, prefills `call me `, and continues into the first room
+  without waiting. A bare name during that first rename window or `CALL ME
+  <name>` changes it at zero turn cost. `RESTART 2` clears the checkpoint name
+  and repeats the same nonblocking intro before awakening.
   Authored `{{player_name}}` tokens pass through `game.showMessage()` before
   terminal display, phone display, or speech.
 

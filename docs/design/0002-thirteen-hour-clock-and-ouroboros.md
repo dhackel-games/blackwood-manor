@@ -1,10 +1,10 @@
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
 > **UPDATE 2026-09-15 — the simplified reliquary/clock seam is implemented.**
-> The game shows its title and initial AI status, assigns Professor Spooky
-> Pants, prints `What should we call you?` in the intro, prefills `call me `,
-> and continues into the first room without waiting. CALL ME can rename the
-> player later. Authored `{{player_name}}` tokens are
+> The game shows its title and initial AI status, composes a fallback from
+> 12 titles × 12 spooky moods × 12 garments, greets the player with it, asks
+> them to say another name or type `call me {name}`, prefills `call me `, and
+> continues into the first room without waiting. Authored `{{player_name}}` tokens are
 > resolved through one output renderer. In BM1, put all thirteen heirlooms in
 > the RELIQUARY, CLOSE it, OPEN the BELL CLOSET beside the front door, and PULL
 > its lower rope. The remote belfry bell tolls, magical light consumes the
@@ -86,8 +86,8 @@ Gary = disowned heir acting in **self-preservation** because completing the rite
 7. The player wakes alone as a ghost holding the clock. EXAMINE CLOCK explains
    the thirteen-hour loop; USE CLOCK enters Hour XIII.
 8. Entering Part II captures the ghost awakening as a serialized checkpoint.
-   Part-II deaths offer RESTART 1 or RESTART 2; both use the nonblocking
-   Professor Spooky Pants / prefilled CALL ME intro before their first room.
+   Part-II deaths offer RESTART 1 or RESTART 2; both use the nonblocking random
+   fallback / prefilled CALL ME intro before their first room.
 
 ---
 

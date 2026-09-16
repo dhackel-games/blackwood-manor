@@ -3165,7 +3165,20 @@ const logicWorld = {
       'What should we call you?\n\nType your name, SAY "Jeb", or CALL ME "Foo".',
     playerNameAccepted:
       "Good. We will call you {{player_name}}.\n\nThe last daylight is draining from the sky.",
-    defaultPlayerName: "Professor Spooky Pants",
+    defaultPlayerNameParts: {
+      titles: [
+        "Professor", "Doctor", "Dean", "Chancellor", "Provost", "Headmaster",
+        "Magister", "Archivist", "Inspector", "Captain", "Baron", "Reverend",
+      ],
+      moods: [
+        "Spooky", "Haunted", "Creepy", "Eerie", "Ghastly", "Phantom",
+        "Shadowy", "Cursed", "Howling", "Midnight", "Spectral", "Uncanny",
+      ],
+      garments: [
+        "Pants", "Trousers", "Breeches", "Bloomers", "Knickerbockers", "Pantaloons",
+        "Slacks", "Leggings", "Overalls", "Drawers", "Jodhpurs", "Culottes",
+      ],
+    },
     defaultPlayerNameAccepted:
       "No name? Fine. We will call you {{player_name}}. Change it anytime with CALL ME FOO.\n\n" +
       "The last daylight is draining from the sky.",

@@ -340,7 +340,7 @@ Then("browser startup includes a nonblocking prefilled name request", function (
   assert.match(ui,
     /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
   assert.match(ui,
-    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*What should we call you\?[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
+    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*If you'd like to go by a different name[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
   assert.match(ui,
     /input\.placeholder = waitingForIntro[\s\S]*"checking AI…"[\s\S]*"type command \/ tap button"/s);
   assert.match(ui, /input\.disabled = waitingForIntro/);
@@ -354,6 +354,8 @@ Then("browser startup includes a nonblocking prefilled name request", function (
   assert.match(css, /#hud\[hidden\], #controls\[hidden\], #nav-disclosure\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(ui,
     /\/\/ --- boot ---\s*beginSession\(\{ showSavedNotice: true \}\)/s);
+  assert.match(ui,
+    /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)[\s\S]*showIntroBanner\(\)/s);
   assert.match(ui,
     /garyBrain\.detect\(\)[\s\S]*modelCheckReady = true;[\s\S]*completeSessionIntro\(\)/s);
 });
@@ -1106,6 +1108,12 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.equal((script.match(
     /--force-with-lease="\$LOCK_REF:\$(?:existing|LOCK_COMMIT)"/g) || []).length, 2);
   assert.match(script, /--latest-build/);
+  assert.match(script, /--force-next-build/);
+  assert.match(script, /--stamp-only\) UPLOAD=0; STAMP_ONLY=1/);
+  assert.match(script,
+    /if \[\[ "\$STAMP_ONLY" -eq 1 \]\]; then[\s\S]*stopping before archive/s);
+  assert.match(script,
+    /if \(\( FORCE_NEXT_BUILD == 1 \)\); then[\s\S]*BASE_BUILD=\$\(\(CUR > LATEST_BUILD \? CUR : LATEST_BUILD\)\)[\s\S]*NEXT=\$\(\(BASE_BUILD \+ 1\)\)/s);
   assert.match(script, /CUR > LATEST_BUILD/);
   assert.match(script, /NEXT=\$\(\(LATEST_BUILD \+ 1\)\)/);
   assert.match(script, /ASC_RELEASE_LOCK_TIMEOUT/);

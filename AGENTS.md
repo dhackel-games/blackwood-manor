@@ -30,7 +30,15 @@ The iOS app pulls web content OTA from `https://dhackel-games.github.io/blackwoo
 when the published `CONTENT_VERSION` (in `web/versions.json`) is **strictly greater** than what's
 installed (`ios/Sources/WebContent.swift`: `guard remote.sortKey > localKey`). A normal code push
 does **not** bump `CONTENT_VERSION`, so a phone already at that version sees "up-to-date" and skips
-the change. **To ship to phones you must bump the version — the release script does this.**
+the change. **Every content push must bump the build before it is committed and pushed:**
+
+```bash
+cd ios
+RELEASE_EDITOR=acoven ./release-testflight.sh --stamp-only --force-next-build
+```
+
+This stamps the next build/`CONTENT_VERSION`, refreshes the bundled web content,
+and regenerates the Xcode project without requiring signing or App Store Connect.
 
 `CONTENT_VERSION = f(APP_VERSION, BUILD) = YYYYMMDDBBB`, validated in three places (Swift
 `parse()`, `web/tools/gen-web-manifest.mjs`, and `web/tests/steps/engine.steps.js`) and coupled to
@@ -56,8 +64,9 @@ gh auth switch --user dhackel-games && \
 ( cd ~/repos/blackwood-manor/ios && ./release-testflight.sh ); \
 gh auth switch --user dhackel_adobe
 ```
-The agent **can** do a credential-free dry run (build+archive+export, no upload/creds) via plain
-`bash`/`zsh -c`: `cd ios && ./release-testflight.sh --no-upload`.
+The agent **can** stamp OTA content with `--stamp-only --force-next-build` and
+attempt a credential-free archive/export with `--no-upload`. Native archive
+validation may still require a valid local Xcode signing account and profile.
 
 Last published TestFlight build: **100** (2026-09-15; source of truth = `LATEST_APP_BUILD_AVAILABLE`
 in `web/versions.json`).
@@ -88,6 +97,7 @@ Every room needs `art` + `searchDesc` + `IMPLICIT_NAVIGATION` + `ROOM_SHORT_NAME
 `ITEM_SHORT_NAMES`; short-names globally unique matching `/^[a-z0-9]+$/`. Part II rooms are `phase:2`
 and excluded from `teleportRandom`. Player-facing prose uses explicit `{{player_name}}` tokens;
 all display and speech output passes through `game.showMessage()` before it reaches the player.
-Startup is nonblocking: title, initial AI status, Professor Spooky Pants fallback, an intro
-name request with `call me ` prefilled, then the first room immediately. The same applies to
-`RESTART 2`; `CALL ME <name>` renames the player without spending a turn.
+Startup is nonblocking: title, initial AI status, a random fallback composed
+from 12 title × 12 spooky-mood × 12 garment choices, an intro rename request
+with `call me ` prefilled, then the first room immediately. The same applies to
+`RESTART 2`; a bare first response or `CALL ME <name>` renames without a turn.

@@ -72,6 +72,7 @@ Feature: Part II — the Thirteenth Hour
     And I send "examine statue"
     And I send "yell"
     Then the game is dead
+    Given the random number generator always returns 0.0
     When I restart from checkpoint "partII"
     Then the game is alive
     And the game is not won

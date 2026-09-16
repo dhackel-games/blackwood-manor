@@ -43,6 +43,16 @@ export function parseRestartTarget(input) {
   return null;
 }
 
+export function composeDefaultPlayerName(parts, random = Math.random) {
+  const pools = [parts?.titles, parts?.moods, parts?.garments];
+  if (pools.some((pool) => !Array.isArray(pool) || pool.length !== 12)) {
+    throw new Error("Default player name requires three 12-entry pools.");
+  }
+  return pools
+    .map((pool) => pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))])
+    .join(" ");
+}
+
 const DIRECTION_ORDER = [
   "north", "northeast", "east", "southeast",
   "south", "southwest", "west", "northwest",
@@ -100,8 +110,11 @@ export function createGame(world) {
   game.showMessage = (message) => renderMessage(message, game.templateValues());
   game.needsPlayerName = () => !!cfg.playerNamePrompt && !state.flags.playerName;
   game.useDefaultPlayerName = () => {
-    state.flags.playerName = cfg.defaultPlayerName || "Professor Spooky Pants";
+    state.flags.playerName = cfg.defaultPlayerNameParts
+      ? composeDefaultPlayerName(cfg.defaultPlayerNameParts)
+      : (cfg.defaultPlayerName || "Professor Spooky Pants");
     state.flags.playerNameDefaulted = true;
+    state.flags.awaitingPlayerName = true;
     return state.flags.playerName;
   };
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
@@ -789,8 +802,23 @@ export function createGame(world) {
       if (!name) return 'CALL ME needs a name, for example: CALL ME FOO.';
       state.flags.playerName = name;
       state.flags.playerNameDefaulted = false;
+      state.flags.awaitingPlayerName = false;
       return game.showMessage(
         cfg.playerNameChanged || "Done. We will call you {{player_name}}.");
+    }
+    if (state.flags.awaitingPlayerName) {
+      const raw = String(input || "").trim();
+      const explicitName = /^(?:my name is|i am|i'm|say)\b/i.test(raw);
+      const parsed = parse(raw);
+      const name = parsePlayerNameInput(raw);
+      if (name && (explicitName || parsed.error === "unknown-verb")) {
+        state.flags.playerName = name;
+        state.flags.playerNameDefaulted = false;
+        state.flags.awaitingPlayerName = false;
+        return game.showMessage(
+          cfg.playerNameChanged || "Done. We will call you {{player_name}}.");
+      }
+      state.flags.awaitingPlayerName = false;
     }
     return game.showMessage(sendRaw(input));
   };

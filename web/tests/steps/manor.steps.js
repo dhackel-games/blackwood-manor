@@ -2,7 +2,7 @@
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
-import { createGame } from "../../js/core.js";
+import { composeDefaultPlayerName, createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
 import { parse } from "../../js/parser.js";
 import {
@@ -529,6 +529,16 @@ Then("the required family item count is {int}", function (count) {
   assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
   assert.equal(this.game.world.config.requiredFamilyItemCount, count);
   assert.equal(Object.values(this.game.world.items).filter((item) => item.treasure).length, count);
+});
+
+Then("the default name uses three distinct twelve-entry pools", function () {
+  const parts = world.config.defaultPlayerNameParts;
+  for (const pool of [parts.titles, parts.moods, parts.garments]) {
+    assert.equal(pool.length, 12);
+    assert.equal(new Set(pool).size, 12);
+  }
+  assert.equal(composeDefaultPlayerName(parts, () => 0), "Professor Spooky Pants");
+  assert.equal(composeDefaultPlayerName(parts, () => 0.999), "Reverend Uncanny Culottes");
 });
 
 Then("every recurring flavor pool has twelve distinct entries and cycles without repetition", function () {

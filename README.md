@@ -76,6 +76,7 @@ unpublished iOS build number, archive, export, and optionally upload:
 
 ```bash
 cd ios
+./release-testflight.sh --stamp-only --force-next-build  # next OTA identity; no archive
 ./release-testflight.sh --no-upload  # archive and export locally
 ./release-testflight.sh              # archive, export, and upload
 ```
@@ -84,6 +85,9 @@ The release script runs `copy-web.sh` before generating the Xcode project, so th
 archive always contains the current canonical files from `web/`. It reads the
 date-only `YYYY.M.D` version from `web/package.json` and uses the checked-in build
 when it is newer than the published TestFlight build number, otherwise incrementing it.
+Every web-content push intended for phones must first use
+`--stamp-only --force-next-build`, because the updater only downloads a strictly
+greater `CONTENT_VERSION`.
 After upload, it waits for App Store Connect processing, assigns the build to an
 internal beta group, verifies that testers can receive it, writes
 `LATEST_APP_BUILD_AVAILABLE` in `web/versions.json`, and commits and pushes that

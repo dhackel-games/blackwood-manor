@@ -7,6 +7,7 @@ Feature: Player name and message templates
 
   Scenario: The browser intro requests a name without blocking the first room
     Then browser startup includes a nonblocking prefilled name request
+    And the default name uses three distinct twelve-entry pools
 
   Scenario Outline: The opening accepts natural name responses without spending a turn
     Given a fresh unnamed manor game
@@ -43,6 +44,7 @@ Feature: Player name and message templates
 
   Scenario Outline: Skipping the name assigns a changeable silly name
     Given a fresh unnamed manor game
+    And the random number generator always returns 0.0
     When I send '<input>'
     Then flag "playerName" equals "Professor Spooky Pants"
     And the output contains "Change it anytime with CALL ME FOO"

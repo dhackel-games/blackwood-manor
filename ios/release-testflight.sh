@@ -18,6 +18,10 @@
 #   cd <blackwood-manor-repo>/ios
 #   ./release-testflight.sh              # build, upload, distribute, publish availability
 #   ./release-testflight.sh --no-upload  # build + export only (dry run, no creds needed)
+#   ./release-testflight.sh --stamp-only --force-next-build
+#                                      # bump/stamp OTA content without archiving
+#   ./release-testflight.sh --no-upload --force-next-build
+#                                      # stamp a new OTA identity and dry-run it
 #
 set -euo pipefail
 
@@ -34,7 +38,19 @@ LOCK_REF="refs/heads/$LOCK_BRANCH"
 LOCK_COMMIT=""
 LOCK_HELD=0
 UPLOAD=1
-[[ "${1:-}" == "--no-upload" ]] && UPLOAD=0
+FORCE_NEXT_BUILD=0
+STAMP_ONLY=0
+for arg in "$@"; do
+  case "$arg" in
+    --no-upload) UPLOAD=0 ;;
+    --force-next-build) FORCE_NEXT_BUILD=1 ;;
+    --stamp-only) UPLOAD=0; STAMP_ONLY=1 ;;
+    *)
+      echo "Unknown option: $arg" >&2
+      exit 2
+      ;;
+  esac
+done
 
 release_lock() {
   local status=$?
@@ -166,7 +182,10 @@ if [[ "$UPLOAD" -eq 1 ]]; then
     --bundle-id "$BUNDLE_ID")
 fi
 LATEST_BUILD=$((AVAILABLE_BUILD > ASC_LATEST_BUILD ? AVAILABLE_BUILD : ASC_LATEST_BUILD))
-if (( CUR > LATEST_BUILD )); then
+if (( FORCE_NEXT_BUILD == 1 )); then
+  BASE_BUILD=$((CUR > LATEST_BUILD ? CUR : LATEST_BUILD))
+  NEXT=$((BASE_BUILD + 1))
+elif (( CUR > LATEST_BUILD )); then
   NEXT=$CUR
 else
   NEXT=$((LATEST_BUILD + 1))
@@ -210,6 +229,11 @@ sed -i '' -E \
 
 echo "==> Regenerating project (xcodegen)"
 xcodegen generate
+
+if [[ "$STAMP_ONLY" -eq 1 ]]; then
+  echo "==> --stamp-only set; stopping before archive."
+  exit 0
+fi
 
 echo "==> Archiving"
 rm -rf "$ARCHIVE"

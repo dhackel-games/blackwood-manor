@@ -230,7 +230,8 @@ function completeSessionIntro() {
     pendingSessionMessage = "";
   }
   print(game.showMessage(
-    "What should we call you? Finish the pre-entered CALL ME command, or keep {{player_name}}."),
+    "Hello, {{player_name}}. If you'd like to go by a different name, say it or type " +
+      "\"call me {name}\". The command box is ready for you."),
   "sys");
   print("\n" + game.startMessage());
   sessionIntroReady = true;

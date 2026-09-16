@@ -25,9 +25,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 
 - **Your name:** before the first room appears, the game asks `What should we
   call you?` Respond with a bare name, `say "Jeb"`, `call me Foo`, or
-  `call me "Foo"`. Startup shows the title and initial AI status, assigns the
-  silly fallback **Professor Spooky Pants**, prints the name request in the
-  intro, prefills `call me `, and continues into the first room without waiting.
+  `call me "Foo"`. Startup shows the title and initial AI status, composes a
+  silly fallback from 12 titles × 12 spooky moods × 12 garments, greets the
+  player by that name, asks them to say another name or type `call me {name}`,
+  prefills `call me `, and continues into the first room without waiting.
   `call me <name>` changes it later without spending a turn. `RESTART 2` uses
   the same nonblocking intro before the ghost awakening.
   Authored `{{player_name}}` tokens in rooms, items, Gary dialogue, and endings
