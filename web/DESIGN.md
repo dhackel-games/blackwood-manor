@@ -893,16 +893,14 @@ Blackwood Manor has one ritual and two immediate choices.
   `saveBm2Seed(ctx)` persists `{score, turns, playerName, holdsClock}`.
 - **Part-II death recovery.** Entering Part II captures a serialized `partII`
   checkpoint at the ghost awakening. A death in Part II explicitly offers
-  `RESTART 1` for a fresh game (including the opening name question) and
-  `RESTART 2` for the same named player's Part-II checkpoint.
-- **Player-name templates.** The whole game begins with `What should we call
-  you?` after the title banner and initial AI status but before the first room.
-  HUD/navigation stay gated until it is answered. Bare names, SAY forms, and
-  CALL ME forms are accepted without spending a turn. Blank or declined names
-  become Professor Spooky Pants; `CALL ME <name>` changes the name later at
-  zero turn cost. `RESTART 2` clears the checkpoint name and repeats the title,
-  AI, name, awakening sequence. Authored `{{player_name}}` tokens pass through
-  `game.showMessage()` before terminal display, phone display, or speech.
+  `RESTART 1` for a fresh game and `RESTART 2` for the Part-II checkpoint.
+- **Player-name templates.** Startup shows the title and initial AI status,
+  assigns Professor Spooky Pants, prints `What should we call you?` as intro
+  text, prefills `call me `, and continues into the first room without waiting.
+  `CALL ME <name>` changes the name later at zero turn cost. `RESTART 2` clears
+  the checkpoint name and repeats the same nonblocking intro before awakening.
+  Authored `{{player_name}}` tokens pass through `game.showMessage()` before
+  terminal display, phone display, or speech.
 
 ### 12.31 The GREAT OAK gem-panel lift and TREE FORT
 

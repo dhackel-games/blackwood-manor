@@ -333,23 +333,21 @@ Then("restart command {string} selects Part {int}", function (input, part) {
   assert.equal(parseRestartTarget(input), part);
 });
 
-Then("browser startup shows title and AI before asking for the name", function () {
+Then("browser startup includes a nonblocking prefilled name request", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(ui,
     /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
   assert.match(ui,
-    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*showNamePrompt\(\)/s);
+    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*What should we call you\?[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
   assert.match(ui,
-    /function showNamePrompt\(\) \{[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)/s);
-  assert.match(ui,
-    /input\.placeholder = waitingForPrompt[\s\S]*"checking AI…"[\s\S]*"What should we call you\?"[\s\S]*"type command \/ tap button"/s);
-  assert.match(ui, /input\.disabled = waitingForPrompt/);
-  assert.match(ui, /mainGo\.disabled = waitingForPrompt/);
-  assert.match(ui, /hudElement\.hidden = naming/);
-  assert.match(ui, /controls\.hidden = naming/);
-  assert.match(ui, /navDisclosure\.hidden = naming/);
+    /input\.placeholder = waitingForIntro[\s\S]*"checking AI…"[\s\S]*"type command \/ tap button"/s);
+  assert.match(ui, /input\.disabled = waitingForIntro/);
+  assert.match(ui, /mainGo\.disabled = waitingForIntro/);
+  assert.match(ui, /hudElement\.hidden = waitingForIntro/);
+  assert.match(ui, /controls\.hidden = waitingForIntro/);
+  assert.match(ui, /navDisclosure\.hidden = waitingForIntro/);
   assert.match(html, /id=["']hud["'] hidden/);
   assert.match(html, /id=["']controls["'] hidden/);
   assert.match(html, /id=["']nav-disclosure["'][^>]*hidden/);
@@ -369,6 +367,8 @@ Then("browser restart handling supports both game parts", function () {
     /function restartPartTwo\(\) \{[\s\S]*game\.restoreCheckpoint\("partII"\)[\s\S]*Restarting Part II/s);
   assert.match(ui,
     /function restartPartTwo\(\) \{[\s\S]*delete game\.state\.flags\.playerName[\s\S]*beginSession\(\{ message: "Restarting Part II\.\.\." \}\)/s);
+  assert.match(ui,
+    /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)/s);
 });
 
 Then("the copyright-version is exact", function () {

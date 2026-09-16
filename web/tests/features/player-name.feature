@@ -5,8 +5,8 @@ Feature: Player name and message templates
   The game asks for a name before the first room appears and resolves explicit
   player-name templates through the single message renderer.
 
-  Scenario: The browser shows title and AI status before the name question
-    Then browser startup shows title and AI before asking for the name
+  Scenario: The browser intro requests a name without blocking the first room
+    Then browser startup includes a nonblocking prefilled name request
 
   Scenario Outline: The opening accepts natural name responses without spending a turn
     Given a fresh unnamed manor game

@@ -88,6 +88,6 @@ Every room needs `art` + `searchDesc` + `IMPLICIT_NAVIGATION` + `ROOM_SHORT_NAME
 `ITEM_SHORT_NAMES`; short-names globally unique matching `/^[a-z0-9]+$/`. Part II rooms are `phase:2`
 and excluded from `teleportRandom`. Player-facing prose uses explicit `{{player_name}}` tokens;
 all display and speech output passes through `game.showMessage()` before it reaches the player.
-Startup order is title, initial AI status, name question, first room; the same order applies to
-`RESTART 2`. Blank/declined names become Professor Spooky Pants, and `CALL ME <name>` renames
-the player without spending a turn.
+Startup is nonblocking: title, initial AI status, Professor Spooky Pants fallback, an intro
+name request with `call me ` prefilled, then the first room immediately. The same applies to
+`RESTART 2`; `CALL ME <name>` renames the player without spending a turn.

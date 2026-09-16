@@ -284,6 +284,7 @@ When("I restart from checkpoint {string}", function (name) {
   if (name === "partII") {
     delete this.game.state.flags.playerName;
     delete this.game.state.flags.playerNameDefaulted;
+    this.game.useDefaultPlayerName();
     this.output = this.game.startMessage();
   } else {
     this.output = restored.message;

@@ -99,6 +99,11 @@ export function createGame(world) {
   });
   game.showMessage = (message) => renderMessage(message, game.templateValues());
   game.needsPlayerName = () => !!cfg.playerNamePrompt && !state.flags.playerName;
+  game.useDefaultPlayerName = () => {
+    state.flags.playerName = cfg.defaultPlayerName || "Professor Spooky Pants";
+    state.flags.playerNameDefaulted = true;
+    return state.flags.playerName;
+  };
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
   let darkWarningRendered = false;
@@ -749,18 +754,20 @@ export function createGame(world) {
     return out.join("\n\n");
   }
 
-  game.startMessage = () => game.needsPlayerName()
-    ? game.showMessage(cfg.playerNamePrompt)
-    : game.describeRoom(true);
+  game.startMessage = () => {
+    if (game.needsPlayerName()) return game.showMessage(cfg.playerNamePrompt);
+    const message = typeof world.afterPlayerNamed === "function"
+      ? world.afterPlayerNamed(game)
+      : game.describeRoom(true);
+    return game.showMessage(message);
+  };
 
   game.send = (input) => {
     if (game.needsPlayerName()) {
       const raw = String(input || "").trim();
       const useDefault = !raw
         || /^(?:skip|pass|no|no thanks|rather not|you choose|whatever)$/i.test(raw);
-      const name = useDefault
-        ? (cfg.defaultPlayerName || "Professor Spooky Pants")
-        : parsePlayerNameInput(raw);
+      const name = useDefault ? game.useDefaultPlayerName() : parsePlayerNameInput(raw);
       if (!name) {
         return game.showMessage(
           cfg.playerNameInvalid ||

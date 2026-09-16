@@ -59,8 +59,7 @@ let introBannerElement = null;
 let currentSessionAnchorId = "";
 let modelCheckReady = false;
 let modelCheckAnnounced = false;
-let namePromptReady = false;
-let namePromptShown = false;
+let sessionIntroReady = false;
 let pendingSavedNotice = false;
 let pendingSessionMessage = "";
 let autoCallPending = /[?&]call\b/.test(location.search);
@@ -208,29 +207,19 @@ function showIntroBanner() {
 }
 
 function syncNameGate() {
-  const naming = game.needsPlayerName();
-  const waitingForPrompt = naming && !namePromptReady;
-  input.disabled = waitingForPrompt;
-  mainGo.disabled = waitingForPrompt;
-  input.placeholder = waitingForPrompt
+  const waitingForIntro = !sessionIntroReady;
+  input.disabled = waitingForIntro;
+  mainGo.disabled = waitingForIntro;
+  input.placeholder = waitingForIntro
     ? "checking AI…"
-    : naming ? "What should we call you?" : "type command / tap button";
-  hudElement.hidden = naming;
-  controls.hidden = naming;
-  navDisclosure.hidden = naming;
-}
-
-function showNamePrompt() {
-  if (!game.needsPlayerName() || namePromptShown) return;
-  namePromptReady = true;
-  namePromptShown = true;
-  print("\n" + game.startMessage());
-  syncNameGate();
-  if (canType) input.focus();
+    : "type command / tap button";
+  hudElement.hidden = waitingForIntro;
+  controls.hidden = waitingForIntro;
+  navDisclosure.hidden = waitingForIntro;
 }
 
 function completeSessionIntro() {
-  if (!modelCheckReady) return;
+  if (!modelCheckReady || sessionIntroReady) return;
   announceModelCheck();
   if (pendingSavedNotice) {
     print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
@@ -240,17 +229,32 @@ function completeSessionIntro() {
     print(pendingSessionMessage, "sys");
     pendingSessionMessage = "";
   }
-  showNamePrompt();
+  print(game.showMessage(
+    "What should we call you? Finish the pre-entered CALL ME command, or keep {{player_name}}."),
+  "sys");
+  print("\n" + game.startMessage());
+  sessionIntroReady = true;
+  mainEntry.setValue("call me ");
+  syncNameGate();
+  if (canType) {
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
+  if (autoCallPending) {
+    autoCallPending = false;
+    mainEntry.clear();
+    setTimeout(() => handle("call"), 0);
+  }
 }
 
 function beginSession({ showSavedNotice = false, message = "" } = {}) {
   markSessionStart();
   introBannerElement = null;
   modelCheckAnnounced = false;
-  namePromptReady = false;
-  namePromptShown = false;
+  sessionIntroReady = false;
   pendingSavedNotice = showSavedNotice && hasSave();
   pendingSessionMessage = message;
+  if (game.needsPlayerName()) game.useDefaultPlayerName();
   showIntroBanner();
   syncNameGate();
   updateHud();
@@ -947,6 +951,7 @@ function handle(raw) {
       if (!hasSave()) { print("There is no saved game."); return; }
       const restored = loadGame(game);
       if (restored) {
+        if (game.needsPlayerName()) game.useDefaultPlayerName();
         game.setFlag("usedSaveRestore", true);
         saveGame(game);
         markSessionStart();
@@ -964,7 +969,6 @@ function handle(raw) {
 
   if (onCall) recordBugDialogue(bugTrace, "user", submitted);
   const prevFlags = { ...game.state.flags };
-  const wasNaming = game.needsPlayerName();
   const turnsBefore = game.state.turns;
   const out = game.send(cmd);
   bugTrace.turns += Math.max(0, game.state.turns - turnsBefore);
@@ -1011,9 +1015,6 @@ function handle(raw) {
   }
 
   // normal terminal turn
-  if (wasNaming && !game.needsPlayerName()) {
-    syncNameGate();
-  }
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
@@ -1023,10 +1024,6 @@ function handle(raw) {
   if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
   if (game.state.won) printRestartPrompt();
   else if (!game.state.dead) saveGame(game);
-  if (wasNaming && !game.needsPlayerName() && autoCallPending) {
-    autoCallPending = false;
-    setTimeout(() => handle("call"), 0);
-  }
 }
 
 function applySysopCommand(raw) {
