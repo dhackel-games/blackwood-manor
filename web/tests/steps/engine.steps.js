@@ -930,7 +930,7 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
   assert.match(css,
-    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--action-controls-min-width:\s*17rem[^}]*--action-controls-max-width:\s*28rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\) -[\s\S]*var\(--action-controls-min-width\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
+    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--action-controls-min-width:\s*17rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\) -[\s\S]*var\(--action-controls-min-width\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*display:\s*block/s);
   assert.match(css,
@@ -938,7 +938,7 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.match(css,
     /#controls \.movement-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*left:\s*var\(--dpad-left\)/s);
   assert.match(css,
-    /#controls \.action-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*50%[^}]*right:\s*0[^}]*left:\s*auto[^}]*width:\s*min\([\s\S]*var\(--action-controls-max-width\)[\s\S]*100% - var\(--dpad-left\) - var\(--movement-controls-width\) - var\(--movement-to-action-gap\)[\s\S]*max-width:\s*var\(--action-controls-max-width\)[^}]*transform:\s*translateY\(-50%\)/s);
+    /#controls \.action-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*50%[^}]*right:\s*0[^}]*left:\s*calc\(var\(--dpad-left\) \+ var\(--movement-controls-width\) \+ var\(--movement-to-action-gap\)\)[^}]*width:\s*auto[^}]*max-width:\s*none[^}]*transform:\s*translateY\(-50%\)/s);
   assert.match(css,
     /@media \(max-width:\s*600px\)[\s\S]*#controls\s*\{[^}]*--dpad-max-left:\s*calc\(100% - var\(--movement-controls-width\)\)[\s\S]*#controls \.action-controls\s*\{[^}]*position:\s*static[^}]*width:\s*100%[^}]*max-width:\s*none[^}]*margin-top:\s*0\.5rem[^}]*transform:\s*none/s);
   assert.match(css, /#controls \.verbs\s*\{[^}]*width:\s*100%[^}]*min-width:\s*0[^}]*flex-direction:\s*column/s);

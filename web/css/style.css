@@ -166,7 +166,6 @@ body { -webkit-text-size-adjust: 100%; }
   --picker-to-dpad-gap: 0.2rem;
   --movement-to-action-gap: 0.5rem;
   --action-controls-min-width: 17rem;
-  --action-controls-max-width: 28rem;
   --dpad-min-left: calc(var(--nav-picker-width) + var(--picker-to-dpad-gap));
   --dpad-centered-left: calc(50% - var(--dpad-half-width));
   --dpad-max-left: calc(
@@ -290,12 +289,9 @@ body { -webkit-text-size-adjust: 100%; }
   position: absolute;
   top: 50%;
   right: 0;
-  left: auto;
-  width: min(
-    var(--action-controls-max-width),
-    calc(100% - var(--dpad-left) - var(--movement-controls-width) - var(--movement-to-action-gap))
-  );
-  max-width: var(--action-controls-max-width);
+  left: calc(var(--dpad-left) + var(--movement-controls-width) + var(--movement-to-action-gap));
+  width: auto;
+  max-width: none;
   min-width: 0;
   display: block;
   transform: translateY(-50%);
