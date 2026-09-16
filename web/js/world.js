@@ -382,6 +382,12 @@ function describeAwakening(ctx) {
     "EXAMINE the CLOCK.";
 }
 
+function afterPlayerNamed(ctx) {
+  return ctx.getFlag("partII") && ctx.state.room === "p2_awakening"
+    ? describeAwakening(ctx)
+    : ctx.describeRoom(true);
+}
+
 function clockTalismanText(ctx) {
   if (!ctx.getFlag("partII")) {
     return "A beautiful grand clock small enough to cradle in both hands. It has THIRTEEN numbers instead of " +
@@ -3159,6 +3165,11 @@ const logicWorld = {
       'What should we call you?\n\nType your name, SAY "Jeb", or CALL ME "Foo".',
     playerNameAccepted:
       "Good. We will call you {{player_name}}.\n\nThe last daylight is draining from the sky.",
+    defaultPlayerName: "Professor Spooky Pants",
+    defaultPlayerNameAccepted:
+      "No name? Fine. We will call you {{player_name}}. Change it anytime with CALL ME FOO.\n\n" +
+      "The last daylight is draining from the sky.",
+    playerNameChanged: "Done. We will call you {{player_name}}.",
     requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
     equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck", "back"],
   },
@@ -3184,6 +3195,7 @@ const logicWorld = {
   nextFlavor: cycleFlavor,
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
+  afterPlayerNamed,
   migrateState(state, { savedItems }) {
     if (!state.flags.playerName && state.flags.ghostName) {
       state.flags.playerName = state.flags.ghostName;

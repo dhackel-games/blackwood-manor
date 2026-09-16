@@ -51,11 +51,19 @@ const phoneTimer = document.getElementById("phone-timer");
 const phoneBillEl = document.getElementById("phone-bill");
 const garyVoiceSelect = document.getElementById("gary-voice");
 const garyVolumeInput = document.getElementById("gary-volume");
+const aiBadge = document.getElementById("phone-ai");
 let callTimer = null;
 let callSeconds = 0;
 let endingCall = false;
 let introBannerElement = null;
 let currentSessionAnchorId = "";
+let modelCheckReady = false;
+let modelCheckAnnounced = false;
+let namePromptReady = false;
+let namePromptShown = false;
+let pendingSavedNotice = false;
+let pendingSessionMessage = "";
+let autoCallPending = /[?&]call\b/.test(location.search);
 
 // HUD status is declarative: each HudSlot owns its emoji and calculation.
 const hud = createHud(document);
@@ -201,10 +209,52 @@ function showIntroBanner() {
 
 function syncNameGate() {
   const naming = game.needsPlayerName();
-  input.placeholder = naming ? "What should we call you?" : "type command / tap button";
+  const waitingForPrompt = naming && !namePromptReady;
+  input.disabled = waitingForPrompt;
+  mainGo.disabled = waitingForPrompt;
+  input.placeholder = waitingForPrompt
+    ? "checking AI…"
+    : naming ? "What should we call you?" : "type command / tap button";
   hudElement.hidden = naming;
   controls.hidden = naming;
   navDisclosure.hidden = naming;
+}
+
+function showNamePrompt() {
+  if (!game.needsPlayerName() || namePromptShown) return;
+  namePromptReady = true;
+  namePromptShown = true;
+  print("\n" + game.startMessage());
+  syncNameGate();
+  if (canType) input.focus();
+}
+
+function completeSessionIntro() {
+  if (!modelCheckReady) return;
+  announceModelCheck();
+  if (pendingSavedNotice) {
+    print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
+    pendingSavedNotice = false;
+  }
+  if (pendingSessionMessage) {
+    print(pendingSessionMessage, "sys");
+    pendingSessionMessage = "";
+  }
+  showNamePrompt();
+}
+
+function beginSession({ showSavedNotice = false, message = "" } = {}) {
+  markSessionStart();
+  introBannerElement = null;
+  modelCheckAnnounced = false;
+  namePromptReady = false;
+  namePromptShown = false;
+  pendingSavedNotice = showSavedNotice && hasSave();
+  pendingSessionMessage = message;
+  showIntroBanner();
+  syncNameGate();
+  updateHud();
+  completeSessionIntro();
 }
 
 // --- terminal output ---
@@ -765,15 +815,10 @@ window.__contentStatus = (message) => {
 
 function newGame(origin = "restart") {
   game = createGame(world);
-  introBannerElement = null;
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
-  markSessionStart();
-  print("\n" + game.startMessage());
-  if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
-  syncNameGate();
-  updateHud();
+  beginSession({ showSavedNotice: true, message: "Restarting Part I..." });
 }
 
 function restartPartTwo() {
@@ -782,15 +827,12 @@ function restartPartTwo() {
     print("The Part II restart point is unavailable. Type RESTART 1 to begin again.", "sys");
     return;
   }
+  delete game.state.flags.playerName;
+  delete game.state.flags.playerNameDefaulted;
   bugTrace = createBugTrace("Part II restart");
   history.length = 0;
   hi = 0;
-  markSessionStart();
-  print("Restarting Part II...", "sys");
-  print(restored.message || game.describeRoom(true));
-  syncNameGate();
-  updateHud();
-  saveGame(game);
+  beginSession({ message: "Restarting Part II..." });
 }
 
 function finishPhoneCall(message) {
@@ -820,16 +862,20 @@ function finishPhoneCall(message) {
 
 function handle(raw) {
   let cmd = raw.trim();
-  if (!cmd || endingCall) return;
+  if ((!cmd && !game.needsPlayerName()) || endingCall) return;
   const submitted = cmd;
   const onCall = !!game.state.flags.onCall;
 
   // Echo to whichever screen is active.
-  if (onCall) printToPhone(cmd, "you");
-  else print("> " + cmd, "echo");
+  if (cmd) {
+    if (onCall) printToPhone(cmd, "you");
+    else print("> " + cmd, "echo");
+  }
 
-  history.push(cmd);
-  hi = history.length;
+  if (cmd) {
+    history.push(cmd);
+    hi = history.length;
+  }
 
   const low = cmd.toLowerCase();
 
@@ -852,7 +898,6 @@ function handle(raw) {
     if (onCall) endCallUI();
     if (restartTarget === 2) restartPartTwo();
     else {
-      print("Restarting Part I...");
       newGame();
     }
     return;
@@ -967,9 +1012,7 @@ function handle(raw) {
 
   // normal terminal turn
   if (wasNaming && !game.needsPlayerName()) {
-    showIntroBanner();
     syncNameGate();
-    announceModelCheck();
   }
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
@@ -980,6 +1023,10 @@ function handle(raw) {
   if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
   if (game.state.won) printRestartPrompt();
   else if (!game.state.dead) saveGame(game);
+  if (wasNaming && !game.needsPlayerName() && autoCallPending) {
+    autoCallPending = false;
+    setTimeout(() => handle("call"), 0);
+  }
 }
 
 function applySysopCommand(raw) {
@@ -1158,19 +1205,11 @@ document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
 // --- boot ---
-markSessionStart();
-print("\n" + game.startMessage());
-if (hasSave()) print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
-syncNameGate();
-updateHud();
-if (canType) input.focus();
+beginSession({ showSavedNotice: true });
 
 // Probe for an on-device model for Gary (native app bridge, or the local Mac
-// daemon). Fire-and-forget: if nothing answers, Gary stays canned and nobody
-// ever sees an error.
-const aiBadge = document.getElementById("phone-ai");
-let modelCheckReady = false;
-let modelCheckAnnounced = false;
+// daemon). The name prompt waits for this bounded check so the startup order is
+// always title, AI status, name, then first room.
 export function refreshAiBadge() {
   if (!aiBadge) return;
   const s = garyBrain.status();
@@ -1189,23 +1228,21 @@ if (aiBadge) {
   });
 }
 
-garyBrain.detect().then(() => {
-  refreshAiBadge();
-  modelCheckReady = true;
-  announceModelCheck();
-});
+garyBrain.detect()
+  .catch((error) => {
+    console.warn("[gary] initial model check failed", error);
+  })
+  .finally(() => {
+    refreshAiBadge();
+    modelCheckReady = true;
+    completeSessionIntro();
+  });
 
 // Launch-time model check.
 //
-// Testers kept reporting "Gary isn't using the LLM" with no way to tell whether
-// the model was missing, switched off, or simply not being reached — the badge
-// alone was too quiet and only lives on the call screen. Surface the report in
-// the native app and in a local browser whose daemon is active; keep the public
-// scripted site quiet.
+// Always surface the result before asking the player's name.
 function announceModelCheck() {
-  if (!modelCheckReady || modelCheckAnnounced || game.needsPlayerName()) return;
-  const s = garyBrain.status();
-  if (!s.nativeApp && s.provider !== "daemon") return;
+  if (!modelCheckReady || modelCheckAnnounced) return;
   modelCheckAnnounced = true;
   print(modelStatusText(), garyBrain.isAvailable() ? "sys ok" : "sys");
 }
@@ -1226,5 +1263,4 @@ function refreshIntroBanner() {
   if (introBannerElement) introBannerElement.textContent = bannerText();
 }
 
-// Demo/testing helper: index.html?call auto-dials Gary on load.
-if (/[?&]call\b/.test(location.search)) setTimeout(() => handle("call"), 350);
+// Demo/testing helper: index.html?call auto-dials Gary after naming.

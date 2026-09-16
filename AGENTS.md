@@ -71,7 +71,7 @@ Examining the reliquary, taking the clock, and going down reaches Gary; he is al
 silent phone, knocks the player out, and leaves them as a ghost holding the clock.
 `examine clock` explains the loop.
 Part-II death offers `RESTART 1` for a fresh Part I (including naming) or `RESTART 2` for the
-serialized ghost-awakening checkpoint with the same player name and Part-I state.
+serialized ghost-awakening checkpoint and a fresh name prompt before the room appears.
 Hour-13 slice: `use clock` → `examine statue` (find the living queen) → `examine pool` → `yell`
 (she turns to stone by the water; yelling after finding her but before knowing the pool = death)
 → carry emerald to the garden bush → clock ticks 13→12. Design:
@@ -88,4 +88,6 @@ Every room needs `art` + `searchDesc` + `IMPLICIT_NAVIGATION` + `ROOM_SHORT_NAME
 `ITEM_SHORT_NAMES`; short-names globally unique matching `/^[a-z0-9]+$/`. Part II rooms are `phase:2`
 and excluded from `teleportRandom`. Player-facing prose uses explicit `{{player_name}}` tokens;
 all display and speech output passes through `game.showMessage()` before it reaches the player.
-The name question is the first transcript output; title, HUD, controls, and AI-status output wait.
+Startup order is title, initial AI status, name question, first room; the same order applies to
+`RESTART 2`. Blank/declined names become Professor Spooky Pants, and `CALL ME <name>` renames
+the player without spending a turn.

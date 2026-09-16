@@ -755,15 +755,35 @@ export function createGame(world) {
 
   game.send = (input) => {
     if (game.needsPlayerName()) {
-      const name = parsePlayerNameInput(input);
+      const raw = String(input || "").trim();
+      const useDefault = !raw
+        || /^(?:skip|pass|no|no thanks|rather not|you choose|whatever)$/i.test(raw);
+      const name = useDefault
+        ? (cfg.defaultPlayerName || "Professor Spooky Pants")
+        : parsePlayerNameInput(raw);
       if (!name) {
         return game.showMessage(
           cfg.playerNameInvalid ||
           'Please type a name, SAY "Jeb", or type CALL ME "Jeb".');
       }
       state.flags.playerName = name;
-      const accepted = cfg.playerNameAccepted || "Welcome, {{player_name}}.";
-      return game.showMessage(`${accepted}\n\n${game.describeRoom(true)}`);
+      state.flags.playerNameDefaulted = useDefault;
+      const accepted = useDefault
+        ? (cfg.defaultPlayerNameAccepted ||
+          'No name? Fine. We will call you {{player_name}}. Change it anytime with CALL ME FOO.')
+        : (cfg.playerNameAccepted || "Welcome, {{player_name}}.");
+      const firstRoom = typeof world.afterPlayerNamed === "function"
+        ? world.afterPlayerNamed(game)
+        : game.describeRoom(true);
+      return game.showMessage(`${accepted}\n\n${firstRoom}`);
+    }
+    if (/^call\s+me\b/i.test(String(input || "").trim())) {
+      const name = parsePlayerNameInput(input);
+      if (!name) return 'CALL ME needs a name, for example: CALL ME FOO.';
+      state.flags.playerName = name;
+      state.flags.playerNameDefaulted = false;
+      return game.showMessage(
+        cfg.playerNameChanged || "Done. We will call you {{player_name}}.");
     }
     return game.showMessage(sendRaw(input));
   };

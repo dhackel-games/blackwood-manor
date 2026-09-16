@@ -25,11 +25,13 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 
 - **Your name:** before the first room appears, the game asks `What should we
   call you?` Respond with a bare name, `say "Jeb"`, `call me Foo`, or
-  `call me "Foo"`. This question appears before the title banner; the HUD,
-  navigation, and asynchronous AI-status message remain gated until it is
-  answered. Authored `{{player_name}}` tokens in rooms, items, Gary dialogue,
-  and endings are resolved by the engine's single `showMessage` renderer before
-  any text is displayed or spoken.
+  `call me "Foo"`. Startup order is title banner, initial AI status, name
+  question, then the first room. Blank, SKIP, or NO THANKS assigns the silly
+  fallback **Professor Spooky Pants**; `call me <name>` changes it later without
+  spending a turn. `RESTART 2` uses the same ordering and asks again before the
+  ghost awakening. HUD and navigation remain gated until naming is complete.
+  Authored `{{player_name}}` tokens in rooms, items, Gary dialogue, and endings
+  are resolved by the engine's single `showMessage` renderer before display or speech.
 - **Move:** `north` / `n`, `south` / `s`, `east` / `e`, `west` / `w`,
   `northeast` / `ne`, `northwest` / `nw`, `southeast` / `se`,
   `southwest` / `sw`, `up` / `u`, `down` / `d`, `in`, `out`. The touch

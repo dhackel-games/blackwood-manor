@@ -76,8 +76,12 @@ Feature: Part II — the Thirteenth Hour
     Then the game is alive
     And the game is not won
     And the current room is "p2_awakening"
-    And flag "playerName" equals "Jeb"
+    And flag "playerName" is unset
     And flag "clockExplained" is false
+    And the output contains "What should we call you?"
+    When I send "call me Ada"
+    Then flag "playerName" equals "Ada"
+    And the output contains "You are a ghost, Ada"
     And the output contains "EXAMINE the CLOCK"
 
   Scenario: Finding the queen and using the mirror pool frees the emerald safely

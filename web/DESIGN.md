@@ -896,10 +896,13 @@ Blackwood Manor has one ritual and two immediate choices.
   `RESTART 1` for a fresh game (including the opening name question) and
   `RESTART 2` for the same named player's Part-II checkpoint.
 - **Player-name templates.** The whole game begins with `What should we call
-  you?` before the title banner; HUD/navigation and asynchronous status output
-  stay gated until it is answered. Bare names, SAY forms, and CALL ME forms are
-  accepted without spending a turn. Authored `{{player_name}}` tokens pass
-  through `game.showMessage()` before terminal display, phone display, or speech.
+  you?` after the title banner and initial AI status but before the first room.
+  HUD/navigation stay gated until it is answered. Bare names, SAY forms, and
+  CALL ME forms are accepted without spending a turn. Blank or declined names
+  become Professor Spooky Pants; `CALL ME <name>` changes the name later at
+  zero turn cost. `RESTART 2` clears the checkpoint name and repeats the title,
+  AI, name, awakening sequence. Authored `{{player_name}}` tokens pass through
+  `game.showMessage()` before terminal display, phone display, or speech.
 
 ### 12.31 The GREAT OAK gem-panel lift and TREE FORT
 

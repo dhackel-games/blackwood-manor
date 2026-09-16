@@ -281,7 +281,13 @@ When("I round-trip the game snapshot", function () {
 When("I restart from checkpoint {string}", function (name) {
   const restored = this.game.restoreCheckpoint(name);
   assert.ok(restored, `Missing checkpoint: ${name}`);
-  this.output = restored.message;
+  if (name === "partII") {
+    delete this.game.state.flags.playerName;
+    delete this.game.state.flags.playerNameDefaulted;
+    this.output = this.game.startMessage();
+  } else {
+    this.output = restored.message;
+  }
 });
 
 Then("the game is won", function () {

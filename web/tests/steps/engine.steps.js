@@ -333,18 +333,20 @@ Then("restart command {string} selects Part {int}", function (input, part) {
   assert.equal(parseRestartTarget(input), part);
 });
 
-Then("browser boot asks for the name before rendering the title", function () {
+Then("browser startup shows title and AI before asking for the name", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
-  const boot = ui.slice(ui.indexOf("// --- boot ---"));
-  const prompt = boot.indexOf('print("\\n" + game.startMessage())');
-  const banner = boot.indexOf("showIntroBanner()");
-  assert.ok(prompt >= 0, "boot must print the name-gated start message");
-  assert.equal(banner, -1, "boot must not render the title before the name is accepted");
   assert.match(ui,
-    /const wasNaming = game\.needsPlayerName\(\)[\s\S]*game\.send\(cmd\)[\s\S]*if \(wasNaming && !game\.needsPlayerName\(\)\) \{[\s\S]*showIntroBanner\(\)/s);
-  assert.match(ui, /input\.placeholder = naming \? "What should we call you\?" : "type command \/ tap button"/);
+    /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
+  assert.match(ui,
+    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*showNamePrompt\(\)/s);
+  assert.match(ui,
+    /function showNamePrompt\(\) \{[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)/s);
+  assert.match(ui,
+    /input\.placeholder = waitingForPrompt[\s\S]*"checking AI…"[\s\S]*"What should we call you\?"[\s\S]*"type command \/ tap button"/s);
+  assert.match(ui, /input\.disabled = waitingForPrompt/);
+  assert.match(ui, /mainGo\.disabled = waitingForPrompt/);
   assert.match(ui, /hudElement\.hidden = naming/);
   assert.match(ui, /controls\.hidden = naming/);
   assert.match(ui, /navDisclosure\.hidden = naming/);
@@ -353,7 +355,9 @@ Then("browser boot asks for the name before rendering the title", function () {
   assert.match(html, /id=["']nav-disclosure["'][^>]*hidden/);
   assert.match(css, /#hud\[hidden\], #controls\[hidden\], #nav-disclosure\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(ui,
-    /function announceModelCheck\(\) \{[\s\S]*game\.needsPlayerName\(\)[\s\S]*return/s);
+    /\/\/ --- boot ---\s*beginSession\(\{ showSavedNotice: true \}\)/s);
+  assert.match(ui,
+    /garyBrain\.detect\(\)[\s\S]*modelCheckReady = true;[\s\S]*completeSessionIntro\(\)/s);
 });
 
 Then("browser restart handling supports both game parts", function () {
@@ -363,6 +367,8 @@ Then("browser restart handling supports both game parts", function () {
     /if \(restartTarget\) \{[\s\S]*if \(restartTarget === 2\) restartPartTwo\(\)[\s\S]*else \{[\s\S]*newGame\(\)/s);
   assert.match(ui,
     /function restartPartTwo\(\) \{[\s\S]*game\.restoreCheckpoint\("partII"\)[\s\S]*Restarting Part II/s);
+  assert.match(ui,
+    /function restartPartTwo\(\) \{[\s\S]*delete game\.state\.flags\.playerName[\s\S]*beginSession\(\{ message: "Restarting Part II\.\.\." \}\)/s);
 });
 
 Then("the copyright-version is exact", function () {
@@ -709,10 +715,9 @@ Then("game-over restart text links to the latest session start", function () {
   assert.match(ui,
     /link\.addEventListener\("click", \(event\) => \{[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(currentSessionAnchorId\)/s);
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
-  assert.match(ui, /function newGame[\s\S]*markSessionStart\(\)[\s\S]*game\.startMessage/s);
+  assert.match(ui, /function newGame[\s\S]*beginSession\(\{ showSavedNotice: true/);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
-  assert.match(ui,
-    /\/\/ --- boot ---\s*markSessionStart\(\);\s*print\("\\n" \+ game\.startMessage\(\)\)/s);
+  assert.match(ui, /\/\/ --- boot ---\s*beginSession\(\{ showSavedNotice: true \}\)/s);
   assert.match(ui, /if \(game\.state\.won\) printRestartPrompt\(\)/);
   assert.match(css, /\.session-restart a\s*\{[^}]*color:\s*var\(--green-bright\)[^}]*text-decoration:\s*underline/s);
 });
@@ -1049,7 +1054,8 @@ Then("release-channel metadata decides whether a native iOS update is available"
 Then("local daemon status is announced in the transcript without console noise", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
-  assert.match(ui, /if \(!s\.nativeApp && s\.provider !== "daemon"\) return;/);
+  assert.doesNotMatch(ui, /if \(!s\.nativeApp && s\.provider !== "daemon"\) return;/);
+  assert.match(ui, /function announceModelCheck\(\)[\s\S]*modelCheckAnnounced = true/s);
   assert.match(ui, /print\(modelStatusText\(\), garyBrain\.isAvailable\(\) \? "sys ok" : "sys"\)/);
   assert.match(ui, /his lines are marked ◆ AI\./);
   assert.doesNotMatch(ui, /gary scripted|· scripted/);
