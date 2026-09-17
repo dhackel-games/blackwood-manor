@@ -67,7 +67,7 @@ for (const r of Object.values(out)) {
   r.items.sort((a, b) => (rank[a.kind] - rank[b.kind]) || a.label.localeCompare(b.label));
 }
 
-writeFileSync(join(here, "roomdata.json"), JSON.stringify(out, null, 2) + "\n");
+writeFileSync(join(here, "..", "view2d", "roomdata.json"), JSON.stringify(out, null, 2) + "\n");
 const n = Object.keys(out).length;
 const items = Object.values(out).reduce((s, r) => s + r.items.length, 0);
 console.log(`wrote roomdata.json — ${n} rooms, ${items} placed items`);

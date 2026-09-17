@@ -651,3 +651,13 @@ body { -webkit-text-size-adjust: 100%; }
 #phone-end:disabled { color: #fff; opacity: 1; cursor: wait; }
 @keyframes end-call-progress { to { transform: scaleX(1); } }
 #phone-end:active { background: #e0483c; }
+
+/* Entry point to the 2D tile-map view of the manor (view2d/tilemap.html). */
+#view-2d {
+  position: fixed; top: max(6px, env(safe-area-inset-top)); right: 8px; z-index: 20;
+  font: 600 12px/1 "Courier New", monospace; letter-spacing: 1px;
+  color: #8fd3ff; text-decoration: none;
+  background: rgba(5, 8, 5, 0.72); border: 1px solid #2a3b2f; border-radius: 6px;
+  padding: 4px 7px;
+}
+#view-2d:active { color: #fff; border-color: #8fd3ff; }

@@ -101,6 +101,17 @@ export function buildManifest(root, version, commit) {
     }
   }
 
+  // Optional shipped content bundles beyond the core runtime (e.g. the 2D tile
+  // view under view2d/). Present in the real web root, absent in the manifest
+  // unit-test fixtures, so a missing directory is not an error here.
+  for (const sub of ["view2d"]) {
+    try {
+      walk(join(root, sub), files);
+    } catch {
+      // optional bundle not present in this root
+    }
+  }
+
   const relFiles = files
     .map((f) => relative(root, f).split(sep).join(posix.sep))
     .filter((f) => f !== "manifest.json")

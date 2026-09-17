@@ -8,7 +8,7 @@ SRC="$HERE/../web"
 DST="$HERE/Resources/www"
 rm -rf "$DST"; mkdir -p "$DST"
 cp "$SRC/index.html" "$SRC/versions.json" "$DST/"
-cp -R "$SRC/css" "$SRC/js" "$DST/"
+cp -R "$SRC/css" "$SRC/js" "$SRC/view2d" "$DST/"
 echo "Copied web game -> $DST"
 
 # Stamp the declared content identity into every module URL and manifest. Pages

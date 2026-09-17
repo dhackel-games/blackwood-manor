@@ -27,6 +27,10 @@
     "js/ui.js",
     "js/world.content.js",
     "js/world.js",
-    "versions.json"
+    "versions.json",
+    "view2d/atlas.png",
+    "view2d/roomdata.json",
+    "view2d/tilemap.html",
+    "view2d/tilemap.js"
   ]
 }

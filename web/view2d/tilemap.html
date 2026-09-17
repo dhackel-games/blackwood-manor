@@ -12,6 +12,9 @@
   body { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
   header { padding:10px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
   header h1 { margin:0; font-size:15px; letter-spacing:1px; }
+  header .back { float:right; margin-left:12px; color:#8fd3ff; text-decoration:none;
+    font-size:12px; border:1px solid var(--line); border-radius:6px; padding:4px 8px; }
+  header .back:hover { border-color:#8fd3ff; }
   header details { color:var(--dim); font-size:12px; margin-top:4px; }
   header summary { cursor:pointer; }
   header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
@@ -71,6 +74,7 @@
 </head>
 <body>
 <header>
+  <a class="back" href="../index.html">← text game</a>
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (Phase 1 · playable spike)</h1>
   <details>
     <summary>what is this?</summary>
@@ -82,8 +86,8 @@
     seen to read its description + items on the right. Press <b>B</b> to drop
     bait and lure the guest. Switch labels between <b>vector</b> (crisp) and
     <b>8-bit</b>, or turn on <b>reveal all</b> for a pure map view of how the
-    whole manor connects. Fully isolated under <code>web/spike/</code> — the
-    shipped game and its tests are untouched.</p>
+    whole manor connects. Shipped in the app under <code>web/view2d/</code> and
+    reachable from the text game via the <b>2D</b> link.</p>
   </details>
 </header>
 

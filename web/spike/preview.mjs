@@ -11,7 +11,7 @@ import { deflateSync } from "node:zlib";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { FLOORS, TILE, PALETTE, buildTileGrid } from "./tilemap.js";
+import { FLOORS, TILE, PALETTE, buildTileGrid } from "../view2d/tilemap.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const outDir = join(here, "preview");
