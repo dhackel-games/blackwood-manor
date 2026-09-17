@@ -960,8 +960,12 @@ ends and an explicit omission marker.
 ### 12.34 Persistent iOS web-content updates
 
 `versions.json` owns content updates. Its `CONTENT_VERSION` is the numeric
-`YYYYMMDDBBB` composition of `APP_VERSION` and zero-padded `BUILD`, followed by
-`CONTENT_FILES` as the final declaration. iOS parses that stable data and chooses
+`YYYYMMDDBBB` composition of `CONTENT_DATE` and zero-padded `CONTENT_BUILD`,
+followed by `CONTENT_FILES` as the final declaration. `APP_VERSION` and `BUILD`
+remain deprecated aliases of those content fields for compatibility with
+already-installed updaters. Native app identity is explicit in
+`NATIVE_APP_VERSION` / `NATIVE_APP_BUILD` and lives canonically in
+`web/package.json` and `ios/project.yml`. iOS parses the content data and chooses
 the greatest `CONTENT_VERSION` among the bundled copy, persistent cache, and
 GitHub.io copy. The winner is atomically written to Application Support and the
 web view always serves `app://local/` from that cache. Thus an older cache cannot

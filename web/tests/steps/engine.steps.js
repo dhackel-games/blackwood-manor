@@ -32,11 +32,15 @@ const versionMetadata = JSON.parse(
 const {
   APP_VERSION,
   BUILD,
+  NATIVE_APP_VERSION,
+  NATIVE_APP_BUILD,
+  CONTENT_DATE,
+  CONTENT_BUILD,
   CONTENT_VERSION,
   COPYRIGHT,
   LATEST_APP_BUILD_AVAILABLE,
 } = versionMetadata;
-const VERSION = `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`;
+const VERSION = `${COPYRIGHT} ${CONTENT_DATE} (content build ${CONTENT_BUILD})`;
 
 const NONE = "[none]";
 const EMPTY = "[empty]";
@@ -386,13 +390,15 @@ Then("browser mirror routes are prefilled after command submission", function ()
 Then("the copyright-version is exact", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
   const design = readFileSync(new URL("../../DESIGN.md", import.meta.url), "utf8");
-  // The clean number we monitor stays locked to the App Store marketing version.
-  assert.equal(APP_VERSION, packageJson.version);
-  // Apple-style "version (build)" so the on-screen badge mirrors App Store Connect exactly.
-  assert.equal(VERSION, `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`);
-  const [year, month, day] = APP_VERSION.split(".");
+  // Legacy aliases remain aligned with content for already-installed updaters.
+  assert.equal(APP_VERSION, CONTENT_DATE);
+  assert.equal(BUILD, CONTENT_BUILD);
+  assert.equal(NATIVE_APP_VERSION, packageJson.version);
+  assert.equal(NATIVE_APP_BUILD, "107");
+  assert.equal(VERSION, `${COPYRIGHT} ${CONTENT_DATE} (content build ${CONTENT_BUILD})`);
+  const [year, month, day] = CONTENT_DATE.split(".");
   assert.equal(CONTENT_VERSION,
-    Number(`${year}${month.padStart(2, "0")}${day.padStart(2, "0")}${BUILD.padStart(3, "0")}`));
+    Number(`${year}${month.padStart(2, "0")}${day.padStart(2, "0")}${CONTENT_BUILD.padStart(3, "0")}`));
   assert.ok(Array.isArray(versionMetadata.CONTENT_FILES));
   assert.match(design, /### Source-file identity header/);
   assert.match(design, /YYYY-MM-DD\.BBB:\{last editor\}/);
@@ -400,7 +406,7 @@ Then("the copyright-version is exact", function () {
 
 Then("the package version is the release date", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  assert.equal(packageJson.version, "2026.9.16");
+  assert.equal(packageJson.version, "2026.9.11");
 });
 
 Then("the large title art has aligned top strokes", function () {
@@ -983,7 +989,7 @@ Then("Version reports local and source content through the native bridge", funct
   assert.match(native, /export class Native/);
   assert.match(native, /static isMobileApp\(\)/);
   assert.match(native, /static version\(\)/);
-  assert.match(native, /`\$\{COPYRIGHT\} Web \$\{APP_VERSION\} \(Build \$\{BUILD\}\)\. `/);
+  assert.match(native, /`\$\{COPYRIGHT\} Web \$\{CONTENT_DATE\} \(Content Build \$\{CONTENT_BUILD\}\)\. `/);
   assert.match(native, /Content: Version \$\{CONTENT_VERSION\}\. Continuous updates\./);
   assert.match(native, /`\$\{COPYRIGHT\} iOS \$\{this\.appInstalledVersion\} \(Build \$\{this\.appInstalledBuild\}\)\. `/);
   assert.match(native, /Content: Local \$\{this\.contentLocal\}\. Source \$\{this\.contentSource \|\| "Unavailable"\}\./);
@@ -1047,6 +1053,8 @@ Then("release-channel metadata decides whether a native iOS update is available"
   assert.match(appUpdate,
     /version\.compare\(installedVersion, options: \.numeric\)/);
   assert.match(appUpdate,
+    /static func releaseNumber\(appVersion: String, build: String\)[\s\S]*String\(format: "%04d%02d%02d%03d"/);
+  assert.doesNotMatch(appUpdate,
     /static func releaseNumber\(appVersion: String, build: String\)[\s\S]*WebContentRelease\.contentVersion/);
   assert.match(appUpdate, /release\.latestAppBuildAvailable > installedRelease/);
   assert.equal(JSON.parse(versionSource).LATEST_APP_BUILD_AVAILABLE,
@@ -1121,16 +1129,21 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.match(script, /--latest-build/);
   assert.match(script, /--force-next-build/);
   assert.match(script, /RELEASE_DATE_OVERRIDE/);
-  assert.match(script, /pkg\.version = process\.argv\[2\]/);
-  assert.match(script, /if \(\( DATE_CHANGED == 1 \)\); then\s*NEXT=1/s);
-  assert.match(script, /web\/package\.json/);
+  assert.doesNotMatch(script, /pkg\.version = process\.argv\[2\]/);
+  assert.match(script, /versions\.CONTENT_DATE = process\.argv\[2\]/);
+  assert.match(script, /versions\.CONTENT_BUILD = process\.argv\[3\]/);
+  assert.match(script, /Legacy aliases keep already-installed native updaters compatible/);
+  assert.match(script,
+    /if \[\[ "\$CONTENT_DATE" != "\$RELEASE_CONTENT_DATE" \]\]; then\s*NEXT_CONTENT_BUILD=1/s);
   assert.match(script, /--stamp-only\) UPLOAD=0; STAMP_ONLY=1/);
   assert.match(script,
-    /if \[\[ "\$STAMP_ONLY" -eq 1 \]\]; then[\s\S]*stopping before archive/s);
+    /if \[\[ "\$STAMP_ONLY" -eq 1 \]\]; then[\s\S]*app version\/build unchanged/s);
   assert.match(script,
     /if \(\( FORCE_NEXT_BUILD == 1 \)\); then[\s\S]*BASE_BUILD=\$\(\(CUR > LATEST_BUILD \? CUR : LATEST_BUILD\)\)[\s\S]*NEXT=\$\(\(BASE_BUILD \+ 1\)\)/s);
   assert.match(script, /CUR > LATEST_BUILD/);
   assert.match(script, /NEXT=\$\(\(LATEST_BUILD \+ 1\)\)/);
+  assert.match(script, /versions\.LATEST_APP_BUILD_AVAILABLE = Number\(process\.argv\[2\]\)/);
+  assert.match(script, /APP_RELEASE_ID/);
   assert.match(script, /ASC_RELEASE_LOCK_TIMEOUT/);
   assert.match(script, /cleanup_failed=1/);
   assert.match(script, /status" -eq 0 && "\$cleanup_failed" -eq 1/);

@@ -42,7 +42,7 @@ export function contentVersionFor(appVersion, build) {
       || numbers[2] > 31
       || !/^\d+$/.test(String(build))
       || buildNumber > 999) {
-    throw new Error("gen-web-manifest: APP_VERSION and BUILD must fit YYYY.M.D and BBB");
+    throw new Error("gen-web-manifest: content date and build must fit YYYY.M.D and BBB");
   }
   return Number(`${parts[0].padStart(4, "0")}${parts[1].padStart(2, "0")}` +
     `${parts[2].padStart(2, "0")}${String(build).padStart(3, "0")}`);
@@ -106,16 +106,16 @@ export function buildManifest(root, version, commit) {
     .filter((f) => f !== "manifest.json")
     .sort();
 
-  let appVersion = "?";
-  let build = "?";
+  let contentDate = "?";
+  let contentBuild = "?";
   try {
     const source = readFileSync(join(root, "versions.json"), "utf8");
     const versions = JSON.parse(source);
-    appVersion = versions.APP_VERSION ?? appVersion;
-    build = versions.BUILD ?? build;
+    contentDate = versions.CONTENT_DATE ?? contentDate;
+    contentBuild = versions.CONTENT_BUILD ?? contentBuild;
     const declaredVersion = versions.CONTENT_VERSION;
-    if (declaredVersion !== contentVersionFor(appVersion, build)) {
-      throw new Error("gen-web-manifest: CONTENT_VERSION does not match APP_VERSION and BUILD");
+    if (declaredVersion !== contentVersionFor(contentDate, contentBuild)) {
+      throw new Error("gen-web-manifest: CONTENT_VERSION does not match CONTENT_DATE and CONTENT_BUILD");
     }
     const declaredFiles = contentFilesFromVersionSource(source).slice().sort();
     if (JSON.stringify(declaredFiles) !== JSON.stringify(relFiles)) {
@@ -128,7 +128,7 @@ export function buildManifest(root, version, commit) {
 
   return {
     version: Number.parseInt(String(version ?? "0"), 10) || 0,
-    label: `${appVersion} build ${build} \u00b7 ${commit || "local"}`,
+    label: `${contentDate} content build ${contentBuild} \u00b7 ${commit || "local"}`,
     commit: commit || "local",
     files: relFiles,
   };

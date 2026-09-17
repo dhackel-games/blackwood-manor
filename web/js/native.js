@@ -15,6 +15,10 @@ if (versionsURL.protocol === "file:") {
 }
 if (typeof versions.APP_VERSION !== "string"
     || typeof versions.BUILD !== "string"
+    || typeof versions.NATIVE_APP_VERSION !== "string"
+    || typeof versions.NATIVE_APP_BUILD !== "string"
+    || typeof versions.CONTENT_DATE !== "string"
+    || typeof versions.CONTENT_BUILD !== "string"
     || typeof versions.COPYRIGHT !== "string"
     || !Number.isSafeInteger(versions.CONTENT_VERSION)
     || !Number.isSafeInteger(versions.LATEST_APP_BUILD_AVAILABLE)
@@ -25,12 +29,16 @@ if (typeof versions.APP_VERSION !== "string"
 export const {
   APP_VERSION,
   BUILD,
+  NATIVE_APP_VERSION,
+  NATIVE_APP_BUILD,
+  CONTENT_DATE,
+  CONTENT_BUILD,
   CONTENT_VERSION,
   COPYRIGHT,
   LATEST_APP_BUILD_AVAILABLE,
   CONTENT_FILES,
 } = versions;
-export const VERSION = `${COPYRIGHT} ${APP_VERSION} (build ${BUILD})`;
+export const VERSION = `${COPYRIGHT} ${CONTENT_DATE} (content build ${CONTENT_BUILD})`;
 
 export class Native {
   static appInstalledVersion =
@@ -73,7 +81,7 @@ export class Native {
       return `${COPYRIGHT} iOS ${this.appInstalledVersion} (Build ${this.appInstalledBuild}). ` +
         `Content: Local ${this.contentLocal}. Source ${this.contentSource || "Unavailable"}.`;
     }
-    return `${COPYRIGHT} Web ${APP_VERSION} (Build ${BUILD}). ` +
+    return `${COPYRIGHT} Web ${CONTENT_DATE} (Content Build ${CONTENT_BUILD}). ` +
       `Content: Version ${CONTENT_VERSION}. Continuous updates.`;
   }
 }

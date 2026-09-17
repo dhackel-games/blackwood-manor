@@ -37,16 +37,18 @@ cd ios
 RELEASE_EDITOR=acoven ./release-testflight.sh --stamp-only --force-next-build
 ```
 
-This stamps the next build/`CONTENT_VERSION`, refreshes the bundled web content,
-and regenerates the Xcode project without requiring signing or App Store Connect.
-The script updates `web/package.json` to today first; when the date changes the
-build resets to 1, and additional pushes on the same date increment from there.
+This stamps only `CONTENT_DATE`, `CONTENT_BUILD`, and `CONTENT_VERSION`, then
+refreshes the bundled web content. It does not change `web/package.json`,
+`ios/project.yml`, `APP_VERSION`, or `BUILD`. When the content date changes,
+`CONTENT_BUILD` resets to 1; additional content pushes that date increment it.
 
-`CONTENT_VERSION = f(APP_VERSION, BUILD) = YYYYMMDDBBB`, validated in three places (Swift
+`CONTENT_VERSION = f(CONTENT_DATE, CONTENT_BUILD) = YYYYMMDDBBB`, validated in three places (Swift
 `parse()`, `web/tools/gen-web-manifest.mjs`, and `web/tests/steps/engine.steps.js`) and coupled to
-`web/package.json` version (a test pins it), `web/versions.json`, and `ios/project.yml`
-(MARKETING_VERSION / CURRENT_PROJECT_VERSION). **Don't hand-edit these piecemeal — let the release
-script stamp them.**
+the content fields in `web/versions.json`. `APP_VERSION` / `BUILD` in that JSON
+remain deprecated content aliases solely for already-installed updater compatibility.
+Actual app identity is explicit in `NATIVE_APP_VERSION` / `NATIVE_APP_BUILD` and
+remains coupled to `web/package.json` and `ios/project.yml`.
+**Don't hand-edit these piecemeal — let the release script stamp them.**
 
 ### 2. TestFlight release — MUST be run by David in his own terminal
 `ios/release-testflight.sh` stamps the next version+build, runs `copy-web.sh` (bundles current

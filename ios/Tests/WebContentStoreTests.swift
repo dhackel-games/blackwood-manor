@@ -21,25 +21,29 @@ final class WebContentStoreTests: XCTestCase {
         return url
     }
 
-    private func versionData(appVersion: String = "2026.9.11", build: Int) -> Data {
-        let version = contentVersion(appVersion, build)
+    private func versionData(contentDate: String = "2026.9.16", contentBuild: Int) -> Data {
+        let version = contentVersion(contentDate, contentBuild)
         return try! JSONSerialization.data(withJSONObject: [
-            "APP_VERSION": appVersion,
-            "BUILD": String(build),
+            "APP_VERSION": contentDate,
+            "BUILD": String(contentBuild),
+            "NATIVE_APP_VERSION": "2026.9.11",
+            "NATIVE_APP_BUILD": "107",
+            "CONTENT_DATE": contentDate,
+            "CONTENT_BUILD": String(contentBuild),
             "CONTENT_VERSION": version,
             "LATEST_APP_BUILD_AVAILABLE": version,
             "CONTENT_FILES": ["index.html", "versions.json"],
         ], options: [.sortedKeys])
     }
 
-    private func contentVersion(_ appVersion: String, _ build: Int) -> Int64 {
-        let parts = appVersion.split(separator: ".").map(String.init)
+    private func contentVersion(_ contentDate: String, _ contentBuild: Int) -> Int64 {
+        let parts = contentDate.split(separator: ".").map(String.init)
         return Int64(parts[0] + parts[1].leftPadded(to: 2) +
-                     parts[2].leftPadded(to: 2) + String(build).leftPadded(to: 3))!
+                     parts[2].leftPadded(to: 2) + String(contentBuild).leftPadded(to: 3))!
     }
 
-    private func writeRelease(appVersion: String = "2026.9.11", build: Int, at root: URL) {
-        try? versionData(appVersion: appVersion, build: build)
+    private func writeRelease(contentDate: String = "2026.9.16", contentBuild: Int, at root: URL) {
+        try? versionData(contentDate: contentDate, contentBuild: contentBuild)
             .write(to: root.appendingPathComponent("versions.json"))
         try? Data("<html></html>".utf8).write(to: root.appendingPathComponent("index.html"))
         try? Data("{\"files\":[]}".utf8).write(to: root.appendingPathComponent("manifest.json"))
@@ -47,66 +51,66 @@ final class WebContentStoreTests: XCTestCase {
 
     func testNumericContentVersionUsesPaddedDateAndBuild() {
         XCTAssertEqual(
-            WebContentRelease.contentVersion(appVersion: "2026.9.11", build: 67),
-            20260911067)
+            WebContentRelease.contentVersion(contentDate: "2026.9.16", contentBuild: 67),
+            20260916067)
     }
 
     func testNumericContentVersionRejectsValuesOutsideYYYYMMDDBBB() {
-        XCTAssertNil(WebContentRelease.contentVersion(appVersion: "2026.13.1", build: 67))
-        XCTAssertNil(WebContentRelease.contentVersion(appVersion: "2026.9.11", build: 1000))
+        XCTAssertNil(WebContentRelease.contentVersion(contentDate: "2026.13.1", contentBuild: 67))
+        XCTAssertNil(WebContentRelease.contentVersion(contentDate: "2026.9.16", contentBuild: 1000))
     }
 
     func testBundleSeedsPersistentCacheWhenCacheIsMissing() {
         let bundle = root("bundle")
         let cache = tmp.appendingPathComponent("cache")
-        writeRelease(build: 10, at: bundle)
+        writeRelease(contentBuild: 10, at: bundle)
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         XCTAssertEqual(store.activeRoot(), bundle)
         XCTAssertTrue(store.ensureCacheFromBundle())
         XCTAssertEqual(store.activeRoot(), cache)
-        XCTAssertEqual(store.cacheRelease?.build, 10)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 10)
     }
 
     func testNewerBundledContentReplacesOlderPersistentCache() {
         let bundle = root("bundle")
         let cache = tmp.appendingPathComponent("cache")
         let staging = root("downloaded")
-        writeRelease(build: 30, at: bundle)
-        writeRelease(build: 20, at: staging)
+        writeRelease(contentBuild: 30, at: bundle)
+        writeRelease(contentBuild: 20, at: staging)
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         XCTAssertTrue(store.replaceCache(with: staging))
         XCTAssertTrue(store.ensureCacheFromBundle())
-        XCTAssertEqual(store.cacheRelease?.build, 30)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 30)
     }
 
     func testNewerDownloadedCacheSurvivesAnOlderAppBundle() {
         let bundle = root("bundle")
         let cache = tmp.appendingPathComponent("cache")
         let staging = root("downloaded")
-        writeRelease(build: 10, at: bundle)
-        writeRelease(build: 20, at: staging)
+        writeRelease(contentBuild: 10, at: bundle)
+        writeRelease(contentBuild: 20, at: staging)
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         XCTAssertTrue(store.replaceCache(with: staging))
         XCTAssertTrue(store.ensureCacheFromBundle())
-        XCTAssertEqual(store.cacheRelease?.build, 20)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 20)
     }
 
     func testInvalidCacheIsReplacedByBundledContent() {
         let bundle = root("bundle")
         let cache = root("cache")
-        writeRelease(build: 10, at: bundle)
+        writeRelease(contentBuild: 10, at: bundle)
         try? Data("not version metadata".utf8)
             .write(to: cache.appendingPathComponent("versions.json"))
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         XCTAssertTrue(store.ensureCacheFromBundle())
-        XCTAssertEqual(store.cacheRelease?.build, 10)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 10)
     }
 
     func testNewerPartialCacheIsReplacedByCompleteBundledContent() {
         let bundle = root("bundle")
         let cache = root("cache")
-        writeRelease(build: 10, at: bundle)
-        writeRelease(build: 20, at: cache)
+        writeRelease(contentBuild: 10, at: bundle)
+        writeRelease(contentBuild: 20, at: cache)
         try? FileManager.default.removeItem(at: cache.appendingPathComponent("index.html"))
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
 
@@ -114,7 +118,7 @@ final class WebContentStoreTests: XCTestCase {
         XCTAssertEqual(store.activeRoot(), bundle)
         XCTAssertTrue(store.ensureCacheFromBundle())
         XCTAssertEqual(store.activeRoot(), cache)
-        XCTAssertEqual(store.cacheRelease?.build, 10)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 10)
     }
 }
 

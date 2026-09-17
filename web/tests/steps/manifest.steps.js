@@ -30,6 +30,10 @@ Given("a scratch web root that mirrors the real bundle", function () {
   put(this.root, "versions.json", JSON.stringify({
     APP_VERSION: "2026.9.11",
     BUILD: "77",
+    NATIVE_APP_VERSION: "2026.9.1",
+    NATIVE_APP_BUILD: "42",
+    CONTENT_DATE: "2026.9.11",
+    CONTENT_BUILD: "77",
     COPYRIGHT: "Copyright test",
     CONTENT_VERSION: 20260911077,
     LATEST_APP_BUILD_AVAILABLE: 20260911077,

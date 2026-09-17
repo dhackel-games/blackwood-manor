@@ -31,9 +31,13 @@ final class AppUpdateCheckerTests: XCTestCase {
     private func testFlightVersion(_ availableVersion: String = "20260911085") -> Data {
         Data("""
         {
-          "APP_VERSION": "2026.9.11",
-          "BUILD": "85",
-          "CONTENT_VERSION": 20260911085,
+          "APP_VERSION": "2026.9.16",
+          "BUILD": "1",
+          "NATIVE_APP_VERSION": "2026.9.11",
+          "NATIVE_APP_BUILD": "85",
+          "CONTENT_DATE": "2026.9.16",
+          "CONTENT_BUILD": "1",
+          "CONTENT_VERSION": 20260916001,
           "LATEST_APP_BUILD_AVAILABLE": \(availableVersion),
           "CONTENT_FILES": ["index.html", "versions.json"]
         }

@@ -41,7 +41,7 @@ Feature: iOS self-update manifest generation
 
   Scenario: The label is human-readable and pulled from versions.json
     When I build a manifest with version "1000" and commit "abc1234"
-    Then the manifest label is "2026.9.11 build 77 · abc1234"
+    Then the manifest label is "2026.9.11 content build 77 · abc1234"
     And content version "2026.9.11" build 77 composes to 20260911077
 
   Scenario: Content identity enforces the YYYYMMDDBBB format
@@ -60,7 +60,7 @@ Feature: iOS self-update manifest generation
     Given the scratch web root links its entry module
     When I write the manifest from its declared content identity
     Then the manifest version is the number 20260911077
-    And the manifest label is "2026.9.11 build 77 · 20260911077"
+    And the manifest label is "2026.9.11 content build 77 · 20260911077"
     And the entry module URL contains cache key "20260911077"
 
   Scenario: A newer deploy always sorts above an older one

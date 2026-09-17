@@ -99,9 +99,20 @@ final class AppUpdateChecker {
     }
 
     static func releaseNumber(appVersion: String, build: String) -> Int64? {
-        guard let buildNumber = Int(build) else { return nil }
-        return WebContentRelease.contentVersion(
-            appVersion: appVersion, build: buildNumber)
+        let rawParts = appVersion.split(separator: ".")
+        guard rawParts.count == 3,
+              let buildNumber = Int(build) else { return nil }
+        let parsedParts = rawParts.map { Int($0) }
+        guard parsedParts.allSatisfy({ $0 != nil }) else { return nil }
+        let parts = parsedParts.map { $0! }
+        guard (1000...9999).contains(parts[0]),
+              (1...12).contains(parts[1]),
+              (1...31).contains(parts[2]),
+              (0...999).contains(buildNumber) else {
+            return nil
+        }
+        return Int64(String(format: "%04d%02d%02d%03d",
+                            parts[0], parts[1], parts[2], buildNumber))
     }
 
     private static func releaseIdentity(

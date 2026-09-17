@@ -13,11 +13,11 @@ final class WebContentUpdaterTests: XCTestCase {
         bundle = tmp.appendingPathComponent("bundle", isDirectory: true)
         cache = tmp.appendingPathComponent("cache", isDirectory: true)
         try FileManager.default.createDirectory(at: bundle, withIntermediateDirectories: true)
-        try manifestJSON(version: 1000, label: "2026.9.11 build 10", files: ["index.html"])
+        try manifestJSON(version: 1000, label: "2026.9.16 content build 10", files: ["index.html"])
             .write(to: bundle.appendingPathComponent("manifest.json"))
         try FileManager.default.createDirectory(
             at: bundle.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try versionsJSON(build: 10).write(
+        try versionsJSON(contentBuild: 10).write(
             to: bundle.appendingPathComponent("versions.json"))
         try Data("<html>bundled</html>".utf8)
             .write(to: bundle.appendingPathComponent("index.html"))
@@ -28,14 +28,18 @@ final class WebContentUpdaterTests: XCTestCase {
         try? FileManager.default.removeItem(at: tmp)
     }
 
-    private func versionsJSON(appVersion: String = "2026.9.11", build: Int,
+    private func versionsJSON(contentDate: String = "2026.9.16", contentBuild: Int,
                               files: [String] = ["index.html", "versions.json"]) -> Data {
-        let parts = appVersion.split(separator: ".").map(String.init)
+        let parts = contentDate.split(separator: ".").map(String.init)
         let contentVersion = Int64(parts[0] + parts[1].leftPadded(to: 2) +
-            parts[2].leftPadded(to: 2) + String(build).leftPadded(to: 3))!
+            parts[2].leftPadded(to: 2) + String(contentBuild).leftPadded(to: 3))!
         return try! JSONSerialization.data(withJSONObject: [
-            "APP_VERSION": appVersion,
-            "BUILD": String(build),
+            "APP_VERSION": contentDate,
+            "BUILD": String(contentBuild),
+            "NATIVE_APP_VERSION": "2026.9.11",
+            "NATIVE_APP_BUILD": "107",
+            "CONTENT_DATE": contentDate,
+            "CONTENT_BUILD": String(contentBuild),
             "CONTENT_VERSION": contentVersion,
             "LATEST_APP_BUILD_AVAILABLE": contentVersion,
             "CONTENT_FILES": files,
@@ -56,7 +60,7 @@ final class WebContentUpdaterTests: XCTestCase {
     func testUpToDateWhenRemoteNotNewer() {
         StubURLProtocol.handler = { req in
             if req.url!.lastPathComponent == "versions.json" {
-                return (200, self.versionsJSON(build: 10))
+                return (200, self.versionsJSON(contentBuild: 10))
             }
             return nil
         }
@@ -87,7 +91,7 @@ final class WebContentUpdaterTests: XCTestCase {
             case "index.html":    return (200, Data("<html>v2</html>".utf8))
             case "core.js":       return (200, Data("core-v2".utf8))
             case "versions.json": return (200, self.versionsJSON(
-                build: 20, files: ["index.html", "js/core.js", "versions.json"]))
+                contentBuild: 20, files: ["index.html", "js/core.js", "versions.json"]))
             default:              return nil
             }
         }
@@ -95,9 +99,9 @@ final class WebContentUpdaterTests: XCTestCase {
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         let updater = WebContentUpdater(store: store, session: StubURLProtocol.makeSession())
         updater.checkForUpdate { result in
-            XCTAssertEqual(result, .updated(label: "2026.9.11 build 20"))
+            XCTAssertEqual(result, .updated(label: "2026.9.16 content build 20"))
             // Cache now exists, holds the new version and files.
-            XCTAssertEqual(store.cacheRelease?.build, 20)
+            XCTAssertEqual(store.cacheRelease?.contentBuild, 20)
             XCTAssertEqual(store.activeRoot(), self.cache)
             let core = self.cache.appendingPathComponent("js/core.js")
             XCTAssertEqual(try? String(contentsOf: core, encoding: .utf8), "core-v2")
@@ -105,8 +109,8 @@ final class WebContentUpdaterTests: XCTestCase {
             let observedKeys = cacheKeys
             lock.unlock()
             XCTAssertFalse(observedKeys["versions.json", default: ""].isEmpty)
-            XCTAssertEqual(observedKeys["index.html"], "20260911020")
-            XCTAssertEqual(observedKeys["core.js"], "20260911020")
+            XCTAssertEqual(observedKeys["index.html"], "20260916020")
+            XCTAssertEqual(observedKeys["core.js"], "20260916020")
             exp.fulfill()
         }
         wait(for: [exp], timeout: 5)
@@ -115,14 +119,14 @@ final class WebContentUpdaterTests: XCTestCase {
     func testReportsCurrentAndRemoteVersionLabelsWithoutDownloading() {
         StubURLProtocol.handler = { req in
             guard req.url!.lastPathComponent == "versions.json" else { return nil }
-            return (200, self.versionsJSON(build: 20))
+            return (200, self.versionsJSON(contentBuild: 20))
         }
         let exp = expectation(description: "versions")
         let updater = makeUpdater()
         updater.versionLabels { labels in
             XCTAssertEqual(labels, .init(
-                contentLocal: "20260911010",
-                contentSource: "20260911020"))
+                contentLocal: "20260916010",
+                contentSource: "20260916020"))
             XCTAssertFalse(FileManager.default.fileExists(atPath: self.cache.path))
             exp.fulfill()
         }
@@ -132,20 +136,20 @@ final class WebContentUpdaterTests: XCTestCase {
     func testVersionLabelsReportNewerDownloadedCache() throws {
         try FileManager.default.createDirectory(
             at: cache.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try versionsJSON(build: 30).write(
+        try versionsJSON(contentBuild: 30).write(
             to: cache.appendingPathComponent("versions.json"))
         try Data("<html>cached</html>".utf8)
             .write(to: cache.appendingPathComponent("index.html"))
         StubURLProtocol.handler = { req in
             guard req.url!.lastPathComponent == "versions.json" else { return nil }
-            return (200, self.versionsJSON(build: 40))
+            return (200, self.versionsJSON(contentBuild: 40))
         }
 
         let exp = expectation(description: "content versions")
         makeUpdater().versionLabels { labels in
             XCTAssertEqual(labels, .init(
-                contentLocal: "20260911030",
-                contentSource: "20260911040"))
+                contentLocal: "20260916030",
+                contentSource: "20260916040"))
             exp.fulfill()
         }
         wait(for: [exp], timeout: 5)
@@ -161,14 +165,14 @@ final class WebContentUpdaterTests: XCTestCase {
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html": return (200, Data("<html>different</html>".utf8))
-            case "versions.json": return (200, self.versionsJSON(build: 20))
+            case "versions.json": return (200, self.versionsJSON(contentBuild: 20))
             default: return nil
             }
         }
         let exp = expectation(description: "content identity")
         let updater = makeUpdater()
         updater.checkForUpdate { result in
-            XCTAssertEqual(result, .updated(label: "2026.9.11 build 20"))
+            XCTAssertEqual(result, .updated(label: "2026.9.16 content build 20"))
             XCTAssertEqual(
                 try? String(contentsOf: self.cache.appendingPathComponent("index.html"),
                             encoding: .utf8),
@@ -185,7 +189,7 @@ final class WebContentUpdaterTests: XCTestCase {
             switch req.url!.lastPathComponent {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>serialized</html>".utf8))
-            case "versions.json": return (200, self.versionsJSON(build: 20))
+            case "versions.json": return (200, self.versionsJSON(contentBuild: 20))
             default:              return nil
             }
         }
@@ -194,7 +198,7 @@ final class WebContentUpdaterTests: XCTestCase {
         let store = WebContentStore(bundleRoot: bundle, cacheRoot: cache)
         let updater = WebContentUpdater(store: store, session: StubURLProtocol.makeSession())
         updater.checkForUpdate { result in
-            XCTAssertEqual(result, .updated(label: "2026.9.11 build 20"))
+            XCTAssertEqual(result, .updated(label: "2026.9.16 content build 20"))
             exp.fulfill()
         }
         updater.checkForUpdate { result in
@@ -202,7 +206,7 @@ final class WebContentUpdaterTests: XCTestCase {
             exp.fulfill()
         }
         wait(for: [exp], timeout: 5)
-        XCTAssertEqual(store.cacheRelease?.build, 20)
+        XCTAssertEqual(store.cacheRelease?.contentBuild, 20)
         let html = cache.appendingPathComponent("index.html")
         XCTAssertEqual(try? String(contentsOf: html, encoding: .utf8), "<html>serialized</html>")
     }
@@ -215,7 +219,7 @@ final class WebContentUpdaterTests: XCTestCase {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>v2</html>".utf8))
             case "versions.json": return (200, self.versionsJSON(
-                build: 20, files: ["index.html", "versions.json", "js/missing.js"]))
+                contentBuild: 20, files: ["index.html", "versions.json", "js/missing.js"]))
             default:              return nil   // js/missing.js -> 404
             }
 
@@ -240,7 +244,7 @@ final class WebContentUpdaterTests: XCTestCase {
             .write(to: cache.appendingPathComponent("index.html"))
         try? FileManager.default.createDirectory(
             at: cache.appendingPathComponent("js"), withIntermediateDirectories: true)
-        try? versionsJSON(build: 9).write(
+        try? versionsJSON(contentBuild: 9).write(
             to: cache.appendingPathComponent("versions.json"))
         let remoteManifest = manifestJSON(version: 1000, label: "remote-1000",
                                           files: ["index.html", "versions.json", "js/missing.js"])
@@ -249,7 +253,7 @@ final class WebContentUpdaterTests: XCTestCase {
             case "manifest.json": return (200, remoteManifest)
             case "index.html":    return (200, Data("<html>remote</html>".utf8))
             case "versions.json": return (200, self.versionsJSON(
-                build: 20, files: ["index.html", "versions.json", "js/missing.js"]))
+                contentBuild: 20, files: ["index.html", "versions.json", "js/missing.js"]))
             default:              return nil
             }
         }

@@ -54,25 +54,25 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
 }
 
 struct WebContentRelease: Equatable {
-    let appVersion: String
-    let build: Int
+    let contentDate: String
+    let contentBuild: Int
     let contentVersion: Int64
     let latestAppBuildAvailable: Int64
     let files: [String]
 
-    var label: String { "\(appVersion) build \(build)" }
+    var label: String { "\(contentDate) content build \(contentBuild)" }
     var sortKey: Int64 { contentVersion }
 
     private struct VersionDocument: Decodable {
-        let appVersion: String
-        let build: String
+        let contentDate: String
+        let contentBuild: String
         let contentVersion: Int64
         let latestAppBuildAvailable: Int64
         let contentFiles: [String]
 
         enum CodingKeys: String, CodingKey {
-            case appVersion = "APP_VERSION"
-            case build = "BUILD"
+            case contentDate = "CONTENT_DATE"
+            case contentBuild = "CONTENT_BUILD"
             case contentVersion = "CONTENT_VERSION"
             case latestAppBuildAvailable = "LATEST_APP_BUILD_AVAILABLE"
             case contentFiles = "CONTENT_FILES"
@@ -91,8 +91,8 @@ struct WebContentRelease: Equatable {
         return parts.allSatisfy { !$0.isEmpty && $0 != "." && $0 != ".." }
     }
 
-    static func contentVersion(appVersion: String, build: Int) -> Int64? {
-        let rawParts = appVersion.split(separator: ".")
+    static func contentVersion(contentDate: String, contentBuild: Int) -> Int64? {
+        let rawParts = contentDate.split(separator: ".")
         guard rawParts.count == 3 else { return nil }
         let parsedParts = rawParts.map { Int($0) }
         guard parsedParts.allSatisfy({ $0 != nil }) else { return nil }
@@ -100,18 +100,18 @@ struct WebContentRelease: Equatable {
         guard (1000...9999).contains(parts[0]),
               (1...12).contains(parts[1]),
               (1...31).contains(parts[2]),
-              (0...999).contains(build) else {
+              (0...999).contains(contentBuild) else {
             return nil
         }
         return Int64(String(format: "%04d%02d%02d%03d",
-                            parts[0], parts[1], parts[2], build))
+                            parts[0], parts[1], parts[2], contentBuild))
     }
 
     static func parse(_ data: Data) -> WebContentRelease? {
         guard let document = try? JSONDecoder().decode(VersionDocument.self, from: data),
-              let build = Int(document.build),
+              let contentBuild = Int(document.contentBuild),
               document.contentVersion == Self.contentVersion(
-                  appVersion: document.appVersion, build: build),
+                  contentDate: document.contentDate, contentBuild: contentBuild),
               document.contentFiles.contains("index.html"),
               document.contentFiles.contains("versions.json"),
               document.contentFiles.allSatisfy(Self.isSafeRelativePath),
@@ -119,7 +119,7 @@ struct WebContentRelease: Equatable {
             return nil
         }
         return WebContentRelease(
-            appVersion: document.appVersion, build: build,
+            contentDate: document.contentDate, contentBuild: contentBuild,
             contentVersion: document.contentVersion,
             latestAppBuildAvailable: document.latestAppBuildAvailable,
             files: document.contentFiles)

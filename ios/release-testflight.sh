@@ -160,29 +160,52 @@ echo "==> Removing artifacts from prior release"
 rm -rf "$BUILD_ROOT"
 mkdir -p "$BUILD_ROOT"
 
-# Stamp today's marketing version before choosing the build. The first release
-# on a new date starts at build 1; later releases that same day increment.
-CHECKED_MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
-MARKETING_VERSION="${RELEASE_DATE_OVERRIDE:-$(date '+%Y.%m.%d' | sed -E 's/\.0([0-9])/\.\1/g')}"
-if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid YYYY.M.D release version: $MARKETING_VERSION" >&2
-  exit 1
-fi
-DATE_CHANGED=0
-if [[ "$CHECKED_MARKETING_VERSION" != "$MARKETING_VERSION" ]]; then
-  DATE_CHANGED=1
-  echo "==> Advancing release date ${CHECKED_MARKETING_VERSION} -> ${MARKETING_VERSION}"
+if [[ "$STAMP_ONLY" -eq 1 ]]; then
+  CONTENT_DATE=$(node -p 'require("../web/versions.json").CONTENT_DATE')
+  CONTENT_BUILD=$(node -p 'require("../web/versions.json").CONTENT_BUILD')
+  RELEASE_CONTENT_DATE="${RELEASE_DATE_OVERRIDE:-$(date '+%Y.%m.%d' | sed -E 's/\.0([0-9])/\.\1/g')}"
+  if [[ ! "$RELEASE_CONTENT_DATE" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+      || [[ ! "$CONTENT_BUILD" =~ ^[0-9]+$ ]]; then
+    echo "Invalid content YYYY.M.D / build metadata." >&2
+    exit 1
+  fi
+  if [[ "$CONTENT_DATE" != "$RELEASE_CONTENT_DATE" ]]; then
+    NEXT_CONTENT_BUILD=1
+  elif (( FORCE_NEXT_BUILD == 1 )); then
+    NEXT_CONTENT_BUILD=$((CONTENT_BUILD + 1))
+  else
+    NEXT_CONTENT_BUILD=$CONTENT_BUILD
+  fi
+  CONTENT_VERSION=$(node -e '
+    const [y, m, d] = process.argv[1].split(".").map(Number);
+    console.log(`${String(y).padStart(4, "0")}${String(m).padStart(2, "0")}${String(d).padStart(2, "0")}${String(process.argv[2]).padStart(3, "0")}`);
+  ' "$RELEASE_CONTENT_DATE" "$NEXT_CONTENT_BUILD")
+  echo "==> Stamping content ${RELEASE_CONTENT_DATE} build ${NEXT_CONTENT_BUILD} (${CONTENT_VERSION})"
   node -e '
     const fs = require("fs");
     const path = process.argv[1];
-    const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
-    pkg.version = process.argv[2];
-    fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
-  ' ../web/package.json "$MARKETING_VERSION"
+    const versions = JSON.parse(fs.readFileSync(path, "utf8"));
+    // Legacy aliases keep already-installed native updaters compatible.
+    versions.APP_VERSION = process.argv[2];
+    versions.BUILD = process.argv[3];
+    versions.CONTENT_DATE = process.argv[2];
+    versions.CONTENT_BUILD = process.argv[3];
+    versions.CONTENT_VERSION = Number(process.argv[4]);
+    fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
+  ' ../web/versions.json "$RELEASE_CONTENT_DATE" "$NEXT_CONTENT_BUILD" "$CONTENT_VERSION"
+  echo "==> Refreshing bundled web game"
+  ./copy-web.sh
+  echo "==> --stamp-only set; app version/build unchanged."
+  exit 0
 fi
 
-# Reuse an unpublished checked-in build on the same date unless force-next was
-# requested. A new release date always resets the build number to 1.
+# Reuse a checked-in app build that has not reached TestFlight yet; otherwise
+# advance beyond the last app build whose availability was published.
+MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
+if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Invalid YYYY.M.D package version: $MARKETING_VERSION" >&2
+  exit 1
+fi
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
 AVAILABLE_BUILD=$(node -e '
   const fs = require("fs");
@@ -198,9 +221,7 @@ if [[ "$UPLOAD" -eq 1 ]]; then
     --bundle-id "$BUNDLE_ID")
 fi
 LATEST_BUILD=$((AVAILABLE_BUILD > ASC_LATEST_BUILD ? AVAILABLE_BUILD : ASC_LATEST_BUILD))
-if (( DATE_CHANGED == 1 )); then
-  NEXT=1
-elif (( FORCE_NEXT_BUILD == 1 )); then
+if (( FORCE_NEXT_BUILD == 1 )); then
   BASE_BUILD=$((CUR > LATEST_BUILD ? CUR : LATEST_BUILD))
   NEXT=$((BASE_BUILD + 1))
 elif (( CUR > LATEST_BUILD )); then
@@ -214,11 +235,10 @@ if (( NEXT > 999 )); then
 fi
 echo "==> Releasing version ${MARKETING_VERSION} build ${NEXT}"
 
-# Stamp versions.json so the browser and the app
-# always report the same version + build number. Done BEFORE copy-web.sh so the
-# stamped file is the copy that lands in the app bundle.
-echo "==> Stamping build badge (v${MARKETING_VERSION} build ${NEXT})"
-CONTENT_VERSION=$(node -e '
+# Compose the native app release identity without changing independently
+# versioned web-content metadata.
+echo "==> Preparing app badge (v${MARKETING_VERSION} build ${NEXT})"
+APP_RELEASE_ID=$(node -e '
   const [y, m, d] = process.argv[1].split(".").map(Number);
   console.log(`${String(y).padStart(4, "0")}${String(m).padStart(2, "0")}${String(d).padStart(2, "0")}${String(process.argv[2]).padStart(3, "0")}`);
 ' "$MARKETING_VERSION" "$NEXT")
@@ -226,11 +246,10 @@ node -e '
   const fs = require("fs");
   const path = process.argv[1];
   const versions = JSON.parse(fs.readFileSync(path, "utf8"));
-  versions.APP_VERSION = process.argv[2];
-  versions.BUILD = process.argv[3];
-  versions.CONTENT_VERSION = Number(process.argv[4]);
+  versions.NATIVE_APP_VERSION = process.argv[2];
+  versions.NATIVE_APP_BUILD = process.argv[3];
   fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
-' ../web/versions.json "$MARKETING_VERSION" "$NEXT" "$CONTENT_VERSION"
+' ../web/versions.json "$MARKETING_VERSION" "$NEXT"
 
 echo "==> Refreshing bundled web game"
 ./copy-web.sh
@@ -247,11 +266,6 @@ sed -i '' -E \
 
 echo "==> Regenerating project (xcodegen)"
 xcodegen generate
-
-if [[ "$STAMP_ONLY" -eq 1 ]]; then
-  echo "==> --stamp-only set; stopping before archive."
-  exit 0
-fi
 
 echo "==> Archiving"
 rm -rf "$ARCHIVE"
@@ -299,7 +313,7 @@ node -e '
   const versions = JSON.parse(fs.readFileSync(path, "utf8"));
   versions.LATEST_APP_BUILD_AVAILABLE = Number(process.argv[2]);
   fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
-' ../web/versions.json "$CONTENT_VERSION"
+' ../web/versions.json "$APP_RELEASE_ID"
 
 echo "==> Publishing the verified TestFlight build number"
 git -C "$REPO_ROOT" fetch origin main
@@ -310,7 +324,6 @@ if [[ "$(git -C "$REPO_ROOT" rev-parse HEAD)" != "$START_HEAD" ]] \
 fi
 git -C "$REPO_ROOT" add \
   ios/project.yml \
-  web/package.json \
   web/versions.json
 if git -C "$REPO_ROOT" diff --cached --quiet; then
   echo "==> Release metadata already identifies build ${NEXT}"

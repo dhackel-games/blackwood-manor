@@ -87,8 +87,11 @@ date-only `YYYY.M.D` version from `web/package.json` and uses the checked-in bui
 when it is newer than the published TestFlight build number, otherwise incrementing it.
 Every web-content push intended for phones must first use
 `--stamp-only --force-next-build`, because the updater only downloads a strictly
-greater `CONTENT_VERSION`. The script stamps today's `YYYY.M.D` first and resets
-the build to 1 on a new date; later pushes that day increment the build.
+greater `CONTENT_VERSION`. This changes only `CONTENT_DATE`, `CONTENT_BUILD`, and
+`CONTENT_VERSION` (plus legacy JSON aliases required by installed updaters);
+`NATIVE_APP_VERSION`, `NATIVE_APP_BUILD`, app package, and project versions remain
+untouched. The content build resets to 1 on a new date and increments for later
+pushes that day.
 After upload, it waits for App Store Connect processing, assigns the build to an
 internal beta group, verifies that testers can receive it, writes
 `LATEST_APP_BUILD_AVAILABLE` in `web/versions.json`, and commits and pushes that
