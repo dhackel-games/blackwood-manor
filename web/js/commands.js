@@ -108,6 +108,7 @@ ring <thing> | Ring / Ring a bell or similar object.
 save | Save / Save the current game in this browser.
 say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
 score | Score / Show points, turns, and rank.
+show <room> in mirror | Scry / Reveal a room's third-eye view and prepare its route.
 throw <thing> at <target> | Throw / Throw a carried item.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
@@ -480,6 +481,7 @@ export const commands = {
     return commands.go(ctx, { ...cmd, dobj: "in" });
   },
   give(ctx) { return "There's no one here to give it to."; },
+  show() { return "There is nothing here that can show you that."; },
   talk() { return "No one answers."; },
   say(ctx, cmd) {
     const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "");

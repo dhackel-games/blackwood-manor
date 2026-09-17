@@ -699,7 +699,7 @@ export function createGame(world) {
 
     deferStatusBanner = true;
     describedRoomThisTurn = false;
-    if (["look", "examine", "search"].includes(cmd.verb)) game.setFlag("usedInspection");
+    if (["look", "examine", "search", "show"].includes(cmd.verb)) game.setFlag("usedInspection");
     const override = acquisitionBlocked || acquisition?.completed || runHandlers(cmd);
     let text;
     if (override != null) {

@@ -17,6 +17,7 @@
 import { MAP_MARK, renderMap } from "./map.js?v=source";
 import { composeWorld } from "./compose.js?v=source";
 import { content } from "./world.content.js?v=source";
+import { pathToRoom } from "./sysop-menu.js?v=source";
 
 // ---- helpers used by handlers ------------------------------------------------
 export const REQUIRED_FAMILY_ITEM_COUNT = 13;
@@ -261,22 +262,42 @@ function resolveBatSightRoom(ctx, phrase) {
 }
 
 function lookThroughBatSightMirror(ctx, cmd) {
-  const target = cmd.iobj;
+  const target = cmd.verb === "show" ? cmd.dobj : cmd.iobj;
   if (!target) {
     return "The BAT SIGHT MIRROR clouds, waiting for a destination. Name any room: " +
-      "LOOK IN MIRROR AT KITCHEN, for example.";
+      "SHOW KITCHEN IN MIRROR, for example.";
   }
+  ctx.setFlag("mirrorRoutePrefill", null);
   const match = resolveBatSightRoom(ctx, target);
   if (!match) return `The mirror finds no room called "${target}".`;
   const [roomId, room] = match;
   const description = typeof room.desc === "function" ? room.desc(ctx) : room.desc;
+  const visionSource = room.highDesc || room.searchDesc;
+  const vision = typeof visionSource === "function" ? visionSource(ctx) : visionSource;
   const shapes = ctx.itemsIn(roomId)
     .map((item) => item.roomDesc || item.names?.[0])
     .filter(Boolean);
+  let routeText = "";
+  try {
+    const route = pathToRoom(ctx, roomId).map((step) =>
+      step === "u" ? "up" : step === "d" ? "dn" : step);
+    const routeCommand = [
+      `say "route to ${room.name.toLowerCase()}"`,
+      ...route,
+    ].join("; ");
+    ctx.setFlag("mirrorRoutePrefill", routeCommand);
+    routeText = route.length
+      ? `\n\nROUTE READY\n${route.join("; ")}`
+      : "\n\nROUTE READY\nYou are already there.";
+  } catch {
+    routeText = "\n\nNo currently traversable route reaches that room.";
+  }
   return `BAT SIGHT — ${room.name.toUpperCase()}\n` +
     (room.art ? MAP_MARK + room.art + MAP_MARK + "\n" : "") +
     `${description || "The room lies silent."}` +
-    (shapes.length ? `\n\nShapes in the room:\n${shapes.map((shape) => `* ${shape}`).join("\n")}` : "");
+    (vision ? `\n\nTHIRD EYE\n${vision}` : "") +
+    (shapes.length ? `\n\nShapes in the room:\n${shapes.map((shape) => `* ${shape}`).join("\n")}` : "") +
+    routeText;
 }
 
 function pullClosetBellRope(ctx) {
@@ -3969,6 +3990,7 @@ const logicWorld = {
       loc: null, takeable: true, treasure: true, points: 20,
       on: {
         examine: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
+        show: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
         use: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
         read: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
       },

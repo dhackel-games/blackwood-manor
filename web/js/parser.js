@@ -6,7 +6,7 @@ const DIRECTIONS = {
   north: "north", n: "north", south: "south", s: "south", east: "east", e: "east",
   west: "west", w: "west", ne: "ne", nw: "nw", se: "se", sw: "sw",
   northeast: "ne", northwest: "nw", southeast: "se", southwest: "sw",
-  up: "up", u: "up", down: "down", d: "down", in: "in", out: "out",
+  up: "up", u: "up", down: "down", d: "down", dn: "down", in: "in", out: "out",
 };
 
 // canonical verb -> synonyms
@@ -23,6 +23,7 @@ const VERBS = {
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in", "board", "ride", "step"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
+  show: ["show"],
   talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],

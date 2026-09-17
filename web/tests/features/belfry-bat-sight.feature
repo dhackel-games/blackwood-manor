@@ -34,16 +34,34 @@ Feature: Belfry bell and Bat Sight Mirror
     Given item "batSightMirror" is carried
     And the player is in room "belfry"
     When I send "look in mirror"
-    Then the output contains "LOOK IN MIRROR AT KITCHEN"
+    Then the output contains "SHOW KITCHEN IN MIRROR"
     When I send "look in mirror at kitchen"
     Then the output contains "BAT SIGHT"
     And the output contains "KITCHEN"
     And the output contains "cavernous scullery"
+    And the output contains "THIRD EYE"
+    And the output contains "ROUTE READY"
+    And flag "mirrorRoutePrefill" equals "say \"route to kitchen\"; w; dn; dn; dn; w; s"
     And the current room is "belfry"
     And flag "seen:kitchen" is unset
 
   Scenario: The Bat Sight Mirror covers every Part I room
     Then the Bat Sight Mirror can view every Part I room
+
+  Scenario: SHOW reveals third-eye detail and prepares but does not execute the route
+    Given item "batSightMirror" is carried
+    And flag "frontDoorOpen" is set
+    And the player is in room "belfry"
+    When I send "show library in mirror"
+    Then the output contains "BAT SIGHT — LIBRARY"
+    And the output contains "THIRD EYE"
+    And the output contains "brass LEVER is polished"
+    And the output contains "ROUTE READY"
+    And the output contains "w; dn; dn; dn; e; s"
+    And flag "mirrorRoutePrefill" equals "say \"route to library\"; w; dn; dn; dn; e; s"
+    And the current room is "belfry"
+    And flag "seen:library" is unset
+    And browser mirror routes are prefilled after command submission
 
   Scenario: The mirror replaces the removed Family Ring in the thirteen heirlooms
     Then the required family item count is 13

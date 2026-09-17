@@ -104,7 +104,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   one-time progress points, including +5 for reading the mailbox letter;
   `::winmax2bell` performs every deterministic scoring challenge, deposits all
   thirteen heirlooms, closes the reliquary, and stops immediately before the
-  main-floor bell rope. `::powerup` equips reusable powers; `::winquick1`
+  main-floor bell rope with its closet already open. `::powerup` equips reusable powers; `::winquick1`
   completes the shorter required-heirloom route and stops after the bell but
   before walking out. These are the only three sysop shortcuts. The maximum route intentionally
   leaves the random MYSTERY PACKAGE unopened.
@@ -124,8 +124,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Belfry and Bat Sight Mirror:** the great BELL and upper ROPE are in the
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
-  required BAT SIGHT MIRROR (+20 when deposited). `LOOK IN MIRROR AT <room>`
-  views any Part-I room without moving there. The mirror replaces the removed
+  required BAT SIGHT MIRROR (+20 when deposited). `SHOW <room> IN MIRROR`
+  displays that room's normal and THIRD EYE descriptions, then prefills an
+  unexecuted route such as `say "route to library"; w; dn; dn; dn; e; s`.
+  `LOOK IN MIRROR AT <room>` is an exact synonym. The mirror replaces the removed
   Family Ring; the Ravenblood Signet is now the **Ravenblood Ring**.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,

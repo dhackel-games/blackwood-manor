@@ -16,6 +16,7 @@ Feature: Player command parsing
       | southeast                           | go      | se        | [none]      | [none]    |
       | southwest                           | go      | sw        | [none]      | [none]    |
       | u                                   | go      | up        | [none]      | [none]    |
+      | dn                                  | go      | down      | [none]      | [none]    |
       | u talisman                          | use     | talisman  | [none]      | [none]    |
       | take the brass key                  | take    | brass key | [none]      | [none]    |
       | t rope                              | take    | rope      | [none]      | [none]    |
@@ -29,6 +30,7 @@ Feature: Player command parsing
       | look                                | look    | [none]    | [none]      | [none]    |
       | look at brass key                   | examine | brass key | [none]      | [none]    |
       | look in mirror at kitchen           | examine | mirror    | at          | kitchen   |
+      | show library in mirror              | show    | library   | in          | mirror    |
       | look brass key                      | examine | brass key | [none]      | [none]    |
       | search brass key                    | examine | brass key | [none]      | [none]    |
       | ex brass key                        | examine | brass key | [none]      | [none]    |

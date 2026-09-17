@@ -20,7 +20,7 @@ that self-updates its web content **over-the-air** from GitHub Pages.
   `::powerup`, `::winquick1`, and `::winmax2bell`. `::winquick1` stops after
   the bell ritual but before walking out. The last earns every
   deterministic reward, deposits all 13 heirlooms, closes the reliquary, and
-  stops before pulling the main-floor bell rope.
+  opens the bell closet so the player stops directly in front of the lower rope.
 
 ## ⚠️ The two facts that always cause confusion
 
@@ -89,8 +89,9 @@ prototype — kept locally per David, excluded via `.git/info/exclude` (do not d
 
 The Bat Sight Mirror replaces the removed Family Ring as a required heirloom.
 Pulling either bell rope scatters the belfry bats (+5) and drops the mirror;
-`LOOK IN MIRROR AT <room>` scries any Part-I room. The former Ravenblood Signet
-is now the Ravenblood Ring.
+`SHOW <room> IN MIRROR` scries normal + third-eye text and prefills, without
+executing, `say "route to <room>"; n; s; up; dn; ...`. `LOOK IN MIRROR AT
+<room>` is an exact synonym. The former Ravenblood Signet is now the Ravenblood Ring.
 
 ## Engine invariants (enforced by tests)
 Every room needs `art` + `searchDesc` + `IMPLICIT_NAVIGATION` + `ROOM_SHORT_NAMES`; every item needs

@@ -182,7 +182,9 @@ randomly — invent the moment that logically strands each heirloom exactly wher
 The great bell's rope runs from the BELFRY through the house to a closet beside
 the front door. Pulling either end rings **DONG... DONG...**, scatters the bats,
 and drops their silver mirror onto the belfry floor. Its black glass can scry any
-named Part-I room.
+named Part-I room. `SHOW <room> IN MIRROR` includes the room's third-eye text and
+prefills an unexecuted `say "route to <room>"; <short directions>` chain;
+`LOOK IN MIRROR AT <room>` is an exact synonym.
 
 **Worked example 2 — the emerald / the garden STATUE (BM1: emerald gem + the leaning garden
 statue that hides the front-door key).**

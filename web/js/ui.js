@@ -1018,12 +1018,25 @@ function handle(raw) {
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
+  const mirrorRoute = game.getFlag("mirrorRoutePrefill");
+  if (typeof mirrorRoute === "string" && mirrorRoute) {
+    game.setFlag("mirrorRoutePrefill", null);
+  }
   const sfxKind = ambientSfxKind(out, prevFlags, game.state.flags);
   if (sfxKind) playSfx(sfxKind);       // noise cue, not Gary talking
   const reaction = garyReacts(prevFlags, game.state.flags);
   if (reaction) garySpeak(reaction);   // Gary editorializes from off-screen
   if (game.state.won) printRestartPrompt();
   else if (!game.state.dead) saveGame(game);
+  if (mirrorRoute) {
+    queueMicrotask(() => {
+      mainEntry.setValue(mirrorRoute);
+      if (canType) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    });
+  }
 }
 
 function applySysopCommand(raw) {

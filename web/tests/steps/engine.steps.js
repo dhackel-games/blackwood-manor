@@ -375,6 +375,14 @@ Then("browser restart handling supports both game parts", function () {
     /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)/s);
 });
 
+Then("browser mirror routes are prefilled after command submission", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui,
+    /const mirrorRoute = game\.getFlag\("mirrorRoutePrefill"\)[\s\S]*game\.setFlag\("mirrorRoutePrefill", null\)/s);
+  assert.match(ui,
+    /if \(mirrorRoute\) \{[\s\S]*queueMicrotask\(\(\) => \{[\s\S]*mainEntry\.setValue\(mirrorRoute\)[\s\S]*input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/s);
+});
+
 Then("the copyright-version is exact", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
   const design = readFileSync(new URL("../../DESIGN.md", import.meta.url), "utf8");

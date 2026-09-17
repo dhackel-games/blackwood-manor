@@ -1,8 +1,8 @@
 {
   "APP_VERSION": "2026.9.11",
-  "BUILD": "106",
+  "BUILD": "107",
   "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
-  "CONTENT_VERSION": 20260911106,
+  "CONTENT_VERSION": 20260911107,
   "LATEST_APP_BUILD_AVAILABLE": 20260911100,
   "CONTENT_FILES": [
     "css/style.css",

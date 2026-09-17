@@ -244,7 +244,7 @@ DREADMAW'S apple remains +10. Scattering the belfry bats and freeing the Bat
 Sight Mirror awards +5; depositing the mirror awards its 20 heirloom points.
 `::winmax2bell` performs every deterministic scoring challenge, deposits all
 thirteen heirlooms, closes the reliquary, and stops immediately before the
-main-floor bell rope. It leaves the MYSTERY PACKAGE untouched because its
+main-floor bell rope with the closet open. It leaves the MYSTERY PACKAGE untouched because its
 outcome is random. The only other sysop shortcuts are `::powerup` and
 `::winquick1`, which stops after the bell ritual but before walking out; the
 older Gary/brink/ring-bell/max variants are retired.
@@ -823,8 +823,10 @@ preserving spoiler hiding for both secret destinations.
   wearable WINGED SHOES.
 - **Belfry payoff.** The Bat Sight Mirror replaces the removed Family Ring as a
   required +20 heirloom. Pulling either end of the bell rope awards +5, scatters
-  the bats, and drops the mirror onto the belfry floor. `LOOK IN MIRROR AT
-  <room>` sees any Part-I room without moving or marking it visited.
+  the bats, and drops the mirror onto the belfry floor. `SHOW <room> IN MIRROR`
+  sees the normal and third-eye descriptions without marking the room visited,
+  then prefills `say "route to <room>"; <short directions>` without executing
+  it. `LOOK IN MIRROR AT <room>` is an exact synonym.
 - **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
   mirrored PANEL. Seating the RUBY, EMERALD, and SAPPHIRE GEMS in the correct
   named slots opens the route to the required BM SPYGLASS (+8) in the TREE FORT.

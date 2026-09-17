@@ -285,6 +285,7 @@ export const SYSOP_COMMANDS = Object.freeze([
       ...MAX_COLLECTION,
       ...REQUIRED_DEPOSITS,
       "close rq",
+      "open bellcloset",
     ]),
   }),
 ]);

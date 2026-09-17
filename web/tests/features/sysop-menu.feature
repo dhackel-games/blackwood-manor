@@ -49,6 +49,7 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winmax2bell" includes "t batsight"
     And sysop command "::winmax2bell" includes "put batsight in rq"
     And sysop command "::winmax2bell" includes "c rq"
+    And sysop command "::winmax2bell" includes "o bellcloset"
     And sysop command "::winmax2bell" omits "pull bellrope"
     And sysop command "::winmax2bell" omits "put family in rq"
     And every hidden prompt avoids an explicit take immediately before direct use
@@ -90,6 +91,7 @@ Feature: Maintained sysop shortcuts
     And the current room is "grandHall"
     And flag "reliquarySealed" is true
     And flag "bellRung" is unset
+    And item "bellCloset" is open
     And flag "progressAward:trollRiddleSolved" is set
     And flag "progressAward:oakPanelAligned" is set
     And flag "progressAward:belfryMirrorFreed" is set
