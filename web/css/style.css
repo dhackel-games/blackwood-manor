@@ -47,6 +47,7 @@ body { -webkit-text-size-adjust: 100%; }
   display: flex; flex-wrap: nowrap; gap: 0.2rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.15rem; margin-bottom: 0.2rem;
+  padding-right: 5.75rem;  /* clear the fixed Text | 2D toggle in the top-right */
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
 #hud[hidden], #controls[hidden], #nav-disclosure[hidden] { display: none; }
@@ -180,7 +181,8 @@ body { -webkit-text-size-adjust: 100%; }
   position: relative;
   display: block;
   width: calc(100% + 1px);
-  margin-top: -1px;
+  max-width: 30rem;          /* keep the cluster compact and centered on wide screens */
+  margin: -1px auto 0;
 }
 #inputline > .nav-disclosure {
   position: absolute;
@@ -462,6 +464,7 @@ body { -webkit-text-size-adjust: 100%; }
     --action-button-height: 2.96875rem;
     --dpad-half-width: 4.573125rem;
   }
+  #controls .controls-content { max-width: 36rem; }
   #controls .dpad button {
     font-size: 1.35rem;
   }
@@ -652,12 +655,22 @@ body { -webkit-text-size-adjust: 100%; }
 @keyframes end-call-progress { to { transform: scaleX(1); } }
 #phone-end:active { background: #e0483c; }
 
-/* Entry point to the 2D tile-map view of the manor (view2d/tilemap.html). */
-#view-2d {
-  position: fixed; top: max(6px, env(safe-area-inset-top)); right: 8px; z-index: 20;
-  font: 600 12px/1 "Courier New", monospace; letter-spacing: 1px;
-  color: #8fd3ff; text-decoration: none;
-  background: rgba(5, 8, 5, 0.72); border: 1px solid #2a3b2f; border-radius: 6px;
-  padding: 4px 7px;
+/* Mode switch: a Text | 2D segmented toggle, fixed top-right. The active
+   segment is filled; the other is a link to the other view. */
+#mode-switch {
+  position: fixed; top: max(6px, env(safe-area-inset-top)); right: 8px; z-index: 60;
+  display: inline-flex; align-items: stretch;
+  font: 700 11px/1 "Courier New", monospace; letter-spacing: 1px;
+  background: rgba(5, 8, 5, 0.82); border: 1px solid #2a3b2f; border-radius: 7px;
+  overflow: hidden;
 }
-#view-2d:active { color: #fff; border-color: #8fd3ff; }
+#mode-switch .mode-seg {
+  display: inline-flex; align-items: center;
+  padding: 5px 9px; text-decoration: none; color: #8fd3ff;
+}
+#mode-switch .mode-seg + .mode-seg { border-left: 1px solid #2a3b2f; }
+#mode-switch .mode-seg.is-active {
+  color: #050805; background: var(--green-bright); cursor: default;
+}
+#mode-switch a.mode-seg:hover { color: #fff; background: rgba(143, 211, 255, 0.15); }
+#mode-switch a.mode-seg:active { color: #fff; background: rgba(143, 211, 255, 0.3); }

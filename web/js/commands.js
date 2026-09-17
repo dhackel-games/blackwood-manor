@@ -73,6 +73,7 @@ function inspectRoom(ctx) {
 
 export const HELP_TEXT = `COMMANDS
 COMMAND | TITLE / DESCRIPTION
+2d/text | Switch view / 2D opens the 8-bit tile-map view; TEXT returns to the text game.
 again/(g) | Repeat / Repeat the previous command.
 ai | AI status / Report whether Gary is scripted or using an on-device model.
 attack <thing> | Attack / Attack a visible target.
@@ -115,6 +116,11 @@ unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z) | Wait / Let one turn pass.
+
+MODES: TEXT ↔ 2D
+This game has two views of the same manor. TEXT (this one) is the classic terminal.
+2D is an 8-bit, top-down tile-map view that fills in as you explore.
+Switch either way with the TEXT | 2D toggle in the top-right corner, or by typing 2D (here) or TEXT (in the 2D view).
 
 TOUCH CONTROLS
 The on-screen buttons mirror typed commands.

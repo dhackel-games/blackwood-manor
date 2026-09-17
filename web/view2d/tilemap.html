@@ -12,9 +12,15 @@
   body { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
   header { padding:10px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
   header h1 { margin:0; font-size:15px; letter-spacing:1px; }
-  header .back { float:right; margin-left:12px; color:#8fd3ff; text-decoration:none;
-    font-size:12px; border:1px solid var(--line); border-radius:6px; padding:4px 8px; }
-  header .back:hover { border-color:#8fd3ff; }
+  header .mode-switch { float:right; margin-left:12px; display:inline-flex; align-items:stretch;
+    font:700 11px/1 "Courier New", monospace; letter-spacing:1px;
+    border:1px solid #2a3b2f; border-radius:7px; overflow:hidden; }
+  header .mode-switch .mode-seg { display:inline-flex; align-items:center; padding:5px 9px;
+    color:#8fd3ff; text-decoration:none; }
+  header .mode-switch .mode-seg + .mode-seg { border-left:1px solid #2a3b2f; }
+  header .mode-switch .mode-seg.is-active { color:#05070a; background:#49ff7a; cursor:default; }
+  header .mode-switch a.mode-seg:hover { color:#fff; background:rgba(143,211,255,0.15); }
+  header .mode-switch a.mode-seg:active { color:#fff; background:rgba(143,211,255,0.3); }
   header details { color:var(--dim); font-size:12px; margin-top:4px; }
   header summary { cursor:pointer; }
   header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
@@ -74,7 +80,10 @@
 </head>
 <body>
 <header>
-  <a class="back" href="../index.html">← text game</a>
+  <nav class="mode-switch" aria-label="view mode">
+    <a class="mode-seg" href="../index.html" title="Switch to the text game">Text</a>
+    <span class="mode-seg is-active" aria-current="page">2D</span>
+  </nav>
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (Phase 1 · playable spike)</h1>
   <details>
     <summary>what is this?</summary>
@@ -111,6 +120,7 @@
     </select>
   </label>
   <button id="baitBtn">drop bait (B)</button>
+  <button id="tourBtn">▶ auto-tour</button>
   <button id="resetBtn">reset</button>
   <button id="atlasBtn">load atlas…</button>
   <input type="file" id="atlasFile" accept="image/png,image/*" hidden />
@@ -154,6 +164,7 @@
   const atlasBtn = document.getElementById("atlasBtn");
   const atlasFile = document.getElementById("atlasFile");
   const resetBtn = document.getElementById("resetBtn");
+  const tourBtn = document.getElementById("tourBtn");
   const baitBtn = document.getElementById("baitBtn");
   const legend = document.getElementById("legend");
   const hud = document.getElementById("hud");
@@ -183,9 +194,34 @@
         import("../js/world.js"), import("../js/core.js"),
       ]);
       game = createGame(world);
+      if (game.needsPlayerName()) startNameGate();
       render();
     } catch (e) { console.warn("live engine unavailable — using static roomdata", e); }
   })();
+
+  // Name gate: the shipped engine wants a name before it will run commands (and
+  // resolves {{player_name}} in every room description). Mirror the text game —
+  // ask the name first, THEN take commands — instead of silently eating the
+  // player's first command as their name.
+  const CMD_PLACEHOLDER = cmdInput.getAttribute("placeholder");
+  const NAME_PLACEHOLDER = "type your name and press Enter (or just press Enter)…";
+  function namePromptMsg() {
+    return "First — what should we call you? Type your name and press Enter " +
+      "(or just press Enter to be named for you). Then type what Gary does.";
+  }
+  function startNameGate() {
+    msg = namePromptMsg();
+    cmdInput.placeholder = NAME_PLACEHOLDER;
+  }
+  function submitName(raw) {
+    game.state.room = gary;              // describe Gary's room, not the engine's default start
+    try { game.send(raw); } catch (e) { /* keep the spike un-brickable */ }
+    game.state.dead = false; game.state.won = false;
+    cmdInput.placeholder = CMD_PLACEHOLDER;
+    const named = game.state.flags.playerName || "you";
+    msg = `The manor will call you ${named}. Now type what Gary does — or move with the arrows / click a room.`;
+    render(); canvas.focus();
+  }
 
   const kindOf = (it) => it.takeable ? "takeable" : it.container ? "container" : it.scenery ? "scenery" : "fixture";
   const ITEM_RANK = { takeable:0, container:1, scenery:2, fixture:3 };
@@ -220,10 +256,12 @@
   let gary, seen, steps, msg, guest, bait, lured, focusId, recenter;
   let lastLayout = null, lastFloor = 0;
   function reset() {
+    stopTour();
     gary = START; seen = new Set([START]); steps = 0;
     guest = GUEST_START; bait = new Set(); lured = 0;
     focusId = START; recenter = true;
-    msg = "You are Gary. Move around; drop bait (B) and lure the guest to it.";
+    if (game && game.needsPlayerName()) startNameGate();
+    else msg = "You are Gary. Move around; drop bait (B) and lure the guest to it.";
     render(); canvas.focus();
   }
   const floorOf = (id) => graph.home.get(id).floorIndex;
@@ -265,6 +303,7 @@
     drawReachable(layout);
     drawItemIcons(layout);
     drawTokens(layout, fi);
+    drawFire(layout);
     drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
@@ -341,6 +380,25 @@
     }
   }
 
+  // Flames on Gary's room whenever the shipped engine says he's ablaze (e.g. he
+  // lit himself on the candles/boiler). A visual echo of the text game's
+  // "you're on fire" state, plus a HUD/textbar cue in renderHud/render.
+  function drawFire(layout) {
+    if (!game || !game.state.flags || !game.state.flags.onFire) return;
+    const box = layout.boxes.find((b) => b.id === gary);
+    if (!box) return;
+    const cx = (box.x + box.w / 2) * TILEPX;
+    const cy = (box.y + 0.95) * TILEPX;
+    ctx.save();
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `${Math.round(TILEPX * 1.15)}px serif`;
+    // a little cluster of flames so it reads at any zoom
+    ctx.fillText("🔥", cx - TILEPX * 0.5, cy);
+    ctx.fillText("🔥", cx + TILEPX * 0.5, cy);
+    ctx.fillText("🔥", cx, cy - TILEPX * 0.35);
+    ctx.restore();
+  }
+
   // Highlight the room currently shown in the inspector.
   function drawFocusRing(layout) {
     if (!focusId) return;
@@ -376,7 +434,9 @@
       `<span>👤 guest in <b>${guestLabel}</b></span>` +
       `<span>🧀 bait <b>${bait.size}</b></span>` +
       `<span>✨ lured <b>${lured}</b></span>` +
-      `<span>👣 steps <b>${steps}</b></span>`;
+      `<span>👣 steps <b>${steps}</b></span>` +
+      ((game && game.state.flags && game.state.flags.onFire)
+        ? `<span style="color:#ff8a3d">🔥 <b>ON FIRE</b></span>` : "");
   }
 
   // Right-hand inspector: name + real description + item list of a room (only if
@@ -492,7 +552,58 @@
     step();
   }
 
-  // Resolve a typed room name to an id: exact label, then id, then prefix match.
+  // --- auto-tour: sit back and watch Gary drift through the whole manor ------
+  // A depth-first Euler walk of the connected room graph from Gary's current
+  // room: every consecutive pair is adjacent, so it plays as a smooth room-by-
+  // room stroll (including up/down stairs). Any manual move/click/command stops
+  // it. Kept separate from `walking` so we can distinguish "watching" from a
+  // one-off click-to-walk.
+  let touring = false, tourTimer = null;
+  function buildTourRoute(start) {
+    const visited = new Set([start]);
+    const route = [];
+    const dfs = (node) => {
+      for (const n of graph.adj.get(node) || []) {
+        if (visited.has(n.id)) continue;
+        visited.add(n.id);
+        route.push(n.id);   // step into the child room
+        dfs(n.id);
+        route.push(node);   // …then back out to keep every hop adjacent
+      }
+    };
+    dfs(start);
+    return route;
+  }
+  function stopTour(note) {
+    if (!touring && !tourTimer) return;
+    touring = false; walking = false;
+    if (tourTimer) { clearTimeout(tourTimer); tourTimer = null; }
+    tourBtn.classList.remove("on"); tourBtn.textContent = "▶ auto-tour";
+    if (note) { msg = note; render(); }
+  }
+  function startTour() {
+    if (touring) { stopTour("🎬 Auto-tour stopped."); return; }
+    if (game && game.needsPlayerName()) { msg = namePromptMsg(); render(); return; }
+    const route = buildTourRoute(gary);
+    if (!route.length) { msg = "Nowhere left to tour from here."; render(); return; }
+    touring = true; walking = true;
+    tourBtn.classList.add("on"); tourBtn.textContent = "⏹ stop tour";
+    let i = 0;
+    const step = () => {
+      if (!touring) return;
+      moveTo(route[i]);
+      i++;
+      if (touring) {
+        msg = i < route.length
+          ? `🎬 Auto-tour… room ${i}/${route.length} — type, click, or press ⏹ to stop.`
+          : "🎬 Auto-tour complete.";
+        render();
+      }
+      if (i < route.length && touring) tourTimer = setTimeout(step, 520);
+      else stopTour();
+    };
+    step();
+  }
   function resolveRoom(name) {
     const q = name.trim().toLowerCase();
     if (!q) return null;
@@ -528,12 +639,20 @@
     const [verb, ...rest] = line.split(/\s+/);
     const arg = rest.join(" ");
 
+    if (verb === "tour" || verb === "auto" || verb === "demo" || verb === "watch") { startTour(); return; }
+    if (verb === "stop" || verb === "halt") { stopTour("🎬 Auto-tour stopped."); return; }
+    if (touring) stopTour();   // any other manual command ends the tour, then runs
+
     if (verb === "help" || verb === "?") {
       msg = "move: n/s/e/w · up/down · go <room> · click a room. " +
         "act: examine/take/open/read/push/pull/pray… (real manor verbs). " +
-        "spike: bait · reveal · reset. Or hover a room to inspect it.";
+        "watch: tour (auto-walk the whole manor) · stop. " +
+        "spike: bait · reveal · reset. modes: TEXT switches to the text game (toggle top-right). " +
+        "Or hover a room to inspect it.";
       render(); return;
     }
+    if (verb === "text" || (verb === "1d")) { window.location.href = "../index.html"; return; }
+    if (verb === "2d") { msg = "You're already in 2D. Type TEXT to switch to the text game."; render(); return; }
     if (WORD_DIRS[verb]) {
       const [dx, dy] = WORD_DIRS[verb];
       const id = neighborInDirection(graph, floorOf(gary), gary, dx, dy);
@@ -578,6 +697,7 @@
   };
   window.addEventListener("keydown", (e) => {
     if (e.target === cmdInput) return; // let the command bar capture typing
+    if (touring) stopTour("🎬 Auto-tour stopped.");
     if (e.code === "KeyB") { e.preventDefault(); toggleBait(); return; }
     const d = DIRS[e.code];
     if (!d) return;
@@ -599,6 +719,7 @@
   // Click any connected room to have Gary walk there (Andy's ask); clicking an
   // unreachable-but-seen room just inspects it.
   canvas.addEventListener("click", (e) => {
+    if (touring) { stopTour("🎬 Auto-tour stopped."); return; }
     if (walking) return;
     const hit = roomAt(e);
     if (!hit) return;
@@ -623,10 +744,18 @@
   [revealChk, labelMode].forEach((el) => el.addEventListener("input", render));
   zoom.addEventListener("input", () => { recenter = true; render(); });
   resetBtn.addEventListener("click", reset);
+  tourBtn.addEventListener("click", () => { startTour(); canvas.focus(); });
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
 
   // --- command bar: type what Gary does ------------------------------------
-  cmdForm.addEventListener("submit", (e) => { e.preventDefault(); runCommand(cmdInput.value); cmdInput.value = ""; cmdInput.focus(); });
+  cmdForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const val = cmdInput.value;
+    cmdInput.value = "";
+    if (game && game.needsPlayerName()) { submitName(val); cmdInput.focus(); return; }
+    runCommand(val);
+    cmdInput.focus();
+  });
 
   atlasBtn.addEventListener("click", () => atlasFile.click());
   atlasFile.addEventListener("change", () => {

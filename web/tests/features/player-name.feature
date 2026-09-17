@@ -6,7 +6,7 @@ Feature: Player name and message templates
   player-name templates through the single message renderer.
 
   Scenario: The browser intro requests a name without blocking the first room
-    Then browser startup includes a nonblocking prefilled name request
+    Then browser startup includes a nonblocking name request
     And the default name uses three distinct twelve-entry pools
 
   Scenario Outline: The opening accepts natural name responses without spending a turn

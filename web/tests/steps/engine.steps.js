@@ -337,18 +337,22 @@ Then("restart command {string} selects Part {int}", function (input, part) {
   assert.equal(parseRestartTarget(input), part);
 });
 
-Then("browser startup includes a nonblocking prefilled name request", function () {
+Then("browser startup includes a nonblocking name request", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.match(ui,
     /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
+  // Intro invites a name (type it, or CALL ME) but never blocks the first room,
+  // and leaves the command box EMPTY — the engine's awaiting-name gate accepts a
+  // bare typed name, so no "call me " prefill is needed.
   assert.match(ui,
-    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*the manor has decided to call you[\s\S]*If you'd like to go by a[\s\S]*different name[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
+    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*the manor calls you[\s\S]*type it and press[\s\S]*CALL ME[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.clear\(\)/s);
+  assert.doesNotMatch(ui, /mainEntry\.setValue\("call me "\)/);
   assert.doesNotMatch(ui,
-    /the manor has decided to call you[\s\S]{0,300}"sys"/s);
+    /the manor calls you[\s\S]{0,300}"sys"/s);
   assert.match(ui,
-    /input\.placeholder = waitingForIntro[\s\S]*"checking AI…"[\s\S]*"type command \/ tap button"/s);
+    /input\.placeholder = waitingForIntro[\s\S]*"checking AI…"[\s\S]*type your name[\s\S]*"type command \/ tap button"/s);
   assert.match(ui, /input\.disabled = waitingForIntro/);
   assert.match(ui, /mainGo\.disabled = waitingForIntro/);
   assert.match(ui, /hudElement\.hidden = waitingForIntro/);
@@ -957,7 +961,7 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*display:\s*block/s);
   assert.match(css,
-    /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*margin-top:\s*-1px/s);
+    /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*max-width:\s*30rem[^}]*margin:\s*-1px auto 0/s);
   assert.match(css,
     /#controls \.movement-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*left:\s*var\(--dpad-left\)/s);
   assert.match(css,

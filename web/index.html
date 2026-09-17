@@ -150,8 +150,11 @@
     </div>
   </div>
 
-  <!-- Entry point to the 2D tile-map view (bundled under view2d/). -->
-  <a id="view-2d" href="view2d/tilemap.html" title="View the manor in 2D">2D</a>
+  <!-- Mode switch: Text (current) ↔ 2D tile-map view (view2d/tilemap.html). -->
+  <nav id="mode-switch" aria-label="view mode">
+    <span class="mode-seg is-active" aria-current="page">Text</span>
+    <a class="mode-seg" href="view2d/tilemap.html" title="Switch to the 2D map view">2D</a>
+  </nav>
 
   <script type="module" src="js/ui.js?v=source"></script>
 </body>

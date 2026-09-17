@@ -210,9 +210,12 @@ function syncNameGate() {
   const waitingForIntro = !sessionIntroReady;
   input.disabled = waitingForIntro;
   mainGo.disabled = waitingForIntro;
+  const awaitingName = sessionIntroReady && !!game.state.flags.awaitingPlayerName;
   input.placeholder = waitingForIntro
     ? "checking AI…"
-    : "type command / tap button";
+    : awaitingName
+      ? "type your name and press Enter (or just start playing)…"
+      : "type command / tap button";
   hudElement.hidden = waitingForIntro;
   controls.hidden = waitingForIntro;
   navDisclosure.hidden = waitingForIntro;
@@ -230,11 +233,11 @@ function completeSessionIntro() {
     pendingSessionMessage = "";
   }
   print(game.showMessage(
-    "For now, the manor has decided to call you {{player_name}}. If you'd like to go by a " +
-      "different name, say it now or type \"call me {name}\". The command box is ready for you."));
+    "For now the manor calls you {{player_name}}. To pick your own name, just type it and press " +
+      "Enter — or type CALL ME {name}. Prefer to keep it? Ignore this and start exploring."));
   print("\n" + game.startMessage());
   sessionIntroReady = true;
-  mainEntry.setValue("call me ");
+  mainEntry.clear();
   syncNameGate();
   if (canType) {
     input.focus();
@@ -883,6 +886,18 @@ function handle(raw) {
 
   const low = cmd.toLowerCase();
 
+  // View-mode switch. "2D" jumps to the tile-map view; "text" is a no-op here
+  // (you're already in the text game). The Text/2D toggle top-right does the same.
+  if (!onCall && (low === "2d" || low === "2d mode" || low === "2-d")) {
+    print("Switching to the 2D map view…", "sys");
+    window.location.href = "view2d/tilemap.html";
+    return;
+  }
+  if (!onCall && (low === "text" || low === "text mode" || low === "1d")) {
+    print("You're already in text mode. Type 2D to switch to the tile-map view.", "sys");
+    return;
+  }
+
   const bugDescription = bugReportDescription(cmd);
   if (bugDescription !== null) {
     recordBugCommand(bugTrace, submitted);
@@ -1018,6 +1033,7 @@ function handle(raw) {
   const gameOver = game.state.dead || game.state.won;
   print(out, gameOver ? "over" : null);
   updateHud();
+  syncNameGate();  // reset the "type your name" placeholder once the name gate closes
   const mirrorRoute = game.getFlag("mirrorRoutePrefill");
   if (typeof mirrorRoute === "string" && mirrorRoute) {
     game.setFlag("mirrorRoutePrefill", null);
