@@ -231,8 +231,7 @@ function completeSessionIntro() {
   }
   print(game.showMessage(
     "Hello, {{player_name}}. If you'd like to go by a different name, say it or type " +
-      "\"call me {name}\". The command box is ready for you."),
-  "sys");
+      "\"call me {name}\". The command box is ready for you."));
   print("\n" + game.startMessage());
   sessionIntroReady = true;
   mainEntry.setValue("call me ");
@@ -936,7 +935,7 @@ function handle(raw) {
   // using the model?" is precisely the question you ask while talking to him.
   if (low === "ai" || low === "ai status" || low === "model") {
     const text = modelStatusText();
-    onCall ? printToPhone(text, "sys") : print(text, garyBrain.isAvailable() ? "sys ok" : "sys");
+    onCall ? printToPhone(text, "sys") : print(text);
     if (onCall) phoneT.scrollTop = phoneT.scrollHeight;
     return;
   }
@@ -1242,19 +1241,19 @@ garyBrain.detect()
 function announceModelCheck() {
   if (!modelCheckReady || modelCheckAnnounced) return;
   modelCheckAnnounced = true;
-  print(modelStatusText(), garyBrain.isAvailable() ? "sys ok" : "sys");
+  print(modelStatusText());
 }
 
 /** One honest answer about the model, shared by the launch check, the badge and AI. */
 export function modelStatusText() {
   const s = garyBrain.status();
   if (s.available) {
-    return "[AI check] Model READY — Gary's replies are generated live on-device; his lines are marked ◆ AI.";
+    return "Gary's AI is ready. His replies are generated live on this device and marked ◆ AI.";
   }
   const why = s.native ? s.native.detail : s.reason;
   const fix = s.fix || (s.native ? "" : "");
-  return "[AI check] Model NOT ACTIVE — Gary is using scripted lines.\n" +
-         `  Why: ${why}` + (fix ? `\n  Fix: ${fix}` : "");
+  return "Gary is using scripted replies.\n" +
+         `Reason: ${why}` + (fix ? `\nFix: ${fix}` : "");
 }
 
 function refreshIntroBanner() {

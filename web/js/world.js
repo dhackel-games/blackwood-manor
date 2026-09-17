@@ -3167,22 +3167,23 @@ const logicWorld = {
       "Good. We will call you {{player_name}}.\n\nThe last daylight is draining from the sky.",
     defaultPlayerNameParts: {
       titles: [
-        "Professor", "Doctor", "Dean", "Chancellor", "Provost", "Headmaster",
-        "Magister", "Archivist", "Inspector", "Captain", "Baron", "Reverend",
+        "Professor", "Doctor", "Madame", "Mister", "Dean", "Chancellor",
+        "Reverend", "Captain", "Baron", "Dame", "Sir", "Inspector",
       ],
       moods: [
-        "Spooky", "Haunted", "Creepy", "Eerie", "Ghastly", "Phantom",
-        "Shadowy", "Cursed", "Howling", "Midnight", "Spectral", "Uncanny",
+        "Spooky", "Craptastic", "Farty", "Poopy", "Stinkbomb", "Buttcheek",
+        "Booger", "Wobblegut", "Dingleberry", "Snotrocket", "Burptastic", "Gassy",
       ],
       garments: [
-        "Pants", "Trousers", "Breeches", "Bloomers", "Knickerbockers", "Pantaloons",
-        "Slacks", "Leggings", "Overalls", "Drawers", "Jodhpurs", "Culottes",
+        "McPoopypants", "Elastic", "Poopaloons", "Fartbritches", "Butttrousers", "Stinkpants",
+        "Crapbreeches", "Snotshorts", "Wobblepants", "Doodoodrawers", "Burpbloomers", "Tootleggings",
       ],
     },
     defaultPlayerNameAccepted:
       "No name? Fine. We will call you {{player_name}}. Change it anytime with CALL ME FOO.\n\n" +
       "The last daylight is draining from the sky.",
     playerNameChanged: "Done. We will call you {{player_name}}.",
+    singlePlayerNameChanged: "Okay! I'll call you {{player_name}}.",
     requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
     equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck", "back"],
   },

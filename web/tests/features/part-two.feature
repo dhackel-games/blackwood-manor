@@ -77,13 +77,13 @@ Feature: Part II — the Thirteenth Hour
     Then the game is alive
     And the game is not won
     And the current room is "p2_awakening"
-    And flag "playerName" equals "Professor Spooky Pants"
+    And flag "playerName" equals "Professor Spooky McPoopypants"
     And flag "clockExplained" is false
-    And the output contains "You are a ghost, Professor Spooky Pants"
+    And the output contains "You are a ghost, Professor Spooky McPoopypants"
     And the output contains "EXAMINE the CLOCK"
     When I send "call me Ada"
-    Then flag "playerName" equals "Ada"
-    And the output contains "We will call you Ada"
+    Then flag "playerName" equals "Professor Ada McPoopypants"
+    And the output contains "Okay! I'll call you Professor Ada McPoopypants"
 
   Scenario: Finding the queen and using the mirror pool frees the emerald safely
     When I fast-forward into Part II

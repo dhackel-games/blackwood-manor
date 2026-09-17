@@ -24,7 +24,9 @@ export function renderMessage(template, values = {}) {
 
 export function parsePlayerNameInput(input) {
   let name = String(input || "").trim();
-  name = name.replace(/^say\s+/i, "").replace(/^call\s+me\s+/i, "").trim();
+  name = name
+    .replace(/^(?:say|call\s+me|my\s+name\s+is|i\s+am|i'm)\s+/i, "")
+    .trim();
   if ((name.startsWith('"') && name.endsWith('"')) ||
       (name.startsWith("'") && name.endsWith("'"))) {
     name = name.slice(1, -1).trim();
@@ -113,10 +115,23 @@ export function createGame(world) {
     state.flags.playerName = cfg.defaultPlayerNameParts
       ? composeDefaultPlayerName(cfg.defaultPlayerNameParts)
       : (cfg.defaultPlayerName || "Professor Spooky Pants");
+    state.flags.generatedPlayerNameParts = state.flags.playerName.split(" ");
     state.flags.playerNameDefaulted = true;
     state.flags.awaitingPlayerName = true;
     return state.flags.playerName;
   };
+  function changePlayerName(name) {
+    const generated = state.flags.generatedPlayerNameParts;
+    const singleName = !/\s/.test(name);
+    const inserted = singleName && Array.isArray(generated) && generated.length === 3;
+    const chosen = inserted
+      ? `${generated[0]} ${name.charAt(0).toUpperCase()}${name.slice(1)} ${generated[2]}`
+      : name;
+    state.flags.playerName = chosen;
+    state.flags.playerNameDefaulted = false;
+    state.flags.awaitingPlayerName = false;
+    return inserted;
+  }
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
   let darkWarningRendered = false;
@@ -800,11 +815,11 @@ export function createGame(world) {
     if (/^call\s+me\b/i.test(String(input || "").trim())) {
       const name = parsePlayerNameInput(input);
       if (!name) return 'CALL ME needs a name, for example: CALL ME FOO.';
-      state.flags.playerName = name;
-      state.flags.playerNameDefaulted = false;
-      state.flags.awaitingPlayerName = false;
+      const inserted = changePlayerName(name);
       return game.showMessage(
-        cfg.playerNameChanged || "Done. We will call you {{player_name}}.");
+        inserted
+          ? (cfg.singlePlayerNameChanged || "Okay! I'll call you {{player_name}}.")
+          : (cfg.playerNameChanged || "Done. We will call you {{player_name}}."));
     }
     if (state.flags.awaitingPlayerName) {
       const raw = String(input || "").trim();
@@ -812,11 +827,11 @@ export function createGame(world) {
       const parsed = parse(raw);
       const name = parsePlayerNameInput(raw);
       if (name && (explicitName || parsed.error === "unknown-verb")) {
-        state.flags.playerName = name;
-        state.flags.playerNameDefaulted = false;
-        state.flags.awaitingPlayerName = false;
+        const inserted = changePlayerName(name);
         return game.showMessage(
-          cfg.playerNameChanged || "Done. We will call you {{player_name}}.");
+          inserted
+            ? (cfg.singlePlayerNameChanged || "Okay! I'll call you {{player_name}}.")
+            : (cfg.playerNameChanged || "Done. We will call you {{player_name}}."));
       }
       state.flags.awaitingPlayerName = false;
     }

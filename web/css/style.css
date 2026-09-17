@@ -109,8 +109,7 @@ body { -webkit-text-size-adjust: 100%; }
 }
 
 #transcript .banner { color: var(--green-bright); }
-/* Diagnostic lines (the launch AI check, the AI command). Deliberately set
-   apart from game prose so nobody mistakes a model report for story text. */
+/* Diagnostic/meta lines used by explicit status commands and update notices. */
 #transcript .sys {
   color: var(--dim);
   border-left: 2px solid var(--dim);

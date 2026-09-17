@@ -537,8 +537,11 @@ Then("the default name uses three distinct twelve-entry pools", function () {
     assert.equal(pool.length, 12);
     assert.equal(new Set(pool).size, 12);
   }
-  assert.equal(composeDefaultPlayerName(parts, () => 0), "Professor Spooky Pants");
-  assert.equal(composeDefaultPlayerName(parts, () => 0.999), "Reverend Uncanny Culottes");
+  assert.equal(composeDefaultPlayerName(parts, () => 0), "Professor Spooky McPoopypants");
+  assert.equal(composeDefaultPlayerName(parts, () => 0.999), "Inspector Gassy Tootleggings");
+  const sequence = [0.1, 0.1, 0.1];
+  assert.equal(composeDefaultPlayerName(parts, () => sequence.shift()),
+    "Doctor Craptastic Elastic");
 });
 
 Then("every recurring flavor pool has twelve distinct entries and cycles without repetition", function () {

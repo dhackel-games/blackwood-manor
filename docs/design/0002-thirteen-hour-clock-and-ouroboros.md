@@ -4,7 +4,10 @@
 > The game shows its title and initial AI status, composes a fallback from
 > 12 titles × 12 spooky moods × 12 garments, greets the player with it, asks
 > them to say another name or type `call me {name}`, prefills `call me `, and
-> continues into the first room without waiting. Authored `{{player_name}}` tokens are
+> continues into the first room without waiting. AI/name guidance is plain
+> descriptive prose. A single response such as Dave replaces the generated
+> middle token (Professor Dave McPoopypants); a multiword response replaces the
+> whole name. Authored `{{player_name}}` tokens are
 > resolved through one output renderer. In BM1, put all thirteen heirlooms in
 > the RELIQUARY, CLOSE it, OPEN the BELL CLOSET beside the front door, and PULL
 > its lower rope. The remote belfry bell tolls, magical light consumes the

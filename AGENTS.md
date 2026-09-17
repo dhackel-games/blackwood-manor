@@ -100,4 +100,6 @@ all display and speech output passes through `game.showMessage()` before it reac
 Startup is nonblocking: title, initial AI status, a random fallback composed
 from 12 title × 12 spooky-mood × 12 garment choices, an intro rename request
 with `call me ` prefilled, then the first room immediately. The same applies to
-`RESTART 2`; a bare first response or `CALL ME <name>` renames without a turn.
+`RESTART 2`; AI/name intro lines are plain prose. A single supplied name replaces
+the generated middle token (for example Professor Dave McPoopypants), while a
+multiword name replaces the whole name. Renaming costs no turn.

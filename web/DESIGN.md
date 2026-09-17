@@ -898,9 +898,11 @@ Blackwood Manor has one ritual and two immediate choices.
   randomly composes a fallback from three distinct 12-entry pools (title,
   spooky mood, garment), greets the player, asks them to say another name or
   type `CALL ME <name>`, prefills `call me `, and continues into the first room
-  without waiting. A bare name during that first rename window or `CALL ME
-  <name>` changes it at zero turn cost. `RESTART 2` clears the checkpoint name
-  and repeats the same nonblocking intro before awakening.
+  without waiting. Initial AI and name guidance use ordinary prose, not
+  diagnostic styling. A single supplied name replaces the generated middle
+  token (`Professor Spooky McPoopypants` → `Professor Dave McPoopypants`) and
+  receives “Okay! I'll call you …”; a multiword name replaces the whole name.
+  `RESTART 2` clears the checkpoint name and repeats the same nonblocking intro.
   Authored `{{player_name}}` tokens pass through `game.showMessage()` before
   terminal display, phone display, or speech.
 
