@@ -340,9 +340,9 @@ Then("browser startup includes a nonblocking prefilled name request", function (
   assert.match(ui,
     /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
   assert.match(ui,
-    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*If you'd like to go by a different name[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
+    /function completeSessionIntro\(\) \{[\s\S]*announceModelCheck\(\)[\s\S]*the manor has decided to call you[\s\S]*If you'd like to go by a[\s\S]*different name[\s\S]*print\("\\n" \+ game\.startMessage\(\)\)[\s\S]*mainEntry\.setValue\("call me "\)/s);
   assert.doesNotMatch(ui,
-    /If you'd like to go by a different name[\s\S]{0,200}"sys"/s);
+    /the manor has decided to call you[\s\S]{0,300}"sys"/s);
   assert.match(ui,
     /input\.placeholder = waitingForIntro[\s\S]*"checking AI…"[\s\S]*"type command \/ tap button"/s);
   assert.match(ui, /input\.disabled = waitingForIntro/);
@@ -1060,8 +1060,9 @@ Then("local daemon status is announced in the transcript without console noise",
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
   assert.doesNotMatch(ui, /if \(!s\.nativeApp && s\.provider !== "daemon"\) return;/);
   assert.match(ui, /function announceModelCheck\(\)[\s\S]*modelCheckAnnounced = true/s);
-  assert.match(ui, /function announceModelCheck\(\)[\s\S]*print\(modelStatusText\(\)\)/s);
-  assert.match(ui, /His replies are generated live on this device and marked ◆ AI\./);
+  assert.match(ui, /function announceModelCheck\(\)[\s\S]*print\(modelIntroText\(\)\)/s);
+  assert.match(ui, /Somewhere inside the machine, Gary clears his throat/);
+  assert.match(ui, /Somewhere beyond the manor, Gary settles in beside his phone/);
   assert.doesNotMatch(ui, /gary scripted|· scripted/);
   assert.doesNotMatch(css, /gary\.scripted|· scripted/);
   assert.doesNotMatch(ui, /console\.log\(p[\s\S]*on-device voice active/);

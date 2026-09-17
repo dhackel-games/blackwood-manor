@@ -121,8 +121,15 @@ export function createGame(world) {
     return state.flags.playerName;
   };
   function changePlayerName(name) {
-    const generated = state.flags.generatedPlayerNameParts;
     const singleName = !/\s/.test(name);
+    let generated = state.flags.generatedPlayerNameParts;
+    if (singleName && (!Array.isArray(generated) || generated.length !== 3)) {
+      const fallback = cfg.defaultPlayerNameParts
+        ? composeDefaultPlayerName(cfg.defaultPlayerNameParts)
+        : (cfg.defaultPlayerName || "Professor Spooky McPoopypants");
+      generated = fallback.split(" ");
+      state.flags.generatedPlayerNameParts = generated;
+    }
     const inserted = singleName && Array.isArray(generated) && generated.length === 3;
     const chosen = inserted
       ? `${generated[0]} ${name.charAt(0).toUpperCase()}${name.slice(1)} ${generated[2]}`

@@ -230,8 +230,8 @@ function completeSessionIntro() {
     pendingSessionMessage = "";
   }
   print(game.showMessage(
-    "Hello, {{player_name}}. If you'd like to go by a different name, say it or type " +
-      "\"call me {name}\". The command box is ready for you."));
+    "For now, the manor has decided to call you {{player_name}}. If you'd like to go by a " +
+      "different name, say it now or type \"call me {name}\". The command box is ready for you."));
   print("\n" + game.startMessage());
   sessionIntroReady = true;
   mainEntry.setValue("call me ");
@@ -1241,10 +1241,19 @@ garyBrain.detect()
 function announceModelCheck() {
   if (!modelCheckReady || modelCheckAnnounced) return;
   modelCheckAnnounced = true;
-  print(modelStatusText());
+  print(modelIntroText());
 }
 
-/** One honest answer about the model, shared by the launch check, the badge and AI. */
+function modelIntroText() {
+  const s = garyBrain.status();
+  return s.available
+    ? "Somewhere inside the machine, Gary clears his throat. Tonight his replies will be " +
+      "generated live on this device; a ◆ marks the lines he invents."
+    : "Somewhere beyond the manor, Gary settles in beside his phone. Tonight he will answer " +
+      "from his stack of hand-written replies rather than a live AI voice.";
+}
+
+/** Detailed status for the explicit AI command and phone controls. */
 export function modelStatusText() {
   const s = garyBrain.status();
   if (s.available) {

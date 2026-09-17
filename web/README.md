@@ -31,10 +31,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   prefills `call me `, and continues into the first room without waiting.
   The pools include combinations such as **Professor Spooky McPoopypants** and
   **Doctor Craptastic Elastic**. A single supplied name is inserted into the
-  generated title and surname (`Dave` → **Professor Dave McPoopypants**);
-  `call me <name>` changes it without spending a turn. `RESTART 2` uses the same
-  nonblocking intro before the ghost awakening. Initial AI and naming prose is
-  rendered as ordinary descriptive text rather than diagnostic/comment styling.
+  generated title and surname (`Dave` or `call me Dave` → **Professor Dave
+  McPoopypants**), generating a fresh frame if older state lacks one. A multiword
+  name replaces the whole name. Renaming spends no turn. `RESTART 2` uses the
+  same nonblocking intro before the ghost awakening. Initial AI and naming
+  guidance is written and rendered as ordinary story prose.
   Authored `{{player_name}}` tokens in rooms, items, Gary dialogue, and endings
   are resolved by the engine's single `showMessage` renderer before display or speech.
 - **Move:** `north` / `n`, `south` / `s`, `east` / `e`, `west` / `w`,
