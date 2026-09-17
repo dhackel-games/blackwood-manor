@@ -160,13 +160,29 @@ echo "==> Removing artifacts from prior release"
 rm -rf "$BUILD_ROOT"
 mkdir -p "$BUILD_ROOT"
 
-# Reuse a checked-in build that has not reached TestFlight yet; otherwise advance
-# monotonically beyond the last build whose availability was published.
-MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
+# Stamp today's marketing version before choosing the build. The first release
+# on a new date starts at build 1; later releases that same day increment.
+CHECKED_MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
+MARKETING_VERSION="${RELEASE_DATE_OVERRIDE:-$(date '+%Y.%m.%d' | sed -E 's/\.0([0-9])/\.\1/g')}"
 if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid YYYY.M.D package version: $MARKETING_VERSION" >&2
+  echo "Invalid YYYY.M.D release version: $MARKETING_VERSION" >&2
   exit 1
 fi
+DATE_CHANGED=0
+if [[ "$CHECKED_MARKETING_VERSION" != "$MARKETING_VERSION" ]]; then
+  DATE_CHANGED=1
+  echo "==> Advancing release date ${CHECKED_MARKETING_VERSION} -> ${MARKETING_VERSION}"
+  node -e '
+    const fs = require("fs");
+    const path = process.argv[1];
+    const pkg = JSON.parse(fs.readFileSync(path, "utf8"));
+    pkg.version = process.argv[2];
+    fs.writeFileSync(path, `${JSON.stringify(pkg, null, 2)}\n`);
+  ' ../web/package.json "$MARKETING_VERSION"
+fi
+
+# Reuse an unpublished checked-in build on the same date unless force-next was
+# requested. A new release date always resets the build number to 1.
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
 AVAILABLE_BUILD=$(node -e '
   const fs = require("fs");
@@ -182,7 +198,9 @@ if [[ "$UPLOAD" -eq 1 ]]; then
     --bundle-id "$BUNDLE_ID")
 fi
 LATEST_BUILD=$((AVAILABLE_BUILD > ASC_LATEST_BUILD ? AVAILABLE_BUILD : ASC_LATEST_BUILD))
-if (( FORCE_NEXT_BUILD == 1 )); then
+if (( DATE_CHANGED == 1 )); then
+  NEXT=1
+elif (( FORCE_NEXT_BUILD == 1 )); then
   BASE_BUILD=$((CUR > LATEST_BUILD ? CUR : LATEST_BUILD))
   NEXT=$((BASE_BUILD + 1))
 elif (( CUR > LATEST_BUILD )); then
@@ -292,6 +310,7 @@ if [[ "$(git -C "$REPO_ROOT" rev-parse HEAD)" != "$START_HEAD" ]] \
 fi
 git -C "$REPO_ROOT" add \
   ios/project.yml \
+  web/package.json \
   web/versions.json
 if git -C "$REPO_ROOT" diff --cached --quiet; then
   echo "==> Release metadata already identifies build ${NEXT}"

@@ -400,7 +400,7 @@ Then("the copyright-version is exact", function () {
 
 Then("the package version is the release date", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  assert.equal(packageJson.version, "2026.9.11");
+  assert.equal(packageJson.version, "2026.9.16");
 });
 
 Then("the large title art has aligned top strokes", function () {
@@ -1120,6 +1120,10 @@ Then("successful TestFlight releases publish verified app availability", functio
     /--force-with-lease="\$LOCK_REF:\$(?:existing|LOCK_COMMIT)"/g) || []).length, 2);
   assert.match(script, /--latest-build/);
   assert.match(script, /--force-next-build/);
+  assert.match(script, /RELEASE_DATE_OVERRIDE/);
+  assert.match(script, /pkg\.version = process\.argv\[2\]/);
+  assert.match(script, /if \(\( DATE_CHANGED == 1 \)\); then\s*NEXT=1/s);
+  assert.match(script, /web\/package\.json/);
   assert.match(script, /--stamp-only\) UPLOAD=0; STAMP_ONLY=1/);
   assert.match(script,
     /if \[\[ "\$STAMP_ONLY" -eq 1 \]\]; then[\s\S]*stopping before archive/s);

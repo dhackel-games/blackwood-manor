@@ -39,6 +39,8 @@ RELEASE_EDITOR=acoven ./release-testflight.sh --stamp-only --force-next-build
 
 This stamps the next build/`CONTENT_VERSION`, refreshes the bundled web content,
 and regenerates the Xcode project without requiring signing or App Store Connect.
+The script updates `web/package.json` to today first; when the date changes the
+build resets to 1, and additional pushes on the same date increment from there.
 
 `CONTENT_VERSION = f(APP_VERSION, BUILD) = YYYYMMDDBBB`, validated in three places (Swift
 `parse()`, `web/tools/gen-web-manifest.mjs`, and `web/tests/steps/engine.steps.js`) and coupled to
