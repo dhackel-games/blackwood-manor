@@ -304,6 +304,7 @@
     drawItemIcons(layout);
     drawTokens(layout, fi);
     drawFire(layout);
+    drawSick(layout);
     drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
@@ -380,15 +381,15 @@
     }
   }
 
-  // Flames on Gary's room whenever the shipped engine says he's ablaze (e.g. he
-  // lit himself on the candles/boiler). A visual echo of the text game's
-  // "you're on fire" state, plus a HUD/textbar cue in renderHud/render.
+  // Flames on Gary's room whenever the shipped engine says he's ablaze — that
+  // covers matches, the boiler AND the burrito flaming-fart butt fire (all the
+  // same onFire flag). Drawn a touch high so a barf cue can sit below it.
   function drawFire(layout) {
     if (!game || !game.state.flags || !game.state.flags.onFire) return;
     const box = layout.boxes.find((b) => b.id === gary);
     if (!box) return;
     const cx = (box.x + box.w / 2) * TILEPX;
-    const cy = (box.y + 0.95) * TILEPX;
+    const cy = (box.y + 0.85) * TILEPX;
     ctx.save();
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.font = `${Math.round(TILEPX * 1.15)}px serif`;
@@ -396,6 +397,21 @@
     ctx.fillText("🔥", cx - TILEPX * 0.5, cy);
     ctx.fillText("🔥", cx + TILEPX * 0.5, cy);
     ctx.fillText("🔥", cx, cy - TILEPX * 0.35);
+    ctx.restore();
+  }
+
+  // Barf on Gary's room while the burrito/mushrooms have him sick (the `sick`
+  // counter > 0 — the same state that makes him retch "H U U U R K").
+  function drawSick(layout) {
+    if (!game || !game.state.flags || !((game.state.flags.sick || 0) > 0)) return;
+    const box = layout.boxes.find((b) => b.id === gary);
+    if (!box) return;
+    const cx = (box.x + box.w / 2) * TILEPX;
+    const cy = (box.y + box.h - 0.9) * TILEPX;
+    ctx.save();
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.font = `${Math.round(TILEPX * 1.15)}px serif`;
+    ctx.fillText("🤮", cx, cy);
     ctx.restore();
   }
 
@@ -436,7 +452,9 @@
       `<span>✨ lured <b>${lured}</b></span>` +
       `<span>👣 steps <b>${steps}</b></span>` +
       ((game && game.state.flags && game.state.flags.onFire)
-        ? `<span style="color:#ff8a3d">🔥 <b>ON FIRE</b></span>` : "");
+        ? `<span style="color:#ff8a3d">🔥 <b>ON FIRE</b></span>` : "") +
+      ((game && game.state.flags && (game.state.flags.sick || 0) > 0)
+        ? `<span style="color:#8fd36a">🤮 <b>SICK</b></span>` : "");
   }
 
   // Right-hand inspector: name + real description + item list of a room (only if
