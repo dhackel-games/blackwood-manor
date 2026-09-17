@@ -30,10 +30,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   player by that name, asks them to say another name or type `call me {name}`,
   prefills `call me `, and continues into the first room without waiting.
   The pools include combinations such as **Professor Spooky McPoopypants** and
-  **Doctor Craptastic Elastic**. A single supplied name is inserted into the
-  generated title and surname (`Dave` or `call me Dave` → **Professor Dave
-  McPoopypants**), generating a fresh frame if older state lacks one. A multiword
-  name replaces the whole name. Renaming spends no turn. `RESTART 2` uses the
+  **Doctor Craptastic Elastic**. `CALL ME Dave` or `MY NAME IS Dave` jokes with
+  **Professor Dave McPoopypants**; two supplied words replace both generated
+  name slots. The response then says “just kidding” and stores only the supplied
+  name. Bare, SAY, CALL ME, and MY NAME IS forms all use the joke. Renaming
+  spends no turn. `RESTART 2` uses the
   same nonblocking intro before the ghost awakening. Initial AI and naming
   guidance is written and rendered as ordinary story prose.
   Authored `{{player_name}}` tokens in rooms, items, Gary dialogue, and endings

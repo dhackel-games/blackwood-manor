@@ -60,27 +60,43 @@ Feature: Player name and message templates
     Given a fresh manor game
     And the random number generator always returns 0.0
     When I send "call me Foo"
-    Then flag "playerName" equals "Professor Foo McPoopypants"
+    Then flag "playerName" equals "Foo"
     And the output contains "Okay! I'll call you Professor Foo McPoopypants"
+    And the output contains "just kidding, I'll call you Foo from now on"
     And the turn count is 0
     Given the player is in room "hallBedroom"
     When I send "examine hall mirror"
-    Then the output contains "gives Professor Foo McPoopypants back as a reflection"
+    Then the output contains "gives Foo back as a reflection"
 
-  Scenario Outline: A single first name is inserted into the generated funny name
+  Scenario Outline: A bare first response uses the generated-name joke
     Given a fresh unnamed manor game
     And the random number generator always returns 0.0
     When I send ""
     And I send '<input>'
-    Then flag "playerName" equals "Professor Dave McPoopypants"
-    And the output contains "Okay! I'll call you Professor Dave McPoopypants"
+    Then flag "playerName" equals "Dave"
+    And the output contains "Professor Dave McPoopypants"
+    And the output contains "just kidding, I'll call you Dave from now on"
     And the turn count is 0
 
     Examples:
-      | input           |
-      | dave            |
-      | say dave        |
-      | call me dave    |
-      | my name is dave |
+      | input    |
+      | dave     |
+      | say dave |
+
+  Scenario Outline: CALL ME jokes with one or two supplied words
+    Given a fresh unnamed manor game
+    And the random number generator always returns 0.0
+    When I send ""
+    And I send '<input>'
+    Then flag "playerName" equals "<actual>"
+    And the output contains "<funny>"
+    And the output contains "just kidding, I'll call you <actual> from now on"
+    And the turn count is 0
+
+    Examples:
+      | input               | actual      | funny                       |
+      | call me dave        | Dave        | Professor Dave McPoopypants |
+      | call me dave hackel | Dave Hackel | Professor Dave Hackel       |
+      | my name is dave     | Dave        | Professor Dave McPoopypants |
 
 # end player-name.feature

@@ -82,8 +82,9 @@ Feature: Part II — the Thirteenth Hour
     And the output contains "You are a ghost, Professor Spooky McPoopypants"
     And the output contains "EXAMINE the CLOCK"
     When I send "call me Ada"
-    Then flag "playerName" equals "Professor Ada McPoopypants"
+    Then flag "playerName" equals "Ada"
     And the output contains "Okay! I'll call you Professor Ada McPoopypants"
+    And the output contains "just kidding, I'll call you Ada from now on"
 
   Scenario: Finding the queen and using the mirror pool frees the emerald safely
     When I fast-forward into Part II

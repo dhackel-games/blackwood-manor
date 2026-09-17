@@ -5,9 +5,11 @@
 > 12 titles × 12 spooky moods × 12 garments, greets the player with it, asks
 > them to say another name or type `call me {name}`, prefills `call me `, and
 > continues into the first room without waiting. AI/name guidance is plain
-> descriptive prose. Any single response such as Dave replaces the generated
-> middle token (Professor Dave McPoopypants), creating a frame if needed; a
-> multiword response replaces the whole name. Authored `{{player_name}}` tokens are
+> descriptive prose. CALL ME and MY NAME IS are synonyms: one supplied word
+> replaces the generated first-name token for the joke, while two replace first
+> and last. It then says “…just kidding, I'll call you {name} from now on” and
+> stores only the supplied name. Bare, SAY, CALL ME, and MY NAME IS forms all
+> use the joke. Authored `{{player_name}}` tokens are
 > resolved through one output renderer. In BM1, put all thirteen heirlooms in
 > the RELIQUARY, CLOSE it, OPEN the BELL CLOSET beside the front door, and PULL
 > its lower rope. The remote belfry bell tolls, magical light consumes the

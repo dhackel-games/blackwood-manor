@@ -3183,7 +3183,8 @@ const logicWorld = {
       "No name? Fine. We will call you {{player_name}}. Change it anytime with CALL ME FOO.\n\n" +
       "The last daylight is draining from the sky.",
     playerNameChanged: "Done. We will call you {{player_name}}.",
-    singlePlayerNameChanged: "Okay! I'll call you {{player_name}}.",
+    shortPlayerNameJoke:
+      "Okay! I'll call you {{funny_name}}... just kidding, I'll call you {{player_name}} from now on.",
     requiredFamilyItemCount: REQUIRED_FAMILY_ITEM_COUNT,
     equipmentSlots: ["head", "forehead", "eyes", "feet", "finger", "wrist", "neck", "back"],
   },

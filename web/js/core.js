@@ -107,6 +107,7 @@ export function createGame(world) {
   const game = { world, state };
   game.templateValues = () => ({
     player_name: state.flags.playerName || "",
+    funny_name: state.flags.funnyPlayerName || "",
     ...(typeof world.templateValues === "function" ? world.templateValues(game) : {}),
   });
   game.showMessage = (message) => renderMessage(message, game.templateValues());
@@ -120,24 +121,27 @@ export function createGame(world) {
     state.flags.awaitingPlayerName = true;
     return state.flags.playerName;
   };
-  function changePlayerName(name) {
-    const singleName = !/\s/.test(name);
+  function changePlayerName(name, { joke = false } = {}) {
+    const words = name.split(/\s+/).map(
+      (word) => `${word.charAt(0).toUpperCase()}${word.slice(1)}`);
+    const actualName = words.join(" ");
     let generated = state.flags.generatedPlayerNameParts;
-    if (singleName && (!Array.isArray(generated) || generated.length !== 3)) {
+    const canJoke = joke && words.length >= 1 && words.length <= 2;
+    if (canJoke && (!Array.isArray(generated) || generated.length !== 3)) {
       const fallback = cfg.defaultPlayerNameParts
         ? composeDefaultPlayerName(cfg.defaultPlayerNameParts)
         : (cfg.defaultPlayerName || "Professor Spooky McPoopypants");
       generated = fallback.split(" ");
       state.flags.generatedPlayerNameParts = generated;
     }
-    const inserted = singleName && Array.isArray(generated) && generated.length === 3;
-    const chosen = inserted
-      ? `${generated[0]} ${name.charAt(0).toUpperCase()}${name.slice(1)} ${generated[2]}`
-      : name;
-    state.flags.playerName = chosen;
+    const funnyName = canJoke && Array.isArray(generated) && generated.length === 3
+      ? `${generated[0]} ${words[0]} ${words[1] || generated[2]}`
+      : null;
+    state.flags.playerName = actualName;
+    state.flags.funnyPlayerName = funnyName;
     state.flags.playerNameDefaulted = false;
     state.flags.awaitingPlayerName = false;
-    return inserted;
+    return funnyName;
   }
   let pending = null;    // one-shot message queued by tick (fuel/darkness)
   let grueKill = false;  // set when a second dark action occurs
@@ -819,14 +823,17 @@ export function createGame(world) {
         : game.describeRoom(true);
       return game.showMessage(`${accepted}\n\n${firstRoom}`);
     }
-    if (/^call\s+me\b/i.test(String(input || "").trim())) {
+    if (/^(?:call\s+me|my\s+name\s+is)\b/i.test(String(input || "").trim())) {
       const name = parsePlayerNameInput(input);
       if (!name) return 'CALL ME needs a name, for example: CALL ME FOO.';
-      const inserted = changePlayerName(name);
-      return game.showMessage(
-        inserted
-          ? (cfg.singlePlayerNameChanged || "Okay! I'll call you {{player_name}}.")
+      const funnyName = changePlayerName(name, { joke: true });
+      const response = game.showMessage(
+        funnyName
+          ? (cfg.shortPlayerNameJoke ||
+            "Okay! I'll call you {{funny_name}}... just kidding, I'll call you {{player_name}} from now on.")
           : (cfg.playerNameChanged || "Done. We will call you {{player_name}}."));
+      delete state.flags.funnyPlayerName;
+      return response;
     }
     if (state.flags.awaitingPlayerName) {
       const raw = String(input || "").trim();
@@ -834,11 +841,14 @@ export function createGame(world) {
       const parsed = parse(raw);
       const name = parsePlayerNameInput(raw);
       if (name && (explicitName || parsed.error === "unknown-verb")) {
-        const inserted = changePlayerName(name);
-        return game.showMessage(
-          inserted
-            ? (cfg.singlePlayerNameChanged || "Okay! I'll call you {{player_name}}.")
+        const funnyName = changePlayerName(name, { joke: true });
+        const response = game.showMessage(
+          funnyName
+            ? (cfg.shortPlayerNameJoke ||
+              "Okay! I'll call you {{funny_name}}... just kidding, I'll call you {{player_name}} from now on.")
             : (cfg.playerNameChanged || "Done. We will call you {{player_name}}."));
+        delete state.flags.funnyPlayerName;
+        return response;
       }
       state.flags.awaitingPlayerName = false;
     }
