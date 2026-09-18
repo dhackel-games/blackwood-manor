@@ -82,8 +82,8 @@
     display:flex; align-items:center; justify-content:center; }
   .recess.filled { border-color:#c9a24b; background:#241d10;
     box-shadow:inset 0 0 6px rgba(201,162,75,.4); }
-  .recess.carried { border-color:#3a5a44; background:#14231a; }
-  .recess .ghost { opacity:.18; filter:grayscale(1); font-size:15px; line-height:1; }
+  /* Not yet enshrined: show the same art, faint. Enshrined slots stay full color. */
+  .recess.pending .ic { opacity:.22; filter:grayscale(1); }
   .ic { position:relative; display:inline-flex; width:22px; height:22px; line-height:1;
     align-items:center; justify-content:center; font-size:16px; }
   .ic img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
@@ -405,15 +405,15 @@
       const where = game.roomOf(id);
       const cell = document.createElement("div");
       cell.className = "recess";
+      // Same heirloom art in every recess: faint until enshrined, full color once
+      // placed (it visually moves out of CARRYING and into the reliquary).
+      cell.appendChild(heirloomIcon(id, emoji, label));
       if (where === "reliquary") {
         cell.classList.add("filled");
-        cell.appendChild(heirloomIcon(id, emoji, label));
         placed++;
       } else {
-        if (where === "inventory") { cell.classList.add("carried"); carried.push([id, emoji, label]); }
-        const ghost = document.createElement("span");
-        ghost.className = "ghost"; ghost.textContent = emoji; ghost.title = label;
-        cell.appendChild(ghost);
+        cell.classList.add("pending");
+        if (where === "inventory") carried.push([id, emoji, label]);
       }
       reliqGrid.appendChild(cell);
     }

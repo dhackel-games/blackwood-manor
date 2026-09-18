@@ -1,12 +1,12 @@
 {
   "APP_VERSION": "2026.9.17",
-  "BUILD": "2",
+  "BUILD": "3",
   "NATIVE_APP_VERSION": "2026.9.11",
   "NATIVE_APP_BUILD": "107",
   "CONTENT_DATE": "2026.9.17",
-  "CONTENT_BUILD": "2",
+  "CONTENT_BUILD": "3",
   "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
-  "CONTENT_VERSION": 20260917002,
+  "CONTENT_VERSION": 20260917003,
   "LATEST_APP_BUILD_AVAILABLE": 20260911107,
   "CONTENT_FILES": [
     "css/style.css",
