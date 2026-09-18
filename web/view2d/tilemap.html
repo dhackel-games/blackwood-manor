@@ -120,52 +120,54 @@
   .howto-btn { border-color:#49ff7a; color:#49ff7a; font-weight:700; }
   .howto-overlay { position:fixed; inset:0; z-index:50; display:none;
     background:rgba(3,5,8,.82); backdrop-filter:blur(3px);
-    align-items:flex-start; justify-content:center; overflow:auto; padding:24px 16px; }
+    align-items:center; justify-content:center; padding:14px; }
   .howto-overlay.open { display:flex; }
-  .howto-card { width:min(920px,100%); background:linear-gradient(180deg,#0c1016,#080b10);
-    border:1px solid #26404f; border-radius:14px; box-shadow:0 20px 60px #000a;
-    padding:0 0 28px; position:relative; }
-  .howto-close { position:absolute; top:12px; right:12px; z-index:2;
-    width:34px; height:34px; border-radius:8px; font-size:18px; line-height:1;
+  .howto-card { width:min(900px,100%); max-height:calc(100dvh - 28px); overflow:auto;
+    background:linear-gradient(180deg,#0c1016,#080b10);
+    border:1px solid #26404f; border-radius:12px; box-shadow:0 20px 60px #000a;
+    padding:0 0 16px; position:relative; }
+  .howto-close { position:absolute; top:10px; right:10px; z-index:2;
+    width:30px; height:30px; border-radius:8px; font-size:17px; line-height:1;
     background:#0c1016cc; border:1px solid var(--line); color:var(--ink); cursor:pointer; }
-  .howto-hero { position:relative; border-radius:14px 14px 0 0; overflow:hidden;
+  .howto-hero { position:relative; border-radius:12px 12px 0 0; overflow:hidden;
     border-bottom:1px solid #1c2733; }
-  .howto-hero img { display:block; width:100%; height:220px; object-fit:cover;
-    object-position:center 40%; }
-  .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; padding:18px 22px 14px;
+  .howto-hero img { display:block; width:100%; height:118px; object-fit:cover;
+    object-position:center 38%; }
+  .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; padding:10px 18px 8px;
     background:linear-gradient(180deg,transparent,#05070aee); }
-  .howto-hero h2 { margin:0; font-size:26px; letter-spacing:2px; color:#f2e6c8; }
-  .howto-hero p { margin:4px 0 0; font-size:13px; color:#c9a24b; letter-spacing:.5px; }
-  .howto-body { padding:20px 22px 0; }
-  .howto-body h3 { margin:22px 0 8px; font-size:13px; letter-spacing:1px; color:#8fd3ff;
+  .howto-hero h2 { margin:0; font-size:21px; letter-spacing:2px; color:#f2e6c8; }
+  .howto-hero p { margin:2px 0 0; font-size:12px; color:#c9a24b; letter-spacing:.5px; }
+  .howto-body { padding:12px 18px 0; }
+  .howto-body h3 { margin:14px 0 5px; font-size:12px; letter-spacing:1px; color:#8fd3ff;
     text-transform:uppercase; }
-  .howto-body p { margin:0 0 8px; font-size:13px; line-height:1.6; color:var(--ink); }
-  .howto-goal { display:flex; gap:14px; align-items:flex-start; margin-top:16px;
-    padding:14px 16px; background:#0f1620; border:1px solid #1c2733; border-radius:10px; }
-  .howto-goal .g-ic { flex:0 0 auto; width:56px; height:56px; }
+  .howto-body > p { margin:0 0 6px; font-size:12.5px; line-height:1.4; color:var(--ink); }
+  .howto-goal { display:flex; gap:12px; align-items:center; margin-top:10px;
+    padding:9px 12px; background:#0f1620; border:1px solid #1c2733; border-radius:10px; }
+  .howto-goal .g-ic { flex:0 0 auto; width:42px; height:42px; }
   .howto-goal .g-ic img { width:100%; height:100%; object-fit:contain; }
-  .howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .howto-goal p { margin:0; font-size:12px; line-height:1.4; }
+  .howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (max-width:640px){ .howto-modes { grid-template-columns:1fr; } }
-  .howto-mode { padding:14px 16px; background:#0f1620; border:1px solid #1c2733;
+  .howto-mode { padding:9px 12px; background:#0f1620; border:1px solid #1c2733;
     border-radius:10px; }
-  .howto-mode h4 { margin:0 0 6px; font-size:13px; color:#49ff7a; letter-spacing:.5px; }
-  .howto-mode p { font-size:12px; color:var(--dim); line-height:1.55; margin:0; }
+  .howto-mode h4 { margin:0 0 3px; font-size:12.5px; color:#49ff7a; letter-spacing:.5px; }
+  .howto-mode p { font-size:11.5px; color:var(--dim); line-height:1.4; margin:0; }
   .howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
-    padding:1px 5px; font-size:11px; color:#8fd3ff; }
-  .howto-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
-    gap:12px; margin-top:6px; }
-  .howto-item { text-align:center; padding:12px 6px 10px; background:#0f1620;
+    padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
+  .howto-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(88px,1fr));
+    gap:7px; margin-top:4px; }
+  .howto-item { text-align:center; padding:7px 4px 5px; background:#0f1620;
+    border:1px solid #1c2733; border-radius:8px; }
+  .howto-item img { width:46px; height:46px; object-fit:contain; }
+  .howto-item .nm { display:block; margin-top:3px; font-size:9.5px; color:var(--dim);
+    letter-spacing:.2px; text-transform:capitalize; line-height:1.2; }
+  .howto-reliquary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
+  .howto-shrine { text-align:center; padding:9px; background:#0f1620;
     border:1px solid #1c2733; border-radius:10px; }
-  .howto-item img { width:64px; height:64px; object-fit:contain; }
-  .howto-item .nm { display:block; margin-top:6px; font-size:11px; color:var(--dim);
-    letter-spacing:.3px; text-transform:capitalize; }
-  .howto-reliquary { display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; }
-  .howto-shrine { flex:1 1 200px; text-align:center; padding:14px; background:#0f1620;
-    border:1px solid #1c2733; border-radius:10px; }
-  .howto-shrine img { width:110px; height:110px; object-fit:contain; }
+  .howto-shrine img { width:66px; height:66px; object-fit:contain; }
   .howto-shrine.reward { border-color:#c9a24b; box-shadow:inset 0 0 12px rgba(201,162,75,.25); }
-  .howto-shrine .nm { display:block; margin-top:8px; font-size:12px; color:var(--ink); }
-  .howto-shrine .sub { display:block; font-size:11px; color:var(--dim); margin-top:2px; }
+  .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:var(--ink); }
+  .howto-shrine .sub { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
 </style>
 </head>
 <body>
