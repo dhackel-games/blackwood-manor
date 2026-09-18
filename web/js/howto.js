@@ -236,17 +236,22 @@ export function initHowto(opts = {}) {
   });
 
   // --- header button in the Text|2D switch ---
-  const modeSwitch = document.querySelector(modeSwitchSel);
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.id = "howtoBtn";
-  btn.className = "mode-seg howto-seg";
-  btn.title = "How to play";
-  btn.setAttribute("aria-label", "How to play");
-  btn.textContent = "\uD83D\uDCD6";
+  // Prefer a static button already in the markup (robust against timing); only
+  // create one as a fallback.
+  let btn = document.getElementById("howtoBtn");
+  if (!btn) {
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "howtoBtn";
+    btn.className = "mode-seg howto-seg";
+    btn.title = "How to play";
+    btn.setAttribute("aria-label", "How to play");
+    btn.textContent = "\uD83D\uDCD6";
+    const modeSwitch = document.querySelector(modeSwitchSel);
+    if (modeSwitch) modeSwitch.insertBefore(btn, modeSwitch.firstChild);
+    else document.body.appendChild(btn);
+  }
   btn.addEventListener("click", open);
-  if (modeSwitch) modeSwitch.insertBefore(btn, modeSwitch.firstChild);
-  else document.body.appendChild(btn);
 
   // First-time visitors get the tutorial automatically.
   if (autoOpen) {
