@@ -118,56 +118,112 @@
 
   /* --- How-to-play / onboarding overlay ---------------------------------- */
   .howto-btn { border-color:#49ff7a; color:#49ff7a; font-weight:700; }
+  .howto-btn:hover { background:rgba(73,255,122,.12); box-shadow:0 0 12px rgba(73,255,122,.35); }
   .howto-overlay { position:fixed; inset:0; z-index:50; display:none;
-    background:rgba(3,5,8,.82); backdrop-filter:blur(3px);
+    background:radial-gradient(120% 90% at 50% 0%, rgba(20,10,40,.72), rgba(3,5,8,.9));
+    backdrop-filter:blur(3px);
     align-items:center; justify-content:center; padding:14px; }
-  .howto-overlay.open { display:flex; }
+  .howto-overlay.open { display:flex; animation:howtoFade .28s ease; }
   .howto-card { width:min(900px,100%); max-height:calc(100dvh - 28px); overflow:auto;
     background:linear-gradient(180deg,#0c1016,#080b10);
-    border:1px solid #26404f; border-radius:12px; box-shadow:0 20px 60px #000a;
-    padding:0 0 16px; position:relative; }
+    border:1px solid #2f4a63; border-radius:12px;
+    box-shadow:0 24px 70px #000c, 0 0 0 1px rgba(143,211,255,.06) inset;
+    padding:0 0 16px; position:relative;
+    animation:howtoRise .4s cubic-bezier(.2,.8,.2,1); }
   .howto-close { position:absolute; top:10px; right:10px; z-index:2;
     width:30px; height:30px; border-radius:8px; font-size:17px; line-height:1;
     background:#0c1016cc; border:1px solid var(--line); color:var(--ink); cursor:pointer; }
+  .howto-close:hover { border-color:#c9556a; color:#ff9db0; }
   .howto-hero { position:relative; border-radius:12px 12px 0 0; overflow:hidden;
     border-bottom:1px solid #1c2733; }
-  .howto-hero img { display:block; width:100%; height:118px; object-fit:cover;
-    object-position:center 38%; }
-  .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; padding:10px 18px 8px;
-    background:linear-gradient(180deg,transparent,#05070aee); }
-  .howto-hero h2 { margin:0; font-size:21px; letter-spacing:2px; color:#f2e6c8; }
-  .howto-hero p { margin:2px 0 0; font-size:12px; color:#c9a24b; letter-spacing:.5px; }
+  .howto-hero img { display:block; width:100%; height:132px; object-fit:cover;
+    object-position:center 34%; }
+  /* moonlight bloom + bottom fade so the title sits on darkness */
+  .howto-hero::after { content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(60% 120% at 72% 8%, rgba(255,244,200,.28), transparent 55%),
+      linear-gradient(180deg, transparent 45%, #05070a 100%); }
+  .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; z-index:1;
+    padding:12px 20px 10px; }
+  .howto-hero h2 { margin:0; font-size:25px; letter-spacing:3px; color:#f6eccf;
+    text-shadow:0 0 18px rgba(255,224,150,.45), 0 2px 4px #000; }
+  .howto-hero p { margin:3px 0 0; font-size:12.5px; color:#e2b658; letter-spacing:.6px;
+    font-style:italic; text-shadow:0 1px 3px #000; }
   .howto-body { padding:12px 18px 0; }
-  .howto-body h3 { margin:14px 0 5px; font-size:12px; letter-spacing:1px; color:#8fd3ff;
+  .howto-body h3 { margin:15px 0 6px; font-size:12px; letter-spacing:1.5px; color:#8fd3ff;
     text-transform:uppercase; }
-  .howto-body > p { margin:0 0 6px; font-size:12.5px; line-height:1.4; color:var(--ink); }
+  .howto-body > p { margin:0 0 6px; font-size:12.5px; line-height:1.45; color:var(--ink); }
+  .howto-body i { color:#e6a3b4; font-style:italic; }
   .howto-goal { display:flex; gap:12px; align-items:center; margin-top:10px;
-    padding:9px 12px; background:#0f1620; border:1px solid #1c2733; border-radius:10px; }
-  .howto-goal .g-ic { flex:0 0 auto; width:42px; height:42px; }
+    padding:10px 13px; border-radius:10px;
+    background:linear-gradient(180deg,#14110a,#0f1620);
+    border:1px solid #3a2f18; box-shadow:inset 0 0 18px rgba(201,162,75,.12); }
+  .howto-goal .g-ic { flex:0 0 auto; width:46px; height:46px;
+    filter:drop-shadow(0 0 8px rgba(201,162,75,.5)); }
   .howto-goal .g-ic img { width:100%; height:100%; object-fit:contain; }
-  .howto-goal p { margin:0; font-size:12px; line-height:1.4; }
+  .howto-goal p { margin:0; font-size:12px; line-height:1.45; }
   .howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (max-width:640px){ .howto-modes { grid-template-columns:1fr; } }
-  .howto-mode { padding:9px 12px; background:#0f1620; border:1px solid #1c2733;
-    border-radius:10px; }
+  .howto-mode { padding:10px 13px; background:#0f1620; border:1px solid #1c2733;
+    border-radius:10px; transition:border-color .15s, box-shadow .15s; }
+  .howto-mode:hover { border-color:#2f4a63; box-shadow:0 0 14px rgba(143,211,255,.12); }
   .howto-mode h4 { margin:0 0 3px; font-size:12.5px; color:#49ff7a; letter-spacing:.5px; }
-  .howto-mode p { font-size:11.5px; color:var(--dim); line-height:1.4; margin:0; }
+  .howto-mode p { font-size:11.5px; color:var(--dim); line-height:1.45; margin:0; }
   .howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
     padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
   .howto-gallery { display:flex; flex-wrap:wrap; justify-content:center;
     gap:8px; margin-top:4px; }
-  .howto-item { flex:0 0 108px; text-align:center; padding:8px 4px 6px; background:#0f1620;
-    border:1px solid #1c2733; border-radius:8px; }
-  .howto-item img { width:52px; height:52px; object-fit:contain; }
+  .howto-item { flex:0 0 108px; text-align:center; padding:8px 4px 6px;
+    background:linear-gradient(180deg,#111925,#0d141d);
+    border:1px solid #1c2733; border-radius:8px;
+    transition:transform .16s ease, border-color .16s, box-shadow .16s;
+    opacity:0; animation:howtoPop .4s ease forwards; }
+  .howto-item:hover { transform:translateY(-4px) scale(1.04);
+    border-color:#c9a24b; box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.35); }
+  .howto-item img { width:54px; height:54px; object-fit:contain;
+    transition:filter .16s; }
+  .howto-item:hover img { filter:drop-shadow(0 0 8px rgba(201,162,75,.55)); }
   .howto-item .nm { display:block; margin-top:4px; font-size:10px; color:var(--dim);
     letter-spacing:.2px; text-transform:capitalize; line-height:1.2; }
+  .howto-item:hover .nm { color:#e9d9a8; }
   .howto-reliquary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
-  .howto-shrine { text-align:center; padding:9px; background:#0f1620;
-    border:1px solid #1c2733; border-radius:10px; }
-  .howto-shrine img { width:66px; height:66px; object-fit:contain; }
-  .howto-shrine.reward { border-color:#c9a24b; box-shadow:inset 0 0 12px rgba(201,162,75,.25); }
+  .howto-shrine { text-align:center; padding:10px; background:#0f1620;
+    border:1px solid #1c2733; border-radius:10px; transition:transform .16s; }
+  .howto-shrine:hover { transform:translateY(-3px); }
+  .howto-shrine img { width:70px; height:70px; object-fit:contain; }
+  .howto-shrine.reward { border-color:#c9a24b;
+    background:linear-gradient(180deg,#151009,#0f1620);
+    animation:rewardGlow 2.4s ease-in-out infinite; }
+  .howto-shrine.reward img { filter:drop-shadow(0 0 10px rgba(201,162,75,.55)); }
   .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:var(--ink); }
   .howto-shrine .sub { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
+  .howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
+    margin-top:18px; }
+  .howto-cta .cta-primary { font-size:15px; font-weight:700; letter-spacing:1px;
+    padding:11px 26px; border-radius:10px; color:#04120a; cursor:pointer;
+    background:linear-gradient(180deg,#6bffa0,#22c55e); border:1px solid #7dffb0;
+    box-shadow:0 6px 20px rgba(34,197,94,.4), 0 0 0 3px rgba(73,255,122,.12);
+    animation:ctaPulse 2s ease-in-out infinite; }
+  .howto-cta .cta-primary:hover { transform:translateY(-1px);
+    box-shadow:0 10px 28px rgba(34,197,94,.55), 0 0 0 4px rgba(73,255,122,.18); }
+  .howto-cta .cta-ghost { font-size:13px; padding:11px 18px; border-radius:10px;
+    color:#8fd3ff; background:transparent; border:1px solid #2f4a63; cursor:pointer; }
+  .howto-cta .cta-ghost:hover { background:rgba(143,211,255,.1); color:#c9f5ff; }
+
+  @keyframes howtoFade { from { opacity:0; } to { opacity:1; } }
+  @keyframes howtoRise { from { opacity:0; transform:translateY(18px) scale(.98); }
+    to { opacity:1; transform:none; } }
+  @keyframes howtoPop { from { opacity:0; transform:translateY(8px) scale(.96); }
+    to { opacity:1; transform:none; } }
+  @keyframes rewardGlow {
+    0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
+    50% { box-shadow:inset 0 0 18px rgba(201,162,75,.4), 0 0 22px rgba(201,162,75,.4); } }
+  @keyframes ctaPulse {
+    0%,100% { box-shadow:0 6px 20px rgba(34,197,94,.4), 0 0 0 3px rgba(73,255,122,.1); }
+    50% { box-shadow:0 6px 26px rgba(34,197,94,.6), 0 0 0 5px rgba(73,255,122,.2); } }
+  @media (prefers-reduced-motion: reduce) {
+    .howto-overlay.open, .howto-card, .howto-item { animation:none; opacity:1; }
+    .howto-shrine.reward, .howto-cta .cta-primary { animation:none; }
+  }
 </style>
 </head>
 <body>
@@ -278,20 +334,21 @@
       <img src="icons/manor.png" alt="Blackwood Manor at night" />
       <div class="cap">
         <h2>BLACKWOOD MANOR</h2>
-        <p>Chapter 2 — Walk the manor as Gary</p>
+        <p>Thirteen heirlooms. One cursed clock. One restless ghost.</p>
       </div>
     </div>
     <div class="howto-body">
-      <p>You are <b>Gary</b>, a ghost bound to the manor you once explored in life.
-      Thirteen <b>Blackwood heirlooms</b> lie scattered through its rooms. Find each
-      one, carry it home, and enshrine it in the <b>Reliquary</b>.</p>
+      <p>You are <b>Gary</b> — dead, but not gone. Bound to the manor you once
+      explored in life, you drift its fog-drowned halls where <b>thirteen lost
+      Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
+      Make the house whole again… before it makes <i>you</i> part of it.</p>
 
       <div class="howto-goal">
         <span class="g-ic"><img src="icons/clockTalisman.png" alt="Countdown clock" /></span>
         <div>
-          <p style="margin:0"><b>The goal:</b> gather all 13 and place them in the
-          Reliquary's thirteen recesses. Enshrine the final heirloom and they fuse
-          into the <b>Countdown Clock</b> — the manor's thirteenth hour.</p>
+          <p style="margin:0"><b>Your quest:</b> enshrine all thirteen relics in the
+          Reliquary's recesses. Set the last one in place and they fuse into the
+          <b>Countdown Clock</b> — and the manor tolls its <b>thirteenth hour</b>.</p>
         </div>
       </div>
 
@@ -299,22 +356,22 @@
       <div class="howto-modes">
         <div class="howto-mode">
           <h4>📜 Text mode</h4>
-          <p>Classic adventure. <b>Type commands</b> — "go library", "take locket",
-          "look", "drop bait" — or tap the on-screen arrows. Read the room, decide
-          what Gary does. Switch here anytime with the <kbd>Text</kbd> tab.</p>
+          <p>Old-school adventure. <b>Type what Gary does</b> — "go library", "take
+          locket", "drop bait" — or tap the arrows. Read the room. Trust your gut.
+          Jump in anytime from the <kbd>Text</kbd> tab.</p>
         </div>
         <div class="howto-mode">
           <h4>🗺️ 2D map mode</h4>
-          <p>This view. The manor draws itself in 8-bit as you enter each room;
-          unexplored places stay fogged. <b>Click a connected room</b> to walk there,
-          use arrow keys / WASD, or press <kbd>▶ auto-tour</kbd> to sit back and watch
-          Gary drift through the whole house.</p>
+          <p>The manor paints itself in 8-bit as you step into each room; everywhere
+          you haven't been stays lost in fog. <b>Click a room to walk there</b>, use
+          arrow keys / WASD, or hit <kbd>▶ auto-tour</kbd> and watch Gary haunt the
+          whole house.</p>
         </div>
       </div>
 
       <h3>The thirteen heirlooms</h3>
-      <p>Collect these — they appear in your <b>Carrying</b> row, then move into the
-      Reliquary once enshrined.</p>
+      <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
+      into the Reliquary the moment they're enshrined.</p>
       <div class="howto-gallery" id="howtoGallery"></div>
 
       <h3>The Reliquary</h3>
@@ -327,13 +384,18 @@
         <div class="howto-shrine">
           <img src="icons/reliquary_open.png" alt="Reliquary, open" />
           <span class="nm">All 13 enshrined</span>
-          <span class="sub">The cabinet opens</span>
+          <span class="sub">The cabinet groans open</span>
         </div>
         <div class="howto-shrine reward">
           <img src="icons/clockTalisman.png" alt="Countdown clock" />
           <span class="nm">Countdown Clock</span>
           <span class="sub">The fused reward · one hand on XIII</span>
         </div>
+      </div>
+
+      <div class="howto-cta">
+        <button type="button" id="howtoPlay" class="cta-primary">▶ Enter the manor</button>
+        <button type="button" id="howtoTour" class="cta-ghost">🎬 Watch a tour</button>
       </div>
     </div>
   </div>
@@ -1321,11 +1383,15 @@
   const howtoBtn = document.getElementById("howtoBtn");
   const howtoClose = document.getElementById("howtoClose");
   const howtoGallery = document.getElementById("howtoGallery");
+  const howtoPlay = document.getElementById("howtoPlay");
+  const howtoTour = document.getElementById("howtoTour");
   const HOWTO_SEEN_KEY = "blackwood-howto-seen-v1";
   if (howtoGallery) {
+    let i = 0;
     for (const [id, , label] of HEIRLOOMS) {
       const item = document.createElement("div");
       item.className = "howto-item";
+      item.style.animationDelay = `${0.04 * i++}s`; // staggered reveal
       const img = document.createElement("img");
       img.src = `icons/heirlooms/${id}.png`;
       img.alt = label; img.loading = "lazy";
@@ -1342,6 +1408,14 @@
   }
   if (howtoBtn) howtoBtn.addEventListener("click", openHowto);
   if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+  if (howtoPlay) howtoPlay.addEventListener("click", () => {
+    closeHowto();
+    if (cmdInput) cmdInput.focus();
+  });
+  if (howtoTour) howtoTour.addEventListener("click", () => {
+    closeHowto();
+    startTour();
+  });
   if (howtoOverlay) {
     howtoOverlay.addEventListener("click", (e) => {
       if (e.target === howtoOverlay) closeHowto();
