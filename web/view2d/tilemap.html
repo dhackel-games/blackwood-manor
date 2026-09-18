@@ -113,6 +113,57 @@
   .legend span { display:inline-flex; align-items:center; gap:6px; }
   .sw { width:12px; height:12px; border:1px solid #0008; display:inline-block; }
   code { color:#8fd3ff; }
+
+  /* --- How-to-play / onboarding overlay ---------------------------------- */
+  .howto-btn { border-color:#49ff7a; color:#49ff7a; font-weight:700; }
+  .howto-overlay { position:fixed; inset:0; z-index:50; display:none;
+    background:rgba(3,5,8,.82); backdrop-filter:blur(3px);
+    align-items:flex-start; justify-content:center; overflow:auto; padding:24px 16px; }
+  .howto-overlay.open { display:flex; }
+  .howto-card { width:min(920px,100%); background:linear-gradient(180deg,#0c1016,#080b10);
+    border:1px solid #26404f; border-radius:14px; box-shadow:0 20px 60px #000a;
+    padding:0 0 28px; position:relative; }
+  .howto-close { position:absolute; top:12px; right:12px; z-index:2;
+    width:34px; height:34px; border-radius:8px; font-size:18px; line-height:1;
+    background:#0c1016cc; border:1px solid var(--line); color:var(--ink); cursor:pointer; }
+  .howto-hero { position:relative; border-radius:14px 14px 0 0; overflow:hidden;
+    border-bottom:1px solid #1c2733; }
+  .howto-hero img { display:block; width:100%; height:220px; object-fit:cover;
+    object-position:center 40%; }
+  .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; padding:18px 22px 14px;
+    background:linear-gradient(180deg,transparent,#05070aee); }
+  .howto-hero h2 { margin:0; font-size:26px; letter-spacing:2px; color:#f2e6c8; }
+  .howto-hero p { margin:4px 0 0; font-size:13px; color:#c9a24b; letter-spacing:.5px; }
+  .howto-body { padding:20px 22px 0; }
+  .howto-body h3 { margin:22px 0 8px; font-size:13px; letter-spacing:1px; color:#8fd3ff;
+    text-transform:uppercase; }
+  .howto-body p { margin:0 0 8px; font-size:13px; line-height:1.6; color:var(--ink); }
+  .howto-goal { display:flex; gap:14px; align-items:flex-start; margin-top:16px;
+    padding:14px 16px; background:#0f1620; border:1px solid #1c2733; border-radius:10px; }
+  .howto-goal .g-ic { flex:0 0 auto; width:56px; height:56px; }
+  .howto-goal .g-ic img { width:100%; height:100%; object-fit:contain; }
+  .howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:640px){ .howto-modes { grid-template-columns:1fr; } }
+  .howto-mode { padding:14px 16px; background:#0f1620; border:1px solid #1c2733;
+    border-radius:10px; }
+  .howto-mode h4 { margin:0 0 6px; font-size:13px; color:#49ff7a; letter-spacing:.5px; }
+  .howto-mode p { font-size:12px; color:var(--dim); line-height:1.55; margin:0; }
+  .howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
+    padding:1px 5px; font-size:11px; color:#8fd3ff; }
+  .howto-gallery { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:12px; margin-top:6px; }
+  .howto-item { text-align:center; padding:12px 6px 10px; background:#0f1620;
+    border:1px solid #1c2733; border-radius:10px; }
+  .howto-item img { width:64px; height:64px; object-fit:contain; }
+  .howto-item .nm { display:block; margin-top:6px; font-size:11px; color:var(--dim);
+    letter-spacing:.3px; text-transform:capitalize; }
+  .howto-reliquary { display:flex; flex-wrap:wrap; gap:14px; margin-top:6px; }
+  .howto-shrine { flex:1 1 200px; text-align:center; padding:14px; background:#0f1620;
+    border:1px solid #1c2733; border-radius:10px; }
+  .howto-shrine img { width:110px; height:110px; object-fit:contain; }
+  .howto-shrine.reward { border-color:#c9a24b; box-shadow:inset 0 0 12px rgba(201,162,75,.25); }
+  .howto-shrine .nm { display:block; margin-top:8px; font-size:12px; color:var(--ink); }
+  .howto-shrine .sub { display:block; font-size:11px; color:var(--dim); margin-top:2px; }
 </style>
 </head>
 <body>
@@ -138,6 +189,7 @@
 </header>
 
 <div class="bar">
+  <button id="howtoBtn" class="howto-btn" type="button">📖 How to play</button>
   <label>Jump to floor
     <select id="floor"></select>
   </label>
@@ -206,9 +258,82 @@
 <div class="textbar" id="textbar"></div>
 <form class="cmdbar" id="cmdForm" autocomplete="off">
   <span class="prompt">&gt;</span>
-  <input type="text" id="cmd" placeholder="type what Gary does — e.g. 'go library', 'n', 'drop bait', 'look', 'help'" />
+  <input type="text" id="cmd" name="gary-command"
+    autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+    enterkeyhint="send" data-1p-ignore data-lpignore="true" data-form-type="other"
+    placeholder="type what Gary does — e.g. 'go library', 'n', 'drop bait', 'look', 'help'" />
 </form>
 <div class="legend" id="legend"></div>
+
+<!-- Onboarding / how-to-play showcase. Auto-opens on first visit; reopen via the
+     "How to play" button. Shows the goal, both play modes, and all the art. -->
+<div class="howto-overlay" id="howtoOverlay" role="dialog" aria-modal="true" aria-label="How to play Blackwood Manor">
+  <div class="howto-card">
+    <button class="howto-close" id="howtoClose" type="button" aria-label="close">×</button>
+    <div class="howto-hero">
+      <img src="icons/manor.png" alt="Blackwood Manor at night" />
+      <div class="cap">
+        <h2>BLACKWOOD MANOR</h2>
+        <p>Chapter 2 — Walk the manor as Gary</p>
+      </div>
+    </div>
+    <div class="howto-body">
+      <p>You are <b>Gary</b>, a ghost bound to the manor you once explored in life.
+      Thirteen <b>Blackwood heirlooms</b> lie scattered through its rooms. Find each
+      one, carry it home, and enshrine it in the <b>Reliquary</b>.</p>
+
+      <div class="howto-goal">
+        <span class="g-ic"><img src="icons/clockTalisman.png" alt="Countdown clock" /></span>
+        <div>
+          <p style="margin:0"><b>The goal:</b> gather all 13 and place them in the
+          Reliquary's thirteen recesses. Enshrine the final heirloom and they fuse
+          into the <b>Countdown Clock</b> — the manor's thirteenth hour.</p>
+        </div>
+      </div>
+
+      <h3>Two ways to play</h3>
+      <div class="howto-modes">
+        <div class="howto-mode">
+          <h4>📜 Text mode</h4>
+          <p>Classic adventure. <b>Type commands</b> — "go library", "take locket",
+          "look", "drop bait" — or tap the on-screen arrows. Read the room, decide
+          what Gary does. Switch here anytime with the <kbd>Text</kbd> tab.</p>
+        </div>
+        <div class="howto-mode">
+          <h4>🗺️ 2D map mode</h4>
+          <p>This view. The manor draws itself in 8-bit as you enter each room;
+          unexplored places stay fogged. <b>Click a connected room</b> to walk there,
+          use arrow keys / WASD, or press <kbd>▶ auto-tour</kbd> to sit back and watch
+          Gary drift through the whole house.</p>
+        </div>
+      </div>
+
+      <h3>The thirteen heirlooms</h3>
+      <p>Collect these — they appear in your <b>Carrying</b> row, then move into the
+      Reliquary once enshrined.</p>
+      <div class="howto-gallery" id="howtoGallery"></div>
+
+      <h3>The Reliquary</h3>
+      <div class="howto-reliquary">
+        <div class="howto-shrine">
+          <img src="icons/reliquary.png" alt="Reliquary, closed" />
+          <span class="nm">Reliquary</span>
+          <span class="sub">Thirteen empty recesses await</span>
+        </div>
+        <div class="howto-shrine">
+          <img src="icons/reliquary_open.png" alt="Reliquary, open" />
+          <span class="nm">All 13 enshrined</span>
+          <span class="sub">The cabinet opens</span>
+        </div>
+        <div class="howto-shrine reward">
+          <img src="icons/clockTalisman.png" alt="Countdown clock" />
+          <span class="nm">Countdown Clock</span>
+          <span class="sub">The fused reward · one hand on XIII</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="module">
   import {
@@ -1086,6 +1211,12 @@
     ArrowLeft:[-1,0], KeyA:[-1,0], ArrowRight:[1,0], KeyD:[1,0],
   };
   window.addEventListener("keydown", (e) => {
+    // Tutorial overlay open: let Escape close it, swallow everything else so
+    // Gary doesn't wander behind the modal.
+    if (howtoOverlay && howtoOverlay.classList.contains("open")) {
+      if (e.key === "Escape") { e.preventDefault(); closeHowto(); }
+      return;
+    }
     const t = e.target;
     // Never hijack keys while a form control has focus (command bar, the Auto
     // speed menu, etc.) — otherwise opening a <select> would move Gary / stop
@@ -1178,6 +1309,42 @@
   });
 
   reset();
+
+  // --- How-to-play / onboarding overlay -----------------------------------
+  // Populate the heirloom gallery from the same HEIRLOOMS list the tray uses,
+  // wire open/close, and greet first-time visitors with the tutorial.
+  const howtoOverlay = document.getElementById("howtoOverlay");
+  const howtoBtn = document.getElementById("howtoBtn");
+  const howtoClose = document.getElementById("howtoClose");
+  const howtoGallery = document.getElementById("howtoGallery");
+  const HOWTO_SEEN_KEY = "blackwood-howto-seen-v1";
+  if (howtoGallery) {
+    for (const [id, , label] of HEIRLOOMS) {
+      const item = document.createElement("div");
+      item.className = "howto-item";
+      const img = document.createElement("img");
+      img.src = `icons/heirlooms/${id}.png`;
+      img.alt = label; img.loading = "lazy";
+      const nm = document.createElement("span");
+      nm.className = "nm"; nm.textContent = label;
+      item.append(img, nm);
+      howtoGallery.appendChild(item);
+    }
+  }
+  function openHowto() { if (howtoOverlay) howtoOverlay.classList.add("open"); }
+  function closeHowto() {
+    if (howtoOverlay) howtoOverlay.classList.remove("open");
+    try { localStorage.setItem(HOWTO_SEEN_KEY, "1"); } catch { /* private mode */ }
+  }
+  if (howtoBtn) howtoBtn.addEventListener("click", openHowto);
+  if (howtoClose) howtoClose.addEventListener("click", closeHowto);
+  if (howtoOverlay) {
+    howtoOverlay.addEventListener("click", (e) => {
+      if (e.target === howtoOverlay) closeHowto();
+    });
+  }
+  try { if (!localStorage.getItem(HOWTO_SEEN_KEY)) openHowto(); }
+  catch { /* private mode — just don't auto-open */ }
 
   // Auto-load the bundled NanoBanana atlas so real art shows by default. Re-center
   // on Gary once it lands, since the art arriving is the last thing that settles

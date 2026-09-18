@@ -1,12 +1,12 @@
 {
   "APP_VERSION": "2026.9.17",
-  "BUILD": "3",
+  "BUILD": "4",
   "NATIVE_APP_VERSION": "2026.9.11",
   "NATIVE_APP_BUILD": "107",
   "CONTENT_DATE": "2026.9.17",
-  "CONTENT_BUILD": "3",
+  "CONTENT_BUILD": "4",
   "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
-  "CONTENT_VERSION": 20260917003,
+  "CONTENT_VERSION": 20260917004,
   "LATEST_APP_BUILD_AVAILABLE": 20260911107,
   "CONTENT_FILES": [
     "css/style.css",
@@ -43,6 +43,7 @@
     "view2d/icons/heirlooms/rubyRing.png",
     "view2d/icons/heirlooms/spyglass.png",
     "view2d/icons/heirlooms/talisman.png",
+    "view2d/icons/manor.png",
     "view2d/icons/reliquary.png",
     "view2d/icons/reliquary_open.png",
     "view2d/roomdata.json",
