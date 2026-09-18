@@ -15,6 +15,8 @@
   header .mode-switch { float:right; margin-left:12px; display:inline-flex; align-items:stretch;
     font:700 11px/1 "Courier New", monospace; letter-spacing:1px;
     border:1px solid #2a3b2f; border-radius:7px; overflow:hidden; }
+  header .howto-btn { float:right; margin-left:10px; padding:5px 11px; border-radius:7px;
+    font:700 11px/1 "Courier New", monospace; letter-spacing:1px; }
   header .mode-switch .mode-seg { display:inline-flex; align-items:center; padding:5px 9px;
     color:#8fd3ff; text-decoration:none; }
   header .mode-switch .mode-seg + .mode-seg { border-left:1px solid #2a3b2f; }
@@ -172,6 +174,7 @@
     <a class="mode-seg" href="../index.html" title="Switch to the text game">Text</a>
     <span class="mode-seg is-active" aria-current="page">2D</span>
   </nav>
+  <button id="howtoBtn" class="howto-btn" type="button">📖 How to play</button>
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (2D map)</h1>
   <details>
     <summary>what is this?</summary>
@@ -189,7 +192,6 @@
 </header>
 
 <div class="bar">
-  <button id="howtoBtn" class="howto-btn" type="button">📖 How to play</button>
   <label>Jump to floor
     <select id="floor"></select>
   </label>
