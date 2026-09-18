@@ -4,8 +4,8 @@
    identical wherever it is mounted. */
 
 /* Book button injected into the Text|2D mode switch */
-#mode-switch .howto-seg { background:transparent; border:none; cursor:pointer;
-  color:#49ff7a; font:inherit; letter-spacing:0; padding:5px 8px; }
+#mode-switch .howto-seg { background:transparent; border:0; margin:0; cursor:pointer;
+  font:inherit; letter-spacing:inherit; color:#49ff7a; }
 #mode-switch .howto-seg:hover { background:rgba(73,255,122,.15); color:#7dffb0; }
 
 .howto-overlay { position:fixed; inset:0; z-index:70; display:none;
