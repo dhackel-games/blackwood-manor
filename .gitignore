@@ -17,3 +17,6 @@ mac/gary-daemon/.build/
 
 # generated at deploy/build time (Pages CI + copy-web.sh)
 web/manifest.json
+
+# python bytecode cache
+__pycache__/
