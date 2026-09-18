@@ -9,6 +9,7 @@ import { createHud, hudStateSummary } from "./hud.js?v=source";
 import { Native } from "./native.js?v=source";
 import * as garyBrain from "./gary-brain.js?v=source";
 import { MAP_MARK } from "./map.js?v=source";
+import { initHowto } from "./howto.js?v=source";
 import {
   bugReportBody,
   bugReportDescription,
@@ -1268,6 +1269,20 @@ if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 // The top-right 2D toggle is a plain link; snapshot the game into the handoff
 // slot before it navigates so the 2D view resumes exactly here.
 document.getElementById("to-2d")?.addEventListener("click", () => saveModeHandoff());
+
+// The How-to-play tutorial, shared with the 2D map so both modes match. The
+// mode cards let you hop to the 2D view (with the same state handoff), and the
+// tour button hands off to the 2D map with a flag that auto-starts its tour.
+initHowto({
+  iconBase: "view2d/icons/",
+  currentMode: "text",
+  onEnter: () => { try { input.focus(); } catch { /* ignore */ } },
+  onSwitch2d: () => document.getElementById("to-2d")?.click(),
+  onTour: () => {
+    try { localStorage.setItem("blackwood-autotour", "1"); } catch { /* private mode */ }
+    document.getElementById("to-2d")?.click();
+  },
+});
 
 // --- boot ---
 // If we just arrived from the 2D map view, restore that game (and its command

@@ -1541,8 +1541,21 @@
       if (loreActiveItem && !e.target.closest(".howto-item")) hideLore();
     });
   }
-  try { if (!localStorage.getItem(HOWTO_SEEN_KEY)) openHowto(); }
-  catch { /* private mode — just don't auto-open */ }
+  // Arriving from the text game's "Watch a tour" button: skip the tutorial and
+  // kick off the auto-tour once the view has settled.
+  let autoTourQueued = false;
+  try {
+    if (localStorage.getItem("blackwood-autotour") === "1") {
+      localStorage.removeItem("blackwood-autotour");
+      autoTourQueued = true;
+    }
+  } catch { /* private mode */ }
+  if (autoTourQueued) {
+    setTimeout(() => { try { startTour(); } catch { /* not ready */ } }, 600);
+  } else {
+    try { if (!localStorage.getItem(HOWTO_SEEN_KEY)) openHowto(); }
+    catch { /* private mode — just don't auto-open */ }
+  }
 
   // Auto-load the bundled NanoBanana atlas so real art shows by default. Re-center
   // on Gary once it lands, since the art arriving is the last thing that settles

@@ -1,0 +1,151 @@
+/* Shared "How to Play" onboarding overlay. Used by the text game (index.html);
+   mirrors the inline version on the 2D map (view2d/tilemap.html) so both modes
+   present the same tutorial. Colors are concrete (not page vars) so it looks
+   identical wherever it is mounted. */
+
+/* Book button injected into the Text|2D mode switch */
+#mode-switch .howto-seg { background:transparent; border:none; cursor:pointer;
+  color:#49ff7a; font:inherit; letter-spacing:0; padding:5px 8px; }
+#mode-switch .howto-seg:hover { background:rgba(73,255,122,.15); color:#7dffb0; }
+
+.howto-overlay { position:fixed; inset:0; z-index:70; display:none;
+  background:radial-gradient(120% 90% at 50% 0%, rgba(20,10,40,.72), rgba(3,5,8,.9));
+  backdrop-filter:blur(3px);
+  align-items:center; justify-content:center; padding:14px; }
+.howto-overlay.open { display:flex; animation:howtoFade .28s ease; }
+.howto-card { width:min(900px,100%); max-height:calc(100dvh - 28px); overflow:auto;
+  background:linear-gradient(180deg,#0c1016,#080b10);
+  border:1px solid #2f4a63; border-radius:12px;
+  box-shadow:0 24px 70px #000c, 0 0 0 1px rgba(143,211,255,.06) inset;
+  padding:0 0 16px; position:relative;
+  font-family:system-ui, -apple-system, "Segoe UI", sans-serif;
+  animation:howtoRise .4s cubic-bezier(.2,.8,.2,1); }
+.howto-close { position:absolute; top:10px; right:10px; z-index:2;
+  width:30px; height:30px; border-radius:8px; font-size:17px; line-height:1;
+  background:#0c1016cc; border:1px solid #1c2733; color:#c9f5d4; cursor:pointer; }
+.howto-close:hover { border-color:#c9556a; color:#ff9db0; }
+.howto-hero { position:relative; border-radius:12px 12px 0 0; overflow:hidden;
+  border-bottom:1px solid #1c2733; }
+.howto-hero img.bg { display:block; width:100%; height:132px; object-fit:cover;
+  object-position:center 40%; }
+.howto-hero .gary { position:absolute; right:12px; bottom:-2px; z-index:2;
+  width:96px; height:auto; pointer-events:none;
+  filter:drop-shadow(0 0 12px rgba(73,255,122,.45)) drop-shadow(0 6px 10px #000a);
+  animation:garyFloat 4.2s ease-in-out infinite; }
+.howto-hero::after { content:""; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(60% 120% at 72% 8%, rgba(255,244,200,.28), transparent 55%),
+    linear-gradient(180deg, transparent 45%, #05070a 100%); }
+.howto-hero .cap { position:absolute; left:0; right:0; bottom:0; z-index:1;
+  padding:12px 20px 10px; }
+.howto-hero h2 { margin:0; font-size:25px; letter-spacing:3px; color:#f6eccf;
+  text-shadow:0 0 18px rgba(255,224,150,.45), 0 2px 4px #000; }
+.howto-hero p { margin:3px 0 0; font-size:12.5px; color:#e2b658; letter-spacing:.6px;
+  font-style:italic; text-shadow:0 1px 3px #000; }
+.howto-body { padding:12px 18px 0; }
+.howto-body h3 { margin:15px 0 6px; font-size:12px; letter-spacing:1.5px; color:#8fd3ff;
+  text-transform:uppercase; }
+.howto-body > p { margin:0 0 6px; font-size:12.5px; line-height:1.45; color:#c9f5d4; }
+.howto-body i { color:#e6a3b4; font-style:italic; }
+.howto-goal { display:flex; gap:12px; align-items:center; margin-top:10px;
+  padding:10px 13px; border-radius:10px;
+  background:linear-gradient(180deg,#14110a,#0f1620);
+  border:1px solid #3a2f18; box-shadow:inset 0 0 18px rgba(201,162,75,.12); }
+.howto-goal .g-ic { flex:0 0 auto; width:46px; height:46px;
+  filter:drop-shadow(0 0 8px rgba(201,162,75,.5)); }
+.howto-goal .g-ic img { width:100%; height:100%; object-fit:contain; }
+.howto-goal p { margin:0; font-size:12px; line-height:1.45; color:#c9f5d4; }
+.howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+@media (max-width:640px){ .howto-modes { grid-template-columns:1fr; } }
+.howto-mode { padding:10px 13px; background:#0f1620; border:1px solid #1c2733;
+  border-radius:10px; transition:border-color .15s, box-shadow .15s, transform .15s;
+  cursor:pointer; }
+.howto-mode:hover { border-color:#49ff7a; transform:translateY(-2px);
+  box-shadow:0 8px 18px #000a, 0 0 16px rgba(73,255,122,.18); }
+.howto-mode:focus-visible { outline:2px solid #49ff7a; outline-offset:2px; }
+.howto-mode h4 { margin:0 0 3px; font-size:12.5px; color:#49ff7a; letter-spacing:.5px;
+  display:flex; align-items:center; justify-content:space-between; }
+.howto-mode h4 .go { font-size:11px; color:#8fd3ff; opacity:0; transition:opacity .15s; }
+.howto-mode:hover h4 .go { opacity:1; }
+.howto-mode p { font-size:11.5px; color:#7c9a86; line-height:1.45; margin:0; }
+.howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
+  padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
+.howto-gallery { display:flex; flex-wrap:wrap; justify-content:center;
+  gap:8px; margin-top:4px; }
+.howto-item { flex:0 0 108px; text-align:center; padding:8px 4px 6px;
+  background:linear-gradient(180deg,#111925,#0d141d);
+  border:1px solid #1c2733; border-radius:8px; cursor:pointer;
+  transition:transform .16s ease, border-color .16s, box-shadow .16s;
+  opacity:0; animation:howtoPop .4s ease forwards; }
+.howto-item:focus-visible { outline:2px solid #c9a24b; outline-offset:2px; }
+.howto-item.active { border-color:#c9a24b;
+  box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.45); }
+.howto-item:hover { transform:translateY(-4px) scale(1.04);
+  border-color:#c9a24b; box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.35); }
+.howto-item img { width:54px; height:54px; object-fit:contain;
+  transition:filter .16s; }
+.howto-item:hover img { filter:drop-shadow(0 0 8px rgba(201,162,75,.55)); }
+.howto-item .nm { display:block; margin-top:4px; font-size:10px; color:#7c9a86;
+  letter-spacing:.2px; text-transform:capitalize; line-height:1.2; }
+.howto-item:hover .nm { color:#e9d9a8; }
+/* floating heirloom backstory popover */
+.lore-pop { position:fixed; z-index:80; width:250px; max-width:calc(100vw - 24px);
+  background:linear-gradient(180deg,#141b26,#0c1219);
+  border:1px solid #c9a24b66; border-radius:12px; padding:12px 13px 13px;
+  box-shadow:0 18px 50px #000c, 0 0 0 1px #0006 inset;
+  color:#c9f5d4; opacity:0; transform:translateY(6px) scale(.98);
+  font-family:system-ui, -apple-system, "Segoe UI", sans-serif;
+  transition:opacity .16s ease, transform .16s ease; pointer-events:none; }
+.lore-pop.show { opacity:1; transform:none; pointer-events:auto; }
+.lore-pop .lp-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+.lore-pop .lp-head img { width:40px; height:40px; object-fit:contain;
+  filter:drop-shadow(0 0 6px rgba(201,162,75,.5)); }
+.lore-pop .lp-nm { font-size:12.5px; letter-spacing:.6px; color:#f0d99a;
+  text-transform:capitalize; font-weight:600; }
+.lore-pop .lp-body { font-size:11.5px; line-height:1.5; color:#c9d4de; margin:0; }
+.lore-pop .lp-x { position:absolute; top:6px; right:7px; width:20px; height:20px;
+  border:none; background:transparent; color:#7d8b98; font-size:15px; line-height:1;
+  cursor:pointer; border-radius:5px; }
+.lore-pop .lp-x:hover { color:#ff9db0; background:#0006; }
+.howto-reliquary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
+.howto-shrine { text-align:center; padding:10px; background:#0f1620;
+  border:1px solid #1c2733; border-radius:10px; transition:transform .16s; }
+.howto-shrine:hover { transform:translateY(-3px); }
+.howto-shrine img { width:70px; height:70px; object-fit:contain; }
+.howto-shrine.reward { border-color:#c9a24b;
+  background:linear-gradient(180deg,#151009,#0f1620);
+  animation:rewardGlow 2.4s ease-in-out infinite; }
+.howto-shrine.reward img { filter:drop-shadow(0 0 10px rgba(201,162,75,.55)); }
+.howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:#c9f5d4; }
+.howto-shrine .sub { display:block; font-size:10px; color:#7c9a86; margin-top:1px; }
+.howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
+  margin-top:18px; }
+.howto-cta .cta-primary { font-size:15px; font-weight:700; letter-spacing:1px;
+  padding:11px 26px; border-radius:10px; color:#04120a; cursor:pointer;
+  background:linear-gradient(180deg,#6bffa0,#22c55e); border:1px solid #7dffb0;
+  box-shadow:0 6px 20px rgba(34,197,94,.4), 0 0 0 3px rgba(73,255,122,.12);
+  animation:ctaPulse 2s ease-in-out infinite; }
+.howto-cta .cta-primary:hover { transform:translateY(-1px);
+  box-shadow:0 10px 28px rgba(34,197,94,.55), 0 0 0 4px rgba(73,255,122,.18); }
+.howto-cta .cta-ghost { font-size:13px; padding:11px 18px; border-radius:10px;
+  color:#8fd3ff; background:transparent; border:1px solid #2f4a63; cursor:pointer; }
+.howto-cta .cta-ghost:hover { background:rgba(143,211,255,.1); color:#c9f5ff; }
+
+@keyframes howtoFade { from { opacity:0; } to { opacity:1; } }
+@keyframes howtoRise { from { opacity:0; transform:translateY(18px) scale(.98); }
+  to { opacity:1; transform:none; } }
+@keyframes howtoPop { from { opacity:0; transform:translateY(8px) scale(.96); }
+  to { opacity:1; transform:none; } }
+@keyframes rewardGlow {
+  0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
+  50% { box-shadow:inset 0 0 18px rgba(201,162,75,.4), 0 0 22px rgba(201,162,75,.4); } }
+@keyframes ctaPulse {
+  0%,100% { box-shadow:0 6px 20px rgba(34,197,94,.4), 0 0 0 3px rgba(73,255,122,.1); }
+  50% { box-shadow:0 6px 26px rgba(34,197,94,.6), 0 0 0 5px rgba(73,255,122,.2); } }
+@keyframes garyFloat {
+  0%,100% { transform:translateY(0) rotate(-1deg); }
+  50% { transform:translateY(-7px) rotate(1deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .howto-overlay.open, .howto-card, .howto-item { animation:none; opacity:1; }
+  .howto-shrine.reward, .howto-cta .cta-primary { animation:none; }
+  .howto-hero .gary { animation:none; }
+}
