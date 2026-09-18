@@ -131,6 +131,40 @@ Feature: One-time rewards for meaningful progress
     And I send "south"
     Then the game score is 5
 
+  Scenario: Discovering mushroom vision and reusable power gear rewards each capability once
+    Given the player is in room "kitchen"
+    When I send "eat mushrooms"
+    Then the output contains "(+10)"
+    And the game score is 10
+    Given item "mushrooms" is carried
+    When I send "eat mushrooms"
+    Then the game score is 10
+    Given the player is in room "deepShaft"
+    When I send "take backpack"
+    Then the output contains "(+5)"
+    And the game score is 15
+    Given the player is in room "mineGallery"
+    When I send "take headlamp"
+    Then the output contains "(+5)"
+    And the game score is 20
+    Given the player is in room "dreadmawVault"
+    When I send "take winged shoes"
+    Then the output contains "(+5)"
+    And the game score is 25
+    Given the player is in room "hallBedroom"
+    When I send "open drawer"
+    And I send "take xray goggles"
+    Then the output contains "(+5)"
+    And the game score is 30
+
+  Scenario: Lowering the attic ladder rewards the solved access mechanism once
+    Given the player is in room "landing"
+    When I send "pull cord"
+    Then the output contains "(+5)"
+    And the game score is 5
+    When I send "pull cord"
+    Then the game score is 5
+
   Scenario: Sealing the collection and pulling the closet rope reward each step
     Given every treasure but the "ancestralPortrait" is already in the reliquary
     And the player is in room "grandHall"

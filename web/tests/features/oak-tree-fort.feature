@@ -16,9 +16,9 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "mirrors"
     And the output does not contain "RGB"
     When I send "examine panel"
-    Then the output contains "TOP SLOT: SAPPHIRE GEM"
+    Then the output contains "TOP SLOT: RUBY GEM"
     And the output contains "MIDDLE SLOT: EMPTY"
-    And the output contains "BOTTOM SLOT: RUBY GEM"
+    And the output contains "BOTTOM SLOT: SAPPHIRE GEM"
     And the output contains "holes bored in the tree"
     And the output does not contain "R G B"
     And the output does not contain "MECHANISM"
@@ -38,19 +38,19 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And I send "place emerald gem in middle slot"
     Then the output contains "EMERALD GEM"
     And the output contains "MIDDLE SLOT"
-    When I send "place ruby gem in bottom slot"
+    When I send "place ruby gem in top slot"
     Then the output contains "RUBY GEM"
-    And the output contains "BOTTOM SLOT"
-    When I send "place sapphire gem in top slot"
-    Then the output contains "SAPPHIRE GEM"
     And the output contains "TOP SLOT"
+    When I send "place sapphire gem in bottom slot"
+    Then the output contains "SAPPHIRE GEM"
+    And the output contains "BOTTOM SLOT"
     And flag "oakLightAligned" is set
     And the game score is 5
 
   Scenario: A complete wrong arrangement ejects every gem
-    When I send "take sapphire gem"
-    And I send "place sapphire in panel"
-    Then the output contains "SAPPHIRE GEM"
+    When I send "take ruby gem"
+    And I send "place ruby in panel"
+    Then the output contains "RUBY GEM"
     And the output contains "MIDDLE SLOT"
     And the output contains "fail to converge"
     When I send "place emerald in panel"
@@ -68,8 +68,8 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "BOTTOM SLOT: EMPTY"
 
   Scenario: An explicitly occupied slot identifies its gem
-    When I send "place emerald in bottom slot"
-    Then the output contains "BOTTOM SLOT already holds the RUBY GEM"
+    When I send "place emerald in top slot"
+    Then the output contains "TOP SLOT already holds the RUBY GEM"
     And item "emberStone" is carried
 
   Scenario: TAKE ALL removes both installed gems without corrupting their slots
@@ -80,10 +80,19 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the output contains "TOP SLOT: EMPTY"
     And the output contains "MIDDLE SLOT: EMPTY"
     And the output contains "BOTTOM SLOT: EMPTY"
-    When I send "put ruby gem in bottom slot"
+    When I send "put ruby gem in top slot"
     And I send "put emerald gem in middle slot"
-    And I send "put sapphire gem in top slot"
+    And I send "put sapphire gem in bottom slot"
     Then flag "oakLightAligned" is set
+
+  Scenario: PUT ALL does not bypass the ordered gem puzzle
+    When I send "take all"
+    And I send "put all in panel"
+    Then the output contains "Place each GEM in its named SLOT"
+    And item "emberStone" is carried
+    And item "greenGlassStone" is carried
+    And item "blueGlassStone" is carried
+    And flag "oakLightAligned" is unset
 
   Scenario: Boarding waits one turn before carrying the player to the fort
     When I send "place emerald in panel"

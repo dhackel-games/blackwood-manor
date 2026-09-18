@@ -32,8 +32,36 @@ Feature: Player name and message templates
     Then the output contains "Ada, you stand at the rusted iron FRONT GATE"
     Given the player is in room "hallBedroom"
     When I send "examine hall mirror"
-    Then the output contains "gives Ada back as a reflection"
+    Then the output contains "gives you back as a reflection"
     And the output does not contain "{{player_name}}"
+
+  Scenario: Descriptions use second-person grammar instead of treating the player name as a pronoun
+    Given a fresh unnamed manor game
+    When I send "Call me Ada"
+    Given the player is in room "porch"
+    When I send "look"
+    Then the output contains "under your weight"
+    And the output does not contain "Ada's weight"
+    Given the player is in room "grandHall"
+    When I send "look"
+    Then the output contains "your smallest movement"
+    Given the player is in room "parlor"
+    When I send "look"
+    Then the output contains "track you"
+    Given flag "__suSight" is set
+    And the player is in room "crypt"
+    When I send "look"
+    Then the output contains "at your breast"
+    Given the player is in room "nursery"
+    When I send "look"
+    Then the output contains "fixed on you"
+    Given the player is in room "attic"
+    When I send "look"
+    Then the output contains "eyes find you"
+    Given item "backwardsWatch" is carried
+    When I send "examine woodblack watch"
+    Then the output contains "beneath your reflection"
+    And the output does not contain "Ada's reflection"
 
   Scenario: Gary addresses the player by the authored name token
     Given a fresh unnamed manor game
@@ -66,7 +94,7 @@ Feature: Player name and message templates
     And the turn count is 0
     Given the player is in room "hallBedroom"
     When I send "examine hall mirror"
-    Then the output contains "gives Foo back as a reflection"
+    Then the output contains "gives you back as a reflection"
 
   Scenario Outline: A bare first response uses the generated-name joke
     Given a fresh unnamed manor game

@@ -941,7 +941,10 @@
       return;
     }
     const rd = ROOMDATA[id];
-    const desc = rd && rd.desc ? rd.desc : "(no description on record)";
+    const descTemplate = rd && rd.desc ? rd.desc : "(no description on record)";
+    const desc = game?.state.flags.playerName
+      ? game.showMessage(descTemplate)
+      : descTemplate.replaceAll("{{player_name}}", "Traveler");
     const items = roomItems(id);
     const tag = id === gary ? " · you are here" : (id === guest ? " · the guest" : "");
     let html = `<h2>${label}</h2><div class="sub">${id}${tag}</div>`;

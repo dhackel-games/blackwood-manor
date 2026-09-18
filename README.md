@@ -82,9 +82,13 @@ cd ios
 ```
 
 The release script runs `copy-web.sh` before generating the Xcode project, so the
-archive always contains the current canonical files from `web/`. It reads the
-date-only `YYYY.M.D` version from `web/package.json` and uses the checked-in build
-when it is newer than the published TestFlight build number, otherwise incrementing it.
+archive always contains the current canonical files from `web/`. A native release
+uses the current `YYYY.M.D` date. A genuinely new app date resets the build to `1`;
+later app releases that day advance beyond both uploaded app builds and OTA content
+builds. The script synchronizes `web/package.json`, `ios/project.yml`, native fields,
+content fields, compatibility aliases, and `CONTENT_VERSION` to that same app
+date/build. It refuses to rewind content identity if content-only releases already
+used a higher build on the proposed app date.
 Every web-content push intended for phones must first use
 `--stamp-only --force-next-build`, because the updater only downloads a strictly
 greater `CONTENT_VERSION`. This changes only `CONTENT_DATE`, `CONTENT_BUILD`, and

@@ -212,7 +212,7 @@ Then("item {string} is unlocked", function (item) {
 Then("room {string} contains exactly {string}", function (room, items) {
   assert.deepEqual(
     this.game.itemsIn(room).map((item) => item.id).sort(),
-    items.split(",").sort(),
+    items.split(",").filter(Boolean).sort(),
   );
 });
 
@@ -298,12 +298,12 @@ Then("HELP is one alphabetized command-per-line data block", function () {
   assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search \| Inspect \//);
   assert.match(HELP_TEXT,
     /\(n\)orth, \(s\)outh, \(e\)ast, \(w\)est, northeast \(ne\), northwest \(nw\), southeast \(se\), southwest \(sw\), \(u\)p, \(d\)own, in, out \| Directions \/ Go that direction\./);
-  assert.match(HELP_TEXT, /get\/\(t\)ake\/grab <thing>\/all \| Take \//);
+  assert.match(HELP_TEXT, /get\/\(t\)ake\/grab <thing>\/all \[from <container>\] \| Take \//);
   assert.match(HELP_TEXT, /\(g\)o <room> \| Go \//);
   assert.match(HELP_TEXT, /\(c\)lose\/shut <thing> \| Close \//);
   assert.match(HELP_TEXT, /lock\/\(lk\) <thing> with <key> \| Lock \//);
   assert.match(HELP_TEXT, /unlock\/\(un\) <thing> with <key> \| Unlock \//);
-  assert.match(HELP_TEXT, /put\/place <thing> in <container\/slot> \| Put \//);
+  assert.match(HELP_TEXT, /put\/place <thing>\/all in <container\/slot> \| Put \//);
   assert.match(HELP_TEXT, /say\/talk <words\/person> \| Speak \//);
   assert.match(HELP_TEXT, /\(u\)se\/wear\/don\/eat\/drink <thing> \| Use \//);
   assert.match(HELP_TEXT, /WITH may be shortened to w\//);
@@ -341,6 +341,7 @@ Then("browser startup includes a nonblocking name request", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const tilemap = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
   assert.match(ui,
     /function beginSession\([\s\S]*showIntroBanner\(\)[\s\S]*completeSessionIntro\(\)/s);
   // Intro invites a name (type it, or CALL ME) but never blocks the first room,
@@ -368,6 +369,8 @@ Then("browser startup includes a nonblocking name request", function () {
     /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)[\s\S]*showIntroBanner\(\)/s);
   assert.match(ui,
     /garyBrain\.detect\(\)[\s\S]*modelCheckReady = true;[\s\S]*completeSessionIntro\(\)/s);
+  assert.match(tilemap,
+    /const desc = game\?\.state\.flags\.playerName[\s\S]*game\.showMessage\(descTemplate\)/s);
 });
 
 Then("browser restart handling supports both game parts", function () {
@@ -957,7 +960,8 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
   assert.match(css,
-    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--action-controls-min-width:\s*17rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\) -[\s\S]*var\(--action-controls-min-width\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
+    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
+  assert.doesNotMatch(css, /--action-controls-min-width/);
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*display:\s*block/s);
   assert.match(css,
@@ -1133,7 +1137,7 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.match(script, /--latest-build/);
   assert.match(script, /--force-next-build/);
   assert.match(script, /RELEASE_DATE_OVERRIDE/);
-  assert.doesNotMatch(script, /pkg\.version = process\.argv\[2\]/);
+  assert.match(script, /pkg\.version = version/);
   assert.match(script, /versions\.CONTENT_DATE = process\.argv\[2\]/);
   assert.match(script, /versions\.CONTENT_BUILD = process\.argv\[3\]/);
   assert.match(script, /Legacy aliases keep already-installed native updaters compatible/);
@@ -1142,10 +1146,11 @@ Then("successful TestFlight releases publish verified app availability", functio
   assert.match(script, /--stamp-only\) UPLOAD=0; STAMP_ONLY=1/);
   assert.match(script,
     /if \[\[ "\$STAMP_ONLY" -eq 1 \]\]; then[\s\S]*app version\/build unchanged/s);
-  assert.match(script,
-    /if \(\( FORCE_NEXT_BUILD == 1 \)\); then[\s\S]*BASE_BUILD=\$\(\(CUR > LATEST_BUILD \? CUR : LATEST_BUILD\)\)[\s\S]*NEXT=\$\(\(BASE_BUILD \+ 1\)\)/s);
-  assert.match(script, /CUR > LATEST_BUILD/);
-  assert.match(script, /NEXT=\$\(\(LATEST_BUILD \+ 1\)\)/);
+  assert.match(script, /synchronizedAppBuild/);
+  assert.match(script, /versions\.NATIVE_APP_VERSION = version/);
+  assert.match(script, /versions\.NATIVE_APP_BUILD = build/);
+  assert.match(script, /versions\.CONTENT_VERSION = Number\(releaseId\)/);
+  assert.match(script, /web\/package\.json/);
   assert.match(script, /versions\.LATEST_APP_BUILD_AVAILABLE = Number\(process\.argv\[2\]\)/);
   assert.match(script, /APP_RELEASE_ID/);
   assert.match(script, /ASC_RELEASE_LOCK_TIMEOUT/);

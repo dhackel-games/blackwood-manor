@@ -1,7 +1,7 @@
 {
   "gate": {
     "name": "Front Gate",
-    "desc": "You stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains from the sky. The MANOR looms beyond a dead lawn, its windows like sockets. A gravel path leads NORTH to the PORCH. A low wall gives way EAST to the OVERGROWN GARDEN, while a black yew opening enters the HEDGE MAZE to the WEST.",
+    "desc": "{{player_name}}, you stand at the rusted iron FRONT GATE of BLACKWOOD MANOR as the last light drains from the sky. The MANOR looms beyond a dead lawn, its windows like sockets. A gravel path leads NORTH to the PORCH. A low wall gives way EAST to the OVERGROWN GARDEN, while a black yew opening enters the HEDGE MAZE to the WEST.",
     "items": []
   },
   "garden": {
@@ -180,7 +180,7 @@
   },
   "porch": {
     "name": "Front Porch",
-    "desc": "The PORCH boards sag underfoot. A brass MAILBOX is bolted beside a great oak FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
+    "desc": "The PORCH boards sag under your weight. A brass MAILBOX is bolted beside a great oak FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
     "items": [
       {
         "id": "letter",
@@ -201,7 +201,7 @@
   },
   "grandHall": {
     "name": "Royal Hall",
-    "desc": "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and beside the great FRONT DOOR is a narrow wooden BELL CLOSET. Doorways lead EAST to the PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH.",
+    "desc": "A vast, cobwebbed ROYAL HALL rises two storeys to a shattered chandelier. A royal staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and beside the great FRONT DOOR is a narrow wooden BELL CLOSET. Doorways lead EAST to the PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH. The hall repeats your smallest movement half a beat late.",
     "items": [
       {
         "id": "mysteryPackage",
@@ -209,14 +209,19 @@
         "kind": "takeable"
       },
       {
+        "id": "bellCloset",
+        "label": "closet",
+        "kind": "container"
+      },
+      {
         "id": "reliquary",
         "label": "reliquary",
         "kind": "container"
       },
       {
-        "id": "bellCloset",
-        "label": "bell closet",
-        "kind": "container"
+        "id": "closetBellRope",
+        "label": "rope",
+        "kind": "scenery"
       }
     ]
   },
@@ -345,7 +350,7 @@
   },
   "nursery": {
     "name": "Nursery",
-    "desc": "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares with one glass eye. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
+    "desc": "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares with one glass eye fixed on you. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
     "items": [
       {
         "id": "tinyKey",
@@ -434,7 +439,7 @@
   },
   "attic": {
     "name": "Attic",
-    "desc": "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. The ladder leads DOWN.",
+    "desc": "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. Its painted eyes find you immediately. The ladder leads DOWN.",
     "items": [
       {
         "id": "ancestralPortrait",
@@ -450,8 +455,13 @@
   },
   "belfry": {
     "name": "Belfry",
-    "desc": "The BELFRY crouches above the roofline around a weather-blackened BELL. A thick ROPE hangs from its wheel and passes through a fitted HOLE in the floor. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
+    "desc": "The BELFRY crouches above the roofline around a weather-blackened BELL. The rafters vanish into layers of restless shadow. A thick ROPE hangs from the bell's wheel and passes through a fitted HOLE in the floor, continuing down through the house. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
     "items": [
+      {
+        "id": "belfryBats",
+        "label": "bats",
+        "kind": "scenery"
+      },
       {
         "id": "bell",
         "label": "bell",
@@ -459,12 +469,7 @@
       },
       {
         "id": "belfryBellRope",
-        "label": "bell rope",
-        "kind": "scenery"
-      },
-      {
-        "id": "belfryBats",
-        "label": "bats",
+        "label": "rope",
         "kind": "scenery"
       }
     ]
@@ -477,27 +482,6 @@
         "id": "obsidianEye",
         "label": "obsidian eye",
         "kind": "takeable"
-      }
-    ]
-  },
-  "hollowPassage": {
-    "name": "Hollow Passage",
-    "desc": "A narrow HOLLOW PASSAGE of pale stone the MANOR kept hidden all this time. It is oddly warm, and lit by no lamp you can find — as if the walls themselves remember daylight. The ROYAL HALL lies back to the SOUTH; the PASSAGE runs NORTH.",
-    "items": []
-  },
-  "hollowSanctum": {
-    "name": "The Hollow Sanctum",
-    "desc": "A round, domed HOLLOW SANCTUM at the MANOR'S secret heart, filled with a soft grey light. The pale SPIRIT of a robed woman waits beside a pedestal, and upon the pedestal rests a SILVER MIRROR. Beyond her, an archway opens NORTH onto a growing dawn.",
-    "items": [
-      {
-        "id": "silverMirror",
-        "label": "mirror",
-        "kind": "takeable"
-      },
-      {
-        "id": "spirit",
-        "label": "spirit",
-        "kind": "scenery"
       }
     ]
   },
@@ -514,6 +498,27 @@
         "id": "backwardsWatch",
         "label": "woodblack watch",
         "kind": "takeable"
+      }
+    ]
+  },
+  "p2_awakening": {
+    "name": "Nowhere",
+    "desc": "Cold, lightless nowhere. A grand CLOCK ticks backward in your see-through hands.",
+    "items": []
+  },
+  "t13_medusaGarden": {
+    "name": "The Thirteenth Hour",
+    "desc": "The manor garden, drenched in the green-gold afternoon light of centuries past.",
+    "items": [
+      {
+        "id": "gardenPool",
+        "label": "pool",
+        "kind": "scenery"
+      },
+      {
+        "id": "queenPetrified",
+        "label": "queen",
+        "kind": "scenery"
       }
     ]
   }

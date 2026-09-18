@@ -83,7 +83,7 @@ call/hint | Gary / Call Gary's paid hint line.
 (c)lose/shut <thing> | Close / Close an open door or container.
 drop <thing>/all | Drop / Drop one carried item or every unworn item.
 extinguish <thing> | Extinguish / Put out a light or flame.
-get/(t)ake/grab <thing>/all | Take / Take one visible item or everything portable.
+get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
 give <thing> to <character> | Give / Hand over an item.
 (g)o <room> | Go / Go to a named room when movement or flight allows; bare g repeats AGAIN.
 help/? | Help / Show this command reference.
@@ -97,7 +97,7 @@ move <thing> | Move / Shift or jostle something.
 (o)pen <thing> [w/<key>] | Open / Unlock with a supplied key, then open.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
-put/place <thing> in <container/slot> | Put / Place a carried item inside a container or named slot.
+put/place <thing>/all in <container/slot> | Put / Place one carried item or every unworn carried item inside a container.
 (q)uit | Quit / End the session.
 reach into <thing> | Reach / Reach into an opening.
 read <thing> | Read / Read visible writing.
@@ -152,9 +152,42 @@ function inventoryName(item) {
     : primary.toUpperCase();
 }
 
+function accessibleContainer(ctx, phrase) {
+  const container = phrase ? ctx.find(phrase) : null;
+  if (!container) return { error: `You can't see any ${phrase} here.` };
+  if (!container.container) return { error: "That isn't a container." };
+  if (container.bulkTransfer === false) {
+    return { error: container.bulkTransferMsg || "You must move those items one at a time." };
+  }
+  if (container.openable && !container.open) {
+    return { error: `The ${container.names[0]} is closed.` };
+  }
+  return { container };
+}
+
+function runBulkItemHandler(ctx, verb, item, cmd) {
+  const itemCommand = { ...cmd, verb, dobj: item.names[0], itemId: item.id };
+  const itemHandler = ctx.world.items[item.id]?.on?.[verb];
+  let handled = itemHandler ? itemHandler(ctx, itemCommand) : null;
+  const roomHandler = ctx.world.rooms[ctx.state.room]?.on?.[verb];
+  if (handled == null && roomHandler) handled = roomHandler(ctx, itemCommand);
+  return handled;
+}
+
 function takeAll(ctx, cmd) {
-  const candidates = ctx.visibleItems().filter((item) => item.takeable && !ctx.has(item.id));
-  if (!candidates.length) return "There is nothing here you can take.";
+  let source = null;
+  if (cmd.prep === "from" && cmd.iobj) {
+    const resolved = accessibleContainer(ctx, cmd.iobj);
+    if (resolved.error) return resolved.error;
+    source = resolved.container;
+  }
+  const candidates = (source ? ctx.itemsIn(source.id) : ctx.visibleItems())
+    .filter((item) => item.takeable && !ctx.has(item.id));
+  if (!candidates.length) {
+    return source
+      ? `There is nothing in the ${source.names[0]} you can take.`
+      : "There is nothing here you can take.";
+  }
 
   const results = [];
   const leftBehind = [];
@@ -169,11 +202,7 @@ function takeAll(ctx, cmd) {
       results.push(`${item.names[0]}: ${blocked}`);
       continue;
     }
-    const itemCommand = { ...cmd, dobj: item.names[0], itemId: item.id };
-    const itemHandler = ctx.world.items[item.id]?.on?.take;
-    let handled = itemHandler ? itemHandler(ctx, itemCommand) : null;
-    const roomHandler = ctx.world.rooms[ctx.state.room]?.on?.take;
-    if (handled == null && roomHandler) handled = roomHandler(ctx, itemCommand);
+    const handled = runBulkItemHandler(ctx, "take", item, cmd);
     if (handled != null) {
       results.push(`${item.names[0]}: ${handled}`);
       continue;
@@ -185,7 +214,9 @@ function takeAll(ctx, cmd) {
       pickupAward(ctx, item));
   }
   if (leftBehind.length) {
-    results.push(`Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
+    results.push(source
+      ? `Your hands are full. Left in the ${source.names[0]}: ${leftBehind.join(", ")}.`
+      : `Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
   }
   return results.join("\n");
 }
@@ -204,6 +235,42 @@ function dropAll(ctx) {
     lines.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
   }
   return lines.join("\n");
+}
+
+function putAll(ctx, cmd) {
+  if (!cmd.iobj) return "Put everything where?";
+  const resolved = accessibleContainer(ctx, cmd.iobj);
+  if (resolved.error) return resolved.error;
+  const dest = resolved.container;
+  const inventory = ctx.inventory().filter((item) => item.id !== dest.id);
+  if (!inventory.length) return "You aren't carrying anything to put there.";
+  const candidates = inventory.filter((item) => !item.worn);
+  const worn = inventory.filter((item) => item.worn);
+  const results = [];
+  const leftBehind = [];
+
+  for (const item of candidates) {
+    if (ctx.itemsIn(dest.id).length >= (dest.capacity ?? 99)) {
+      leftBehind.push(item.names[0]);
+      continue;
+    }
+    const handled = runBulkItemHandler(ctx, "put", item, cmd);
+    if (handled != null) {
+      results.push(`${item.names[0]}: ${handled}`);
+      continue;
+    }
+    ctx.moveItem(item.id, dest.id);
+    results.push(`${item.names[0].toUpperCase()}: Put in ${dest.names[0].toUpperCase()}.`);
+  }
+
+  if (!candidates.length) results.push("You have nothing unworn to put there.");
+  if (leftBehind.length) {
+    results.push(`The ${dest.names[0]} is full. Left in your inventory: ${leftBehind.join(", ")}.`);
+  }
+  if (worn.length) {
+    results.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
+  }
+  return results.join("\n");
 }
 
 export const commands = {
@@ -350,6 +417,7 @@ export const commands = {
 
   put(ctx, cmd) {
     if (!cmd.dobj) return "Put what?";
+    if (cmd.dobj === "all" || cmd.dobj === "everything") return putAll(ctx, cmd);
     const it = ctx.find(cmd.dobj, ctx.inventory());
     if (!it) return "You aren't carrying that.";
     if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;

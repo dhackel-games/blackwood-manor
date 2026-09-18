@@ -253,6 +253,26 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is carried
     And item "rope" is carried
 
+  Scenario: PUT ALL and GET ALL preserve reliquary rules and worn equipment
+    Given item "familyCrest" is carried
+    And item "rope" is carried
+    And item "backpack" is carried
+    And the player is in room "grandHall"
+    When I send "wear backpack"
+    And I send "put all in rq"
+    Then item "familyCrest" is in "reliquary"
+    And item "rope" is in "reliquary"
+    And item "backpack" is carried
+    And item "backpack" is worn in slot "back"
+    And the output contains "Still worn"
+    And the game score is 15
+    When I send "close rq"
+    And I send "get all from rq"
+    Then the output contains "(open GLASS RELIQUARY; take ALL from GLASS RELIQUARY)"
+    And item "familyCrest" is carried
+    And item "rope" is carried
+    And the game score is 15
+
   Scenario: Withdrawn heirlooms keep their one-time deposit score
     Given item "goldLocket" is carried
     And item "talisman" is carried

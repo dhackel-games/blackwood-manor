@@ -21,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const jsDir = join(here, "..", "js");
 
 // Only the pure-data modules world.js transitively needs. None touch the DOM.
-const MODULES = ["map.js", "compose.js", "world.content.js", "world.js"];
+const MODULES = ["map.js", "compose.js", "sysop-menu.js", "world.content.js", "world.js"];
 
 const tmp = mkdtempSync(join(tmpdir(), "bm-roomdata-"));
 for (const m of MODULES) {

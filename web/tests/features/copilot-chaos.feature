@@ -22,6 +22,7 @@ Feature: Copilot's mystery package and lightning jumps
     Given the random number generator always returns <roll>
     When I send "open package"
     Then the output contains "<phrase>"
+    And flag "flavorCycle:packageOpenings" equals 1
     And item "mysteryPackage" is destroyed
 
     Examples:
@@ -137,7 +138,8 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "wait"
     Then the output contains "LIGHTNING"
     And the output contains "           ____╲"
-    And the output contains "TOUCH it, if you dare"
+    And the output contains "TOUCH"
+    And flag "flavorCycle:lightningInvitations" equals 1
     And the current room is "grandHall"
     And item "lightningBolt" is in "grandHall"
 

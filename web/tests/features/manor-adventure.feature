@@ -27,6 +27,10 @@ Feature: Blackwood Manor adventure
       take apple
       light candle
       eat burrito
+      wait
+      wait
+      wait
+      wait
       drink milk
       open cellar
       down
@@ -74,9 +78,9 @@ Feature: Blackwood Manor adventure
       east
       take ruby gem
       take sapphire gem
-      put ruby gem in bottom slot
+      put ruby gem in top slot
       put emerald gem in middle slot
-      put sapphire gem in top slot
+      put sapphire gem in bottom slot
       enter platform
       wait
       take spyglass
@@ -166,7 +170,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 415
+    And the game score is 435
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal
@@ -248,14 +252,14 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "in door"
-    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
+    Then the output contains "(unlock FRONT DOOR with IRON KEY; open FRONT DOOR; enter FRONT DOOR)"
     And the current room is "grandHall"
 
   Scenario: Opening a locked door with its key derives unlock then open
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "o frontd w/iron"
-    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR)"
+    Then the output contains "(open FRONT DOOR with IRON KEY)"
     And item "frontDoor" is open
     And item "frontKey" is destroyed
     And the current room is "porch"
@@ -272,7 +276,7 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "go door"
-    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
+    Then the output contains "(unlock FRONT DOOR with IRON KEY; open FRONT DOOR; enter FRONT DOOR)"
     And item "frontDoor" is open
     And the current room is "grandHall"
 
@@ -280,7 +284,7 @@ Feature: Blackwood Manor adventure
     Given the player is in room "porch"
     And item "frontKey" is carried
     When I send "in"
-    Then the output contains "(unlock FRONT DOOR; open FRONT DOOR; enter FRONT DOOR)"
+    Then the output contains "(unlock FRONT DOOR with IRON KEY; open FRONT DOOR; enter FRONT DOOR)"
     And the current room is "grandHall"
     When I send "out"
     Then the current room is "porch"

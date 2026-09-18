@@ -242,6 +242,9 @@ The BRAZIER awards +10 when lit patiently with the CANDLESTICK or +30 when the
 player transfers their own flames. Reading the mailbox LETTER awards +5.
 DREADMAW'S apple remains +10. Scattering the belfry bats and freeing the Bat
 Sight Mirror awards +5; depositing the mirror awards its 20 heirloom points.
+Opening mushroom vision for the first time awards +10. First acquisition of
+the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
+lowering the ATTIC ladder for the first time awards +5.
 `::winmax2bell` performs every deterministic scoring challenge, deposits all
 thirteen heirlooms, closes the reliquary, and stops immediately before the
 main-floor bell rope with the closet open. It leaves the MYSTERY PACKAGE untouched because its
@@ -678,20 +681,25 @@ sanctum's northern exit.
 ## 12.21 Bulk inventory actions
 
 `TAKE ALL` and `GET ALL` collect every currently visible portable object, including
-objects exposed inside open containers. The operation respects `maxCarry`, reports each
-pickup, and names anything left behind when the player's hands fill. If no portable object
-is reachable, it says so explicitly. `DROP ALL` moves every unworn carried item into the
-current room and lists worn equipment that remains equipped.
+objects exposed inside open containers. `GET ALL FROM <container>` limits collection
+to that open container. `PUT ALL IN <container>` deposits every unworn carried item,
+using the same item and room handlers as individual PUT commands so puzzle rules and
+one-time scoring remain intact. Bulk operations consume one turn, respect carrying and
+container capacity, report leftovers, and leave worn equipment equipped. `DROP ALL`
+moves every unworn carried item into the current room.
 
 ## 12.22 TestFlight release
 
 `ios/release-testflight.sh` refreshes `ios/Resources/www` from canonical `web/` before
 generating the Xcode project, so an archive cannot silently contain stale game files.
-TestFlight's displayed app version is the date-only `YYYY.M.D` value read from
-`web/package.json`; `CURRENT_PROJECT_VERSION` remains a separate monotonically increasing
-integer build number. The script reuses a checked-in build only when it is newer than both
-the published TestFlight build and every build already uploaded to App Store Connect; otherwise it
-increments beyond them. A temporary remote Git release-lock branch serializes publishers
+For a native release, TestFlight's displayed app version becomes the current
+`YYYY.M.D` date. A genuinely new date resets `CURRENT_PROJECT_VERSION` to `1`;
+additional app releases on that date advance beyond checked-in content, published
+TestFlight availability, and builds already uploaded under that same app version.
+The script atomically synchronizes `web/package.json`, both Xcode project settings,
+`NATIVE_APP_VERSION` / `NATIVE_APP_BUILD`, `CONTENT_DATE` / `CONTENT_BUILD`,
+`CONTENT_VERSION`, and the legacy content aliases. It rejects any date/build choice
+that would move OTA content backward. A temporary remote Git release-lock branch serializes publishers
 without changing public version metadata before availability. With upload enabled it validates and uploads,
 polls App Store Connect until the exact build is valid, assigns it to a configured internal
 beta group, verifies the group has testers and the build reaches `IN_BETA_TESTING`, then
@@ -915,7 +923,7 @@ Blackwood Manor has one ritual and two immediate choices.
 The path EAST of the PRIVY reaches a GREAT OAK with a dark iron PANEL inset in
 its trunk. A complex array of mirrors catches the afternoon sun and directs
 three beams through holes in the tree toward vertically stacked slots. A RUBY
-GEM begins in the BOTTOM SLOT and a SAPPHIRE GEM in the TOP SLOT; the BRAZIER
+GEM begins in the TOP SLOT and a SAPPHIRE GEM in the BOTTOM SLOT; the BRAZIER
 reveals the missing EMERALD GEM. Players may name the TOP, MIDDLE, or BOTTOM
 SLOT explicitly, while placing a gem merely `IN PANEL` chooses the next empty
 slot from bottom to top. The completed arrangement focuses a white beam into
@@ -965,7 +973,9 @@ followed by `CONTENT_FILES` as the final declaration. `APP_VERSION` and `BUILD`
 remain deprecated aliases of those content fields for compatibility with
 already-installed updaters. Native app identity is explicit in
 `NATIVE_APP_VERSION` / `NATIVE_APP_BUILD` and lives canonically in
-`web/package.json` and `ios/project.yml`. iOS parses the content data and chooses
+`web/package.json` and `ios/project.yml`. Content-only stamping changes only content
+identity and compatibility aliases. A native release synchronizes native and content
+date/build identities so its bundled web content has the same release number. iOS parses the content data and chooses
 the greatest `CONTENT_VERSION` among the bundled copy, persistent cache, and
 GitHub.io copy. The winner is atomically written to Application Support and the
 web view always serves `app://local/` from that cache. Thus an older cache cannot

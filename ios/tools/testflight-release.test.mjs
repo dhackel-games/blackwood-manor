@@ -6,9 +6,11 @@ import test from "node:test";
 
 import {
   appBuildVersion,
+  buildNumberForVersion,
   createAppStoreConnectClient,
   createAppStoreConnectToken,
   latestUploadedBuildNumber,
+  synchronizedAppBuild,
   verifyTestFlightAvailability,
 } from "./testflight-release.mjs";
 
@@ -183,10 +185,66 @@ test("availability version rejects malformed or oversized values", () => {
   assert.throws(() => appBuildVersion("2026.9.11", "1000"), /fit BBB/);
 });
 
+test("release build extraction is scoped to the app version date", () => {
+  assert.equal(buildNumberForVersion(20260917004, "2026.9.17"), 4);
+  assert.equal(buildNumberForVersion(20260911107, "2026.9.17"), 0);
+});
+
+test("a new app date resets every synchronized identity to build one", () => {
+  assert.equal(synchronizedAppBuild({
+    releaseVersion: "2026.9.18",
+    currentAppVersion: "2026.9.17",
+    currentAppBuild: 107,
+    contentDate: "2026.9.17",
+    contentBuild: 4,
+    latestAvailableRelease: 20260917107,
+    latestUploadedBuild: 0,
+  }), 1);
+});
+
+test("a same-date app build advances beyond content and uploaded builds", () => {
+  assert.equal(synchronizedAppBuild({
+    releaseVersion: "2026.9.17",
+    currentAppVersion: "2026.9.17",
+    currentAppBuild: 1,
+    contentDate: "2026.9.17",
+    contentBuild: 4,
+    latestAvailableRelease: 20260917001,
+    latestUploadedBuild: 3,
+  }), 5);
+});
+
+test("an unpublished synchronized app build is reused unless forced", () => {
+  const release = {
+    releaseVersion: "2026.9.17",
+    currentAppVersion: "2026.9.17",
+    currentAppBuild: 5,
+    contentDate: "2026.9.17",
+    contentBuild: 5,
+    latestAvailableRelease: 20260917004,
+    latestUploadedBuild: 4,
+  };
+  assert.equal(synchronizedAppBuild(release), 5);
+  assert.equal(synchronizedAppBuild({ ...release, forceNext: true }), 6);
+});
+
+test("a new app date cannot rewind same-date OTA content", () => {
+  assert.throws(() => synchronizedAppBuild({
+    releaseVersion: "2026.9.17",
+    currentAppVersion: "2026.9.11",
+    currentAppBuild: 107,
+    contentDate: "2026.9.17",
+    contentBuild: 4,
+    latestAvailableRelease: 20260911107,
+    latestUploadedBuild: 0,
+  }), /already has a later build/);
+});
+
 test("latest build selection includes failed and processing uploads", async () => {
-  const request = async (path) => {
+  const request = async (path, options = {}) => {
     if (path === "/v1/apps") return { data: [{ id: "app-1" }] };
     assert.equal(path, "/v1/builds");
+    assert.equal(options.query["filter[preReleaseVersion.version]"], "2026.9.17");
     return {
       data: [
         { attributes: { version: "83" } },
@@ -196,7 +254,7 @@ test("latest build selection includes failed and processing uploads", async () =
     };
   };
   assert.equal(
-    await latestUploadedBuildNumber(request, "com.dhackel.BlackwoodManor"),
+    await latestUploadedBuildNumber(request, "com.dhackel.BlackwoodManor", "2026.9.17"),
     86);
 });
 

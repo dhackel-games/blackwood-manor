@@ -21,6 +21,7 @@ Feature: Player command parsing
       | take the brass key                  | take    | brass key | [none]      | [none]    |
       | t rope                              | take    | rope      | [none]      | [none]    |
       | grab brass key                      | take    | brass key | [none]      | [none]    |
+      | get all from box                    | take    | all       | from        | box       |
       | unlock the oak door with the brass key | unlock | oak door | with      | brass key |
       | unlock front d w/iron               | unlock | front door | with       | iron       |
       | un frontd w/iron                    | unlock | frontd     | with       | iron       |
@@ -47,6 +48,7 @@ Feature: Player command parsing
       | wake up dragon                      | wake    | dragon    | [none]      | [none]    |
       | offer apple to dragon               | give    | apple     | to          | dragon    |
       | put apple on dragon                 | put     | apple     | on          | dragon    |
+      | put all in rq                       | put     | all       | in          | rq        |
       | place emerald gem in middle slot    | put     | emerald gem | in        | middle slot |
       | say "foo"                           | say     | "foo"     | [none]      | [none]    |
       | say d                               | say     | d         | [none]      | [none]    |

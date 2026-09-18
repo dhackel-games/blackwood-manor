@@ -199,64 +199,73 @@ if [[ "$STAMP_ONLY" -eq 1 ]]; then
   exit 0
 fi
 
-# Reuse a checked-in app build that has not reached TestFlight yet; otherwise
-# advance beyond the last app build whose availability was published.
-MARKETING_VERSION=$(node -p 'require("../web/package.json").version')
-if [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "Invalid YYYY.M.D package version: $MARKETING_VERSION" >&2
+# Native releases use today's date. A genuinely new date starts at build 1;
+# same-date releases advance beyond content, TestFlight, and checked-in state.
+CURRENT_APP_VERSION=$(node -p 'require("../web/package.json").version')
+MARKETING_VERSION="${RELEASE_DATE_OVERRIDE:-$(date '+%Y.%m.%d' | sed -E 's/\.0([0-9])/\.\1/g')}"
+if [[ ! "$CURRENT_APP_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] \
+    || [[ ! "$MARKETING_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Invalid current or release YYYY.M.D app version." >&2
   exit 1
 fi
 CUR=$(grep -m1 'CURRENT_PROJECT_VERSION' project.yml | grep -oE '[0-9]+' | head -1)
-AVAILABLE_BUILD=$(node -e '
-  const fs = require("fs");
-  const versions = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
-  const version = versions.LATEST_APP_BUILD_AVAILABLE;
-  if (!Number.isInteger(version) || version <= 0) process.exit(1);
-  console.log(version % 1000);
-' ../web/versions.json)
+CONTENT_DATE=$(node -p 'require("../web/versions.json").CONTENT_DATE')
+CONTENT_BUILD=$(node -p 'require("../web/versions.json").CONTENT_BUILD')
+AVAILABLE_RELEASE=$(node -p 'require("../web/versions.json").LATEST_APP_BUILD_AVAILABLE')
 ASC_LATEST_BUILD=0
 if [[ "$UPLOAD" -eq 1 ]]; then
   ASC_LATEST_BUILD=$(node tools/testflight-release.mjs \
     --latest-build \
-    --bundle-id "$BUNDLE_ID")
+    --bundle-id "$BUNDLE_ID" \
+    --version "$MARKETING_VERSION")
 fi
-LATEST_BUILD=$((AVAILABLE_BUILD > ASC_LATEST_BUILD ? AVAILABLE_BUILD : ASC_LATEST_BUILD))
-if (( FORCE_NEXT_BUILD == 1 )); then
-  BASE_BUILD=$((CUR > LATEST_BUILD ? CUR : LATEST_BUILD))
-  NEXT=$((BASE_BUILD + 1))
-elif (( CUR > LATEST_BUILD )); then
-  NEXT=$CUR
-else
-  NEXT=$((LATEST_BUILD + 1))
-fi
-if (( NEXT > 999 )); then
-  echo "Build ${NEXT} does not fit the required three-digit BBB release identity." >&2
-  exit 1
-fi
+NEXT=$(node --input-type=module -e '
+  import { synchronizedAppBuild } from "./tools/testflight-release.mjs";
+  console.log(synchronizedAppBuild({
+    releaseVersion: process.argv[1],
+    currentAppVersion: process.argv[2],
+    currentAppBuild: process.argv[3],
+    contentDate: process.argv[4],
+    contentBuild: process.argv[5],
+    latestAvailableRelease: process.argv[6],
+    latestUploadedBuild: process.argv[7],
+    forceNext: process.argv[8] === "1",
+  }));
+' "$MARKETING_VERSION" "$CURRENT_APP_VERSION" "$CUR" "$CONTENT_DATE" "$CONTENT_BUILD" \
+  "$AVAILABLE_RELEASE" "$ASC_LATEST_BUILD" "$FORCE_NEXT_BUILD")
 echo "==> Releasing version ${MARKETING_VERSION} build ${NEXT}"
 
-# Compose the native app release identity without changing independently
-# versioned web-content metadata.
-echo "==> Preparing app badge (v${MARKETING_VERSION} build ${NEXT})"
+# A native release is one synchronized identity: package, Xcode project, native
+# metadata, bundled content metadata, and compatibility aliases all use the
+# release date and build. Content-only stamping above never touches app identity.
+echo "==> Synchronizing app and content identity (v${MARKETING_VERSION} build ${NEXT})"
 APP_RELEASE_ID=$(node -e '
   const [y, m, d] = process.argv[1].split(".").map(Number);
   console.log(`${String(y).padStart(4, "0")}${String(m).padStart(2, "0")}${String(d).padStart(2, "0")}${String(process.argv[2]).padStart(3, "0")}`);
 ' "$MARKETING_VERSION" "$NEXT")
 node -e '
   const fs = require("fs");
-  const path = process.argv[1];
-  const versions = JSON.parse(fs.readFileSync(path, "utf8"));
-  versions.NATIVE_APP_VERSION = process.argv[2];
-  versions.NATIVE_APP_BUILD = process.argv[3];
-  fs.writeFileSync(path, `${JSON.stringify(versions, null, 2)}\n`);
-' ../web/versions.json "$MARKETING_VERSION" "$NEXT"
+  const [packagePath, versionsPath, version, build, releaseId] = process.argv.slice(1);
+  const pkg = JSON.parse(fs.readFileSync(packagePath, "utf8"));
+  const versions = JSON.parse(fs.readFileSync(versionsPath, "utf8"));
+  pkg.version = version;
+  versions.APP_VERSION = version;
+  versions.BUILD = build;
+  versions.NATIVE_APP_VERSION = version;
+  versions.NATIVE_APP_BUILD = build;
+  versions.CONTENT_DATE = version;
+  versions.CONTENT_BUILD = build;
+  versions.CONTENT_VERSION = Number(releaseId);
+  fs.writeFileSync(packagePath, `${JSON.stringify(pkg, null, 2)}\n`);
+  fs.writeFileSync(versionsPath, `${JSON.stringify(versions, null, 2)}\n`);
+' ../web/package.json ../web/versions.json "$MARKETING_VERSION" "$NEXT" "$APP_RELEASE_ID"
 
 echo "==> Refreshing bundled web game"
 ./copy-web.sh
 
 echo "==> Setting app version ${MARKETING_VERSION} + build ${NEXT} in project.yml"
 sed -i '' -E "s/MARKETING_VERSION: \"[^\"]+\"/MARKETING_VERSION: \"${MARKETING_VERSION}\"/g" project.yml
-sed -i '' "s/CURRENT_PROJECT_VERSION: \"${CUR}\"/CURRENT_PROJECT_VERSION: \"${NEXT}\"/g" project.yml
+sed -i '' -E "s/CURRENT_PROJECT_VERSION: \"[^\"]+\"/CURRENT_PROJECT_VERSION: \"${NEXT}\"/g" project.yml
 STAMP_DATE=$(date +%Y-%m-%d)
 STAMP_BUILD=$(printf "%03d" "$NEXT")
 RELEASE_EDITOR="${RELEASE_EDITOR:-dhackel}"
@@ -324,6 +333,7 @@ if [[ "$(git -C "$REPO_ROOT" rev-parse HEAD)" != "$START_HEAD" ]] \
 fi
 git -C "$REPO_ROOT" add \
   ios/project.yml \
+  web/package.json \
   web/versions.json
 if git -C "$REPO_ROOT" diff --cached --quiet; then
   echo "==> Release metadata already identifies build ${NEXT}"

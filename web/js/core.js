@@ -246,7 +246,7 @@ export function createGame(world) {
     if (lookIn) return `look in ${displayItem(lookIn[1])}`;
     const parsed = parse(text);
     if (parsed.error || !parsed.verb) return text;
-    return displayCommand(parsed, { omitIndirect: parsed.verb === "unlock" });
+    return displayCommand(parsed);
   }
 
   // --- ctx API for content handlers -----------------------------------------
@@ -492,7 +492,7 @@ export function createGame(world) {
         const keyName = key.names[0];
         const unlock = { verb: "unlock", dobj: target.names[0], prep: "with", iobj: keyName };
         const result = dispatchWithoutTick(unlock);
-        derivedSteps.push(`unlock ${itemTitle(target)}`);
+        derivedSteps.push(displayCommand(unlock));
         if (target.locked) return result;
       }
     }
@@ -509,7 +509,7 @@ export function createGame(world) {
     if (!target?.locked || !target.keyId) return null;
     const unlock = { verb: "unlock", dobj: cmd.dobj, prep: "with", iobj: cmd.iobj };
     const result = dispatchWithoutTick(unlock);
-    derivedSteps.push(`unlock ${itemTitle(target)}`);
+    derivedSteps.push(displayCommand(cmd));
     return target.locked ? result : null;
   }
 
@@ -517,7 +517,8 @@ export function createGame(world) {
     if (!["put", "take"].includes(cmd.verb) || !cmd.iobj) return null;
     const container = game.find(cmd.iobj);
     if (!container?.autoOpenOnAccess || !container.openable || container.open) return null;
-    if (cmd.verb === "put" && !game.find(cmd.dobj, game.inventory())) return null;
+    const bulkPut = cmd.verb === "put" && ["all", "everything"].includes(cmd.dobj);
+    if (cmd.verb === "put" && !bulkPut && !game.find(cmd.dobj, game.inventory())) return null;
     const result = dispatchWithoutTick({
       verb: "open",
       dobj: container.names[0],
@@ -715,10 +716,8 @@ export function createGame(world) {
     deferStatusBanner = false;
     if (derivedSteps.length) {
       let finalStep = executionLabel;
-      if (cmd.verb === "open" && derivedSteps.some((step) => step.startsWith("unlock "))) {
-        finalStep = `open ${displayItem(cmd.dobj)}`;
-      }
-      const sequence = acquisitionBlocked ? derivedSteps : [...derivedSteps, finalStep];
+      if (cmd.verb === "open" && derivedSteps.includes(executionLabel)) finalStep = null;
+      const sequence = acquisitionBlocked || !finalStep ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join("; ")})\n\n${text}`;
     } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {
       text = `(${executionLabel})\n\n${text}`;

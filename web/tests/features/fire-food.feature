@@ -158,6 +158,7 @@ Feature: Fire and food consequences
     Given the player is in room "kitchen"
     When I send "eat mushrooms"
     Then flag "high" is positive
+    And flag "flavorCycle:mushroomRevelations" equals 1
     Given a fresh manor game
     And the player is in room "kitchen"
     When I send "examine burrito"
@@ -171,6 +172,9 @@ Feature: Fire and food consequences
     And item "burritoWrapper" is in "inventory"
     When I send "look"
     Then the output matches "FART|🤢"
+    When I send "wait"
+    And I send "wait"
+    And I send "wait"
     When I send "drink milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true
@@ -179,6 +183,28 @@ Feature: Fire and food consequences
     And the game score is 30
     When I win with "You step into the dawn."
     Then the output contains "Got Milk?"
+
+  Scenario: Milk always rewards recovery but the larger survival award requires all four phases
+    Given the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "drink milk"
+    Then flag "sick" equals 0
+    And the output contains "(+5)"
+    And the output does not contain "survived the super burrito"
+    And flag "progressAward:burritoSurvived" is unset
+    And the game score is 5
+    Given a fresh manor game
+    And the player is in room "kitchen"
+    When I send "eat burrito"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "drink milk"
+    Then the output contains "survived the super burrito"
+    And the output contains "(+25)"
+    And flag "progressAward:burritoSurvived" is set
+    And the game score is 30
 
   Scenario: USE contextually eats food and drinks beverages
     Given the player is in room "kitchen"
@@ -376,8 +402,8 @@ Feature: Fire and food consequences
     And I send "<command>"
     Then the output contains "CURED"
     And flag "sick" equals 0
-    And the output contains "(+25)"
-    And the game score is 25
+    And the output does not contain "(+25)"
+    And the game score is 0
 
     Examples:
       | command      |

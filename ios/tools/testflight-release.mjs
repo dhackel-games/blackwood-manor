@@ -277,6 +277,66 @@ export function appBuildVersion(marketingVersion, buildNumber) {
     `${parts[2].padStart(2, "0")}${String(buildNumber).padStart(3, "0")}`);
 }
 
+export function buildNumberForVersion(releaseNumber, marketingVersion) {
+  if (!Number.isSafeInteger(Number(releaseNumber)) || Number(releaseNumber) <= 0) return 0;
+  const releasePrefix = Math.floor(appBuildVersion(marketingVersion, 0) / 1000);
+  return Math.floor(Number(releaseNumber) / 1000) === releasePrefix
+    ? Number(releaseNumber) % 1000
+    : 0;
+}
+
+export function synchronizedAppBuild({
+  releaseVersion,
+  currentAppVersion,
+  currentAppBuild,
+  contentDate,
+  contentBuild,
+  latestAvailableRelease = 0,
+  latestUploadedBuild = 0,
+  forceNext = false,
+}) {
+  const currentBuild = Number(currentAppBuild);
+  const currentContentBuild = Number(contentBuild);
+  const uploadedBuild = Number(latestUploadedBuild);
+  for (const [label, value] of [
+    ["current app build", currentBuild],
+    ["content build", currentContentBuild],
+    ["latest uploaded build", uploadedBuild],
+  ]) {
+    if (!Number.isInteger(value) || value < 0 || value > 999) {
+      throw new Error(`${label} must fit BBB.`);
+    }
+  }
+  appBuildVersion(releaseVersion, 1);
+  appBuildVersion(currentAppVersion, currentBuild);
+  const availableBuild = buildNumberForVersion(Number(latestAvailableRelease), releaseVersion);
+  const sameAppDate = currentAppVersion === releaseVersion;
+  const sameContentDate = contentDate === releaseVersion;
+
+  if (!sameAppDate) {
+    if ((sameContentDate && currentContentBuild > 1) || availableBuild > 0 || uploadedBuild > 0) {
+      throw new Error(
+        `Cannot reset ${releaseVersion} to build 1 because that release date already has a later build.`);
+    }
+    const nextRelease = appBuildVersion(releaseVersion, 1);
+    const currentContent = appBuildVersion(contentDate, currentContentBuild);
+    if (nextRelease < currentContent) {
+      throw new Error("A native app release cannot move CONTENT_VERSION backward.");
+    }
+    return 1;
+  }
+
+  const contentAhead = sameContentDate && currentContentBuild !== currentBuild
+    ? currentContentBuild
+    : 0;
+  const latestExternal = Math.max(availableBuild, uploadedBuild, contentAhead);
+  const next = forceNext || currentBuild <= latestExternal
+    ? Math.max(currentBuild, latestExternal) + 1
+    : currentBuild;
+  if (next > 999) throw new Error(`Build ${next} does not fit BBB.`);
+  return next;
+}
+
 export async function verifyTestFlightAvailability({
   request,
   bundleIdentifier,
@@ -328,15 +388,17 @@ export async function verifyTestFlightAvailability({
   return { app, build: refreshedBuild, group };
 }
 
-export async function latestUploadedBuildNumber(request, bundleIdentifier) {
+export async function latestUploadedBuildNumber(request, bundleIdentifier, marketingVersion = null) {
   const app = await resolveApp(request, bundleIdentifier);
+  const query = {
+    "filter[app]": app.id,
+    "fields[builds]": "version",
+    "sort": "-uploadedDate",
+    "limit": 200,
+  };
+  if (marketingVersion) query["filter[preReleaseVersion.version]"] = marketingVersion;
   const response = await request("/v1/builds", {
-    query: {
-      "filter[app]": app.id,
-      "fields[builds]": "version",
-      "sort": "-uploadedDate",
-      "limit": 200,
-    },
+    query,
   });
   return Math.max(0, ...(response?.data || [])
     .map((build) => Number(build.attributes?.version))
@@ -368,7 +430,7 @@ async function main() {
   const request = createAppStoreConnectClient({ keyId, issuerId, privateKey });
 
   if (process.argv.includes("--latest-build")) {
-    console.log(await latestUploadedBuildNumber(request, bundleIdentifier));
+    console.log(await latestUploadedBuildNumber(request, bundleIdentifier, marketingVersion));
     return;
   }
   if (!marketingVersion || !buildNumber) {

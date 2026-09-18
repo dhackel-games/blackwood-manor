@@ -152,7 +152,7 @@ export const content = {
     porch: {
       name: "Front Porch",
       desc:
-        "The PORCH boards sag under {{player_name}}'s weight. A brass MAILBOX is bolted beside a great oak " +
+        "The PORCH boards sag under your weight. A brass MAILBOX is bolted beside a great oak " +
         "FRONT DOOR, its wood black with age. The path returns SOUTH to the FRONT GATE.",
     },
 
@@ -163,7 +163,7 @@ export const content = {
         "staircase climbs UP into shadow. Set into the far wall is a stone RELIQUARY, and " +
         "beside the great FRONT DOOR is a narrow wooden BELL CLOSET. Doorways lead EAST to the " +
         "PARLOR and WEST to the DINING ROOM; the PORCH lies SOUTH. The hall repeats " +
-        "{{player_name}}'s smallest movement half a beat late.",
+        "your smallest movement half a beat late.",
       highDesc: "The shelves become transparent enough to reveal a hidden stair folding DOWN behind the brass LEVER.",
     },
 
@@ -171,7 +171,7 @@ export const content = {
       name: "Parlor",
       desc:
         "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track {{player_name}}. An archway " +
+        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
         "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
       highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
     },
@@ -229,7 +229,7 @@ export const content = {
       name: "Crypt",
       desc:
         "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
-        "at {{player_name}}'s breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
+        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
         "LOCKET. The only way out is NORTH to the WINE CELLAR.",
       searchDesc:
         "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
@@ -247,7 +247,7 @@ export const content = {
       name: "Nursery",
       desc:
         "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
-        "with one glass eye fixed on {{player_name}}. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
+        "with one glass eye fixed on you. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
       searchDesc:
         "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
         "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
@@ -287,7 +287,7 @@ export const content = {
       desc:
         "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
         "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. Its painted eyes find " +
-        "{{player_name}} immediately. The ladder leads DOWN.",
+        "you immediately. The ladder leads DOWN.",
       searchDesc:
         "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
     },
@@ -460,7 +460,7 @@ export const content = {
       roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
       desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
         "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
-        "It does not produce light. Inside it, something already knows {{player_name}}.",
+        "It does not produce light. Inside it, something already knows you.",
     },
     burritoWrapper: {
       roomDesc: "The crumpled BURRITO WRAPPER and its greasy tin foil lie here.",
@@ -516,7 +516,7 @@ export const content = {
     },
     hallMirror: {
       desc:
-        "A tarnished MIRROR that gives {{player_name}} back as a reflection standing slightly farther away than it should.",
+        "A tarnished MIRROR that gives you back as a reflection standing slightly farther away than it should.",
     },
     nightTable: {
       desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
@@ -566,7 +566,7 @@ export const content = {
       desc: "A great oak desk, its drawers swollen shut.",
     },
     diary: {
-      desc: "A leather-bound diary in a spidery hand. The ink feathers around {{player_name}} as though freshly written.",
+      desc: "A leather-bound diary in a spidery hand. Its ink feathers as you watch, as though freshly written.",
     },
     wallpaper: {
       desc: "Long tongues of wallpaper hang loose from the plaster. Low near the baseboard, one strip has " +
@@ -602,12 +602,12 @@ export const content = {
     },
     ancestralPortrait: {
       desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
-        "unsettlingly like the STATUE in the GARDEN. Her gaze settles on {{player_name}}.",
+        "unsettlingly like the STATUE in the GARDEN. Her gaze settles on you.",
     },
     backwardsWatch: {
       roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
       desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
-        "On the back, beneath {{player_name}}'s reflection, a family inscription reads: " +
+        "On the back, beneath your reflection, a family inscription reads: " +
         "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
     },
   },

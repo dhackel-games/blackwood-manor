@@ -55,6 +55,7 @@ Feature: Maintained sysop shortcuts
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: Powerup and Quick Win use the current equipment and mirror routes
+    Then sysop command "::powerup" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     Then sysop command "::powerup" includes "u shoes"
     And sysop command "::powerup" includes "u goggles"
     And sysop command "::powerup" includes "u obsidian"
@@ -64,6 +65,9 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winquick1" includes "put batsight in rq"
     And sysop command "::winquick1" includes "pull bellrope"
     And sysop command "::winquick1" omits "south"
+    And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
+    And sysop command "::winmax2bell" contains sequence "g shaft; u backpack; g gallery; u headlamp"
+    And sysop command "::winmax2bell" contains sequence "u burrito; z; z; z; z; u milk"
 
   Scenario: Powerup equips every reusable power item without ending the game
     When I execute sysop command "::powerup"
@@ -74,6 +78,7 @@ Feature: Maintained sysop shortcuts
     And item "talisman" is worn in slot "neck"
     And item "obsidianEye" is worn in slot "forehead"
     And the game is not won
+    And the game score is 55
 
   Scenario: Quick Part I stops after the bell before the front-door ending
     When I execute sysop command "::winquick1"
@@ -83,6 +88,7 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And item "frontDoor" is open
     And every required family item is inside the countdown clock
+    And the game score is 315
 
   Scenario: Winmax2bell earns deterministic progress and stops at the closed reliquary
     When I execute sysop command "::winmax2bell"
@@ -97,9 +103,12 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:belfryMirrorFreed" is set
     And flag "progressAward:burritoSurvived" is set
     And flag "progressAward:selfFireSurvived" is set
+    And flag "progressAward:mushroomVisionOpened" is set
+    And flag "progressAward:atticLadderLowered" is set
     And flag "progressAward:letterRead" is set
     And item "mysteryPackage" is in "grandHall"
     And every required family item is in the reliquary
+    And the game score is 440
 
   Scenario: Winmax2bell recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set

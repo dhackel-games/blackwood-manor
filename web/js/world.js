@@ -610,6 +610,8 @@ const PROGRESS_AWARDS = Object.freeze({
   oakPanelAligned: 5,
   trollRiddleSolved: 5,
   belfryMirrorFreed: 5,
+  mushroomVisionOpened: 10,
+  atticLadderLowered: 5,
   reliquarySealed: 5,
   bellRung: 5,
   burritoSurvived: 25,
@@ -1793,6 +1795,20 @@ const HIGH_LINES = [
   "You can hear the color purple humming from somewhere behind your teeth.",
   "For one radiant moment, you understand the architecture. It is mostly anxiety with stairs.",
 ];
+const MUSHROOM_REVELATIONS = [
+  "...oh. OH. Colours have SOUNDS now. The wallpaper is humming directly into your teeth.",
+  "The mushrooms arrive all at once. Every shadow acquires a personality and most seem supportive.",
+  "A purple chord rings behind your eyes. The manor unfolds like a diagram drawn by an anxious wizard.",
+  "The floor exhales beneath you, the ceiling leans closer, and perspective becomes an optional courtesy.",
+  "Your thoughts grow feathers. Gravity looks embarrassed to have taken itself so seriously.",
+  "The room separates into light, sound, and several new categories for which language has not prepared you.",
+  "Every edge glows with private meaning. Even the dust seems to know where it is going.",
+  "The mushrooms kick open a door behind your forehead and leave the hinges spinning.",
+  "Colour pours through the silence. For one lucid second, the entire house makes terrible sense.",
+  "Your pulse becomes visible, your shadow becomes opinionated, and the walls begin breathing in rounds.",
+  "A warm violet buzz climbs your spine. Reality loosens its collar and stops enforcing the dress code.",
+  "The manor turns translucent around you, less a building now than a nervous system with wallpaper.",
+];
 const SICK_DURATION = 40;
 const SICK_BURP_LINES = [
   "A blast of stomach acid climbs your throat and escapes as a burp hot enough to tarnish silver.",
@@ -1856,6 +1872,7 @@ const DIGESTIVE_PHASES = [
   { name: "FART", emoji: "💨" },
   { name: "POOP", emoji: "💩" },
 ];
+const ALL_DIGESTIVE_PHASES = (1 << DIGESTIVE_PHASES.length) - 1;
 // Per-event ASCII blasts, indexed to match digestive phases (0=burp, 1=barf,
 // 2=flaming fart, 3=sparking diarrhea). Stamped in right after the event line.
 const BURP_ART = [
@@ -1885,17 +1902,18 @@ function eatMushrooms(ctx, cmd) {
   ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 12));
   ctx.setFlag("highGrace", true);
   ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
+  const points = awardProgress(ctx, "mushroomVisionOpened");
   const origin = mushrooms?.fresh
     ? "You eat the fresh mushrooms. They are slick with literal crap and piss from the TOILET HOLE — " +
       "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway."
     : "You chew through the dried kitchen mushrooms. They are dusty and bitter, but the trip hits just the same.";
-  return origin + "\n\n...oh. OH. Colours have SOUNDS now. The house isn't haunted, man — " +
-    "it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
+  return origin + "\n\n" + cycleFlavor(ctx, "mushroomRevelations") + "\n\n" +
+    "The house isn't haunted, man — it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
     "Your body feels so light you could FLY TO any room you can name.\n\n" +
     "Something else opens too: between your brows, an astral eye blinks awake. The dark of the house turns " +
     "to legible grey, and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, behind it " +
     "something that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark, and hidden " +
-    "detail keeps revealing itself while the trip lasts.)";
+    "detail keeps revealing itself while the trip lasts.)" + awardSuffix(points);
 }
 
 function capabilityStatus(ctx, equipmentFlag) {
@@ -1967,6 +1985,8 @@ function eatBurrito(ctx) {
   ctx.setFlag("sick", SICK_DURATION);
   ctx.setFlag("sickGrace", true);
   ctx.setFlag("digestivePhase", 0);
+  ctx.setFlag("burritoPhasesSeen", 0);
+  ctx.setFlag("burritoCourseActive", true);
   ctx.setFlag("fartIgnitionQueued", false);
   ctx.setFlag("ateBurrito", true); // permanent: the digestive pilot light never fully goes out (Andy's rule)
   ctx.setFlag("ateSuperBurrito", true);
@@ -1977,7 +1997,10 @@ function eatBurrito(ctx) {
 }
 
 function surviveBurrito(ctx, wasSick) {
-  if (!wasSick || !ctx.getFlag("ateSuperBurrito")) return "";
+  const completedCourse = ctx.getFlag("burritoCourseActive")
+    && ((ctx.getFlag("burritoPhasesSeen") || 0) & ALL_DIGESTIVE_PHASES) === ALL_DIGESTIVE_PHASES;
+  ctx.setFlag("burritoCourseActive", false);
+  if (!wasSick || !ctx.getFlag("ateSuperBurrito") || !completedCourse) return "";
   const points = awardProgress(ctx, "burritoSurvived");
   return points
     ? `\n\nYou survived the super burrito. Your digestive tract will never be the same. (+${points})`
@@ -2046,13 +2069,13 @@ function lightBrazier(ctx) {
 
 const OAK_GEMS = Object.freeze({
   emberStone: { label: "EMERALD GEM", slot: "middle" },
-  greenGlassStone: { label: "RUBY GEM", slot: "bottom" },
-  blueGlassStone: { label: "SAPPHIRE GEM", slot: "top" },
+  greenGlassStone: { label: "RUBY GEM", slot: "top" },
+  blueGlassStone: { label: "SAPPHIRE GEM", slot: "bottom" },
 });
 const OAK_SLOT_ORDER = Object.freeze(["bottom", "middle", "top"]);
 const OAK_LEGACY_COLOR_GEMS = Object.freeze({
-  red: "emberStone",
-  green: "greenGlassStone",
+  red: "greenGlassStone",
+  green: "emberStone",
   blue: "blueGlassStone",
 });
 
@@ -2130,6 +2153,7 @@ function putOakGem(ctx, cmd) {
   const explicitSlot = /\b(top|middle|bottom)(?:\s+(?:slot|hole))?\b/.exec(target)?.[1];
   const targetsPanel = /\b(panel|mechanism|slots?|holes?|oak)\b/.test(target);
   if (!explicitSlot && !targetsPanel) return null;
+  if (["all", "everything"].includes(cmd.dobj)) return null;
   const gem = ctx.find(cmd.dobj, ctx.inventory());
   if (!gem || !OAK_GEMS[gem.id]) return "Only the RUBY, EMERALD, and SAPPHIRE GEMS fit the PANEL.";
   const slots = oakGemSlots(ctx);
@@ -2249,6 +2273,9 @@ function afflictionTick(ctx) {
     const left = sick - 1;
     ctx.setFlag("sick", left);
     ctx.setFlag("digestivePhase", phase);
+    if (ctx.getFlag("burritoCourseActive")) {
+      ctx.setFlag("burritoPhasesSeen", (ctx.getFlag("burritoPhasesSeen") || 0) | (1 << phase));
+    }
     out.push(cycleFlavor(ctx, ["sickBurp", "sickBarf", "sickFart", "sickPoop"][phase]));
     if (SICK_EVENT_ART[phase]) out.push(MAP_MARK + SICK_EVENT_ART[phase] + MAP_MARK);
 
@@ -2527,11 +2554,24 @@ const PACKAGE_EFFECTS = [
       "here we go. The walls are breathing again.";
   },
 ];
+const PACKAGE_OPENINGS = [
+  "Against every instinct, and the express written warning on the card, you tear the ribbon and lift the lid.",
+  "You reread the warning, misunderstand its purpose completely, and pull the ribbon loose.",
+  "The card says not to. The house feels like it agrees. You open the PACKAGE anyway.",
+  "You test the bow, find it offensively well tied, and dismantle it with mounting personal commitment.",
+  "Common sense files a formal objection. You overrule it and raise the lid.",
+  "You give the PACKAGE one final chance to explain itself, then tear through the paper.",
+  "The ribbon slips free with suspicious ease. You open the box before prudence can catch up.",
+  "You decide the warning is probably decorative and lift the lid with both hands.",
+  "Every survival instinct points away from the PACKAGE. Your hands vote differently.",
+  "You peel back the wrapping one careful inch at a time, as if caution still matters at this point.",
+  "The box waits. You sigh, loosen the bow, and make the exact mistake requested of you.",
+  "You whisper, \"This is a bad idea,\" which apparently counts as consent, and open the PACKAGE.",
+];
 function openMysteryPackage(ctx) {
   ctx.destroy("mysteryPackage");
   const effect = PACKAGE_EFFECTS[Math.floor(Math.random() * PACKAGE_EFFECTS.length)];
-  return "Against every instinct, and the express written warning on the card, you tear the ribbon and lift " +
-    "the lid.\n\n" + effect(ctx);
+  return cycleFlavor(ctx, "packageOpenings") + "\n\n" + effect(ctx);
 }
 
 // --- Lightning Jumps: the manor's own random teleport, no wrapping paper -----
@@ -2577,6 +2617,20 @@ const LIGHTNING_FLAVORS = [
   "A spark races along the floorboards ahead of a LIGHTNING blast that shakes the room.",
   "There is a sharp ozone stink, a white flash, and the unmistakable report of LIGHTNING behaving badly.",
 ];
+const LIGHTNING_INVITATIONS = [
+  "A jagged bolt has speared into the floor where you stand, hissing and crackling. You could TOUCH it, if you dare.",
+  "The blue-white bolt remains planted in the boards like a live wire. TOUCH it if bad judgment feels urgent.",
+  "LIGHTNING writhes in the floor and waits for a volunteer. You may TOUCH it before it vanishes.",
+  "The bolt snaps at the air but does not move toward you. If this becomes a mistake, it begins with TOUCH.",
+  "A fork of raw LIGHTNING hums at your feet. Nothing requires you to TOUCH it, which has rarely stopped you.",
+  "The crackling bolt holds its place for one impossible moment. TOUCH it now or let it burn itself out.",
+  "Blue fire crawls along the floorboards around the embedded bolt. You could TOUCH the center and see what happens.",
+  "The room smells of rain and hot metal. The LIGHTNING waits below your hand if you choose to TOUCH it.",
+  "The bolt trembles like a doorway made of voltage. TOUCH it to step through whatever comes next.",
+  "A white-hot seam of LIGHTNING pulses in the floor. It looks extremely touchable in the worst possible way: TOUCH it.",
+  "Static lifts every hair on your arms while the bolt waits. One TOUCH would settle the question badly.",
+  "The LIGHTNING has arrived, stayed, and offered no instructions. TOUCH it before it sputters out, or exercise restraint.",
+];
 const LIGHTNING_ART = [
   "            ⚡",
   "           ╱",
@@ -2607,8 +2661,7 @@ function lightningTick(ctx) {
   ctx.setFlag("lightningBoltRoom", ctx.state.room);
   ctx.setFlag("lightningBoltFuse", LIGHTNING_FUSE);
   return `${cycleFlavor(ctx, "lightning")}\n\n${MAP_MARK}${LIGHTNING_ART}${MAP_MARK}\n\n` +
-    "A jagged bolt of LIGHTNING has speared into the floor right where you're standing, hissing and " +
-    "crackling. You could TOUCH it, if you dare.";
+    cycleFlavor(ctx, "lightningInvitations");
 }
 function touchLightningBolt(ctx) {
   ctx.destroy("lightningBolt");
@@ -2842,6 +2895,7 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   signoffs3: SIGNOFF_STAGE[3],
   waterOffers: WATER_OFFERS,
   mushroomHigh: HIGH_LINES,
+  mushroomRevelations: MUSHROOM_REVELATIONS,
   sickBurp: SICK_BURP_LINES,
   sickBarf: SICK_BARF_LINES,
   sickFart: SICK_FART_LINES,
@@ -2850,6 +2904,8 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   foreshadowMid: FORESHADOW_MID,
   foreshadowOpen: FORESHADOW_OPEN,
   lightning: LIGHTNING_FLAVORS,
+  lightningInvitations: LIGHTNING_INVITATIONS,
+  packageOpenings: PACKAGE_OPENINGS,
   mushroomRegrowth: MUSHROOM_REGROW_LINES,
   dragonRebukes: DRAGON_REBUKES,
 });
@@ -3311,11 +3367,14 @@ const logicWorld = {
       wraithPassed: state.flags["seen:crypt"],
       oakPanelAligned: state.flags.oakLightAligned,
       trollRiddleSolved: state.flags.dragonVaultOpen,
+      mushroomVisionOpened: state.flags.vaultFound,
+      atticLadderLowered: state.flags.ladderDown,
       reliquarySealed: state.flags.curseLiftable && state.flags.reliquarySealed,
       bellRung: state.flags.bellRung,
       burritoSurvived: (state.flags.ateSuperBurrito
           || (state.flags.ateBurrito && state.items.burrito?.loc == null))
-        && !(state.flags.sick > 0) && !state.dead,
+        && !(state.flags.sick > 0) && !state.dead
+        && ((state.flags.burritoPhasesSeen || 0) & ALL_DIGESTIVE_PHASES) === ALL_DIGESTIVE_PHASES,
     };
     for (const [id, completed] of Object.entries(completedProgress)) {
       const flag = `progressAward:${id}`;
@@ -3600,6 +3659,7 @@ const logicWorld = {
           const dest = ctx.find(cmd.iobj);
           if (!dest || dest.id !== "reliquary") return null; // let generic put handle other containers
           if (!dest.open) return "The RELIQUARY'S glass doors are closed.";
+          if (["all", "everything"].includes(cmd.dobj)) return null;
           const it = ctx.find(cmd.dobj, ctx.inventory());
           if (!it) return "You aren't carrying that.";
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
@@ -4056,6 +4116,8 @@ const logicWorld = {
     oakMechanism: {
       names: ["panel", "mechanism", "slots", "slot"], adjectives: ["oak", "iron", "inset"],
       loc: "greatOak", fixed: true, scenery: true, container: true, open: true, capacity: 3,
+      bulkTransfer: false,
+      bulkTransferMsg: "The mirrored PANEL must be solved deliberately. Place each GEM in its named SLOT.",
       on: { examine: describeOakPanel, search: describeOakPanel, put: putOakGem },
     },
     greenGlassStone: {
@@ -4173,11 +4235,13 @@ const logicWorld = {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
       wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
+      progressPoints: 5, progressFlag: "progressItem:backpack",
     },
     headlamp: {
       names: ["headlamp", "lamp"], adjectives: ["mining", "battery", "battered"],
       loc: "mineGallery", takeable: true, wearable: true, wearSlot: "head",
       lightSource: true, selfPowered: true, activatesOnWear: true, lit: false, fuel: 200,
+      progressPoints: 5, progressFlag: "progressItem:headlamp",
       lowFuelMsg: "The HEADLAMP dims. Its battery has only a few turns left.",
       outOfFuelMsg: "The HEADLAMP flickers once and its battery dies.",
     },
@@ -4190,6 +4254,7 @@ const logicWorld = {
     wingedShoes: {
       names: ["shoes", "sandals"], adjectives: ["winged", "gold", "golden"],
       loc: "dreadmawVault", takeable: true, wearable: true, wearSlot: "feet", grantsFlight: true,
+      progressPoints: 5, progressFlag: "progressItem:wingedShoes",
       wearMsg: "You lace the WINGED SHOES onto your feet. The little feathers snap taut, beat once — and your heels rise off the floor.",
       wearArt: MAP_MARK + WINGED_SHOES_ART + MAP_MARK,
     },
@@ -4219,6 +4284,7 @@ const logicWorld = {
       names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
       loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
       grantsMushroomVision: true, grantsDarkVision: true,
+      progressPoints: 5, progressFlag: "progressItem:xrayGoggles",
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
@@ -4398,7 +4464,9 @@ const logicWorld = {
         pull(ctx) {
           if (ctx.getFlag("ladderDown")) return "The ladder is already down.";
           ctx.setFlag("ladderDown");
-          return "You pull the cord. A trap-door drops open and a rickety wooden ladder clatters down from the attic.";
+          const points = awardProgress(ctx, "atticLadderLowered");
+          return "You pull the cord. A trap-door drops open and a rickety wooden ladder clatters down from the attic." +
+            awardSuffix(points);
         },
       },
     },
@@ -4491,7 +4559,7 @@ function inspectWoodblackWatch(ctx) {
   const remaining = Math.max(0, REQUIRED_FAMILY_ITEM_COUNT - depositedFamilyItemCount(ctx));
   const heirlooms = remaining === 1 ? "heirloom remains" : "heirlooms remain";
   return "The WOODBLACK WATCH has no hands and marks no hour. Its face shows only the number " +
-    `${remaining}: ${remaining} ${heirlooms} to place in the RELIQUARY TROPHY CASE. On the back, ` +
+    `${remaining}: ${remaining} ${heirlooms} to place in the RELIQUARY TROPHY CASE. On the back, beneath your reflection, ` +
     "a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"";
 }
 

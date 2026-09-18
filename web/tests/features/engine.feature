@@ -93,6 +93,23 @@ Feature: Generic text-adventure engine
     When I send "take all"
     Then the output equals "There is nothing here you can take."
 
+  Scenario: Put all and get all target one open container and respect its capacity
+    When I send "take all"
+    And I send "unlock box with key"
+    And I send "open box"
+    And I send "put all in box"
+    Then inventory contains exactly "match"
+    And room "box" contains exactly "candle,key,note"
+    And the output contains "The box is full"
+    And the output contains "Left in your inventory: match"
+    When I send "get all from box"
+    Then inventory contains exactly "candle,key,match,note"
+    And room "box" contains exactly ""
+
+  Scenario: Get all from a closed container reports the access problem
+    When I send "get all from box"
+    Then the output equals "The box is closed."
+
   Scenario: Drop all moves every unworn inventory item into the room
     When I send "take all"
     And I send "drop all"
