@@ -47,7 +47,7 @@ body { -webkit-text-size-adjust: 100%; }
   display: flex; flex-wrap: nowrap; gap: 0.2rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.15rem; margin-bottom: 0.2rem;
-  padding-right: 5.75rem;  /* clear the fixed Text | 2D toggle in the top-right */
+  padding-right: 14rem;  /* fallback; JS sizes this to the actual toggle width */
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
 #hud[hidden], #controls[hidden], #nav-disclosure[hidden] { display: none; }

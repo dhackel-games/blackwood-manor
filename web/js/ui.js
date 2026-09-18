@@ -399,6 +399,14 @@ function syncPhoneHudOffset() {
   phone.style.setProperty(
     "--phone-hud-offset", `${Math.ceil(hudElement.getBoundingClientRect().bottom)}px`);
 }
+// Reserve exactly enough space on the right of the HUD so the fixed
+// "How to play | Text | 2D" toggle never overlaps the score/turns/bill readout.
+function syncModeSwitchClearance() {
+  const sw = document.getElementById("mode-switch");
+  if (!hudElement || !sw) return;
+  const clearance = Math.ceil(sw.getBoundingClientRect().width) + 20;
+  hudElement.style.paddingRight = `${clearance}px`;
+}
 function showPhone() {
   endingCall = false;
   phone.removeAttribute("aria-busy");
@@ -441,6 +449,7 @@ function updateHud() {
 }
 window.addEventListener("resize", () => {
   if (!phone.hidden) syncPhoneHudOffset();
+  syncModeSwitchClearance();
 });
 
 function inventoryForBugReport() {
@@ -1283,6 +1292,11 @@ initHowto({
     document.getElementById("to-2d")?.click();
   },
 });
+
+// Size the HUD's right padding to the actual toggle width now that the
+// "How to play" label is in the DOM (re-run after fonts/emoji settle).
+requestAnimationFrame(syncModeSwitchClearance);
+setTimeout(syncModeSwitchClearance, 250);
 
 // --- boot ---
 // If we just arrived from the 2D map view, restore that game (and its command
