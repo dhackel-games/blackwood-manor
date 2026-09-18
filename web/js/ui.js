@@ -42,6 +42,33 @@ try {
   console.warn("[sysop-menu] could not read unlock state", error);
 }
 
+// Mode-switch continuity: the 2D tile-map view (view2d/tilemap.html) is a
+// separate page with its own engine instance, so switching would otherwise
+// start a brand-new game. We hand the whole game off through a one-shot
+// localStorage slot: snapshot on the way out, restore + consume on the way in.
+// The payload also carries the command history so the trail is visible in 2D.
+const MODE_HANDOFF_KEY = "blackwood-mode-handoff-v1";
+let resumedFromMode = false;
+function saveModeHandoff() {
+  try {
+    localStorage.setItem(MODE_HANDOFF_KEY,
+      JSON.stringify({ snapshot: game.snapshot(), history }));
+  } catch (error) {
+    console.warn("[mode-switch] could not save handoff", error);
+  }
+}
+function takeModeHandoff() {
+  try {
+    const raw = localStorage.getItem(MODE_HANDOFF_KEY);
+    if (!raw) return null;
+    localStorage.removeItem(MODE_HANDOFF_KEY);   // consume once
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn("[mode-switch] could not read handoff", error);
+    return null;
+  }
+}
+
 // phone-call screen elements
 const phone = document.getElementById("phone");
 const phoneT = document.getElementById("phone-transcript");
@@ -224,17 +251,23 @@ function syncNameGate() {
 function completeSessionIntro() {
   if (!modelCheckReady || sessionIntroReady) return;
   announceModelCheck();
-  if (pendingSavedNotice) {
+  if (pendingSavedNotice && !resumedFromMode) {
     print("\n(A saved game exists in this browser. Type RESTORE to continue it.)");
-    pendingSavedNotice = false;
   }
+  pendingSavedNotice = false;
   if (pendingSessionMessage) {
     print(pendingSessionMessage, "sys");
     pendingSessionMessage = "";
   }
-  print(game.showMessage(
-    "For now the manor calls you {{player_name}}. To pick your own name, just type it and press " +
-      "Enter — or type CALL ME {name}. Prefer to keep it? Ignore this and start exploring."));
+  if (resumedFromMode) {
+    print(game.showMessage(
+      "↩︎ Back in the text terminal — same night, same {{player_name}}. " +
+        "Everything you did in the 2D map carried over."), "sys");
+  } else {
+    print(game.showMessage(
+      "For now the manor calls you {{player_name}}. To pick your own name, just type it and press " +
+        "Enter — or type CALL ME {name}. Prefer to keep it? Ignore this and start exploring."));
+  }
   print("\n" + game.startMessage());
   sessionIntroReady = true;
   mainEntry.clear();
@@ -250,11 +283,12 @@ function completeSessionIntro() {
   }
 }
 
-function beginSession({ showSavedNotice = false, message = "" } = {}) {
+function beginSession({ showSavedNotice = false, message = "", resumed = false } = {}) {
   markSessionStart();
   introBannerElement = null;
   modelCheckAnnounced = false;
   sessionIntroReady = false;
+  resumedFromMode = resumed;
   pendingSavedNotice = showSavedNotice && hasSave();
   pendingSessionMessage = message;
   if (game.needsPlayerName()) game.useDefaultPlayerName();
@@ -890,6 +924,7 @@ function handle(raw) {
   // (you're already in the text game). The Text/2D toggle top-right does the same.
   if (!onCall && (low === "2d" || low === "2d mode" || low === "2-d")) {
     print("Switching to the 2D map view…", "sys");
+    saveModeHandoff();
     window.location.href = "view2d/tilemap.html";
     return;
   }
@@ -1230,8 +1265,25 @@ document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
 // Show the mic buttons only if speech input is actually available.
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
+// The top-right 2D toggle is a plain link; snapshot the game into the handoff
+// slot before it navigates so the 2D view resumes exactly here.
+document.getElementById("to-2d")?.addEventListener("click", () => saveModeHandoff());
+
 // --- boot ---
-beginSession({ showSavedNotice: true });
+// If we just arrived from the 2D map view, restore that game (and its command
+// trail) so the two modes are one continuous session.
+const modeHandoff = takeModeHandoff();
+if (modeHandoff && modeHandoff.snapshot) {
+  try { game.restore(modeHandoff.snapshot); } catch (error) {
+    console.warn("[mode-switch] restore failed", error);
+  }
+  if (Array.isArray(modeHandoff.history)) {
+    history.length = 0;
+    history.push(...modeHandoff.history);
+    hi = history.length;
+  }
+}
+beginSession({ showSavedNotice: true, resumed: !!(modeHandoff && modeHandoff.snapshot) });
 
 // Probe for an on-device model for Gary (native app bridge, or the local Mac
 // daemon). The name prompt waits for this bounded check so the startup order is

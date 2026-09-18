@@ -46,7 +46,7 @@
   .labels-ov span.anchor { opacity:.5; font-style:italic; }
   .labels-ov span.fog { color:var(--dim); }
   .side { flex:0 0 300px; border-left:1px solid var(--line); padding:12px 14px;
-    overflow:auto; background:var(--panel); }
+    overflow:auto; background:var(--panel); display:flex; flex-direction:column; }
   .side h2 { margin:0 0 2px; font-size:14px; color:var(--ink); letter-spacing:.5px; }
   .side .sub { color:var(--dim); font-size:11px; margin-bottom:8px; }
   .side .desc { font-size:12px; line-height:1.55; color:#b7d8c2; margin-bottom:12px; }
@@ -55,6 +55,18 @@
   .side .items .k { width:1.4em; text-align:center; }
   .side .items .kind { color:var(--dim); font-size:10px; margin-left:auto; }
   .side .empty { color:var(--dim); font-size:12px; }
+  /* command trail: the sequence of moves/commands that got you here */
+  .trail { margin-top:auto; padding-top:10px; border-top:1px solid var(--line); }
+  .trail .trail-head { display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:6px; }
+  .trail .trail-head h3 { margin:0; font-size:12px; color:var(--dim); letter-spacing:.5px;
+    text-transform:uppercase; }
+  .trail .trail-head button { padding:2px 7px; font-size:11px; }
+  .trail ol { list-style:none; margin:0; padding:0; max-height:150px; overflow:auto;
+    font-size:12px; line-height:1.5; }
+  .trail ol li { display:flex; gap:8px; padding:1px 0; color:#b7d8c2; }
+  .trail ol li .n { color:var(--dim); min-width:2ch; text-align:right; }
+  .trail .empty { color:var(--dim); font-size:12px; }
 
   /* pinned bottom: stats row + message line that never scroll away */
   .hud { display:flex; flex-wrap:wrap; gap:16px; padding:8px 16px; font-size:13px;
@@ -133,7 +145,16 @@
       <div class="labels-ov" id="labelsOv"></div>
     </div>
   </div>
-  <aside class="side" id="side"></aside>
+  <aside class="side">
+    <div id="side"></div>
+    <div class="trail" id="trail">
+      <div class="trail-head">
+        <h3>Your trail</h3>
+        <button id="trailClear" type="button">clear</button>
+      </div>
+      <ol id="trailList"></ol>
+    </div>
+  </aside>
 </div>
 
 <div class="exits" id="exits"></div>
@@ -170,6 +191,8 @@
   const hud = document.getElementById("hud");
   const exitsEl = document.getElementById("exits");
   const sideEl = document.getElementById("side");
+  const trailList = document.getElementById("trailList");
+  const trailClear = document.getElementById("trailClear");
   const textbar = document.getElementById("textbar");
   const cmdForm = document.getElementById("cmdForm");
   const cmdInput = document.getElementById("cmd");
@@ -194,10 +217,67 @@
         import("../js/world.js"), import("../js/core.js"),
       ]);
       game = createGame(world);
-      if (game.needsPlayerName()) startNameGate();
+      const handoff = takeModeHandoff();
+      if (handoff && handoff.snapshot) {
+        try { game.restore(handoff.snapshot); } catch (e) { console.warn("restore failed", e); }
+        history = Array.isArray(handoff.history) ? handoff.history.slice() : [];
+        gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
+        seen.add(gary); focusId = gary; recenter = true;
+        msg = `↩︎ Resumed in 2D as ${game.state.flags.playerName || "Gary"} — ` +
+          "your command trail is on the right. Move on, or type TEXT to switch back.";
+        renderTrail();
+      } else if (game.needsPlayerName()) {
+        startNameGate();
+      }
       render();
     } catch (e) { console.warn("live engine unavailable — using static roomdata", e); }
   })();
+
+  // Mode-switch continuity: mirror ui.js. The text game and this 2D view are
+  // separate pages with separate engine instances, so we hand the whole game
+  // (plus the command trail) across via a one-shot localStorage slot.
+  const MODE_HANDOFF_KEY = "blackwood-mode-handoff-v1";
+  function saveModeHandoff() {
+    try {
+      if (!game) return;
+      game.state.room = gary;   // resume the text game right where Gary stands
+      localStorage.setItem(MODE_HANDOFF_KEY,
+        JSON.stringify({ snapshot: game.snapshot(), history }));
+    } catch (e) { console.warn("could not save handoff", e); }
+  }
+  function takeModeHandoff() {
+    try {
+      const raw = localStorage.getItem(MODE_HANDOFF_KEY);
+      if (!raw) return null;
+      localStorage.removeItem(MODE_HANDOFF_KEY);   // consume once
+      return JSON.parse(raw);
+    } catch (e) { console.warn("could not read handoff", e); return null; }
+  }
+
+  // The command/move trail — the sequence that got Gary to where he is. Seeded
+  // from the text game on switch, then appended as you move and act here.
+  let history = [];
+  function logAction(text) {
+    if (!text) return;
+    history.push(text);
+    if (history.length > 200) history.splice(0, history.length - 200);
+    renderTrail();
+  }
+  function renderTrail() {
+    if (!trailList) return;
+    if (!history.length) {
+      trailList.innerHTML = `<li class="empty">No moves yet — start drifting.</li>`;
+      return;
+    }
+    trailList.innerHTML = history
+      .map((h, i) => `<li><span class="n">${i + 1}</span><span>${escapeHtml(h)}</span></li>`)
+      .join("");
+    trailList.scrollTop = trailList.scrollHeight;
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) =>
+      ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+  }
 
   // Name gate: the shipped engine wants a name before it will run commands (and
   // resolves {{player_name}} in every room description). Mirror the text game —
@@ -260,6 +340,7 @@
     gary = START; seen = new Set([START]); steps = 0;
     guest = GUEST_START; bait = new Set(); lured = 0;
     focusId = START; recenter = true;
+    history = []; renderTrail();
     if (game && game.needsPlayerName()) startNameGate();
     else msg = "You are Gary. Move around; drop bait (B) and lure the guest to it.";
     render(); canvas.focus();
@@ -500,8 +581,8 @@
 
   // Free action: leave/retract bait in Gary's current room (doesn't take a turn).
   function toggleBait() {
-    if (bait.has(gary)) { bait.delete(gary); msg = "You take the bait back."; }
-    else { bait.add(gary); msg = `You leave bait in ${graph.home.get(gary).label}. Now lure someone in…`; }
+    if (bait.has(gary)) { bait.delete(gary); msg = "You take the bait back."; logAction("take bait"); }
+    else { bait.add(gary); msg = `You leave bait in ${graph.home.get(gary).label}. Now lure someone in…`; logAction("drop bait"); }
     render();
   }
 
@@ -521,6 +602,7 @@
     focusId = id; recenter = true;
     const name = label || graph.home.get(id).label;
     msg = first ? `You seep into ${name} for the first time…` : `You drift into ${name}.`;
+    logAction("go " + (graph.home.get(id) ? graph.home.get(id).label.toLowerCase() : id));
     guestTurn();
     render(); canvas.focus();
   }
@@ -640,6 +722,7 @@
   // Route a line to the shipped engine as if Gary were the protagonist. Keeps
   // the spike un-brickable: engine death/win are side effects we swallow here.
   function runEngine(line) {
+    logAction(line);
     game.state.room = gary;
     let text;
     try { text = game.send(line); }
@@ -669,7 +752,7 @@
         "Or hover a room to inspect it.";
       render(); return;
     }
-    if (verb === "text" || (verb === "1d")) { window.location.href = "../index.html"; return; }
+    if (verb === "text" || (verb === "1d")) { saveModeHandoff(); window.location.href = "../index.html"; return; }
     if (verb === "2d") { msg = "You're already in 2D. Type TEXT to switch to the text game."; render(); return; }
     if (WORD_DIRS[verb]) {
       const [dx, dy] = WORD_DIRS[verb];
@@ -763,6 +846,11 @@
   zoom.addEventListener("input", () => { recenter = true; render(); });
   resetBtn.addEventListener("click", reset);
   tourBtn.addEventListener("click", () => { startTour(); canvas.focus(); });
+  trailClear.addEventListener("click", () => { history = []; renderTrail(); canvas.focus(); });
+  // The header "Text" link is a plain anchor — snapshot the game into the
+  // handoff slot before it navigates so the text game resumes exactly here.
+  document.querySelector('header .mode-switch a[href="../index.html"]')
+    ?.addEventListener("click", () => saveModeHandoff());
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
 
   // --- command bar: type what Gary does ------------------------------------

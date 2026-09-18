@@ -363,7 +363,7 @@ Then("browser startup includes a nonblocking name request", function () {
   assert.match(html, /id=["']nav-disclosure["'][^>]*hidden/);
   assert.match(css, /#hud\[hidden\], #controls\[hidden\], #nav-disclosure\[hidden\]\s*\{\s*display:\s*none/);
   assert.match(ui,
-    /\/\/ --- boot ---\s*beginSession\(\{ showSavedNotice: true \}\)/s);
+    /\/\/ --- boot ---[\s\S]*takeModeHandoff\(\)[\s\S]*beginSession\(\{ showSavedNotice: true, resumed:/s);
   assert.match(ui,
     /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)[\s\S]*showIntroBanner\(\)/s);
   assert.match(ui,
@@ -739,7 +739,7 @@ Then("game-over restart text links to the latest session start", function () {
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
   assert.match(ui, /function newGame[\s\S]*beginSession\(\{ showSavedNotice: true/);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
-  assert.match(ui, /\/\/ --- boot ---\s*beginSession\(\{ showSavedNotice: true \}\)/s);
+  assert.match(ui, /\/\/ --- boot ---[\s\S]*takeModeHandoff\(\)[\s\S]*beginSession\(\{ showSavedNotice: true, resumed:/s);
   assert.match(ui, /if \(game\.state\.won\) printRestartPrompt\(\)/);
   assert.match(css, /\.session-restart a\s*\{[^}]*color:\s*var\(--green-bright\)[^}]*text-decoration:\s*underline/s);
 });
