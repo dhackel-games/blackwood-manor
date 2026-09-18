@@ -169,9 +169,15 @@
   .howto-modes { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   @media (max-width:640px){ .howto-modes { grid-template-columns:1fr; } }
   .howto-mode { padding:10px 13px; background:#0f1620; border:1px solid #1c2733;
-    border-radius:10px; transition:border-color .15s, box-shadow .15s; }
-  .howto-mode:hover { border-color:#2f4a63; box-shadow:0 0 14px rgba(143,211,255,.12); }
-  .howto-mode h4 { margin:0 0 3px; font-size:12.5px; color:#49ff7a; letter-spacing:.5px; }
+    border-radius:10px; transition:border-color .15s, box-shadow .15s, transform .15s;
+    cursor:pointer; }
+  .howto-mode:hover { border-color:#49ff7a; transform:translateY(-2px);
+    box-shadow:0 8px 18px #000a, 0 0 16px rgba(73,255,122,.18); }
+  .howto-mode:focus-visible { outline:2px solid #49ff7a; outline-offset:2px; }
+  .howto-mode h4 { margin:0 0 3px; font-size:12.5px; color:#49ff7a; letter-spacing:.5px;
+    display:flex; align-items:center; justify-content:space-between; }
+  .howto-mode h4 .go { font-size:11px; color:#8fd3ff; opacity:0; transition:opacity .15s; }
+  .howto-mode:hover h4 .go { opacity:1; }
   .howto-mode p { font-size:11.5px; color:var(--dim); line-height:1.45; margin:0; }
   .howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
     padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
@@ -179,9 +185,12 @@
     gap:8px; margin-top:4px; }
   .howto-item { flex:0 0 108px; text-align:center; padding:8px 4px 6px;
     background:linear-gradient(180deg,#111925,#0d141d);
-    border:1px solid #1c2733; border-radius:8px;
+    border:1px solid #1c2733; border-radius:8px; cursor:pointer;
     transition:transform .16s ease, border-color .16s, box-shadow .16s;
     opacity:0; animation:howtoPop .4s ease forwards; }
+  .howto-item:focus-visible { outline:2px solid #c9a24b; outline-offset:2px; }
+  .howto-item.active { border-color:#c9a24b;
+    box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.45); }
   .howto-item:hover { transform:translateY(-4px) scale(1.04);
     border-color:#c9a24b; box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.35); }
   .howto-item img { width:54px; height:54px; object-fit:contain;
@@ -190,6 +199,24 @@
   .howto-item .nm { display:block; margin-top:4px; font-size:10px; color:var(--dim);
     letter-spacing:.2px; text-transform:capitalize; line-height:1.2; }
   .howto-item:hover .nm { color:#e9d9a8; }
+  /* floating heirloom backstory popover */
+  .lore-pop { position:fixed; z-index:60; width:250px; max-width:calc(100vw - 24px);
+    background:linear-gradient(180deg,#141b26,#0c1219);
+    border:1px solid #c9a24b66; border-radius:12px; padding:12px 13px 13px;
+    box-shadow:0 18px 50px #000c, 0 0 0 1px #0006 inset;
+    color:var(--ink); opacity:0; transform:translateY(6px) scale(.98);
+    transition:opacity .16s ease, transform .16s ease; pointer-events:none; }
+  .lore-pop.show { opacity:1; transform:none; pointer-events:auto; }
+  .lore-pop .lp-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
+  .lore-pop .lp-head img { width:40px; height:40px; object-fit:contain;
+    filter:drop-shadow(0 0 6px rgba(201,162,75,.5)); }
+  .lore-pop .lp-nm { font-size:12.5px; letter-spacing:.6px; color:#f0d99a;
+    text-transform:capitalize; font-weight:600; }
+  .lore-pop .lp-body { font-size:11.5px; line-height:1.5; color:#c9d4de; margin:0; }
+  .lore-pop .lp-x { position:absolute; top:6px; right:7px; width:20px; height:20px;
+    border:none; background:transparent; color:#7d8b98; font-size:15px; line-height:1;
+    cursor:pointer; border-radius:5px; }
+  .lore-pop .lp-x:hover { color:#ff9db0; background:#0006; }
   .howto-reliquary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
   .howto-shrine { text-align:center; padding:10px; background:#0f1620;
     border:1px solid #1c2733; border-radius:10px; transition:transform .16s; }
@@ -364,18 +391,20 @@
 
       <h3>Two ways to play</h3>
       <div class="howto-modes">
-        <div class="howto-mode">
-          <h4>📜 Text mode</h4>
+        <div class="howto-mode" data-switch="text" role="button" tabindex="0"
+          title="Switch to Text mode">
+          <h4>📜 Text mode <span class="go">switch →</span></h4>
           <p>Old-school adventure. <b>Type what Gary does</b> — "go library", "take
           locket", "drop bait" — or tap the arrows. Read the room. Trust your gut.
-          Jump in anytime from the <kbd>Text</kbd> tab.</p>
+          <b>Click to play in text.</b></p>
         </div>
-        <div class="howto-mode">
-          <h4>🗺️ 2D map mode</h4>
+        <div class="howto-mode" data-switch="2d" role="button" tabindex="0"
+          title="Play the 2D map">
+          <h4>🗺️ 2D map mode <span class="go">play →</span></h4>
           <p>The manor paints itself in 8-bit as you step into each room; everywhere
           you haven't been stays lost in fog. <b>Click a room to walk there</b>, use
-          arrow keys / WASD, or hit <kbd>▶ auto-tour</kbd> and watch Gary haunt the
-          whole house.</p>
+          arrow keys / WASD, or hit <kbd>▶ auto-tour</kbd>. <b>Click to close and
+          explore.</b></p>
         </div>
       </div>
 
@@ -1396,26 +1425,105 @@
   const howtoPlay = document.getElementById("howtoPlay");
   const howtoTour = document.getElementById("howtoTour");
   const HOWTO_SEEN_KEY = "blackwood-howto-seen-v1";
+  // Short backstory for each heirloom, distilled from the text game's descriptions.
+  const HEIRLOOM_LORE = {
+    spyglass: "A handsome brass spyglass etched BM, forever aimed from its rusted swivel cradle at the manor's distant belfry.",
+    batSightMirror: "A silver hand-mirror embossed with tiny bats and the initials BM. Its black glass can spy into any room in Blackwood Manor.",
+    familyCrest: "The Blackwood family crest, resting on velvet beside the hoard — the proof and pride of a cursed bloodline.",
+    candlestick: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt after all these years.",
+    grimoire: "A heavy black grimoire clasped in tarnished silver — a priceless first edition. Some things are worth money, not reading.",
+    talisman: "A silver talisman, warm to the touch, graven with wards against the dead and stamped with the BM crest.",
+    musicBox: "A jeweled music box, its lid inlaid with mother-of-pearl. Wind it and it still remembers a lullaby no one living taught it.",
+    rubyRing: "The Ravenblood Ring — a heavy gold band set with a garnet like a suspended drop of blood, initialed BM inside.",
+    goldLocket: "A gold locket, cold as the grave, its clasp shaped like two clasped hands that will not let go.",
+    ancientCoin: "An ancient coin worn smooth, stamped with a face no one alive remembers — and no one dead will name.",
+    crystalDecanter: "A cut-crystal decanter, still full, throwing splinters of colour even in the manor's deepest gloom.",
+    ancestralPortrait: "A miniature portrait of a woman who looks unsettlingly like the garden statue. Her painted gaze follows you across the room.",
+    backwardsWatch: "A tarnished Woodblack Watch with no hands or hours — only a single changing number. On the back: \u201CWhat time takes, blood remembers.\u201D",
+  };
+  // Shared floating popover reused for whichever heirloom you click.
+  let lorePop = null, loreActiveItem = null;
+  function hideLore() {
+    if (lorePop) lorePop.classList.remove("show");
+    if (loreActiveItem) loreActiveItem.classList.remove("active");
+    loreActiveItem = null;
+  }
+  function showLore(item, id, label) {
+    if (loreActiveItem === item) { hideLore(); return; }
+    if (!lorePop) {
+      lorePop = document.createElement("div");
+      lorePop.className = "lore-pop";
+      document.body.appendChild(lorePop);
+      lorePop.addEventListener("click", (e) => {
+        if (e.target.classList.contains("lp-x")) hideLore();
+      });
+    }
+    lorePop.innerHTML =
+      `<button class="lp-x" type="button" aria-label="close">\u00D7</button>` +
+      `<div class="lp-head"><img src="icons/heirlooms/${id}.png" alt="">` +
+      `<span class="lp-nm">${label}</span></div>` +
+      `<p class="lp-body">${HEIRLOOM_LORE[id] || "A lost Blackwood heirloom."}</p>`;
+    // Position under the item, clamped to the viewport.
+    const r = item.getBoundingClientRect();
+    lorePop.style.visibility = "hidden";
+    lorePop.classList.add("show");
+    const pw = lorePop.offsetWidth, ph = lorePop.offsetHeight;
+    let left = r.left + r.width / 2 - pw / 2;
+    left = Math.max(12, Math.min(left, window.innerWidth - pw - 12));
+    let top = r.bottom + 8;
+    if (top + ph > window.innerHeight - 12) top = r.top - ph - 8; // flip above
+    lorePop.style.left = left + "px";
+    lorePop.style.top = Math.max(12, top) + "px";
+    lorePop.style.visibility = "";
+    if (loreActiveItem) loreActiveItem.classList.remove("active");
+    loreActiveItem = item; item.classList.add("active");
+  }
   if (howtoGallery) {
     let i = 0;
     for (const [id, , label] of HEIRLOOMS) {
       const item = document.createElement("div");
       item.className = "howto-item";
       item.style.animationDelay = `${0.04 * i++}s`; // staggered reveal
+      item.tabIndex = 0;
+      item.setAttribute("role", "button");
+      item.title = `${label} — read its story`;
       const img = document.createElement("img");
       img.src = `icons/heirlooms/${id}.png`;
       img.alt = label; img.loading = "lazy";
       const nm = document.createElement("span");
       nm.className = "nm"; nm.textContent = label;
       item.append(img, nm);
+      item.addEventListener("click", (e) => { e.stopPropagation(); showLore(item, id, label); });
+      item.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showLore(item, id, label); }
+      });
       howtoGallery.appendChild(item);
     }
   }
   function openHowto() { if (howtoOverlay) howtoOverlay.classList.add("open"); }
   function closeHowto() {
+    hideLore();
     if (howtoOverlay) howtoOverlay.classList.remove("open");
     try { localStorage.setItem(HOWTO_SEEN_KEY, "1"); } catch { /* private mode */ }
   }
+  // Mode cards inside the tutorial actually switch play modes.
+  document.querySelectorAll(".howto-mode[data-switch]").forEach((card) => {
+    const go = () => {
+      const mode = card.getAttribute("data-switch");
+      if (mode === "text") { saveModeHandoff(); window.location.href = "../index.html"; }
+      else { closeHowto(); } // already in 2D — just close and explore
+    };
+    card.addEventListener("click", go);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
+    });
+  });
+  // Dismiss the lore popover on scroll inside the card or on Escape.
+  const howtoCard = howtoOverlay ? howtoOverlay.querySelector(".howto-card") : null;
+  if (howtoCard) howtoCard.addEventListener("scroll", hideLore, { passive: true });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && loreActiveItem) { hideLore(); }
+  });
   if (howtoBtn) howtoBtn.addEventListener("click", openHowto);
   if (howtoClose) howtoClose.addEventListener("click", closeHowto);
   if (howtoPlay) howtoPlay.addEventListener("click", () => {
@@ -1428,7 +1536,9 @@
   });
   if (howtoOverlay) {
     howtoOverlay.addEventListener("click", (e) => {
-      if (e.target === howtoOverlay) closeHowto();
+      if (e.target === howtoOverlay) { closeHowto(); return; }
+      // Any click inside the card that isn't on a heirloom tile dismisses the lore popover.
+      if (loreActiveItem && !e.target.closest(".howto-item")) hideLore();
     });
   }
   try { if (!localStorage.getItem(HOWTO_SEEN_KEY)) openHowto(); }
