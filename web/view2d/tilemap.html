@@ -24,6 +24,14 @@
   header .mode-switch a.mode-seg:hover { color:#fff; background:rgba(143,211,255,0.15); }
   header .mode-switch a.mode-seg:active { color:#fff; background:rgba(143,211,255,0.3); }
   header details { color:var(--dim); font-size:12px; margin-top:4px; }
+  /* Top awards readout — same score/capacity/bill slots as the text game. */
+  header .awards { font-size:13px; color:var(--dim); min-height:1.2em; margin-bottom:6px; }
+  header .awards #hud-slots { display:inline-flex; flex-wrap:wrap; align-items:center; gap:0.35rem; }
+  header .awards .hud-slot { color:var(--ink); }
+  header .awards .hud-slot[hidden] { display:none; }
+  header .awards .hud-slot + .hud-slot::before { content:"·"; color:var(--dim); margin-right:0.5rem; }
+  header .awards .hud-slot-emoji { display:inline-block; }
+  header .awards .hud-slot--bill .hud-slot-emoji { font-size:1.5em; line-height:0; vertical-align:-0.08em; }
   header summary { cursor:pointer; }
   header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
   .bar { display:flex; flex-wrap:wrap; gap:14px; align-items:center;
@@ -264,6 +272,7 @@
 </head>
 <body>
 <header>
+  <div class="awards" id="awards"><span id="hud-slots"></span></div>
   <nav class="mode-switch" aria-label="view mode">
     <a class="mode-seg" href="../index.html" title="Switch to the text game">Text</a>
     <span class="mode-seg is-active" aria-current="page">2D</span>
@@ -446,6 +455,7 @@
     buildManorGraph, coordsOnFloor, neighborInDirection, crossFloorExits,
     guestStep,
   } from "./tilemap.js";
+  import { createHud } from "../js/hud.js";
 
   const canvas = document.getElementById("c");
   const ctx = canvas.getContext("2d");
@@ -465,6 +475,7 @@
   const baitBtn = document.getElementById("baitBtn");
   const legend = document.getElementById("legend");
   const hud = document.getElementById("hud");
+  const awardsHud = createHud(document);
   const exitsEl = document.getElementById("exits");
   const sideEl = document.getElementById("side");
   const trailList = document.getElementById("trailList");
@@ -492,6 +503,7 @@
   // front-ends). Dynamic so a load failure degrades to the static snapshot
   // rather than breaking the page.
   let game = null;
+  let worldRef = null;
   // Sysop "::" menu — the same back-office shortcuts the text game exposes.
   // Loaded live (like the engine) so a failure degrades gracefully. The unlock
   // state is shared with the text game via the same localStorage key.
@@ -507,6 +519,7 @@
       ]);
       sysop = sysopMod;
       game = createGame(world);
+      worldRef = world;
       const handoff = takeModeHandoff();
       if (handoff && handoff.snapshot) {
         try { game.restore(handoff.snapshot); } catch (e) { console.warn("restore failed", e); }
@@ -781,6 +794,7 @@
     floorSel.value = String(fi);
     if (recenter) { centerCamera(layout); recenter = false; }
     renderHud();
+    if (game && worldRef) awardsHud.update({ game, world: worldRef });
     renderExits(fi);
     renderInspector();
     renderReliquary();

@@ -655,8 +655,13 @@ body { -webkit-text-size-adjust: 100%; }
 
 /* Mode switch: a Text | 2D segmented toggle, fixed top-right. The active
    segment is filled; the other is a link to the other view. */
-#mode-switch {
+/* Top-right controls: the "How to play" pill + the Text|2D toggle, sitting
+   side by side (mirrors the 2D map header). */
+#top-controls {
   position: fixed; top: max(6px, env(safe-area-inset-top)); right: 8px; z-index: 60;
+  display: inline-flex; align-items: stretch; gap: 10px;
+}
+#mode-switch {
   display: inline-flex; align-items: stretch;
   font: 700 11px/1 "Courier New", monospace; letter-spacing: 1px;
   background: rgba(5, 8, 5, 0.82); border: 1px solid #2a3b2f; border-radius: 7px;

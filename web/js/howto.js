@@ -49,7 +49,7 @@ export function initHowto(opts = {}) {
     onTour = null,
     onSwitchText = null,
     onSwitch2d = null,
-    modeSwitchSel = "#mode-switch",
+    modeSwitchSel = "#top-controls",
   } = opts;
   const ib = iconBase.endsWith("/") ? iconBase : iconBase + "/";
 
@@ -243,10 +243,10 @@ export function initHowto(opts = {}) {
     btn = document.createElement("button");
     btn.type = "button";
     btn.id = "howtoBtn";
-    btn.className = "mode-seg howto-seg";
+    btn.className = "howto-btn";
     btn.title = "How to play";
     btn.setAttribute("aria-label", "How to play");
-    btn.textContent = "\uD83D\uDCD6";
+    btn.textContent = "\uD83D\uDCD6 How to play";
     const modeSwitch = document.querySelector(modeSwitchSel);
     if (modeSwitch) modeSwitch.insertBefore(btn, modeSwitch.firstChild);
     else document.body.appendChild(btn);

@@ -402,9 +402,9 @@ function syncPhoneHudOffset() {
 // Reserve exactly enough space on the right of the HUD so the fixed
 // "How to play | Text | 2D" toggle never overlaps the score/turns/bill readout.
 function syncModeSwitchClearance() {
-  const sw = document.getElementById("mode-switch");
-  if (!hudElement || !sw) return;
-  const clearance = Math.ceil(sw.getBoundingClientRect().width) + 20;
+  const controls = document.getElementById("top-controls");
+  if (!hudElement || !controls) return;
+  const clearance = Math.ceil(controls.getBoundingClientRect().width) + 20;
   hudElement.style.paddingRight = `${clearance}px`;
 }
 function showPhone() {
