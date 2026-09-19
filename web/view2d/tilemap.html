@@ -170,7 +170,7 @@
     backdrop-filter:blur(3px);
     align-items:center; justify-content:center; padding:14px; }
   .howto-overlay.open { display:flex; animation:howtoFade .28s ease; }
-  .howto-card { width:min(900px,100%); max-height:calc(100dvh - 28px); overflow:auto;
+  .howto-card { width:min(860px,100%); max-height:calc(100dvh - 28px); overflow:auto;
     background:linear-gradient(180deg,#0c1016,#080b10);
     border:1px solid #2f4a63; border-radius:12px;
     box-shadow:0 24px 70px #000c, 0 0 0 1px rgba(143,211,255,.06) inset;
@@ -182,7 +182,7 @@
   .howto-close:hover { border-color:#c9556a; color:#ff9db0; }
   .howto-hero { position:relative; border-radius:12px 12px 0 0; overflow:hidden;
     border-bottom:1px solid #1c2733; }
-  .howto-hero img.bg { display:block; width:100%; height:132px; object-fit:cover;
+  .howto-hero img.bg { display:block; width:100%; height:104px; object-fit:cover;
     object-position:center 40%; }
   /* Gary drifts up in the corner of the hero, greeting you */
   .howto-hero .gary { position:absolute; right:12px; bottom:-2px; z-index:2;
@@ -199,13 +199,13 @@
     text-shadow:0 0 18px rgba(255,224,150,.45), 0 2px 4px #000; }
   .howto-hero p { margin:3px 0 0; font-size:12.5px; color:#e2b658; letter-spacing:.6px;
     font-style:italic; text-shadow:0 1px 3px #000; }
-  .howto-body { padding:12px 18px 0; }
-  .howto-body h3 { margin:15px 0 6px; font-size:12px; letter-spacing:1.5px; color:#8fd3ff;
+  .howto-body { padding:10px 20px 0; }
+  .howto-body h3 { margin:11px 0 5px; font-size:12px; letter-spacing:1.5px; color:#8fd3ff;
     text-transform:uppercase; }
   .howto-body > p { margin:0 0 6px; font-size:12.5px; line-height:1.45; color:var(--ink); }
   .howto-body i { color:#e6a3b4; font-style:italic; }
-  .howto-goal { display:flex; gap:12px; align-items:center; margin-top:10px;
-    padding:10px 13px; border-radius:10px;
+  .howto-goal { display:flex; gap:12px; align-items:center; margin-top:8px;
+    padding:8px 13px; border-radius:10px;
     background:linear-gradient(180deg,#14110a,#0f1620);
     border:1px solid #3a2f18; box-shadow:inset 0 0 18px rgba(201,162,75,.12); }
   .howto-goal .g-ic { flex:0 0 auto; width:46px; height:46px;
@@ -229,7 +229,7 @@
     padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
   .howto-gallery { display:flex; flex-wrap:wrap; justify-content:center;
     gap:8px; margin-top:4px; }
-  .howto-item { flex:0 0 108px; text-align:center; padding:8px 4px 6px;
+  .howto-item { flex:0 0 100px; text-align:center; padding:6px 4px 5px;
     background:linear-gradient(180deg,#111925,#0d141d);
     border:1px solid #1c2733; border-radius:8px; cursor:pointer;
     transition:transform .16s ease, border-color .16s, box-shadow .16s;
@@ -239,7 +239,7 @@
     box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.45); }
   .howto-item:hover { transform:translateY(-4px) scale(1.04);
     border-color:#c9a24b; box-shadow:0 8px 20px #000a, 0 0 16px rgba(201,162,75,.35); }
-  .howto-item img { width:54px; height:54px; object-fit:contain;
+  .howto-item img { width:46px; height:46px; object-fit:contain;
     transition:filter .16s; }
   .howto-item:hover img { filter:drop-shadow(0 0 8px rgba(201,162,75,.55)); }
   .howto-item .nm { display:block; margin-top:4px; font-size:10px; color:var(--dim);
@@ -264,10 +264,10 @@
     cursor:pointer; border-radius:5px; }
   .lore-pop .lp-x:hover { color:#ff9db0; background:#0006; }
   .howto-reliquary { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
-  .howto-shrine { text-align:center; padding:10px; background:#0f1620;
+  .howto-shrine { text-align:center; padding:8px; background:#0f1620;
     border:1px solid #1c2733; border-radius:10px; transition:transform .16s; }
   .howto-shrine:hover { transform:translateY(-3px); }
-  .howto-shrine img { width:70px; height:70px; object-fit:contain; }
+  .howto-shrine img { width:56px; height:56px; object-fit:contain; }
   .howto-shrine.reward { border-color:#c9a24b;
     background:linear-gradient(180deg,#151009,#0f1620);
     animation:rewardGlow 2.4s ease-in-out infinite; }
@@ -275,7 +275,7 @@
   .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:var(--ink); }
   .howto-shrine .sub { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
   .howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
-    margin-top:18px; }
+    margin-top:12px; }
   .howto-cta .cta-primary { font-size:15px; font-weight:700; letter-spacing:1px;
     padding:11px 26px; border-radius:10px; color:#04120a; cursor:pointer;
     background:linear-gradient(180deg,#6bffa0,#22c55e); border:1px solid #7dffb0;
@@ -459,7 +459,7 @@
 
       <h3>The thirteen heirlooms</h3>
       <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
-      into the Reliquary the moment they're enshrined.</p>
+      into the Reliquary the moment they're enshrined. <b>Hover (or tap) any relic for its story.</b></p>
       <div class="howto-gallery" id="howtoGallery"></div>
 
       <h3>The Reliquary</h3>
@@ -1577,8 +1577,9 @@
     if (loreActiveItem) loreActiveItem.classList.remove("active");
     loreActiveItem = null;
   }
-  function showLore(item, id, label) {
-    if (loreActiveItem === item) { hideLore(); return; }
+  function showLore(item, id, label, toggle = true) {
+    if (toggle && loreActiveItem === item) { hideLore(); return; }
+    if (loreActiveItem === item && lorePop && lorePop.classList.contains("show")) return;
     if (!lorePop) {
       lorePop = document.createElement("div");
       lorePop.className = "lore-pop";
@@ -1615,13 +1616,16 @@
       item.style.animationDelay = `${0.04 * i++}s`; // staggered reveal
       item.tabIndex = 0;
       item.setAttribute("role", "button");
-      item.title = `${label} — read its story`;
+      item.title = `${label} — hover to read its story`;
       const img = document.createElement("img");
       img.src = `icons/heirlooms/${id}.png`;
       img.alt = label; img.loading = "lazy";
       const nm = document.createElement("span");
       nm.className = "nm"; nm.textContent = label;
       item.append(img, nm);
+      // Hover reveals the backstory; click/keyboard still work for touch + a11y.
+      item.addEventListener("mouseenter", () => showLore(item, id, label, false));
+      item.addEventListener("mouseleave", hideLore);
       item.addEventListener("click", (e) => { e.stopPropagation(); showLore(item, id, label); });
       item.addEventListener("keydown", (e) => {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showLore(item, id, label); }

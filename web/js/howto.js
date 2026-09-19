@@ -104,7 +104,7 @@ export function initHowto(opts = {}) {
 
         <h3>The thirteen heirlooms</h3>
         <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
-        into the Reliquary the moment they're enshrined. <b>Tap any relic for its story.</b></p>
+        into the Reliquary the moment they're enshrined. <b>Hover (or tap) any relic for its story.</b></p>
         <div class="howto-gallery" id="howtoGallery"></div>
 
         <h3>The Reliquary</h3>
@@ -144,8 +144,9 @@ export function initHowto(opts = {}) {
     if (loreActiveItem) loreActiveItem.classList.remove("active");
     loreActiveItem = null;
   }
-  function showLore(item, id, label) {
-    if (loreActiveItem === item) { hideLore(); return; }
+  function showLore(item, id, label, toggle = true) {
+    if (toggle && loreActiveItem === item) { hideLore(); return; }
+    if (loreActiveItem === item && lorePop && lorePop.classList.contains("show")) return;
     if (!lorePop) {
       lorePop = document.createElement("div");
       lorePop.className = "lore-pop";
@@ -182,13 +183,16 @@ export function initHowto(opts = {}) {
     item.style.animationDelay = `${0.04 * i++}s`;
     item.tabIndex = 0;
     item.setAttribute("role", "button");
-    item.title = `${label} \u2014 read its story`;
+    item.title = `${label} \u2014 hover to read its story`;
     const img = document.createElement("img");
     img.src = `${ib}heirlooms/${id}.png`;
     img.alt = label; img.loading = "lazy";
     const nm = document.createElement("span");
     nm.className = "nm"; nm.textContent = label;
     item.append(img, nm);
+    // Hover reveals the backstory; click/keyboard still work for touch + a11y.
+    item.addEventListener("mouseenter", () => showLore(item, id, label, false));
+    item.addEventListener("mouseleave", hideLore);
     item.addEventListener("click", (e) => { e.stopPropagation(); showLore(item, id, label); });
     item.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showLore(item, id, label); }
