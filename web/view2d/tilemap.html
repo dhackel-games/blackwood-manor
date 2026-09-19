@@ -101,6 +101,44 @@
   .satchel { display:flex; flex-wrap:wrap; gap:6px; min-height:26px; align-items:center; }
   .satchel .ic { width:24px; height:24px; font-size:17px; }
   .satchel .satchel-empty { color:var(--dim); font-size:11px; }
+  /* A freshly-collected heirloom pulses in its Carrying slot once the big
+     "item get" flash has settled, so you can see where it landed in the list. */
+  .satchel .ic.just-got { animation:satchelLand 1.1s ease 2; z-index:1; }
+  @keyframes satchelLand {
+    0%,100% { transform:scale(1); filter:none; }
+    45% { transform:scale(1.45);
+          filter:drop-shadow(0 0 7px rgba(201,162,75,.95)) brightness(1.15); } }
+
+  /* "Item get" flourish: a big, glowing version of the heirloom you just picked
+     up, centered over the stage. Pops in, holds, then drops toward the satchel. */
+  .item-get-layer { position:fixed; inset:0; z-index:60; pointer-events:none;
+    display:flex; align-items:center; justify-content:center; }
+  .item-get { display:flex; flex-direction:column; align-items:center; gap:9px;
+    padding:22px 34px 20px; border-radius:18px; text-align:center;
+    background:radial-gradient(120% 120% at 50% 35%, rgba(26,30,52,.94), rgba(7,9,16,.9));
+    border:1px solid rgba(201,162,75,.55);
+    box-shadow:0 0 46px rgba(201,162,75,.4), inset 0 0 34px rgba(201,162,75,.12);
+    animation:itemGetPop 1.6s cubic-bezier(.2,.8,.2,1) forwards; }
+  .item-get .ig-art { width:132px; height:132px; position:relative;
+    filter:drop-shadow(0 0 18px rgba(201,162,75,.8)); }
+  .item-get .ig-art img { position:absolute; inset:0; width:100%; height:100%;
+    object-fit:contain; image-rendering:pixelated; }
+  .item-get .ig-art .emo-big { font-size:108px; line-height:132px; }
+  .item-get .ig-kicker { font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color:#c9a24b; }
+  .item-get .ig-name { font-size:21px; color:#f3e7c6; letter-spacing:.3px;
+    text-shadow:0 0 12px rgba(201,162,75,.6); }
+  .item-get .ig-sub { font-size:11px; color:var(--dim); }
+  .item-get::after { content:""; position:absolute; inset:-2px; border-radius:20px;
+    box-shadow:0 0 0 2px rgba(201,162,75,.25); animation:itemGetHalo 1.6s ease forwards; }
+  @keyframes itemGetPop {
+    0%   { transform:scale(.4) translateY(6px); opacity:0; }
+    14%  { transform:scale(1.09); opacity:1; }
+    26%  { transform:scale(1); opacity:1; }
+    76%  { transform:scale(1); opacity:1; }
+    100% { transform:scale(.6) translateY(64px); opacity:0; } }
+  @keyframes itemGetHalo {
+    0% { opacity:0; } 20% { opacity:1; } 70% { opacity:.5; } 100% { opacity:0; } }
 
   /* pinned bottom: stats row + message line that never scroll away */
   .hud { display:flex; flex-wrap:wrap; gap:16px; padding:8px 16px; font-size:13px;
@@ -267,6 +305,8 @@
     .howto-overlay.open, .howto-card, .howto-item { animation:none; opacity:1; }
     .howto-shrine.reward, .howto-cta .cta-primary { animation:none; }
     .howto-hero .gary { animation:none; }
+    .item-get { animation-duration:2.2s; }
+    .satchel .ic.just-got { animation:none; }
   }
 </style>
 </head>
@@ -623,7 +663,65 @@
     return wrap;
   }
   function heirloomIcon(id, emoji, label, extraCls) {
-    return buildIcon(`icons/heirlooms/${id}.png`, emoji, label, `h:${id}`, extraCls);
+    const el = buildIcon(`icons/heirlooms/${id}.png`, emoji, label, `h:${id}`, extraCls);
+    el.dataset.heirloom = id;
+    return el;
+  }
+
+  // --- "Item get" flourish --------------------------------------------------
+  // When a heirloom enters your Carrying satchel, show a big glowing version of
+  // it centered over the stage, then pulse the satchel slot it settled into.
+  // Acquisitions are queued so several at once play one after another.
+  let knownCarried = null;          // Set<id> carried as of the last render
+  const itemGetQueue = [];
+  let itemGetPlaying = false;
+  let itemGetLayer = null;
+  function pumpItemGet() {
+    if (itemGetPlaying || !itemGetQueue.length) return;
+    itemGetPlaying = true;
+    const { id, emoji, label } = itemGetQueue.shift();
+    if (!itemGetLayer) {
+      itemGetLayer = document.createElement("div");
+      itemGetLayer.className = "item-get-layer";
+      document.body.appendChild(itemGetLayer);
+    }
+    itemGetLayer.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "item-get";
+    const art = document.createElement("div");
+    art.className = "ig-art";
+    const emo = document.createElement("span");
+    emo.className = "emo-big"; emo.textContent = emoji;
+    art.appendChild(emo);
+    if (!iconMissing.has(`h:${id}`)) {
+      const img = document.createElement("img");
+      img.alt = label; img.src = `icons/heirlooms/${id}.png`;
+      img.onload = () => { emo.style.visibility = "hidden"; };
+      img.onerror = () => { img.remove(); };
+      art.appendChild(img);
+    }
+    card.appendChild(art);
+    card.insertAdjacentHTML("afterbegin", '<div class="ig-kicker">Heirloom recovered</div>');
+    const nm = document.createElement("div");
+    nm.className = "ig-name"; nm.textContent = label;
+    card.appendChild(nm);
+    card.insertAdjacentHTML("beforeend",
+      '<div class="ig-sub">Added to your Carrying satchel</div>');
+    itemGetLayer.appendChild(card);
+    const done = () => {
+      card.removeEventListener("animationend", done);
+      itemGetLayer.innerHTML = "";
+      // Now that the flash has dropped away, highlight where it landed.
+      const slot = satchelRow && satchelRow.querySelector(`.ic[data-heirloom="${id}"]`);
+      if (slot) { slot.classList.remove("just-got"); void slot.offsetWidth; slot.classList.add("just-got"); }
+      itemGetPlaying = false;
+      pumpItemGet();
+    };
+    card.addEventListener("animationend", done);
+  }
+  function flashItemGet(id, emoji, label) {
+    itemGetQueue.push({ id, emoji, label });
+    pumpItemGet();
   }
   // Header art: closed cabinet normally, open cabinet once all 13 are enshrined.
   // Rebuilt only when the open/closed state actually flips, so it doesn't churn.
@@ -679,6 +777,19 @@
       for (const [id, emoji, label] of carried) {
         satchelRow.appendChild(heirloomIcon(id, emoji, label, "carry"));
       }
+    }
+
+    // Celebrate heirlooms that just entered the satchel since the last render.
+    // First render (or after a reset) only seeds the baseline so we don't flash
+    // items carried over from text mode / a restored save.
+    const carriedIds = new Set(carried.map(([id]) => id));
+    if (knownCarried === null) {
+      knownCarried = carriedIds;
+    } else {
+      for (const [id, emoji, label] of carried) {
+        if (!knownCarried.has(id)) flashItemGet(id, emoji, label);
+      }
+      knownCarried = carriedIds;
     }
   }
 
@@ -740,6 +851,7 @@
   let lastLayout = null, lastFloor = 0;
   function reset() {
     stopTour(); stopAuto();
+    knownCarried = null;
     gary = START; seen = new Set([START]); steps = 0;
     guest = GUEST_START; bait = new Set(); lured = 0;
     focusId = START; recenter = true;
