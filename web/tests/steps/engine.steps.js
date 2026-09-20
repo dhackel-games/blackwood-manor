@@ -960,12 +960,13 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.ok(html.indexOf('id="nav-size-picker"') < html.indexOf('class="movement-controls"'));
   assert.ok(html.indexOf('class="movement-controls"') < html.indexOf('class="verbs"'));
   assert.match(css,
-    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
-  assert.doesNotMatch(css, /--action-controls-min-width/);
+    /#controls\s*\{[^}]*--picker-to-dpad-gap:\s*0\.2rem[^}]*--movement-to-action-gap:\s*0\.5rem[^}]*--action-controls-min-width:\s*17rem[^}]*--dpad-min-left:\s*calc\(var\(--nav-picker-width\) \+ var\(--picker-to-dpad-gap\)\)[^}]*--dpad-centered-left:\s*calc\(50% - var\(--dpad-half-width\)\)[^}]*--dpad-max-left:\s*calc\([\s\S]*100% - var\(--movement-controls-width\) - var\(--movement-to-action-gap\) -[\s\S]*var\(--action-controls-min-width\)[\s\S]*--dpad-left:\s*clamp\(var\(--dpad-min-left\), var\(--dpad-centered-left\), var\(--dpad-max-left\)\)/s);
   assert.match(css,
     /#controls \.controls-content\s*\{[^}]*display:\s*block/s);
   assert.match(css,
-    /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*max-width:\s*30rem[^}]*margin:\s*-1px auto 0/s);
+    /#controls \.controls-content\s*\{[^}]*width:\s*calc\(100% \+ 1px\)[^}]*margin-top:\s*-1px/s);
+  assert.doesNotMatch(css,
+    /#controls \.controls-content\s*\{[^}]*max-width:/s);
   assert.match(css,
     /#controls \.movement-controls\s*\{[^}]*position:\s*absolute[^}]*top:\s*0[^}]*left:\s*var\(--dpad-left\)/s);
   assert.match(css,

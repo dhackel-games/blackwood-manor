@@ -165,10 +165,12 @@ body { -webkit-text-size-adjust: 100%; }
   );
   --picker-to-dpad-gap: 0.2rem;
   --movement-to-action-gap: 0.5rem;
+  --action-controls-min-width: 17rem;
   --dpad-min-left: calc(var(--nav-picker-width) + var(--picker-to-dpad-gap));
   --dpad-centered-left: calc(50% - var(--dpad-half-width));
   --dpad-max-left: calc(
-    100% - var(--movement-controls-width) - var(--movement-to-action-gap)
+    100% - var(--movement-controls-width) - var(--movement-to-action-gap) -
+      var(--action-controls-min-width)
   );
   --dpad-left: clamp(var(--dpad-min-left), var(--dpad-centered-left), var(--dpad-max-left));
   position: relative;
@@ -179,8 +181,7 @@ body { -webkit-text-size-adjust: 100%; }
   position: relative;
   display: block;
   width: calc(100% + 1px);
-  max-width: 30rem;          /* keep the cluster compact and centered on wide screens */
-  margin: -1px auto 0;
+  margin-top: -1px;
 }
 #inputline > .nav-disclosure {
   position: absolute;
@@ -462,7 +463,6 @@ body { -webkit-text-size-adjust: 100%; }
     --action-button-height: 2.96875rem;
     --dpad-half-width: 4.573125rem;
   }
-  #controls .controls-content { max-width: 36rem; }
   #controls .dpad button {
     font-size: 1.35rem;
   }
