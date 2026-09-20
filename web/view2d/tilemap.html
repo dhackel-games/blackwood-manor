@@ -550,6 +550,8 @@
   // rather than breaking the page.
   let game = null;
   let worldRef = null;
+  let parseCmd = null;   // the shared engine's real parser — single source of
+                          // truth for "is this a valid manor command?"
   // Sysop "::" menu — the same back-office shortcuts the text game exposes.
   // Loaded live (like the engine) so a failure degrades gracefully. The unlock
   // state is shared with the text game via the same localStorage key.
@@ -560,12 +562,14 @@
   catch (e) { /* private mode — stay locked */ }
   (async () => {
     try {
-      const [{ world }, { createGame }, sysopMod] = await Promise.all([
+      const [{ world }, { createGame }, sysopMod, { parse }] = await Promise.all([
         import("../js/world.js"), import("../js/core.js"), import("../js/sysop-menu.js"),
+        import("../js/parser.js"),
       ]);
       sysop = sysopMod;
       game = createGame(world);
       worldRef = world;
+      parseCmd = parse;
       const handoff = takeModeHandoff();
       if (handoff && handoff.snapshot) {
         try { game.restore(handoff.snapshot); } catch (e) { console.warn("restore failed", e); }
@@ -856,15 +860,6 @@
 
   const atlasMap = { [TILE.VOID]:0, [TILE.FLOOR]:1, [TILE.WALL]:2, [TILE.DOOR]:3,
     [TILE.CORRIDOR]:4, [TILE.FOG]:5, [TILE.STAIR]:6, [TILE.PLAYER]:7 };
-
-  // Interaction verbs forwarded to the real engine from the command bar.
-  const ENGINE_VERBS = new Set([
-    "take","get","grab","pick","drop","put","push","pull","open","close","examine","x",
-    "inspect","read","search","pray","give","turn","use","wear","unlock","lock","light",
-    "extinguish","ring","touch","smell","taste","eat","drink","knock","wave","break",
-    "attack","throw","kiss","shake","empty","fill","pour","tie","untie","dig",
-    "talk","speak","chat","wake","awaken","rouse","say","yell","shout","answer","recite",
-  ]);
 
   const KIND_ICON = { takeable:"💎", container:"📦", scenery:"🗿", fixture:"⚙️" };
 
@@ -1435,8 +1430,15 @@
     return (text || "Nothing happens.").trim();
   }
 
-  // Tiny command parser — the seed of a real prompt. Movement, luring, looking,
-  // and view toggles for now; a full verb set is Chapter-2 design work.
+  // Command router. 2D-only affordances (mode switches, tour, bait, map-reveal
+  // toggle, the click/pathfind movement layer) are special-cased here because
+  // they have no text-mode equivalent. Everything else is handed to the
+  // shared engine's own parser (parser.js) to decide whether it's a valid
+  // manor command — the SAME check text mode relies on — instead of a
+  // hand-maintained verb allowlist that silently drifts out of sync with it
+  // (that drift caused "some commands aren't recognized" reports: hotline,
+  // code, show/mirror, score, sit, yes/no, and more were missing from the old
+  // list). This guarantees the two modes share one vocabulary by construction.
   function runCommand(raw) {
     const line = (raw || "").trim().toLowerCase();
     if (!line) return;
@@ -1460,18 +1462,22 @@
     }
     if (verb === "text" || (verb === "1d")) { saveModeHandoff(); window.location.href = "../index.html"; return; }
     if (verb === "2d") { msg = "You're already in 2D. Type TEXT to switch to the text game."; render(); return; }
-    if (WORD_DIRS[verb]) {
+
+    // Bare compass words ("n", "north", …) pathfind to the 2D-graph neighbor.
+    // If there's no such neighbor on the map, fall through to the shared
+    // engine below instead of erroring immediately — the engine's own room
+    // graph may know an exit (hidden, conditional, or one-way) that the 2D
+    // layout doesn't model.
+    if (!rest.length && WORD_DIRS[verb]) {
       const [dx, dy] = WORD_DIRS[verb];
       const id = neighborInDirection(graph, floorOf(gary), gary, dx, dy);
-      if (id) moveTo(id); else { msg = `No room ${verb.toUpperCase()} of here.`; render(); }
-      return;
+      if (id) { moveTo(id); return; }
     }
-    if (verb === "up" || verb === "down") {
+    if (!rest.length && (verb === "up" || verb === "down")) {
       const exits = crossFloorExits(graph, floorOf(gary), gary);
       const want = verb === "up" ? ["up", "ladder", "climb", "fly"] : ["down"];
       const ex = exits.find((x) => x.note && want.some((w) => x.note.toLowerCase().includes(w))) || exits[0];
-      if (ex) moveTo(ex.id, ex.label); else { msg = `No stairs ${verb} from here.`; render(); }
-      return;
+      if (ex) { moveTo(ex.id, ex.label); return; }
     }
     if (verb === "bait" || verb === "lure" || (verb === "drop" && (!arg || arg === "bait"))) { toggleBait(); return; }
     if (verb === "look" || verb === "l") {
@@ -1483,18 +1489,39 @@
     if (verb === "reveal" || verb === "map") { revealChk.checked = !revealChk.checked; render(); return; }
     if (verb === "reset") { reset(); return; }
 
-    // Real manor verbs — run the shipped engine against Gary's current room so
-    // examine/take/open/push/etc. behave exactly as in the shipped game and
-    // move real items around on the map.
-    if (game && ENGINE_VERBS.has(verb)) { msg = runEngine(line); render(); return; }
+    // "go/move/walk/enter/to <room>" — resolve a typed room name and
+    // pathfind, the 2D-native way of moving. Only intercepted when the
+    // argument actually names a known room; otherwise fall through (e.g. a
+    // bare "go", or a direction the WORD_DIRS shortcut above didn't have a
+    // 2D-graph neighbor for) so the shared engine gets a chance to handle it.
+    const MOVE_PREFIXES = ["go", "move", "walk", "run", "enter", "leave", "exit", "float", "fly", "to"];
+    if (MOVE_PREFIXES.includes(verb) && arg) {
+      const target = resolveRoom(arg);
+      if (target) {
+        if (target === gary) { msg = "You're already there."; render(); return; }
+        const path = pathTo(target);
+        if (path && path.length) { walkPath(path); return; }
+        msg = `You can't see a way to ${graph.home.get(target).label} from here.`; render(); return;
+      }
+    }
+    // A bare room name typed with no verb ("library") also pathfinds.
+    if (!MOVE_PREFIXES.includes(verb)) {
+      const bareTarget = resolveRoom(line);
+      if (bareTarget) {
+        if (bareTarget === gary) { msg = "You're already there."; render(); return; }
+        const path = pathTo(bareTarget);
+        if (path && path.length) { walkPath(path); return; }
+        msg = `You can't see a way to ${graph.home.get(bareTarget).label} from here.`; render(); return;
+      }
+    }
 
-    // "go/move/walk/enter <room>" or a bare room name.
-    const target = ["go", "move", "walk", "enter", "to"].includes(verb) ? resolveRoom(arg) : resolveRoom(line);
-    if (!target) { msg = `You don't know how to "${raw.trim()}".`; render(); return; }
-    if (target === gary) { msg = "You're already there."; render(); return; }
-    const path = pathTo(target);
-    if (path && path.length) walkPath(path);
-    else { msg = `You can't see a way to ${graph.home.get(target).label} from here.`; render(); }
+    // Everything else: ask the shared parser if this is a real manor command
+    // (examine/take/open/talk/hotline/code/score/sit/yes/no/…) and, if so,
+    // run it through the shipped engine exactly like text mode does.
+    if (game && parseCmd && parseCmd(line).verb) { msg = runEngine(line); render(); return; }
+
+    msg = `You don't know how to "${raw.trim()}".`;
+    render();
   }
 
   // Keyboard: arrows / WASD move to the best-matching room on this floor.

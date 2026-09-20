@@ -995,6 +995,39 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.match(css, /#controls \.verb-row \.compact-action\s*\{\s*grid-column:\s*span 1/s);
 });
 
+Then("2D command entry delegates manor verbs to the shared parser", function () {
+  const tilemap = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  const formerlyDriftedCommands = [
+    "hotline",
+    "call gary",
+    "code 1234",
+    "show library in mirror",
+    "score",
+    "sit",
+    "inventory",
+    "i",
+    "climb",
+    "yes",
+    "no",
+    "burn note",
+    "go north",
+    "leave",
+    "enter",
+  ];
+
+  assert.doesNotMatch(tilemap, /\bENGINE_VERBS\b/);
+  assert.match(tilemap, /import\("\.\.\/js\/parser\.js"\)/);
+  assert.match(tilemap, /parseCmd\s*=\s*parse/);
+  assert.match(tilemap, /parseCmd\(line\)\.verb[\s\S]*runEngine\(line\)/);
+  assert.match(tilemap, /WORD_DIRS\[verb\][\s\S]*if \(id\) \{ moveTo\(id\); return; \}[\s\S]*if \(verb === "bait"/);
+  assert.match(tilemap, /const MOVE_PREFIXES = \[[\s\S]*"go"[\s\S]*"enter"[\s\S]*"leave"[\s\S]*"exit"[\s\S]*"fly"[\s\S]*\]/);
+  assert.doesNotMatch(tilemap, /No room \$\{verb\.toUpperCase\(\)\} of here/);
+
+  for (const command of formerlyDriftedCommands) {
+    assert.ok(parse(command).verb, `${command} must remain a parser-recognized manor command`);
+  }
+});
+
 Then("the iOS wrapper opens new-window web links externally", function () {
   const swift = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   assert.match(swift, /WKUIDelegate/);
