@@ -832,9 +832,11 @@ preserving spoiler hiding for both secret destinations.
 - **Belfry payoff.** The Bat Sight Mirror replaces the removed Family Ring as a
   required +20 heirloom. Pulling either end of the bell rope awards +5, scatters
   the bats, and drops the mirror onto the belfry floor. `SHOW <room> IN MIRROR`
-  sees the normal and third-eye descriptions without marking the room visited,
-  then prefills `say "route to <room>"; <short directions>` without executing
-  it. `LOOK IN MIRROR AT <room>` is an exact synonym.
+  and carried-mirror shorthand `SHOW <room>` see the normal and third-eye
+  descriptions without marking the room visited, then prefill the short
+  directions without executing them. `GUIDE`, `PATH`, and `ROUTE TO
+  <room-or-object>` use the carried mirror to prefill directions to rooms or
+  item locations. `LOOK IN MIRROR AT <room>` is an exact synonym.
 - **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
   mirrored PANEL. Seating the RUBY, EMERALD, and SAPPHIRE GEMS in the correct
   named slots opens the route to the required BM SPYGLASS (+8) in the TREE FORT.

@@ -219,6 +219,7 @@ export function createGame(world) {
     const parts = [cmd.verb];
     if (cmd.dobj) {
       if (cmd.verb === "talk" && !cmd.prep) parts.push("to");
+      if (cmd.verb === "route") parts.push("to");
       const source = cmd.verb === "take" && cmd.prep === "from" && cmd.iobj
         ? game.find(cmd.iobj)
         : null;
@@ -716,7 +717,7 @@ export function createGame(world) {
     deferStatusBanner = false;
     if (derivedSteps.length) {
       let finalStep = executionLabel;
-      if (cmd.verb === "open" && derivedSteps.includes(executionLabel)) finalStep = null;
+      if (derivedSteps.includes(executionLabel)) finalStep = null;
       const sequence = acquisitionBlocked || !finalStep ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join("; ")})\n\n${text}`;
     } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {

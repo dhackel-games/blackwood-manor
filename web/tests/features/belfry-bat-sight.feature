@@ -34,14 +34,14 @@ Feature: Belfry bell and Bat Sight Mirror
     Given item "batSightMirror" is carried
     And the player is in room "belfry"
     When I send "look in mirror"
-    Then the output contains "SHOW KITCHEN IN MIRROR"
+    Then the output contains "SHOW KITCHEN"
     When I send "look in mirror at kitchen"
     Then the output contains "BAT SIGHT"
     And the output contains "KITCHEN"
     And the output contains "cavernous scullery"
     And the output contains "THIRD EYE"
     And the output contains "ROUTE READY"
-    And flag "mirrorRoutePrefill" equals "say \"route to kitchen\"; w; dn; dn; dn; w; s"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
     And the current room is "belfry"
     And flag "seen:kitchen" is unset
 
@@ -58,10 +58,59 @@ Feature: Belfry bell and Bat Sight Mirror
     And the output contains "brass LEVER is polished"
     And the output contains "ROUTE READY"
     And the output contains "w; dn; dn; dn; e; s"
-    And flag "mirrorRoutePrefill" equals "say \"route to library\"; w; dn; dn; dn; e; s"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; e; s"
     And the current room is "belfry"
     And flag "seen:library" is unset
     And browser mirror routes are prefilled after command submission
+
+  Scenario: SHOW infers the carried mirror for a different room
+    Given item "batSightMirror" is carried
+    And the player is in room "belfry"
+    When I send "show kitchen"
+    Then the output contains "(show KITCHEN in BAT SIGHT MIRROR)"
+    And the output contains "BAT SIGHT — KITCHEN"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
+
+  Scenario: SHOW inspects normally when the named room is the current room
+    Given item "batSightMirror" is carried
+    And the player is in room "kitchen"
+    When I send "show kitchen"
+    Then the output contains "CLOSER INSPECTION"
+    And the output does not contain "BAT SIGHT"
+    And flag "mirrorRoutePrefill" is unset
+
+  Scenario Outline: Guide commands infer the carried mirror and prefill without moving
+    Given item "batSightMirror" is carried
+    And the player is in room "belfry"
+    When I send "<command>"
+    Then the output contains "(route to KITCHEN with BAT SIGHT MIRROR)"
+    And the output contains "ROUTE READY"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
+    And the current room is "belfry"
+
+    Examples:
+      | command          |
+      | guide to kitchen |
+      | path to kitchen  |
+      | route to kitchen |
+
+  Scenario: A mirror route can target an object
+    Given item "batSightMirror" is carried
+    And the player is in room "belfry"
+    When I send "route to diary"
+    Then the output contains "(route to LEATHER DIARY with BAT SIGHT MIRROR)"
+    And the output contains "DIARY is in STUDY"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; s"
+
+  Scenario Outline: Guide commands explain their mirror requirement
+    When I send "<command>"
+    Then the output contains "need the BAT SIGHT MIRROR"
+
+    Examples:
+      | command          |
+      | guide to kitchen |
+      | path to kitchen  |
+      | route to kitchen |
 
   Scenario: The mirror replaces the removed Family Ring in the thirteen heirlooms
     Then the required family item count is 13

@@ -251,12 +251,22 @@ Feature: Generic text-adventure engine
 
   Scenario Outline: Saying or yelling repeats the words without an effect
     When I send "<command>"
-    Then the output contains "\"Foo\""
+    Then the output contains "<spoken>"
     And the output contains "Nothing happens."
 
     Examples:
-      | command   |
-      | say "foo" |
-      | yell foo  |
+      | command            | spoken      |
+      | say "foo"          | Foo         |
+      | say "foo bar baz"  | Foo bar baz |
+      | say `foo to bar`   | Foo to bar  |
+      | yell foo           | Foo         |
+
+  Scenario: Single quotes preserve a spoken phrase as one parser item
+    When I send this raw command:
+      """
+      say 'foo in bar'
+      """
+    Then the output contains "Foo in bar"
+    And the output contains "Nothing happens."
 
 # end engine.feature

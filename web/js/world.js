@@ -270,11 +270,54 @@ function resolveBatSightRoom(ctx, phrase) {
   return matches.length === 1 ? matches[0] : null;
 }
 
+function containingRoom(ctx, item) {
+  let location = ctx.roomOf(item.id);
+  const seen = new Set();
+  while (location && !seen.has(location)) {
+    if (location === "inventory") return ctx.state.room;
+    if (ctx.world.rooms[location]) return location;
+    seen.add(location);
+    const container = ctx.item(location);
+    if (!container) return null;
+    location = ctx.roomOf(container.id);
+  }
+  return null;
+}
+
+function resolveBatSightDestination(ctx, phrase) {
+  const roomMatch = resolveBatSightRoom(ctx, phrase);
+  if (roomMatch) {
+    const [roomId, room] = roomMatch;
+    return { roomId, room, label: room.name };
+  }
+  const matches = ctx.findItems(phrase, Object.values(ctx.state.items)) || [];
+  if (matches.length !== 1) return null;
+  const item = matches[0];
+  const roomId = containingRoom(ctx, item);
+  const room = roomId ? ctx.world.rooms[roomId] : null;
+  if (!room || room.phase === 2) return null;
+  return { roomId, room, item, label: item.names[0] };
+}
+
+function prepareBatSightRoute(ctx, roomId) {
+  ctx.setFlag("mirrorRoutePrefill", null);
+  try {
+    const route = pathToRoom(ctx, roomId).map((step) =>
+      step === "u" ? "up" : step === "d" ? "dn" : step);
+    if (route.length) ctx.setFlag("mirrorRoutePrefill", route.join("; "));
+    return route.length
+      ? `\n\nROUTE READY\n${route.join("; ")}`
+      : "\n\nROUTE READY\nYou are already there.";
+  } catch {
+    return "\n\nNo currently traversable route reaches that room.";
+  }
+}
+
 function lookThroughBatSightMirror(ctx, cmd) {
   const target = cmd.verb === "show" ? cmd.dobj : cmd.iobj;
   if (!target) {
     return "The BAT SIGHT MIRROR clouds, waiting for a destination. Name any room: " +
-      "SHOW KITCHEN IN MIRROR, for example.";
+      "SHOW KITCHEN or ROUTE TO KITCHEN, for example.";
   }
   ctx.setFlag("mirrorRoutePrefill", null);
   const match = resolveBatSightRoom(ctx, target);
@@ -286,27 +329,29 @@ function lookThroughBatSightMirror(ctx, cmd) {
   const shapes = ctx.itemsIn(roomId)
     .map((item) => item.roomDesc || item.names?.[0])
     .filter(Boolean);
-  let routeText = "";
-  try {
-    const route = pathToRoom(ctx, roomId).map((step) =>
-      step === "u" ? "up" : step === "d" ? "dn" : step);
-    const routeCommand = [
-      `say "route to ${room.name.toLowerCase()}"`,
-      ...route,
-    ].join("; ");
-    ctx.setFlag("mirrorRoutePrefill", routeCommand);
-    routeText = route.length
-      ? `\n\nROUTE READY\n${route.join("; ")}`
-      : "\n\nROUTE READY\nYou are already there.";
-  } catch {
-    routeText = "\n\nNo currently traversable route reaches that room.";
-  }
+  const routeText = prepareBatSightRoute(ctx, roomId);
   return `BAT SIGHT — ${room.name.toUpperCase()}\n` +
     (room.art ? MAP_MARK + room.art + MAP_MARK + "\n" : "") +
     `${description || "The room lies silent."}` +
     (vision ? `\n\nTHIRD EYE\n${vision}` : "") +
     (shapes.length ? `\n\nShapes in the room:\n${shapes.map((shape) => `* ${shape}`).join("\n")}` : "") +
     routeText;
+}
+
+function routeWithBatSightMirror(ctx, cmd) {
+  ctx.setFlag("mirrorRoutePrefill", null);
+  if (!ctx.has("batSightMirror")) {
+    return "You need the BAT SIGHT MIRROR before you can GUIDE, PATH, or ROUTE to a room or object.";
+  }
+  const target = cmd.dobj || cmd.iobj;
+  if (!target) return "Route to what?";
+  const destination = resolveBatSightDestination(ctx, target);
+  if (!destination) return `The mirror finds no room or object called "${target}".`;
+  const where = destination.item
+    ? `${destination.label.toUpperCase()} is in ${destination.room.name.toUpperCase()}.`
+    : destination.room.name.toUpperCase();
+  return `BAT SIGHT ROUTE — ${destination.label.toUpperCase()}\n${where}` +
+    prepareBatSightRoute(ctx, destination.roomId);
 }
 
 function pullClosetBellRope(ctx) {
@@ -2736,6 +2781,26 @@ function reachIntoToilet(ctx, cmd) {
   return takeToiletMushrooms(ctx);
 }
 function deriveCommand(ctx, cmd) {
+  if (cmd.verb === "show" && cmd.dobj && !cmd.iobj && ctx.has("batSightMirror")) {
+    const destination = resolveBatSightRoom(ctx, cmd.dobj);
+    if (destination?.[0] === ctx.state.room) {
+      cmd.verb = "look";
+      cmd.dobj = null;
+      cmd.prep = null;
+      cmd.iobj = null;
+      return [];
+    }
+    if (destination) {
+      cmd.prep = "in";
+      cmd.iobj = "batsight";
+      return [`show ${cmd.dobj} in batsight`];
+    }
+  }
+  if (cmd.verb === "route" && cmd.dobj && !cmd.iobj && ctx.has("batSightMirror")) {
+    cmd.prep = "with";
+    cmd.iobj = "batsight";
+    return [`route ${cmd.dobj} with batsight`];
+  }
   if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
   if (!["take", "eat", "reach", "use"].includes(cmd.verb)) return [];
   const target = `${cmd.dobj || ""} ${cmd.iobj || ""}`.toLowerCase();
@@ -2942,7 +3007,7 @@ function wakeDragon(ctx) {
   return dragonFire(ctx);
 }
 function spokenLine(cmd) {
-  const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "");
+  const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"`]+|['"`]+$/g, "");
   const spoken = raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : "...";
   return `"${spoken}"`;
 }
@@ -3282,6 +3347,7 @@ const logicWorld = {
   fireStatus,        // remaining burn turns for the always-on HUD
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   reliquaryStatusValue, // HUD-compatible RELIQUARY count text
+  routeWithMirror: routeWithBatSightMirror,
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment

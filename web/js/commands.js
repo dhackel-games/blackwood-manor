@@ -106,10 +106,11 @@ remove <thing> | Remove / Take off worn equipment.
 restart [1|2] | Restart / Start Part I again, or return to Part II after a Part II death.
 restore | Restore / Restore the browser's saved game.
 ring <thing> | Ring / Ring a bell or similar object.
+route/guide/path to <room/object> | Route / Use the Bat Sight Mirror to prepare, but not execute, a route.
 save | Save / Save the current game in this browser.
 say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
 score | Score / Show points, turns, and rank.
-show <room> in mirror | Scry / Reveal a room's third-eye view and prepare its route.
+show <room> [in mirror] | Scry / Reveal a room's third-eye view and prepare its route.
 throw <thing> at <target> | Throw / Throw a carried item.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
@@ -132,6 +133,7 @@ CHAINING
 Separate commands with ".", ";", ",", or THEN.
 Example: n; open mailbox; read letter
 A chain stops at the first unknown word.
+Double, single, and backtick quotes keep enclosed words together. Escaped or nested quotes are not supported.
 WITH may be shortened to w/ with or without a following space: unlock frontd w/iron.
 In object names, d means DOOR and br means BEDROOM: open front d; fly grand br.
 
@@ -571,9 +573,15 @@ export const commands = {
   },
   give(ctx) { return "There's no one here to give it to."; },
   show() { return "There is nothing here that can show you that."; },
+  route(ctx, cmd) {
+    if (typeof ctx.world.routeWithMirror === "function") {
+      return ctx.world.routeWithMirror(ctx, cmd);
+    }
+    return "You have nothing that can guide you there.";
+  },
   talk() { return "No one answers."; },
   say(ctx, cmd) {
-    const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"]+|['"]+$/g, "");
+    const raw = (cmd.dobj || cmd.iobj || "").replace(/^['"`]+|['"`]+$/g, "");
     if (!raw) return "Say what?";
     const spoken = raw.charAt(0).toUpperCase() + raw.slice(1);
     return `"${spoken}"\nNothing happens.`;

@@ -59,6 +59,8 @@ Feature: Maintained sysop shortcuts
     Then sysop command "::powerup" includes "u shoes"
     And sysop command "::powerup" includes "u goggles"
     And sysop command "::powerup" includes "u obsidian"
+    And sysop command "::powerup" includes "pull bellrope"
+    And sysop command "::powerup" includes "t batsight"
     And sysop command "::winquick1" includes "g belfry"
     And sysop command "::winquick1" includes "pull bellrope"
     And sysop command "::winquick1" includes "t batsight"
@@ -77,8 +79,9 @@ Feature: Maintained sysop shortcuts
     And item "wingedShoes" is worn in slot "feet"
     And item "talisman" is worn in slot "neck"
     And item "obsidianEye" is worn in slot "forehead"
+    And item "batSightMirror" is carried
     And the game is not won
-    And the game score is 55
+    And the game score is 60
 
   Scenario: Quick Part I stops after the bell before the front-door ending
     When I execute sysop command "::winquick1"

@@ -103,6 +103,9 @@ const POWERUP = [
   "wear headlamp",
   "fly dreadvault",
   "wear shoes",
+  "fly belfry",
+  "pull bellrope",
+  "take batsight",
   "fly hallbr",
   "open drawer",
   "wear goggles",
@@ -271,7 +274,7 @@ export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::powerup",
     name: "Power Up",
-    description: "Acquire and equip every reusable power item.",
+    description: "Acquire every reusable power item and the Bat Sight Mirror.",
     compoundPrompt: join(POWERUP),
   }),
   Object.freeze({

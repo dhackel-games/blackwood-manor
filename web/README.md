@@ -127,11 +127,14 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Belfry and Bat Sight Mirror:** the great BELL and upper ROPE are in the
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
-  required BAT SIGHT MIRROR (+20 when deposited). `SHOW <room> IN MIRROR`
-  displays that room's normal and THIRD EYE descriptions, then prefills an
-  unexecuted route such as `say "route to library"; w; dn; dn; dn; e; s`.
-  `LOOK IN MIRROR AT <room>` is an exact synonym. The mirror replaces the removed
-  Family Ring; the Ravenblood Signet is now the **Ravenblood Ring**.
+  required BAT SIGHT MIRROR (+20 when deposited). `SHOW <room> IN MIRROR`,
+  or simply `SHOW <room>` while carrying it, displays that room's normal and
+  THIRD EYE descriptions, then prefills the unexecuted directions. `GUIDE`,
+  `PATH`, or `ROUTE TO <room-or-object>` finds the destination through the
+  mirror and likewise leaves the route in the command entry without running
+  it. `LOOK IN MIRROR AT <room>` remains an exact synonym. `::powerup` now
+  collects the mirror. The mirror replaces the removed Family Ring; the
+  Ravenblood Signet is now the **Ravenblood Ring**.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.

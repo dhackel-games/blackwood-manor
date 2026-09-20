@@ -52,9 +52,16 @@ Feature: Player command parsing
       | put all in rq                       | put     | all       | in          | rq        |
       | drop all in rq                      | put     | all       | in          | rq        |
       | place emerald gem in middle slot    | put     | emerald gem | in        | middle slot |
-      | say "foo"                           | say     | "foo"     | [none]      | [none]    |
+      | take "brass key"                    | take    | brass key | [none]      | [none]    |
+      | say "foo"                           | say     | foo       | [none]      | [none]    |
+      | say "foo in bar"                    | say     | foo in bar | [none]     | [none]    |
+      | say 'foo to bar'                    | say     | foo to bar | [none]     | [none]    |
+      | say `foo with bar`                  | say     | foo with bar | [none]   | [none]    |
       | say d                               | say     | d         | [none]      | [none]    |
       | yell foo                            | say     | foo       | [none]      | [none]    |
+      | guide to kitchen                    | route   | kitchen   | [none]      | [none]    |
+      | path to grand bedroom               | route   | grand bedroom | [none] | [none]    |
+      | route to diary                      | route   | diary     | [none]      | [none]    |
       | leave                               | go      | out       | [none]      | [none]    |
       | exit                                | go      | out       | [none]      | [none]    |
       | enter                               | go      | in        | [none]      | [none]    |
@@ -71,6 +78,9 @@ Feature: Player command parsing
       | n. s. e                    | n / s / e                         |
       | take key then go north     | take key / go north               |
       | n, s                       | n / s                             |
+      | say "foo; bar then baz", look | say "foo; bar then baz" / look |
+      | say 'foo, bar'; look       | say 'foo, bar' / look             |
+      | say `foo. bar` then look   | say `foo. bar` / look             |
       | look                       | look                              |
       | [empty]                    | [none]                            |
       | open thenardier            | open thenardier                   |
