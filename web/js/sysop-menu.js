@@ -166,21 +166,7 @@ const QUICK_COLLECTION = [
   "fly royal",
 ];
 
-const REQUIRED_DEPOSITS = [
-  "put crest in rq",
-  "put batsight in rq",
-  "put spyglass in rq",
-  "put candlestick in rq",
-  "put grimoire in rq",
-  "put musicbox in rq",
-  "put ravenblood in rq",
-  "put locket in rq",
-  "put talisman in rq",
-  "put ancient in rq",
-  "put decanter in rq",
-  "put ancestral in rq",
-  "put woodblack in rq",
-];
+const BULK_DEPOSIT = ["put all in rq"];
 
 const QUICK_TO_BELL = [
   "close rq",
@@ -274,6 +260,13 @@ const MAX_COLLECTION = [
   "fly royal",
 ];
 
+const MAX_TO_BELL = [
+  ...MAX_COLLECTION,
+  ...BULK_DEPOSIT,
+  "close rq",
+  "open bellcloset",
+];
+
 export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::powerup",
@@ -285,18 +278,25 @@ export const SYSOP_COMMANDS = Object.freeze([
     cmd: "::winquick1",
     name: "Quick Part I",
     description: "Collect all 13 heirlooms and pull the closet bell rope, then stop before walking out the front door.",
-    compoundPrompt: join([...QUICK_COLLECTION, ...REQUIRED_DEPOSITS, ...QUICK_TO_BELL]),
+    compoundPrompt: join([...QUICK_COLLECTION, ...BULK_DEPOSIT, ...QUICK_TO_BELL]),
   }),
   Object.freeze({
     cmd: "::winmax2bell",
     name: "Maximum to Bell",
     description: "Collect every deterministic reward and all 13 heirlooms, seal the reliquary, and stop before pulling the closet bell rope.",
-    compoundPrompt: join([
-      ...MAX_COLLECTION,
-      ...REQUIRED_DEPOSITS,
-      "close rq",
-      "open bellcloset",
-    ]),
+    compoundPrompt: join(MAX_TO_BELL),
+  }),
+  Object.freeze({
+    cmd: "::winmaxfrontd",
+    name: "Maximum Front Door",
+    description: "Earn every deterministic reward, complete the bell ritual, and leave through the front door.",
+    compoundPrompt: join([...MAX_TO_BELL, "pull closetrope", "out"]),
+  }),
+  Object.freeze({
+    cmd: "::winmaxgary",
+    name: "Maximum Gary",
+    description: "Earn every deterministic reward, complete the bell ritual, take the clock, and descend to Gary.",
+    compoundPrompt: join([...MAX_TO_BELL, "pull closetrope", "open rq", "take clock", "down"]),
   }),
 ]);
 

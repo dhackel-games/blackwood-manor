@@ -17,10 +17,12 @@ that self-updates its web content **over-the-air** from GitHub Pages.
 - Tests: `cd web && npm test` (cucumber-js). One feature:
   `npx cucumber-js "tests/features/X.feature" --import "tests/steps/**/*.js"`.
 - Sysop menu: type `::` in-game → password `evad`. Maintained shortcuts:
-  `::powerup`, `::winquick1`, and `::winmax2bell`. `::winquick1` stops after
-  the bell ritual but before walking out. The last earns every
-  deterministic reward, deposits all 13 heirlooms, closes the reliquary, and
-  opens the bell closet so the player stops directly in front of the lower rope.
+  `::powerup`, `::winquick1`, `::winmax2bell`, `::winmaxfrontd`, and
+  `::winmaxgary`. `::winquick1` stops after the bell ritual but before walking
+  out. The three `winmax` routes earn every
+  deterministic reward, deposit all 13 heirlooms, close the reliquary, and
+  open the bell closet; they respectively stop before the closet rope, leave
+  through the front door, or take the clock and descend to Gary.
 
 ## ⚠️ The two facts that always cause confusion
 

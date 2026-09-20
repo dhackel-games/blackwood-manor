@@ -103,11 +103,12 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
   one-time progress points, including +5 for reading the mailbox letter;
   `::winmax2bell` performs every deterministic scoring challenge, deposits all
-  thirteen heirlooms, closes the reliquary, and stops immediately before the
-  main-floor bell rope with its closet already open. `::powerup` equips reusable powers; `::winquick1`
-  completes the shorter required-heirloom route and stops after the bell but
-  before walking out. These are the only three sysop shortcuts. The maximum route intentionally
-  leaves the random MYSTERY PACKAGE unopened.
+  thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and stops
+  immediately before the closet rope. `::winmaxfrontd` continues through the
+  clean front-door ending; `::winmaxgary` instead takes the clock and descends
+  to Gary. `::powerup` equips reusable powers, while `::winquick1` completes the
+  shorter required-heirloom route and stops after the bell but before walking
+  out. The maximum routes intentionally leave the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,

@@ -215,10 +215,8 @@ When("I execute sysop command {string}", function (command) {
 });
 
 When("I fast-forward into Part II", function () {
-  const shortcut = sysopCommand("::winmax2bell");
-  this.game.send(expandSysopCommand(shortcut, this.game));
-  this.output = this.game.send(
-    "open bell closet; pull bell rope; open reliquary; take clock; down");
+  const shortcut = sysopCommand("::winmaxgary");
+  this.output = this.game.send(expandSysopCommand(shortcut, this.game));
 });
 
 When("I play until death:", function (docString) {

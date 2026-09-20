@@ -246,11 +246,11 @@ Opening mushroom vision for the first time awards +10. First acquisition of
 the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
 lowering the ATTIC ladder for the first time awards +5.
 `::winmax2bell` performs every deterministic scoring challenge, deposits all
-thirteen heirlooms, closes the reliquary, and stops immediately before the
-main-floor bell rope with the closet open. It leaves the MYSTERY PACKAGE untouched because its
-outcome is random. The only other sysop shortcuts are `::powerup` and
-`::winquick1`, which stops after the bell ritual but before walking out; the
-older Gary/brink/ring-bell/max variants are retired.
+thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and stops
+immediately before the closet rope. `::winmaxfrontd` continues through the
+clean front-door ending; `::winmaxgary` instead takes the clock and descends
+to Gary. All maximum routes leave the MYSTERY PACKAGE untouched because its
+outcome is random. `::powerup` and the shorter `::winquick1` remain available.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*

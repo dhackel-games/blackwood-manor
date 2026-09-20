@@ -2,16 +2,16 @@
 
 @unit
 Feature: Maintained sysop shortcuts
-  The hidden menu exposes power-up, quick-win, and maximum-to-bell routes while
-  omitting the retired Gary, brink, ring-bell, and maximum-win variants.
+  The hidden menu exposes power-up, quick-win, and maximum-score routes for the
+  bell, front-door, and Gary stopping points.
 
   Background:
     Given a fresh manor game
 
-  Scenario: The hidden menu contains only the three maintained shortcuts
+  Scenario: The hidden menu contains the maintained shortcuts
     Then the sysop menu command is "::"
     And the sysop menu unlock passwords are "werdna,evad"
-    And the sysop command catalog defines "::powerup,::winquick1,::winmax2bell"
+    And the sysop command catalog defines "::powerup,::winquick1,::winmax2bell,::winmaxfrontd,::winmaxgary"
     And the sysop menu uses the shared command title description format
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
@@ -47,11 +47,11 @@ Feature: Maintained sysop shortcuts
     Then sysop command "::winmax2bell" includes "g belfry"
     And sysop command "::winmax2bell" includes "pull bellrope"
     And sysop command "::winmax2bell" includes "t batsight"
-    And sysop command "::winmax2bell" includes "put batsight in rq"
+    And sysop command "::winmax2bell" includes "put all in rq"
     And sysop command "::winmax2bell" includes "c rq"
     And sysop command "::winmax2bell" includes "o bellcloset"
     And sysop command "::winmax2bell" omits "pull closetrope"
-    And sysop command "::winmax2bell" omits "put family in rq"
+    And sysop command "::winmax2bell" omits "put batsight in rq"
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: Powerup and Quick Win use the current equipment and mirror routes
@@ -62,7 +62,7 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winquick1" includes "g belfry"
     And sysop command "::winquick1" includes "pull bellrope"
     And sysop command "::winquick1" includes "t batsight"
-    And sysop command "::winquick1" includes "put batsight in rq"
+    And sysop command "::winquick1" includes "put all in rq"
     And sysop command "::winquick1" includes "pull closetrope"
     And sysop command "::winquick1" omits "south"
     And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
@@ -109,6 +109,23 @@ Feature: Maintained sysop shortcuts
     And item "mysteryPackage" is in "grandHall"
     And every required family item is in the reliquary
     And the game score is 440
+
+  Scenario: Winmaxfrontd takes the maximum route through the clean ending
+    When I execute sysop command "::winmaxfrontd"
+    Then the game is won
+    And the output contains "You keep walking"
+    And flag "bellRung" is set
+    And the game score is 490
+
+  Scenario: Winmaxgary takes the maximum route and descends into Part II
+    When I execute sysop command "::winmaxgary"
+    Then the game is alive
+    And the game is not won
+    And the current room is "p2_awakening"
+    And flag "partII" is set
+    And item "clockTalisman" is carried
+    And the output contains "FREEEEDOMMM"
+    And the game score is 445
 
   Scenario: Winmax2bell recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
