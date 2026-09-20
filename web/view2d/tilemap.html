@@ -674,6 +674,23 @@
   // Acquisitions are queued so several at once play one after another.
   let knownCarried = null;          // Set<id> carried as of the last render
   const itemGetQueue = [];
+
+  // --- Dreadmaw the dragon: frame-swapped "animation" ----------------------
+  // No real animation — just five hand-drawn frames swapped based on what the
+  // shipped engine's dragonFire()/giveDragon() logic just did. Preload once so
+  // swaps are instant; drawDragon() picks the frame each render().
+  const DRAGON_FRAMES = ["sleeping", "fire", "swat", "eating", "friendly"];
+  const DRAGON_IMAGES = {};
+  for (const key of DRAGON_FRAMES) {
+    const img = new Image();
+    img.src = `icons/dreadmaw_${key}.png`;
+    DRAGON_IMAGES[key] = img;
+  }
+  let dragonFlash = null;   // { kind: "fire"|"swat"|"eating", until: performance.now()+ms }
+  function flashDragon(kind, ms = 1700) {
+    dragonFlash = { kind, until: performance.now() + ms };
+    setTimeout(() => { dragonFlash = null; render(); }, ms);
+  }
   let itemGetPlaying = false;
   let itemGetLayer = null;
   function pumpItemGet() {
@@ -840,6 +857,7 @@
     "inspect","read","search","pray","give","turn","use","wear","unlock","lock","light",
     "extinguish","ring","touch","smell","taste","eat","drink","knock","wave","break",
     "attack","throw","kiss","shake","empty","fill","pour","tie","untie","dig",
+    "talk","speak","chat","wake","awaken","rouse","say","yell","shout","answer","recite",
   ]);
 
   const KIND_ICON = { takeable:"💎", container:"📦", scenery:"🗿", fixture:"⚙️" };
@@ -901,6 +919,7 @@
     drawTokens(layout, fi);
     drawFire(layout);
     drawSick(layout);
+    drawDragon(layout);
     drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
@@ -1010,6 +1029,27 @@
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.font = `${Math.round(TILEPX * 1.15)}px serif`;
     ctx.fillText("🤮", cx, cy);
+    ctx.restore();
+  }
+
+  // Dreadmaw over the cave-mouth room: sleeping by default, swapped to the
+  // matching frame for ~1.7s whenever runEngine() just detected fire/swat/
+  // eating, then settling to "friendly" for good once she's been fed.
+  function drawDragon(layout) {
+    const box = layout.boxes.find((b) => b.id === "dragonCaveMouth");
+    if (!box || !box.seen) return;
+    let key = "sleeping";
+    if (dragonFlash && performance.now() < dragonFlash.until) key = dragonFlash.kind;
+    else if (game && game.state.flags && game.state.flags.dragonFriendly) key = "friendly";
+    const img = DRAGON_IMAGES[key];
+    if (!img || !img.complete || !img.naturalWidth) return;
+    const w = box.w * TILEPX, h = box.h * TILEPX;
+    const x = box.x * TILEPX, y = box.y * TILEPX;
+    // Fit the (wide) dragon art into the room box, centered, without distortion.
+    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight) * 0.92;
+    const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+    ctx.save();
+    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
     ctx.restore();
   }
 
@@ -1368,11 +1408,23 @@
   function runEngine(line) {
     logAction(line);
     game.state.room = gary;
+    const wasAtDragon = gary === "dragonCaveMouth";
+    const wasOnFire = !!(game.state.flags && game.state.flags.onFire);
+    const wasInjuries = (game.state.flags && game.state.flags.dragonInjuries) || 0;
+    const wasFriendly = !!(game.state.flags && game.state.flags.dragonFriendly);
     let text;
     try { text = game.send(line); }
     catch (e) { text = "The manor does not respond to that."; }
     if (game.state.dead) { game.state.dead = false; text = (text || "") + "\n(Gary can't truly die — you shake it off.)"; }
     if (game.state.won) { game.state.won = false; }
+    if (wasAtDragon && game.state.flags) {
+      const nowFriendly = !!game.state.flags.dragonFriendly;
+      const nowInjuries = game.state.flags.dragonInjuries || 0;
+      const nowOnFire = !!game.state.flags.onFire;
+      if (nowFriendly && !wasFriendly) flashDragon("eating");
+      else if (nowOnFire && !wasOnFire) flashDragon("fire");
+      else if (nowInjuries > wasInjuries) flashDragon("swat");
+    }
     syncGaryToEngine();   // follow teleports/flight onto the map
     return (text || "Nothing happens.").trim();
   }
