@@ -477,10 +477,22 @@ Then("every HUD status is a HudSlot with an emoji and calculation", function () 
 Then("the sound-effects toggle is leftmost in the HUD slots and explains its state", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(html, /id=["']hud-slots["']>\s*<button[^>]+id=["']sound-toggle["']/);
+  const css = readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+  const images = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  assert.match(html,
+    /id=["']hud-slots["'][^>]*>\s*<button[^>]+id=["']sound-toggle["'][\s\S]*?<a[^>]+id=["']to-2d["'][^>]+class=["'][^"']*mode-rocker/s);
+  assert.match(html,
+    /id=["']to-2d["'][^>]+data-active=["']text["'][\s\S]*?>\s*<span[^>]*>TEXT<\/span>\s*<span[^>]*>IMAGES<\/span>/s);
+  assert.match(images,
+    /id=["']hud-slots["'][^>]*>[\s\S]*?<a[^>]+id=["']to-text["'][^>]+data-active=["']images["'][\s\S]*?>[\s\S]*?TEXT[\s\S]*?IMAGES/s);
+  assert.match(css, /#sound-toggle\s*\{[^}]*order:\s*-2/s);
+  assert.match(css, /\.mode-rocker\s*\{[^}]*order:\s*-1[^}]*margin-right:\s*auto/s);
+  assert.match(css, /\.mode-rocker \.mode-choice \+ \.mode-choice\s*\{[^}]*border-left:/s);
   assert.match(ui, /Sound effects off — click to turn on/);
   assert.match(ui, /Sound effects on — click to mute/);
   assert.match(ui, /setAttribute\("aria-pressed", String\(!sfxMuted\)\)/);
+  assert.match(ui, /getElementById\("to-2d"\).*addEventListener\("click".*saveModeHandoff/s);
+  assert.match(images, /getElementById\("to-text"\).*addEventListener\("click".*saveModeHandoff/s);
 });
 
 Then("the HUD remains one non-wrapping row", function () {

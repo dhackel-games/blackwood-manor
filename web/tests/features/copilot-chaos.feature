@@ -76,7 +76,7 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "out"
     Then the current room is "grandHall"
     When I send "put woodblack in reliquary"
-    Then the output contains "Family heirlooms: 1/13"
+    Then the output contains line "HEIRLOOMS: 1/13 +0"
     And the game score is 12
     When I send "examine woodblack"
     Then the output contains "12 heirlooms remain"

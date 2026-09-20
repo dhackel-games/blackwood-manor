@@ -399,9 +399,9 @@ function syncPhoneHudOffset() {
   phone.style.setProperty(
     "--phone-hud-offset", `${Math.ceil(hudElement.getBoundingClientRect().bottom)}px`);
 }
-// Reserve exactly enough space on the right of the HUD so the fixed
-// "How to play | Text | 2D" toggle never overlaps the score/turns/bill readout.
-function syncModeSwitchClearance() {
+// Reserve exactly enough space on the right of the HUD so the fixed tutorial
+// button never overlaps the score/turns/bill readout.
+function syncTopControlsClearance() {
   const controls = document.getElementById("top-controls");
   if (!hudElement || !controls) return;
   const clearance = Math.ceil(controls.getBoundingClientRect().width) + 20;
@@ -449,7 +449,7 @@ function updateHud() {
 }
 window.addEventListener("resize", () => {
   if (!phone.hidden) syncPhoneHudOffset();
-  syncModeSwitchClearance();
+  syncTopControlsClearance();
 });
 
 function inventoryForBugReport() {
@@ -931,7 +931,7 @@ function handle(raw) {
   const low = cmd.toLowerCase();
 
   // View-mode switch. "2D" jumps to the tile-map view; "text" is a no-op here
-  // (you're already in the text game). The Text/2D toggle top-right does the same.
+  // (you're already in the text game). The TEXT | IMAGES HUD rocker does the same.
   if (!onCall && (low === "2d" || low === "2d mode" || low === "2-d")) {
     print("Switching to the 2D map view…", "sys");
     saveModeHandoff();
@@ -1275,8 +1275,8 @@ document.querySelectorAll("#controls [data-prefill]").forEach((b) =>
 // Show the mic buttons only if speech input is actually available.
 if (speechAvailable) { micBtn.hidden = false; phoneMicBtn.hidden = false; }
 
-// The top-right 2D toggle is a plain link; snapshot the game into the handoff
-// slot before it navigates so the 2D view resumes exactly here.
+// The HUD rocker is a plain link; snapshot the game into the handoff slot
+// before it navigates so the images view resumes exactly here.
 document.getElementById("to-2d")?.addEventListener("click", () => saveModeHandoff());
 
 // The How-to-play tutorial, shared with the 2D map so both modes match. The
@@ -1293,10 +1293,9 @@ initHowto({
   },
 });
 
-// Size the HUD's right padding to the actual toggle width now that the
-// "How to play" label is in the DOM (re-run after fonts/emoji settle).
-requestAnimationFrame(syncModeSwitchClearance);
-setTimeout(syncModeSwitchClearance, 250);
+// Size the HUD's right padding after fonts and emoji settle.
+requestAnimationFrame(syncTopControlsClearance);
+setTimeout(syncTopControlsClearance, 250);
 
 // --- boot ---
 // If we just arrived from the 2D map view, restore that game (and its command

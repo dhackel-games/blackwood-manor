@@ -73,7 +73,7 @@ function inspectRoom(ctx) {
 
 export const HELP_TEXT = `COMMANDS
 COMMAND | TITLE / DESCRIPTION
-2d/text | Switch view / 2D opens the 8-bit tile-map view; TEXT returns to the text game.
+2d/text | Switch view / 2D opens the images view; TEXT returns to the text game.
 again/(g) | Repeat / Repeat the previous command.
 ai | AI status / Report whether Gary is scripted or using an on-device model.
 attack <thing> | Attack / Attack a visible target.
@@ -81,7 +81,7 @@ brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
 call/hint | Gary / Call Gary's paid hint line.
 (c)lose/shut <thing> | Close / Close an open door or container.
-drop <thing>/all | Drop / Drop one carried item or every unworn item.
+drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
 extinguish <thing> | Extinguish / Put out a light or flame.
 get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
 give <thing> to <character> | Give / Hand over an item.
@@ -117,10 +117,10 @@ verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z) | Wait / Let one turn pass.
 
-MODES: TEXT ↔ 2D
+MODES: TEXT ↔ IMAGES
 This game has two views of the same manor. TEXT (this one) is the classic terminal.
-2D is an 8-bit, top-down tile-map view that fills in as you explore.
-Switch either way with the TEXT | 2D toggle in the top-right corner, or by typing 2D (here) or TEXT (in the 2D view).
+IMAGES is an 8-bit, top-down tile-map view that fills in as you explore.
+Switch either way with the TEXT | IMAGES rocker beside the sound button, or by typing 2D (here) or TEXT (in the images view).
 
 TOUCH CONTROLS
 The on-screen buttons mirror typed commands.
@@ -166,12 +166,25 @@ function accessibleContainer(ctx, phrase) {
 }
 
 function runBulkItemHandler(ctx, verb, item, cmd) {
-  const itemCommand = { ...cmd, verb, dobj: item.names[0], itemId: item.id };
+  const itemCommand = {
+    ...cmd,
+    verb,
+    dobj: item.names[0],
+    itemId: item.id,
+    bulkTransfer: true,
+  };
   const itemHandler = ctx.world.items[item.id]?.on?.[verb];
   let handled = itemHandler ? itemHandler(ctx, itemCommand) : null;
   const roomHandler = ctx.world.rooms[ctx.state.room]?.on?.[verb];
   if (handled == null && roomHandler) handled = roomHandler(ctx, itemCommand);
   return handled;
+}
+
+function appendBulkTransferSummary(ctx, container, results) {
+  const summarize = ctx.world.items[container.id]?.bulkTransferSummary;
+  if (typeof summarize !== "function") return;
+  const summary = summarize(ctx);
+  if (summary) results.push(summary);
 }
 
 function takeAll(ctx, cmd) {
@@ -218,6 +231,7 @@ function takeAll(ctx, cmd) {
       ? `Your hands are full. Left in the ${source.names[0]}: ${leftBehind.join(", ")}.`
       : `Your hands are full. Left behind: ${leftBehind.join(", ")}.`);
   }
+  if (source) appendBulkTransferSummary(ctx, source, results);
   return results.join("\n");
 }
 
@@ -270,6 +284,7 @@ function putAll(ctx, cmd) {
   if (worn.length) {
     results.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
   }
+  appendBulkTransferSummary(ctx, dest, results);
   return results.join("\n");
 }
 

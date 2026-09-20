@@ -67,6 +67,9 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
     label: "Reliquary",
     emoji: "💎",
     calculate: ({ game, world }) => {
+      if (typeof world.reliquaryStatusValue === "function") {
+        return world.reliquaryStatusValue(game);
+      }
       const status = world.reliquaryStatus?.(game);
       if (!status) return null;
       if (status.transformed) return "CLOCK";

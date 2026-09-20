@@ -126,5 +126,9 @@ export function parse(input) {
     iobj = null;
     prep = null;
   }
+  if (verb === "drop" && (dobj === "all" || dobj === "everything") &&
+      (prep === "in" || prep === "into" || prep === "inside") && iobj) {
+    verb = "put";
+  }
   return { verb, dobj, prep, iobj };
 }

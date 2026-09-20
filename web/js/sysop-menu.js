@@ -125,7 +125,7 @@ const QUICK_COLLECTION = [
   "wear shoes",
   "take all",
   "fly belfry",
-  "pull upperrope",
+  "pull bellrope",
   "take batsight",
   "fly hallbr",
   "open drawer",
@@ -185,7 +185,7 @@ const REQUIRED_DEPOSITS = [
 const QUICK_TO_BELL = [
   "close rq",
   "open bellcloset",
-  "pull bellrope",
+  "pull closetrope",
 ];
 
 const MAX_COLLECTION = [
@@ -219,7 +219,7 @@ const MAX_COLLECTION = [
   "wear shoes",
   "take all",
   "fly belfry",
-  "pull upperrope",
+  "pull bellrope",
   "take batsight",
   "fly kitchen",
   "take rope",

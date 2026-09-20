@@ -47,7 +47,7 @@ body { -webkit-text-size-adjust: 100%; }
   display: flex; flex-wrap: nowrap; gap: 0.2rem; align-items: center; justify-content: flex-end;
   font-size: 0.8rem; color: var(--dim);
   padding-bottom: 0.15rem; margin-bottom: 0.2rem;
-  padding-right: 14rem;  /* fallback; JS sizes this to the actual toggle width */
+  padding-right: 7.5rem;  /* fallback; JS sizes this to the tutorial button */
   border-bottom: 1px solid rgba(31, 122, 58, 0.5);
 }
 #hud[hidden], #controls[hidden], #nav-disclosure[hidden] { display: none; }
@@ -81,10 +81,44 @@ body { -webkit-text-size-adjust: 100%; }
 /* Sound toggle: tiny icon button that sits inline in the HUD row — always
    reachable without opening the phone, independent of Gary's voice mute. */
 #sound-toggle {
-  order: -1;
-  margin-right: auto;
+  order: -2;
   min-height: 1.6rem; min-width: 1.8rem; padding: 0.15rem 0.4rem; font-size: 0.9rem;
 }
+.mode-rocker {
+  order: -1;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: stretch;
+  margin-right: auto;
+  color: #8fd3ff;
+  font: 700 0.67rem/1 "Courier New", monospace;
+  letter-spacing: 0.06rem;
+  text-decoration: none;
+  background: rgba(5, 8, 5, 0.82);
+  border: 1px solid #2a3b2f;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(143, 211, 255, 0.04);
+}
+.mode-rocker .mode-choice {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.33rem 0.45rem;
+}
+.mode-rocker .mode-choice + .mode-choice { border-left: 1px solid #2a3b2f; }
+.mode-rocker .mode-choice.is-active {
+  color: var(--bg);
+  background: var(--green-bright);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.mode-rocker:hover .mode-choice:not(.is-active) {
+  color: #fff;
+  background: rgba(143, 211, 255, 0.15);
+}
+.mode-rocker:active .mode-choice:not(.is-active) {
+  background: rgba(143, 211, 255, 0.3);
+}
+.mode-rocker:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2px; }
 
 #transcript {
   flex: 1;
@@ -653,27 +687,8 @@ body { -webkit-text-size-adjust: 100%; }
 @keyframes end-call-progress { to { transform: scaleX(1); } }
 #phone-end:active { background: #e0483c; }
 
-/* Mode switch: a Text | 2D segmented toggle, fixed top-right. The active
-   segment is filled; the other is a link to the other view. */
-/* Top-right controls: the "How to play" pill + the Text|2D toggle, sitting
-   side by side (mirrors the 2D map header). */
+/* The tutorial remains fixed above the HUD readout. */
 #top-controls {
   position: fixed; top: max(6px, env(safe-area-inset-top)); right: 8px; z-index: 60;
   display: inline-flex; align-items: stretch; gap: 10px;
 }
-#mode-switch {
-  display: inline-flex; align-items: stretch;
-  font: 700 11px/1 "Courier New", monospace; letter-spacing: 1px;
-  background: rgba(5, 8, 5, 0.82); border: 1px solid #2a3b2f; border-radius: 7px;
-  overflow: hidden;
-}
-#mode-switch .mode-seg {
-  display: inline-flex; align-items: center;
-  padding: 5px 9px; text-decoration: none; color: #8fd3ff;
-}
-#mode-switch .mode-seg + .mode-seg { border-left: 1px solid #2a3b2f; }
-#mode-switch .mode-seg.is-active {
-  color: #050805; background: var(--green-bright); cursor: default;
-}
-#mode-switch a.mode-seg:hover { color: #fff; background: rgba(143, 211, 255, 0.15); }
-#mode-switch a.mode-seg:active { color: #fff; background: rgba(143, 211, 255, 0.3); }

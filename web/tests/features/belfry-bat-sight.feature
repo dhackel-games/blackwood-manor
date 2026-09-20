@@ -102,6 +102,7 @@ Feature: Belfry bell and Bat Sight Mirror
     And the output contains "remote"
     And the output contains "CLUNK"
     And the output contains "Nothing changes in the RELIQUARY"
+    And the output contains line "HEIRLOOMS: 0/13 +0"
     And flag "bellRung" is unset
     And flag "floorDoorOpen" is unset
     And item "batSightMirror" is in "belfry"

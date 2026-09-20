@@ -22,7 +22,7 @@ Feature: Build metadata and touch-control contract
   Scenario: HUD statuses use declarative slots
     Then every HUD status is a HudSlot with an emoji and calculation
 
-  Scenario: The compact HUD explains sound state without wasting a row
+  Scenario: The compact HUD groups sound and view controls without wasting a row
     Then the sound-effects toggle is leftmost in the HUD slots and explains its state
     And the HUD remains one non-wrapping row
     And the bowel meter has no trailing solid cap

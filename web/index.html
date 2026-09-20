@@ -21,6 +21,12 @@
         <button id="sound-toggle" class="iconbtn" type="button" aria-pressed="false"
                 aria-label="sound effects off; click to turn on"
                 title="Sound effects off — click to turn on">🔇</button>
+        <a id="to-2d" class="mode-rocker" data-active="text"
+           href="view2d/tilemap.html" aria-label="Switch from text to images view"
+           title="Switch to images view">
+          <span class="mode-choice is-active">TEXT</span>
+          <span class="mode-choice">IMAGES</span>
+        </a>
       </span>
     </div>
 
@@ -153,14 +159,10 @@
     </div>
   </div>
 
-  <!-- Mode switch: Text (current) ↔ 2D tile-map view (view2d/tilemap.html). -->
+  <!-- The tutorial stays top-right; the TEXT | IMAGES rocker lives in the HUD. -->
   <div id="top-controls">
     <button id="howtoBtn" class="howto-btn" type="button"
             title="How to play" aria-label="How to play">📖 How to play</button>
-    <nav id="mode-switch" aria-label="view mode">
-      <span class="mode-seg is-active" aria-current="page">Text</span>
-      <a class="mode-seg" id="to-2d" href="view2d/tilemap.html" title="Switch to the 2D map view">2D</a>
-    </nav>
   </div>
 
   <script type="module" src="js/ui.js?v=source"></script>

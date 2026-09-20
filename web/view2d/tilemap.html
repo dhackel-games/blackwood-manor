@@ -12,21 +12,22 @@
   body { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
   header { padding:10px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
   header h1 { margin:0; font-size:15px; letter-spacing:1px; }
-  header .mode-switch { float:right; margin-left:12px; display:inline-flex; align-items:stretch;
-    font:700 11px/1 "Courier New", monospace; letter-spacing:1px;
-    border:1px solid #2a3b2f; border-radius:7px; overflow:hidden; }
   header .howto-btn { float:right; margin-left:10px; padding:5px 11px; border-radius:7px;
     font:700 11px/1 "Courier New", monospace; letter-spacing:1px; }
-  header .mode-switch .mode-seg { display:inline-flex; align-items:center; padding:5px 9px;
-    color:#8fd3ff; text-decoration:none; }
-  header .mode-switch .mode-seg + .mode-seg { border-left:1px solid #2a3b2f; }
-  header .mode-switch .mode-seg.is-active { color:#05070a; background:#49ff7a; cursor:default; }
-  header .mode-switch a.mode-seg:hover { color:#fff; background:rgba(143,211,255,0.15); }
-  header .mode-switch a.mode-seg:active { color:#fff; background:rgba(143,211,255,0.3); }
   header details { color:var(--dim); font-size:12px; margin-top:4px; }
   /* Top awards readout — same score/capacity/bill slots as the text game. */
   header .awards { font-size:13px; color:var(--dim); min-height:1.2em; margin-bottom:6px; }
-  header .awards #hud-slots { display:inline-flex; flex-wrap:wrap; align-items:center; gap:0.35rem; }
+  header .awards #hud-slots { display:flex; flex-wrap:nowrap; align-items:center; gap:0.35rem;
+    overflow-x:auto; white-space:nowrap; }
+  header .awards .mode-rocker { flex:0 0 auto; display:inline-flex; align-items:stretch;
+    color:#8fd3ff; text-decoration:none; font:700 11px/1 "Courier New", monospace;
+    letter-spacing:1px; border:1px solid #2a3b2f; border-radius:7px; overflow:hidden; }
+  header .awards .mode-choice { display:inline-flex; align-items:center; padding:5px 9px; }
+  header .awards .mode-choice + .mode-choice { border-left:1px solid #2a3b2f; }
+  header .awards .mode-choice.is-active { color:#05070a; background:#49ff7a;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.45); }
+  header .awards .mode-rocker:hover .mode-choice:not(.is-active) {
+    color:#fff; background:rgba(143,211,255,0.15); }
   header .awards .hud-slot { color:var(--ink); }
   header .awards .hud-slot[hidden] { display:none; }
   header .awards .hud-slot + .hud-slot::before { content:"·"; color:var(--dim); margin-right:0.5rem; }
@@ -312,11 +313,16 @@
 </head>
 <body>
 <header>
-  <div class="awards" id="awards"><span id="hud-slots"></span></div>
-  <nav class="mode-switch" aria-label="view mode">
-    <a class="mode-seg" href="../index.html" title="Switch to the text game">Text</a>
-    <span class="mode-seg is-active" aria-current="page">2D</span>
-  </nav>
+  <div class="awards" id="awards">
+    <span id="hud-slots">
+      <a id="to-text" class="mode-rocker" data-active="images"
+         href="../index.html" aria-label="Switch from images to text view"
+         title="Switch to text view">
+        <span class="mode-choice">TEXT</span>
+        <span class="mode-choice is-active">IMAGES</span>
+      </a>
+    </span>
+  </div>
   <button id="howtoBtn" class="howto-btn" type="button">📖 How to play</button>
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (2D map)</h1>
   <details>
@@ -330,7 +336,7 @@
     bait and lure the guest. Switch labels between <b>vector</b> (crisp) and
     <b>8-bit</b>, or turn on <b>reveal all</b> for a pure map view of how the
     whole manor connects. Shipped in the app under <code>web/view2d/</code> and
-    reachable from the text game via the <b>2D</b> link.</p>
+    reachable from the text game via the <b>TEXT | IMAGES</b> rocker.</p>
   </details>
 </header>
 
@@ -1396,7 +1402,7 @@
         "act: examine/take/open/read/push/pull/pray… (real manor verbs). " +
         "watch: tour (auto-walk the whole manor) · stop. " +
         "sysop: :: opens the back-office menu; ::<command> auto-plays a scripted solution (unlock with ::<password> first) — set Auto speed, ⏸ to pause. " +
-        "extras: bait · reveal · reset. modes: TEXT switches to the text game (toggle top-right). " +
+        "extras: bait · reveal · reset. modes: TEXT switches to the text game (HUD rocker). " +
         "Or hover a room to inspect it.";
       render(); return;
     }
@@ -1511,10 +1517,8 @@
     startTour(); canvas.focus();
   });
   trailClear.addEventListener("click", () => { history = []; renderTrail(); canvas.focus(); });
-  // The header "Text" link is a plain anchor — snapshot the game into the
-  // handoff slot before it navigates so the text game resumes exactly here.
-  document.querySelector('header .mode-switch a[href="../index.html"]')
-    ?.addEventListener("click", () => saveModeHandoff());
+  // The HUD rocker snapshots the game before returning to the text view.
+  document.getElementById("to-text")?.addEventListener("click", () => saveModeHandoff());
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });
   autoSpeedSel.addEventListener("change", () => {
     autoDelayMs = Number(autoSpeedSel.value) || 975;

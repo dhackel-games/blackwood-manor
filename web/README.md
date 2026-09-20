@@ -110,12 +110,14 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   leaves the random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
-- **Things:** `take <x>` / `t <x>`, `take all` / `get all`, `drop <x>`, `drop all`,
-  `inventory` (`i`). DROP ALL leaves worn equipment equipped.
+- **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,
+  `drop/place/put all in <container>`, `drop all`, and `inventory` (`i`). Bulk
+  transfers leave worn equipment equipped.
 - **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
-  unworn item can be deposited. PUT auto-opens it; the completed cabinet must
-  be explicitly CLOSED before the lower BELL ROPE will complete the ritual. The
-  `💎` HUD appears after the first deposit as `required/13 +extra`. Pulling the
+  unworn item can be deposited. DROP/PLACE/PUT ALL auto-opens it, as does
+  GET/TAKE ALL FROM it; the completed cabinet must be explicitly CLOSED before
+  the lower BELL ROPE will complete the ritual. Text reports
+  `HEIRLOOMS: required/13 +extra`, matching the `💎` HUD value. Pulling the
   prepared closet rope rings the remote belfry bell, flashes magical light,
   transforms the thirteen heirlooms into the COUNTDOWN CLOCK, slams the FRONT
   DOOR shut and then wide open, and opens the floor trapdoor. EXAMINE the

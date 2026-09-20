@@ -145,14 +145,13 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "BM"
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
-    Then the output contains "Family heirlooms: 1/13"
+    Then the output contains line "HEIRLOOMS: 1/13 +0"
     And the game score is 8
 
   Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
     When I send "place emerald gem in reliquary"
-    Then the output contains "Family heirlooms: 0/13"
-    And the output contains "does not contribute"
+    Then the output contains line "HEIRLOOMS: 0/13 +1"
     When I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And the output contains "take the emerald gem from the RELIQUARY"

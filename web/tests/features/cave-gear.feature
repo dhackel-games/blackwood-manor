@@ -183,12 +183,13 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
 
   Scenario: The reliquary accepts junk but marks it as non-contributing
     Then the reliquary HUD is hidden
+    Given the player is in room "grandHall"
+    When I send "examine rq"
+    Then the output contains line "HEIRLOOMS: 0/13 +0"
     Given item "rope" is carried
-    And the player is in room "grandHall"
     When I send "put rope in reliquary"
     Then item "rope" is in "reliquary"
-    And the output contains "does not contribute"
-    And the output contains "Non-contributing items currently inside: 1"
+    And the output contains line "HEIRLOOMS: 0/13 +1"
     And the reliquary HUD shows "0/13 +1"
 
   Scenario: The protective talisman becomes an heirloom after its crypt work is done
@@ -203,7 +204,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Given item "goldLocket" is carried
     When I send "put talisman in reliquary"
     Then item "talisman" is in "reliquary"
-    And the output contains "Family heirlooms: 1/13"
+    And the output contains line "HEIRLOOMS: 1/13 +0"
     And the game score is 15
 
   Scenario: USE wears wearable equipment
@@ -253,25 +254,33 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is carried
     And item "rope" is carried
 
-  Scenario: PUT ALL and GET ALL preserve reliquary rules and worn equipment
+  Scenario Outline: Bulk reliquary command aliases preserve rules and worn equipment
     Given item "familyCrest" is carried
     And item "rope" is carried
     And item "backpack" is carried
     And the player is in room "grandHall"
     When I send "wear backpack"
-    And I send "put all in rq"
+    And I send "<deposit>"
     Then item "familyCrest" is in "reliquary"
     And item "rope" is in "reliquary"
     And item "backpack" is carried
     And item "backpack" is worn in slot "back"
     And the output contains "Still worn"
+    And the output contains line "HEIRLOOMS: 1/13 +1"
     And the game score is 15
     When I send "close rq"
-    And I send "get all from rq"
+    And I send "<withdraw>"
     Then the output contains "(open GLASS RELIQUARY; take ALL from GLASS RELIQUARY)"
     And item "familyCrest" is carried
     And item "rope" is carried
+    And the output contains line "HEIRLOOMS: 0/13 +0"
     And the game score is 15
+
+    Examples:
+      | deposit         | withdraw         |
+      | put all in rq   | get all from rq  |
+      | place all in rq | take all from rq |
+      | drop all in rq  | get all from rq  |
 
   Scenario: Withdrawn heirlooms keep their one-time deposit score
     Given item "goldLocket" is carried

@@ -45,12 +45,12 @@ Feature: Maintained sysop shortcuts
 
   Scenario: Winmax2bell includes the new mirror route and stops before the ritual
     Then sysop command "::winmax2bell" includes "g belfry"
-    And sysop command "::winmax2bell" includes "pull upperrope"
+    And sysop command "::winmax2bell" includes "pull bellrope"
     And sysop command "::winmax2bell" includes "t batsight"
     And sysop command "::winmax2bell" includes "put batsight in rq"
     And sysop command "::winmax2bell" includes "c rq"
     And sysop command "::winmax2bell" includes "o bellcloset"
-    And sysop command "::winmax2bell" omits "pull bellrope"
+    And sysop command "::winmax2bell" omits "pull closetrope"
     And sysop command "::winmax2bell" omits "put family in rq"
     And every hidden prompt avoids an explicit take immediately before direct use
 
@@ -60,10 +60,10 @@ Feature: Maintained sysop shortcuts
     And sysop command "::powerup" includes "u goggles"
     And sysop command "::powerup" includes "u obsidian"
     And sysop command "::winquick1" includes "g belfry"
-    And sysop command "::winquick1" includes "pull upperrope"
+    And sysop command "::winquick1" includes "pull bellrope"
     And sysop command "::winquick1" includes "t batsight"
     And sysop command "::winquick1" includes "put batsight in rq"
-    And sysop command "::winquick1" includes "pull bellrope"
+    And sysop command "::winquick1" includes "pull closetrope"
     And sysop command "::winquick1" omits "south"
     And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     And sysop command "::winmax2bell" contains sequence "g shaft; u backpack; g gallery; u headlamp"

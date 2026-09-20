@@ -239,7 +239,7 @@ export function initHowto(opts = {}) {
     if (e.key === "Escape") { if (loreActiveItem) hideLore(); else if (overlay.classList.contains("open")) close(); }
   });
 
-  // --- header button in the Text|2D switch ---
+  // --- tutorial button in the page-level controls ---
   // Prefer a static button already in the markup (robust against timing); only
   // create one as a fallback.
   let btn = document.getElementById("howtoBtn");

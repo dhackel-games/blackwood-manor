@@ -122,8 +122,7 @@ Feature: Fire and food consequences
     And I send "place emerald gem in reliquary"
     Then item "emberStone" is in "reliquary"
     And the game score is 40
-    And the output contains "Family heirlooms: 0/13"
-    And the output contains "does not contribute"
+    And the output contains line "HEIRLOOMS: 0/13 +1"
 
   Scenario: A lit candlestick can patiently ignite the garden brazier
     Given the player is in room "garden"

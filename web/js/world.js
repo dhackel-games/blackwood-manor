@@ -25,11 +25,11 @@ export const REQUIRED_FAMILY_ITEM_COUNT = 13;
 export const ITEM_SHORT_NAMES = Object.freeze({
   reliquary: "rq",
   bell: "bell",
-  belfryBellRope: "upperrope",
+  belfryBellRope: "bellrope",
   belfryBats: "bats",
   batSightMirror: "batsight",
   bellCloset: "bellcloset",
-  closetBellRope: "bellrope",
+  closetBellRope: "closetrope",
   mysteryPackage: "package",
   lightningBolt: "lightning",
   statue: "statue",
@@ -176,6 +176,17 @@ function reliquaryStatus(ctx) {
     nonContributing: contents.length - contributing,
   };
 }
+function reliquaryStatusValue(ctx, includeEmpty = false) {
+  const status = reliquaryStatus(ctx);
+  if (!status) {
+    return includeEmpty ? `0/${REQUIRED_FAMILY_ITEM_COUNT} +0` : null;
+  }
+  if (status.transformed) return "CLOCK";
+  return `${status.contributing}/${status.required} +${status.nonContributing}`;
+}
+function reliquaryCountLine(ctx) {
+  return `HEIRLOOMS: ${reliquaryStatusValue(ctx, true)}`;
+}
 
 // Persist the final score as a seed for BLACKWOOD MANOR II. Browser-only; the
 // node test harness has no localStorage, so this is a guarded nice-to-have.
@@ -210,10 +221,8 @@ function inspectReliquary(ctx) {
     }
     return "All thirteen fitted recesses are empty. The heirlooms became the COUNTDOWN CLOCK you now carry.";
   }
-  const status = reliquaryStatus(ctx);
-  const count = status?.contributing || 0;
   return "A tall, glass-fronted RELIQUARY set into the stone wall, with thirteen fitted recesses for the " +
-    `Blackwood heirlooms. ${count}/${REQUIRED_FAMILY_ITEM_COUNT} are in place.`;
+    `Blackwood heirlooms.\n\n${reliquaryCountLine(ctx)}`;
 }
 
 function takeCountdownClock(ctx) {
@@ -306,9 +315,7 @@ function pullClosetBellRope(ctx) {
     return bell + "\n\nThe ritual has already answered. The FRONT DOOR and floor trapdoor remain open.";
   }
   if (!allTreasuresDeposited(ctx)) {
-    const count = depositedFamilyItemCount(ctx);
-    return bell + `\n\nNothing changes in the RELIQUARY. Only ${count}/${REQUIRED_FAMILY_ITEM_COUNT} ` +
-      "heirlooms are in place.";
+    return bell + "\n\nNothing changes in the RELIQUARY.\n\n" + reliquaryCountLine(ctx);
   }
   if (ctx.item("reliquary").open || !ctx.getFlag("reliquarySealed")) {
     return bell + "\n\nA white spark crawls across the open RELIQUARY and dies. CLOSE the doors first.";
@@ -3274,6 +3281,7 @@ const logicWorld = {
   digestiveStatus,   // compact bowel-pressure/phase data for the always-on HUD
   fireStatus,        // remaining burn turns for the always-on HUD
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
+  reliquaryStatusValue, // HUD-compatible RELIQUARY count text
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -3651,7 +3659,8 @@ const logicWorld = {
           const wasContributing = it.treasure && ctx.roomOf(it.id) === "reliquary";
           ctx.moveItem(it.id, "inventory");
           if (wasContributing) ctx.setFlag("curseLiftable", false);
-          return `You take the ${it.names[0]} from the RELIQUARY.`;
+          return `You take the ${it.names[0]} from the RELIQUARY.` +
+            (cmd.bulkTransfer ? "" : `\n\n${reliquaryCountLine(ctx)}`);
         },
         // Deposit heirlooms into the reliquary (scoring the deposit).
         put(ctx, cmd) {
@@ -3676,15 +3685,8 @@ const logicWorld = {
               ctx.setFlag(scoreFlag);
             }
           }
-          const status = reliquaryStatus(ctx);
           let msg = `You place the ${it.names[0]} in its fitted recess in the RELIQUARY.`;
-          msg += `\n\nFamily heirlooms: ${status.contributing}/${status.required}.`;
-          if (!it.treasure) {
-            msg += ` The ${it.names[0]} does not contribute to that total.`;
-          }
-          if (status.nonContributing > 0) {
-            msg += ` Non-contributing items currently inside: ${status.nonContributing}.`;
-          }
+          if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
             msg += "\n\nAll thirteen heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
@@ -4002,6 +4004,7 @@ const logicWorld = {
       names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
       loc: "grandHall", fixed: true, container: true, capacity: 20,
       openable: true, open: false, autoOpenOnAccess: true,
+      bulkTransferSummary: (ctx) => reliquaryCountLine(ctx),
       desc: `A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold ` +
         `${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses behind a pair of carved doors.`,
       on: {
