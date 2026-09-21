@@ -327,7 +327,7 @@
   <h1>CHAPTER 2 — WALK THE MANOR AS GARY (2D map)</h1>
   <details>
     <summary>what is this?</summary>
-    <p>You are Gary the ghost. Drift room to room — the manor you once explored in
+    <p>Walk Blackwood Manor room to room — the manor you explore in
     text now <b>develops in 8-bit as you enter each room</b>, while places you
     haven't visited stay fogged. Move with arrow keys / WASD, <b>click any
     connected room to walk there</b>, or <b>type commands</b> in the bar below
@@ -412,7 +412,7 @@
   <input type="text" id="cmd" name="gary-command"
     autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
     enterkeyhint="send" data-1p-ignore data-lpignore="true" data-form-type="other"
-    placeholder="type what Gary does — e.g. 'go library', 'n', 'drop bait', 'look', 'help'" />
+    placeholder="type a command — e.g. 'go library', 'n', 'drop bait', 'look', 'help'" />
 </form>
 <div class="legend" id="legend"></div>
 
@@ -430,8 +430,8 @@
       </div>
     </div>
     <div class="howto-body">
-      <p>You are <b>Gary</b> — dead, but not gone. Bound to the manor you once
-      explored in life, you drift its fog-drowned halls where <b>thirteen lost
+      <p>You've come to <b>Blackwood Manor</b> — and it does not intend to let
+      you leave. Explore its fog-drowned halls where <b>thirteen lost
       Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
       Make the house whole again… before it makes <i>you</i> part of it.</p>
 
@@ -552,6 +552,15 @@
   let worldRef = null;
   let parseCmd = null;   // the shared engine's real parser — single source of
                           // truth for "is this a valid manor command?"
+  let createGameRef = null;  // engine factory, kept so RESTART can rebuild it
+  let parseRestart = null;   // shared RESTART / RESTART 2 detector (core.js)
+  let saveApi = null;        // save/restore module (save.js), loaded with the engine
+
+  // The player is the named protagonist. Gary is a separate NPC — the surly
+  // hint-line operator who phones YOU by name — so the map must never label the
+  // player "Gary". Fall back to "You" until the manor has a name for them.
+  function playerName() { return (game && game.state.flags && game.state.flags.playerName) || null; }
+  function playerLabel() { return playerName() || "You"; }
   // Sysop "::" menu — the same back-office shortcuts the text game exposes.
   // Loaded live (like the engine) so a failure degrades gracefully. The unlock
   // state is shared with the text game via the same localStorage key.
@@ -562,21 +571,25 @@
   catch (e) { /* private mode — stay locked */ }
   (async () => {
     try {
-      const [{ world }, { createGame }, sysopMod, { parse }] = await Promise.all([
+      const [{ world }, core, sysopMod, { parse }, saveMod] = await Promise.all([
         import("../js/world.js"), import("../js/core.js"), import("../js/sysop-menu.js"),
-        import("../js/parser.js"),
+        import("../js/parser.js"), import("../js/save.js"),
       ]);
+      const { createGame, parseRestartTarget } = core;
       sysop = sysopMod;
       game = createGame(world);
       worldRef = world;
+      createGameRef = createGame;
       parseCmd = parse;
+      parseRestart = parseRestartTarget;
+      saveApi = saveMod;
       const handoff = takeModeHandoff();
       if (handoff && handoff.snapshot) {
         try { game.restore(handoff.snapshot); } catch (e) { console.warn("restore failed", e); }
         history = Array.isArray(handoff.history) ? handoff.history.slice() : [];
         gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
         seen.add(gary); focusId = gary; recenter = true;
-        msg = `↩︎ Resumed in 2D as ${game.state.flags.playerName || "Gary"} — ` +
+        msg = `↩︎ Resumed in 2D as ${game.state.flags.playerName || "yourself"} — ` +
           "your command trail is on the right. Move on, or type TEXT to switch back.";
         renderTrail();
       } else if (game.needsPlayerName()) {
@@ -828,7 +841,7 @@
   const NAME_PLACEHOLDER = "type your name and press Enter (or just press Enter)…";
   function namePromptMsg() {
     return "First — what should we call you? Type your name and press Enter " +
-      "(or just press Enter to be named for you). Then type what Gary does.";
+      "(or just press Enter to be named for you). Then type what you do.";
   }
   function startNameGate() {
     msg = namePromptMsg();
@@ -840,7 +853,7 @@
     game.state.dead = false; game.state.won = false;
     cmdInput.placeholder = CMD_PLACEHOLDER;
     const named = game.state.flags.playerName || "you";
-    msg = `The manor will call you ${named}. Now type what Gary does — or move with the arrows / click a room.`;
+    msg = `The manor will call you ${named}. Now type what you do — or move with the arrows / click a room.`;
     render(); canvas.focus();
   }
 
@@ -876,7 +889,7 @@
     focusId = START; recenter = true;
     history = []; renderTrail();
     if (game && game.needsPlayerName()) startNameGate();
-    else msg = "You are Gary. Move around; drop bait (B) and lure the guest to it.";
+    else msg = "Move around — click a room or type a command. Press B to drop bait and lure the guest.";
     render(); canvas.focus();
   }
   const floorOf = (id) => graph.home.get(id).floorIndex;
@@ -889,7 +902,7 @@
   const LEGEND = [
     [TILE.FLOOR, "floor"], [TILE.WALL, "wall"], [TILE.DOOR, "door"],
     [TILE.CORRIDOR, "corridor"], [TILE.STAIR, "stairs"],
-    [TILE.PLAYER, "Gary (you)"], [TILE.FOG, "unexplored"],
+    [TILE.PLAYER, "you"], [TILE.FOG, "unexplored"],
   ];
   legend.innerHTML = "";
   for (const [t, name] of LEGEND) {
@@ -1085,7 +1098,7 @@
     const here = graph.home.get(gary).label;
     const guestLabel = graph.home.get(guest).label;
     hud.innerHTML =
-      `<span>📍 Gary in <b>${here}</b></span>` +
+      `<span>📍 ${playerLabel()} in <b>${here}</b></span>` +
       `<span>👤 guest in <b>${guestLabel}</b></span>` +
       `<span>🧀 bait <b>${bait.size}</b></span>` +
       `<span>✨ lured <b>${lured}</b></span>` +
@@ -1168,6 +1181,12 @@
   }
 
   function moveTo(id, label) {
+    if (game && game.state.flags && game.state.flags.onCall) {
+      msg = "You're on the line with Gary — type 'bye' to hang up first."; render(); return;
+    }
+    if (game && (game.state.dead || game.state.won)) {
+      msg = "The game is over. Type RESTART to play again."; render(); return;
+    }
     const first = !seen.has(id);
     gary = id; seen.add(id); steps++;
     focusId = id; recenter = true;
@@ -1404,8 +1423,9 @@
     return first;
   }
 
-  // Route a line to the shipped engine as if Gary were the protagonist. Keeps
-  // the spike un-brickable: engine death/win are side effects we swallow here.
+  // Route a line to the shipped engine, with the player as the protagonist.
+  // Death and victory are now real (parity with the text game) — the caller
+  // surfaces the game-over message and RESTART re-arms a fresh manor.
   function runEngine(line) {
     logAction(line);
     game.state.room = gary;
@@ -1416,8 +1436,6 @@
     let text;
     try { text = game.send(line); }
     catch (e) { text = "The manor does not respond to that."; }
-    if (game.state.dead) { game.state.dead = false; text = (text || "") + "\n(Gary can't truly die — you shake it off.)"; }
-    if (game.state.won) { game.state.won = false; }
     if (wasAtDragon && game.state.flags) {
       const nowFriendly = !!game.state.flags.dragonFriendly;
       const nowInjuries = game.state.flags.dragonInjuries || 0;
@@ -1427,7 +1445,41 @@
       else if (nowInjuries > wasInjuries) flashDragon("swat");
     }
     syncGaryToEngine();   // follow teleports/flight onto the map
+    // Post-turn parity with text mode: mirror-route prefill + per-turn autosave.
+    const prefill = game.getFlag && game.getFlag("mirrorRoutePrefill");
+    if (prefill) {
+      game.setFlag("mirrorRoutePrefill", null);
+      queueMicrotask(() => { cmdInput.value = prefill; cmdInput.focus(); });
+    }
+    if (saveApi && !game.state.dead && !game.state.won
+        && !(game.state.flags && game.state.flags.onCall)) {
+      try { saveApi.saveGame(game); } catch (e) { /* private mode — skip */ }
+    }
+    if (game.state.dead || game.state.won) {
+      text = (text || "").trim() + "\n\nType RESTART to play again"
+        + (game.state.flags && game.state.flags.partII ? " (or RESTART 2 for Part II)." : ".");
+    }
     return (text || "Nothing happens.").trim();
+  }
+
+  // Rebuild the engine for RESTART / RESTART 2, mirroring the text game's
+  // newGame()/restartPartTwo(). Part 2 restores the Part II checkpoint and
+  // re-asks the player's name.
+  function restartGame(part) {
+    stopTour(); stopAuto();
+    if (!createGameRef || !worldRef) { reset(); return; }
+    game = createGameRef(worldRef);
+    knownCarried = null;
+    if (part === 2 && game.restoreCheckpoint) {
+      try { game.restoreCheckpoint("partII"); } catch (e) { /* no checkpoint yet */ }
+      if (game.state && game.state.flags) delete game.state.flags.playerName;
+    }
+    gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
+    seen = new Set([gary]); steps = 0; guest = GUEST_START; bait = new Set(); lured = 0;
+    focusId = gary; recenter = true; history = []; renderTrail();
+    if (game.needsPlayerName()) startNameGate();
+    else msg = part === 2 ? "Restarting Part II…" : "Restarted.";
+    render(); canvas.focus();
   }
 
   // Command router. 2D-only affordances (mode switches, tour, bait, map-reveal
@@ -1442,9 +1494,33 @@
   function runCommand(raw) {
     const line = (raw || "").trim().toLowerCase();
     if (!line) return;
+
+    // RESTART is a UI meta-verb that works from anywhere — even after death,
+    // even mid-call — exactly like the text game.
+    const restartTarget = parseRestart ? parseRestart(line) : 0;
+    if (restartTarget) { restartGame(restartTarget); return; }
+
+    // On the hint line, every keystroke is for Gary. Bypass every map intercept
+    // and route it verbatim, just like text mode forwards to game.send() while
+    // onCall. The engine (world.hotlineTalk) owns hang-up ("bye", "hang up", …).
+    if (game && game.state.flags && game.state.flags.onCall) {
+      let text; try { text = game.send(raw.trim()); }
+      catch (e) { text = "The line crackles and goes quiet."; }
+      msg = (text || "").trim(); render(); canvas.focus(); return;
+    }
+
     if (line.startsWith("::")) { runSysop(line); return; }
     const [verb, ...rest] = line.split(/\s+/);
     const arg = rest.join(" ");
+
+    // Once the engine reports game over, only RESTART / mode-switch / help
+    // apply — mirror the text terminal, which refuses ordinary commands then.
+    if (game && (game.state.dead || game.state.won)
+        && !["text", "1d", "2d", "help", "?"].includes(verb)) {
+      msg = "The game is over. Type RESTART to play again"
+        + (game.state.flags && game.state.flags.partII ? " (or RESTART 2)." : ".");
+      render(); return;
+    }
 
     if (verb === "tour" || verb === "auto" || verb === "demo" || verb === "watch") { startTour(); return; }
     if (verb === "stop" || verb === "halt") { stopTour("🎬 Auto-tour stopped."); stopAuto("⏹ Stopped."); return; }
@@ -1463,7 +1539,34 @@
     if (verb === "text" || (verb === "1d")) { saveModeHandoff(); window.location.href = "../index.html"; return; }
     if (verb === "2d") { msg = "You're already in 2D. Type TEXT to switch to the text game."; render(); return; }
 
-    // Bare compass words ("n", "north", …) pathfind to the 2D-graph neighbor.
+    // Terminal meta-verbs, matching the text game. save/restore share the same
+    // browser slot the text terminal uses, so progress crosses modes.
+    if (verb === "quit" && !rest.length) {
+      msg = "Thanks for playing. Reload to return to Blackwood Manor."; render(); return;
+    }
+    if ((verb === "reload" || verb === "refresh") && !rest.length) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("_bmrefresh", Date.now().toString());
+      window.location.replace(url.toString()); return;
+    }
+    if (game && saveApi && verb === "save" && !rest.length) {
+      game.setFlag("usedSaveRestore", true);
+      msg = saveApi.saveGame(game) ? "Game saved to this browser." : "Save failed.";
+      render(); return;
+    }
+    if (game && saveApi && verb === "restore" && !rest.length) {
+      game.setFlag("usedSaveRestore", true);
+      if (!saveApi.hasSave()) { msg = "There is no saved game."; render(); return; }
+      const ok = saveApi.loadGame(game);
+      if (ok) {
+        if (game.needsPlayerName()) game.useDefaultPlayerName();
+        game.setFlag("usedSaveRestore", true);
+        gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
+        seen.add(gary); focusId = gary; recenter = true;
+      }
+      msg = ok ? "Restored." : "Restore failed.";
+      render(); canvas.focus(); return;
+    }
     // If there's no such neighbor on the map, fall through to the shared
     // engine below instead of erroring immediately — the engine's own room
     // graph may know an exit (hidden, conditional, or one-way) that the 2D
@@ -1606,7 +1709,7 @@
   });
   autoPauseBtn.addEventListener("click", () => { toggleAutoPause(); canvas.focus(); });
 
-  // --- command bar: type what Gary does ------------------------------------
+  // --- command bar: type a command -----------------------------------------
   cmdForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const val = cmdInput.value;

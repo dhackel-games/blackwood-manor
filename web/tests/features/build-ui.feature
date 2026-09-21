@@ -87,6 +87,9 @@ Feature: Build metadata and touch-control contract
   Scenario: 2D command entry shares the text-mode parser vocabulary
     Then 2D command entry delegates manor verbs to the shared parser
 
+  Scenario: 2D mode matches the text terminal's behavior
+    Then 2D mode reaches behavior parity with the text terminal
+
   Scenario Outline: Every movement direction has a touch button
     Then the page has a "<direction>" touch command
 
