@@ -1,4 +1,4 @@
-# candelabra-restoration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# candelabra-restoration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @walkthrough
 Feature: Restore the dining-room candelabra
@@ -51,6 +51,7 @@ Feature: Restore the dining-room candelabra
     When I send "take candlestick"
     And I send "<first>"
     Then the output contains "<missing>"
+    And the game score is 0
     When I send "<second>"
     Then flag "candelabraRestored" is set
     And item "mirrorShard" is destroyed
@@ -60,13 +61,19 @@ Feature: Restore the dining-room candelabra
     And item "candelabra" is lit
     And the output contains "beautiful, portable BLACKWOOD CANDELABRA"
     And the output contains "WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS"
+    And the output contains "CANDELABRA RESTORATION BONUS (+20)"
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 20
+    When I round-trip the game snapshot
+    Then flag "progressAward:candelabraRestored" is set
+    And the game score is 20
 
     Examples:
       | first                     | missing                      | second                    |
       | put shard in candelabra   | empty candle socket          | put candle on candelabra  |
       | place candle on candelabra | mirror-shaped recess        | put shard into candelabra |
 
-  Scenario: The restored candelabra is a required ten-point heirloom
+  Scenario: The restored candelabra deposit is a separate ten-point award
     Given the restored candelabra is carried
     And the player is in room "grandHall"
     When I send "put candelabra in reliquary"

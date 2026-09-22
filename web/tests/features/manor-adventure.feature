@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -184,7 +184,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 440
+    And the game score is 460
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

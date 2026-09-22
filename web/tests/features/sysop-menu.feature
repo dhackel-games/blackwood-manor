@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -59,6 +59,7 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winmax2bell" omits "pull closetrope"
     And sysop command "::winmax2bell" omits "put bmwatch in rq"
     And sysop command "::winmax2bell" omits "put goggles in rq"
+    And sysop command "::winmax2bell" contains sequence "g study; read diary; o studrawer; u bmwatch"
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: Powerup and Quick Win use the current equipment and heirloom routes
@@ -75,10 +76,14 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winquick1" includes "o studrawer"
     And sysop command "::winquick1" includes "u bmwatch"
     And sysop command "::winquick1" includes "t family"
+    And sysop command "::winquick1" includes "put candle in fixture"
+    And sysop command "::winquick1" includes "put shard in fixture"
     And sysop command "::winquick1" includes "t candelabra"
     And sysop command "::winquick1" includes "put all in rq"
     And sysop command "::winquick1" includes "pull closetrope"
     And sysop command "::winquick1" omits "south"
+    And sysop command "::powerup" contains sequence "g study; o studrawer; u bmwatch"
+    And sysop command "::winquick1" contains sequence "g study; o studrawer; u bmwatch; g hallbr; o drawer; t family; t shard"
     And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     And sysop command "::winmax2bell" contains sequence "g shaft; u backpack; g gallery; u headlamp"
     And sysop command "::winmax2bell" contains sequence "u burrito; z; z; z; z; u milk"
@@ -92,6 +97,11 @@ Feature: Maintained sysop shortcuts
     And item "talisman" is worn in slot "neck"
     And item "obsidianEye" is worn in slot "forehead"
     And item "backwardsWatch" is worn in slot "wrist"
+    And item "studyDrawer" is open
+    And item "familyRing" is in "nightDrawer"
+    And item "mirrorShard" is in "hallBedroom"
+    And item "candlestick" is in "diningRoom"
+    And item "candelabra" is destroyed
     And item "batSightMirror" is absent from game state
     And the game is not won
     And the game score is 60
@@ -104,7 +114,15 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And item "frontDoor" is open
     And every required family item is inside the countdown clock
-    And the game score is 315
+    And item "familyRing" is in "clockTalisman"
+    And item "blackwoodHammer" is in "clockTalisman"
+    And item "candelabra" is in "clockTalisman"
+    And item "mirrorShard" is destroyed
+    And item "candlestick" is destroyed
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 335
 
   Scenario: Winmax2bell earns deterministic progress and stops at the closed reliquary
     When I execute sysop command "::winmax2bell"
@@ -124,14 +142,27 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:letterRead" is set
     And item "mysteryPackage" is in "grandHall"
     And every required family item is in the reliquary
-    And the game score is 440
+    And item "familyRing" is in "reliquary"
+    And item "blackwoodHammer" is in "reliquary"
+    And item "candelabra" is in "reliquary"
+    And item "mirrorShard" is destroyed
+    And item "candlestick" is destroyed
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 460
 
   Scenario: Winmaxfrontd takes the maximum route through the clean ending
     When I execute sysop command "::winmaxfrontd"
     Then the game is won
     And the output contains "You keep walking"
     And flag "bellRung" is set
-    And the game score is 490
+    And item "familyRing" is in "clockTalisman"
+    And item "blackwoodHammer" is in "clockTalisman"
+    And item "candelabra" is in "clockTalisman"
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
+    And the game score is 510
 
   Scenario: Winmaxgary takes the maximum route and descends into Part II
     When I execute sysop command "::winmaxgary"
@@ -141,7 +172,12 @@ Feature: Maintained sysop shortcuts
     And flag "partII" is set
     And item "clockTalisman" is carried
     And the output contains "FREEEEDOMMM"
-    And the game score is 445
+    And item "familyRing" is in "clockTalisman"
+    And item "blackwoodHammer" is in "clockTalisman"
+    And item "candelabra" is in "clockTalisman"
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
+    And the game score is 465
 
   Scenario: Winmax2bell recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
@@ -149,6 +185,8 @@ Feature: Maintained sysop shortcuts
     And item "mushrooms" has been destroyed
     When I execute sysop command "::winmax2bell"
     Then item "wingedShoes" is worn in slot "feet"
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
     And the current room is "grandHall"
     And the game is alive
     And every required family item is in the reliquary
@@ -159,6 +197,8 @@ Feature: Maintained sysop shortcuts
     And item "mushrooms" has been destroyed
     When I execute sysop command "<command>"
     Then item "wingedShoes" is worn in slot "feet"
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is worn in slot "eyes"
     And the current room is "<room>"
     And the game is alive
 

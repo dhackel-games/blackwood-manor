@@ -1,4 +1,4 @@
-<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
+<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
 
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
@@ -10,7 +10,8 @@
 > scry/route behavior. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
 > between the walls. The old candlestick is now the sole portable CANDLE;
 > together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10
-> DINING ROOM CANDELABRA.
+> DINING ROOM CANDELABRA. Completing that restoration awards a separate,
+> non-farmable +20 puzzle bonus.
 >
 > **➡️ UPDATE 2026-09-14 — see [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md).**
 > Major evolution of this doc: the **13-hour clock**, a reworked **BM1 ending** (ring →

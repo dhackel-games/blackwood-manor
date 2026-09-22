@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
 
 # Blackwood Manor
 
@@ -112,9 +112,12 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   to Gary. `::powerup` equips reusable powers, while `::winquick1` completes the
   shorter required-heirloom route and stops after the bell but before walking
   out. The replacement set keeps the 195-point heirloom total and the maintained
-  maximum checkpoints: 440 before the bell, 445 on the Gary route after it, and
-  490 through the front-door ending. The maximum routes intentionally leave the
-  random MYSTERY PACKAGE unopened.
+  maximum checkpoints: 460 before the bell, 465 on the Gary route after it, and
+  510 through the front-door ending. The maximum routes intentionally leave the
+  random MYSTERY PACKAGE unopened. In the corrected chain, scattering the bats
+  remains +5, first taking the goggles remains +5, the hammer and family-ring
+  deposits remain +12 and +20, and candelabra restoration/deposit award +20/+10.
+  The BM WATCH, mirror shard, and loose candle award no points by themselves.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,
@@ -135,9 +138,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   DINING ROOM'S rundown CANDELABRA has the complementary inscription, a
   mirror-shaped recess, and one empty candle socket. Fit the SHARD and the
   manor's sole portable CANDLE in either order to restore a beautiful, takeable
-  +10 heirloom. Its blue-white flames never consume fuel and can light the
-  GARDEN BRAZIER with `LIGHT BRAZIER`, `LIGHT BRAZIER WITH CANDELABRA`, or
-  `TOUCH CANDELABRA TO BRAZIER`.
+  heirloom. Restoration visibly awards a non-farmable +20 puzzle bonus;
+  depositing the completed CANDELABRA separately awards its +10 heirloom value.
+  Its blue-white flames never consume fuel and can light the GARDEN BRAZIER
+  with `LIGHT BRAZIER`, `LIGHT BRAZIER WITH CANDELABRA`, or `TOUCH CANDELABRA TO BRAZIER`.
 - **Belfry goggles, family ring, and BM Watch:** the great BELL and upper ROPE are in the
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the

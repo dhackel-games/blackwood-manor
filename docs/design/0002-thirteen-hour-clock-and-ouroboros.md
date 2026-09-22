@@ -1,4 +1,4 @@
-<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
+<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
 
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
@@ -10,7 +10,8 @@
 > non-heirloom WRIST scry/route utility, while a +12 BLACKWOOD HAMMER holds its
 > former heirloom role between the walls. The old candlestick becomes the sole
 > portable CANDLE; it and the removable HALL BEDROOM MIRROR SHARD restore the
-> +10 DINING ROOM CANDELABRA. Hour XIII's already-implemented emerald scene
+> DINING ROOM CANDELABRA for a one-time +20 puzzle bonus; depositing the
+> restored heirloom separately awards +10. Hour XIII's already-implemented emerald scene
 > remains a non-reliquary Part-II set-piece, so the unbuilt Hours XII–I roster
 > must be reconciled against the current thirteen before those hours ship.
 >

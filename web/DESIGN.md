@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 ```
 
 ---
@@ -211,8 +211,9 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
   cellar & crypt.
 - **Restore the candelabra:** work the central shard free from the broken HALL
   BEDROOM MIRROR, then fit it and the sole candle into the rundown DINING ROOM
-  fixture in either order. The restored candelabra becomes the +10 heirloom and
-  a permanent light source.
+  fixture in either order. Completing the restoration awards a non-farmable +20
+  puzzle bonus. The restored candelabra becomes a permanent light source and
+  separately awards its +10 heirloom value when deposited.
 - **The diary** (study) reveals the **safe** combination (behind the portrait);
   the safe holds a treasure. The leather-bound diary remains on the desktop,
   while an openable desk drawer beneath it holds the non-heirloom **BM Watch**,
@@ -258,16 +259,21 @@ bats and freeing the XRAY GOGGLES awards +5; the goggles contribute zero to
 the RELIQUARY. Depositing the BLACKWOOD FAMILY RING awards the former +20 slot.
 Opening mushroom vision for the first time awards +10. First acquisition of
 the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
-lowering the ATTIC ladder for the first time awards +5.
+lowering the ATTIC ladder for the first time awards +5. Completing the
+CANDELABRA restoration awards a clearly surfaced, non-farmable +20; depositing
+the restored heirloom later awards its separate +10. The BM WATCH, MIRROR
+SHARD, and loose CANDLE have no independent point value; the BLACKWOOD HAMMER
+and BLACKWOOD FAMILY RING retain +12 and +20 deposit values.
 `::winmax2bell` performs every deterministic scoring challenge, deposits all
 thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and stops
 immediately before the closet rope. `::winmaxfrontd` continues through the
 clean front-door ending; `::winmaxgary` instead takes the clock and descends
 to Gary. All maximum routes leave the MYSTERY PACKAGE untouched because its
 outcome is random. `::powerup` and the shorter `::winquick1` remain available.
-The replacement heirlooms preserve the 195-point deposit pool and the maintained
-maximum checkpoints: 440 before the final bell, 445 after the bell on the Gary
-route, and 490 through the front-door ending with all deterministic end awards.
+The replacement heirlooms preserve the 195-point deposit pool. With the
+candelabra restoration bonus, the maintained maximum checkpoints are 460
+before the final bell, 465 after the bell on the Gary route, and 510 through
+the front-door ending with all deterministic end awards.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*
@@ -875,9 +881,10 @@ preserving spoiler hiding for both secret destinations.
   manor's sole portable CANDLE. A removable shard from the broken HALL BEDROOM
   MIRROR and that candle fit the rundown DINING ROOM CANDELABRA in either order.
   Once both are installed, the pieces are incorporated into a beautiful,
-  permanently lit, portable +10 heirloom. Wrong items are refused. The restored
-  candelabra lights the garden BRAZIER through the normal `LIGHT BRAZIER` path
-  or explicit candelabra/touch wording.
+  permanently lit, portable heirloom and the restoration awards a non-farmable
+  +20 puzzle bonus. Its separate RELIQUARY deposit remains +10. Wrong items are
+  refused. The restored candelabra lights the garden BRAZIER through the normal
+  `LIGHT BRAZIER` path or explicit candelabra/touch wording.
 - **Between-walls heirloom.** The former watch's +12 role moves
   one-for-one to the BLACKWOOD HAMMER, found in sawdust between exposed beams
   with a BM insignia branded into its handle.
@@ -1075,3 +1082,5 @@ deposit credit. Existing watch owners keep carried/worn state where possible;
 untouched legacy watch placements move inside the STUDY desk drawer. The
 hammer and candelabra migrations remain one-for-one, and score flags are
 transferred rather than re-awarded so restored games cannot double-score.
+Saves with an already-restored candelabra receive the new +20 completion credit
+once and persist its progress flag on the next save.

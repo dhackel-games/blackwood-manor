@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",

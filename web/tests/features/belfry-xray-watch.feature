@@ -1,4 +1,4 @@
-# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @unit
 Feature: Belfry goggles, the family ring, and the BM Watch
@@ -59,6 +59,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     And the output contains "BM insignia"
     And the output does not contain "HEIRLOOMS:"
     And the output does not contain "turns"
+    And the game score is 0
 
   Scenario: The Hall Bedroom drawer holds the required Blackwood Family Ring
     Given the player is in room "hallBedroom"
@@ -179,6 +180,10 @@ Feature: Belfry goggles, the family ring, and the BM Watch
   Scenario: The redesigned required set contains exactly thirteen heirlooms
     Then the required family item count is 13
     And the required family items are exactly "ancestralPortrait,ancientCoin,blackwoodHammer,candelabra,crystalDecanter,familyCrest,familyRing,goldLocket,grimoire,musicBox,rubyRing,spyglass,talisman"
+    And the required heirloom deposit total is 195
+    And item "familyRing" has heirloom deposit value 20
+    And item "blackwoodHammer" has heirloom deposit value 12
+    And item "candelabra" has heirloom deposit value 10
     And item "xrayGoggles" is not a required family heirloom
     And item "batSightMirror" is absent from game state
     And the player-facing heirloom catalogs and icons match the required set

@@ -1,4 +1,4 @@
-# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @unit
 Feature: Heirloom correction save migration
@@ -23,8 +23,9 @@ Feature: Heirloom correction save migration
     And flag "candelabraRestored" is set
     And flag "heirloomScore:familyRing" is set
     And flag "heirloomScore:batSightMirror" is unset
+    And flag "progressAward:candelabraRestored" is set
     And flag "curseLiftable" is set
-    And the game score is 200
+    And the game score is 220
 
   Scenario: Pre-redesign transformed mirror progress stays inside the countdown clock
     Given a pre-redesign transformed heirloom save is restored
@@ -36,7 +37,8 @@ Feature: Heirloom correction save migration
     And item "backwardsWatch" is carried
     And item "clockTalisman" is in "reliquary"
     And flag "heirloomsTransformed" is set
-    And the game score is 205
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 225
 
   Scenario: Pre-redesign collected objects preserve ring, watch, and goggles ownership
     Given a pre-redesign carried-equipment save is restored
@@ -71,8 +73,9 @@ Feature: Heirloom correction save migration
     And item "backwardsWatch" is worn in slot "wrist"
     And flag "heirloomScore:familyRing" is set
     And flag "heirloomScore:xrayGoggles" is unset
+    And flag "progressAward:candelabraRestored" is set
     And flag "curseLiftable" is set
-    And the game score is 200
+    And the game score is 220
 
   Scenario: Preceding-redesign transformed goggles transfer into the countdown clock
     Given a preceding-redesign transformed heirloom save is restored
@@ -82,7 +85,8 @@ Feature: Heirloom correction save migration
     And item "backwardsWatch" is worn in slot "wrist"
     And item "clockTalisman" is in "reliquary"
     And flag "heirloomsTransformed" is set
-    And the game score is 205
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 225
 
   Scenario: A corrected migrated save remains stable after another save and restore
     Given a preceding-redesign save with the goggles deposited is restored
@@ -93,7 +97,8 @@ Feature: Heirloom correction save migration
     And flag "heirloomScore:familyRing" is set
     And flag "heirloomScore:xrayGoggles" is unset
     And flag "curseLiftable" is set
-    And the game score is 200
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 220
 
   Scenario: Withdrawn erroneous goggles credit prevents double-scoring the family ring
     Given a preceding-redesign save with withdrawn goggles credit is restored
@@ -122,5 +127,15 @@ Feature: Heirloom correction save migration
     Given the player is in room "study"
     When I send "open desk drawer"
     Then the output contains "BM WATCH"
+
+  Scenario: Pre-bonus restored candelabras receive the puzzle award once
+    Given a pre-bonus save with the restored candelabra is restored
+    Then item "candelabra" is carried
+    And item "candelabra" is lit
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 20
+    When I round-trip the game snapshot
+    Then flag "progressAward:candelabraRestored" is set
+    And the game score is 20
 
 # end heirloom-migration.feature

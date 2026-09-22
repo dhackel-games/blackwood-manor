@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -204,7 +204,8 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the required family item count is 13
     And flag "curseLiftable" is set
     And flag "floorDoorOpen" is set
-    And the game score is 12
+    And flag "progressAward:candelabraRestored" is set
+    And the game score is 32
 
   Scenario: A claimed legacy watch maps to the hammer without scoring twice
     Given an in-progress pre-watch save with the watch already claimed is restored

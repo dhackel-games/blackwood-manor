@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -432,11 +432,13 @@ function restoreCandelabra(ctx, installedPiece) {
   ctx.moveItem("candelabra", "diningRoom");
   ctx.setFlag("candelabraRestored", true);
   ctx.item("candelabra").lit = true;
+  const points = awardProgress(ctx, "candelabraRestored");
   return installedPiece + "\n\nThe fitted shard catches the candle's first impossible spark. Silver branches " +
     "straighten with a ringing sigh, and five blue-white flames flower across them without consuming the wax. " +
     "The rundown fixture has become a beautiful, portable BLACKWOOD CANDELABRA.\n\n" +
     "Around its base, the inscription is complete at last: " +
-    "\"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"";
+    "\"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"" +
+    (points ? `\n\nCANDELABRA RESTORATION BONUS (+${points})` : "");
 }
 
 function installCandelabraPiece(ctx, cmd) {
@@ -793,6 +795,7 @@ const PROGRESS_AWARDS = Object.freeze({
   oakPanelAligned: 5,
   trollRiddleSolved: 5,
   belfryGogglesFreed: 5,
+  candelabraRestored: 20,
   mushroomVisionOpened: 10,
   atticLadderLowered: 5,
   reliquarySealed: 5,
@@ -3688,7 +3691,8 @@ const logicWorld = {
         && !state.flags["progressAward:belfryGogglesFreed"]) {
       state.flags["progressAward:belfryGogglesFreed"] = true;
     }
-    if (state.flags.candelabraRestored || state.items.candelabra.loc !== null) {
+    if (state.items.candelabra.loc !== null) state.flags.candelabraRestored = true;
+    if (state.flags.candelabraRestored) {
       state.items.candelabra.lit = true;
     }
     const collectionComplete = Object.entries(world.items)
@@ -3733,6 +3737,7 @@ const logicWorld = {
       oakPanelAligned: state.flags.oakLightAligned,
       trollRiddleSolved: state.flags.dragonVaultOpen,
       belfryGogglesFreed: state.flags.belfryBatsScattered,
+      candelabraRestored: state.flags.candelabraRestored,
       mushroomVisionOpened: state.flags.vaultFound,
       atticLadderLowered: state.flags.ladderDown,
       reliquarySealed: state.flags.curseLiftable && state.flags.reliquarySealed,

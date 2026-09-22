@@ -1,4 +1,4 @@
-<!-- PLAN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
+<!-- PLAN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
 
 # Blackwood Manor — Implementation Plan
 
@@ -10,7 +10,8 @@
 > the BLACKWOOD FAMILY RING, BLACKWOOD HAMMER, and restored CANDELABRA hold the
 > +20/+12/+10 heirloom roles. XRAY GOGGLES are non-heirloom EYES equipment, the
 > BM WATCH is a non-heirloom WRIST utility inside the STUDY desk drawer, and
-> the former candlestick is the sole portable CANDLE.
+> the former candlestick is the sole portable CANDLE. Completing the candelabra
+> restoration awards a separate, one-time +20 puzzle bonus.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >

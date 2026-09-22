@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -216,6 +216,18 @@ function historicalFamilyRingSnapshot(game) {
   return snapshot;
 }
 
+function markCandelabraRestored(snapshot, location) {
+  snapshot.state.items.candlestick.loc = null;
+  snapshot.state.items.mirrorShard.loc = null;
+  snapshot.state.items.candelabraFrame.loc = null;
+  snapshot.state.items.candelabra.loc = location;
+  snapshot.state.items.candelabra.lit = true;
+  snapshot.state.flags.candelabraCandleInstalled = true;
+  snapshot.state.flags.candelabraShardInstalled = true;
+  snapshot.state.flags.candelabraRestored = true;
+  delete snapshot.state.flags["progressAward:candelabraRestored"];
+}
+
 Given("a pre-redesign save with replaced heirlooms deposited is restored", function () {
   const snapshot = preRedesignSnapshot(this.game);
   for (const id of PRE_REDESIGN_TREASURES) snapshot.state.items[id].loc = "reliquary";
@@ -281,6 +293,7 @@ Given("a pre-redesign save with a deposited mirror and untouched goggles is rest
 Given("a preceding-redesign save with the goggles deposited is restored", function () {
   const snapshot = precedingRedesignSnapshot(this.game);
   for (const id of INCORRECT_REDESIGN_TREASURES) snapshot.state.items[id].loc = "reliquary";
+  markCandelabraRestored(snapshot, "reliquary");
   snapshot.state.items.backwardsWatch.loc = "inventory";
   snapshot.state.items.backwardsWatch.worn = true;
   snapshot.state.flags["progressItem:xrayGoggles"] = true;
@@ -295,6 +308,7 @@ Given("a preceding-redesign save with the goggles deposited is restored", functi
 Given("a preceding-redesign transformed heirloom save is restored", function () {
   const snapshot = precedingRedesignSnapshot(this.game);
   for (const id of INCORRECT_REDESIGN_TREASURES) snapshot.state.items[id].loc = "clockTalisman";
+  markCandelabraRestored(snapshot, "clockTalisman");
   snapshot.state.items.backwardsWatch.loc = "inventory";
   snapshot.state.items.backwardsWatch.worn = true;
   snapshot.state.items.clockTalisman.loc = "reliquary";
@@ -335,6 +349,13 @@ Given("a build-three save with the untouched desk watch is restored", function (
   delete snapshot.state.items.studyDrawer;
   snapshot.state.items.backwardsWatch.loc = "study";
   snapshot.state.items.backwardsWatch.worn = false;
+  this.game.restore(snapshot);
+});
+
+Given("a pre-bonus save with the restored candelabra is restored", function () {
+  const snapshot = this.game.snapshot();
+  markCandelabraRestored(snapshot, "inventory");
+  snapshot.state.score = 0;
   this.game.restore(snapshot);
 });
 
@@ -751,6 +772,18 @@ Then("the required family items are exactly {string}", function (items) {
 Then("item {string} is not a required family heirloom", function (item) {
   assert.equal(!!this.game.world.items[item]?.treasure, false);
   assert.equal(this.game.world.items[item]?.points, undefined);
+});
+
+Then("item {string} has heirloom deposit value {int}", function (item, points) {
+  assert.equal(this.game.world.items[item]?.treasure, true);
+  assert.equal(this.game.world.items[item]?.points, points);
+});
+
+Then("the required heirloom deposit total is {int}", function (points) {
+  const total = Object.values(this.game.world.items)
+    .filter((item) => item.treasure)
+    .reduce((sum, item) => sum + (item.points || 0), 0);
+  assert.equal(total, points);
 });
 
 Then("the Hall Bedroom has exactly one required heirloom", function () {
