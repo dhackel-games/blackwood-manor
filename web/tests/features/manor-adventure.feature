@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -100,12 +100,13 @@ Feature: Blackwood Manor adventure
       up
       south
       read diary
+      wear watch
       north
       north
       examine mirror
       take shard
       open drawer
-      wear watch
+      take family ring
       south
       west
       pull wallpaper
@@ -127,11 +128,11 @@ Feature: Blackwood Manor adventure
       east
       unlock jewelry box with tiny key
       open jewelry box
-      take ring
+      take ravenblood ring
       west
       pull cord
       drop music box
-      drop ring
+      drop ravenblood ring
       drop wrapper
       up
       take miniature
@@ -139,14 +140,16 @@ Feature: Blackwood Manor adventure
       east
       pull bell rope
       take xray goggles
+      wear xray goggles
       west
       down
       down
       take music box
-      take ring
+      take ravenblood ring
       down
       put music box in reliquary
-      put ring in reliquary
+      put ravenblood ring in reliquary
+      put family ring in reliquary
       put miniature in reliquary
       east
       move painting
@@ -174,7 +177,6 @@ Feature: Blackwood Manor adventure
       remove talisman
       put talisman in reliquary
       put candelabra in reliquary
-      put xray goggles in reliquary
       close reliquary
       open bell closet
       pull bell rope

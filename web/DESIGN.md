@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 ```
 
 ---
@@ -213,16 +213,17 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
   BEDROOM MIRROR, then fit it and the sole candle into the rundown DINING ROOM
   fixture in either order. The restored candelabra becomes the +10 heirloom and
   a permanent light source.
-- **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
-  holds a treasure.
+- **The diary** (study) reveals the **safe** combination (behind the portrait);
+  the safe holds a treasure. A non-heirloom **BM Watch** rests visibly on the
+  desk beside the diary and scries rooms or prepares routes while carried.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
   Ravenblood Ring.
+- **Hall Bedroom:** the night-table drawer contains the +20 **Blackwood Family
+  Ring**, the room's only required heirloom. The fixed broken mirror yields a
+  removable non-heirloom shard for the candelabra restoration.
 - **Belfry:** pull either end of the bell rope to scatter the bats and drop the
-  antique BM-marked XRAY GOGGLES. Worn on the EYES, they reveal hidden clues and
-  darkness.
-- **Watch:** the HALL BEDROOM drawer holds the non-heirloom WOODBLACK WATCH.
-  Its black crystal face scries named rooms and prepares routes to rooms or
-  objects.
+  antique BM-marked XRAY GOGGLES. They are non-heirloom EYES equipment that
+  reveal hidden clues and darkness.
 - **Between the walls:** the nursery wallpaper hides a crawl-gap whose single
   heirloom is the BM-marked BLACKWOOD HAMMER in the sawdust.
 - **Library lever** opens the **secret chamber** → the curse's focus.
@@ -230,12 +231,12 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**13 required family heirlooms**, each worth points: restored candelabra, gold
-locket, first-edition grimoire, jeweled music box, Ravenblood Ring, ancient coin
-(well), crystal decanter (wine cellar), ancestral portrait, the Blackwood family
-crest, the BM spyglass recovered from the tree fort, the BM-crested protective
-talisman after it has served against the crypt wraith, the BLACKWOOD HAMMER
-hidden inside the nursery wall, and the XRAY GOGGLES dropped by the belfry bats.
+**13 required family heirlooms**, each worth points: ancestral portrait, ancient
+coin (well), BLACKWOOD HAMMER, restored candelabra, crystal decanter, Blackwood
+family crest, BLACKWOOD FAMILY RING, gold locket, first-edition grimoire,
+jeweled music box, Ravenblood Ring, BM spyglass recovered from the tree fort,
+and the BM-crested protective talisman after it has served against the crypt
+wraith.
 
 ---
 
@@ -252,8 +253,8 @@ points.
 The BRAZIER awards +10 when lit patiently with the CANDLE or restored
 CANDELABRA, or +30 when the player transfers their own flames. Reading the
 mailbox LETTER awards +5. DREADMAW'S apple remains +10. Scattering the belfry
-bats and freeing the XRAY GOGGLES awards +5; depositing the goggles awards
-their 20 heirloom points.
+bats and freeing the XRAY GOGGLES awards +5; the goggles contribute zero to
+the RELIQUARY. Depositing the BLACKWOOD FAMILY RING awards the former +20 slot.
 Opening mushroom vision for the first time awards +10. First acquisition of
 the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
 lowering the ATTIC ladder for the first time awards +5.
@@ -814,8 +815,9 @@ contains the required BLACKWOOD FAMILY CREST and WINGED SHOES.
 Wearable items declare one of seven exclusive body slots: `head`, `forehead`, `eyes`,
 `feet`, `finger`, `wrist`, or `neck`. A worn item remains in inventory, cannot be dropped
 or put into a container until removed, and contributes zero to `inventoryLoad()`.
-The existing TALISMAN and RAVENBLOOD RING occupy NECK and FINGER; the new HEADLAMP,
-XRAY GOGGLES, and WINGED SHOES occupy HEAD, EYES, and FEET.
+The TALISMAN occupies NECK; the RAVENBLOOD RING and BLACKWOOD FAMILY RING
+compete for FINGER; and the HEADLAMP, XRAY GOGGLES, and WINGED SHOES occupy
+HEAD, EYES, and FEET.
 
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
 automatically equips it on the BACK and raises carrying capacity from 6 to 20.
@@ -823,13 +825,16 @@ The HUD displays used slots as `👤 used/6` before acquisition and `👜 used/2
 afterward; worn equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
-and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
-the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains the WOODBLACK WATCH. Worn
-on the WRIST, the watch stays with the player during bulk deposits and provides
-room/object scrying plus route prefill. The antique BM-marked XRAY GOGGLES fall
+and reports remaining power in the `💡` HUD slot. The STUDY'S DESK visibly holds
+the BM WATCH beside the DIARY. Worn on the WRIST, the watch stays with the
+player during bulk deposits and provides room/object scrying plus route prefill
+without reporting heirloom counts or turns. The HALL BEDROOM lies NORTH of the
+UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains the BLACKWOOD FAMILY RING,
+that room's only required heirloom. The antique BM-marked XRAY GOGGLES fall
 from the BELFRY bat roost and provide permanent mushroom-style clue vision and
-darkness sight while worn, shown as `👁️ ∞`. WINGED SHOES similarly show
-permanent flight as `🪽 ∞`.
+darkness sight while worn, shown as `👁️ ∞`. They are non-heirloom equipment and
+can remain worn during bulk deposits. WINGED SHOES similarly show permanent
+flight as `🪽 ∞`.
 The OBSIDIAN EYE must be worn on the FOREHEAD, where it can coexist with EYES-slot
 goggles. It permanently reveals hidden details (`👁️ ∞`) but does not illuminate
 dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light source.
@@ -843,24 +848,28 @@ ROOF, BELFRY, ASTRAL CHAMBER, and every other named room directly. MAP renders t
 HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
 preserving spoiler hiding for both secret destinations.
 
-## 12.28 West-wing payoff, belfry goggles, and open reliquary deposits
+## 12.28 Hall-bedroom ring, belfry goggles, BM Watch, and open deposits
 
 - **West-wing payoff.** The CAVE ANTECHAMBER'S ore carts are empty.
   DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST (+15) and the
   wearable WINGED SHOES.
-- **Belfry payoff.** The XRAY GOGGLES replace the retired Bat Sight Mirror as a
-  required +20 heirloom. Pulling either end of the bell rope awards +5, scatters
-  the bats, and drops the antique BM-marked goggles onto the belfry floor. They
-  retain their EYES-slot hidden-vision and darkness powers.
-- **Woodblack Watch utility.** The watch moves to the HALL BEDROOM drawer,
-  becomes wearable on the WRIST, and is no longer a required heirloom. It
-  inherits the retired mirror's scrying and route behavior. `SHOW <room> IN
-  WATCH` and carried-watch shorthand `SHOW <room>` see the normal and third-eye
-  descriptions without marking the room visited, then prefill the short
-  directions without executing them. `GUIDE`, `PATH`, and `ROUTE TO
-  <room-or-object>` prefill directions to rooms or item locations.
-  `LOOK IN WATCH AT <room>` is an exact synonym. The inscription remains, but
-  the watch no longer displays the reliquary count.
+- **Hall-bedroom payoff.** The NIGHT TABLE DRAWER contains the required +20
+  BLACKWOOD FAMILY RING. It is the room's only required heirloom; the broken
+  fixed MIRROR and its removable SHARD remain non-heirloom puzzle pieces.
+- **Belfry payoff.** Pulling either end of the bell rope awards +5, scatters the
+  bats, and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The
+  goggles are non-heirloom EYES equipment, retain hidden-vision and darkness
+  sight, and keep their +5 first-acquisition award.
+- **BM Watch utility.** The watch rests visibly on the STUDY desk beside the
+  DIARY, is wearable on the WRIST, and is not a required heirloom. Its empty,
+  mirror-like face inherits the retired Bat Sight Mirror's scrying and route
+  behavior. `SHOW <room> IN WATCH` and carried-watch shorthand `SHOW <room>`
+  see the normal and third-eye descriptions without marking the room visited,
+  then prefill the short directions without executing them. `GUIDE`, `PATH`,
+  and `ROUTE TO <room-or-object>` prefill directions to rooms or item
+  locations. `LOOK IN WATCH AT <room>` is an exact synonym. Its nonreflective
+  back bears a BM inscription; the watch displays neither heirloom counts nor
+  turns.
 - **Dining-room restoration.** The former required candlestick is now the
   manor's sole portable CANDLE. A removable shard from the broken HALL BEDROOM
   MIRROR and that candle fit the rundown DINING ROOM CANDELABRA in either order.
@@ -868,7 +877,7 @@ preserving spoiler hiding for both secret destinations.
   permanently lit, portable +10 heirloom. Wrong items are refused. The restored
   candelabra lights the garden BRAZIER through the normal `LIGHT BRAZIER` path
   or explicit candelabra/touch wording.
-- **Between-walls heirloom.** The WOODBLACK WATCH'S former +12 role moves
+- **Between-walls heirloom.** The former watch's +12 role moves
   one-for-one to the BLACKWOOD HAMMER, found in sawdust between exposed beams
   with a BM insignia branded into its handle.
 - **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
@@ -972,8 +981,8 @@ and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
 through it reveals the maintenance hatch inside the roofline and hints that the
 ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
 EMERALD GEM as a +8 required heirloom; the BM-crested TALISMAN, restored
-CANDELABRA, BLACKWOOD HAMMER, and XRAY GOGGLES keep the collection at exactly
-thirteen required heirlooms.
+CANDELABRA, BLACKWOOD HAMMER, and BLACKWOOD FAMILY RING keep the collection at
+exactly thirteen required heirlooms.
 
 ### 12.32 Twelve-line flavor cycles
 
@@ -1047,19 +1056,21 @@ reconstructing platform/version strings independently.
 ### 12.35 Heirloom-role redesign and current-save migration
 
 The required set remains exactly thirteen and keeps the same 195-point deposit
-total. Three roles move one-for-one: the BAT SIGHT MIRROR'S +20 role moves to
-the wearable XRAY GOGGLES, the required WOODBLACK WATCH'S +12 role moves to the
-BLACKWOOD HAMMER, and the silver CANDLESTICK'S +10 role moves to the restored
-CANDELABRA. The standalone Bat Sight Mirror no longer exists in new games. The
-WOODBLACK WATCH remains as a non-heirloom WRIST utility in the HALL BEDROOM
-drawer and owns the former mirror's scrying and route-prefill behavior.
+total. Three roles move one-for-one: the retired BAT SIGHT MIRROR'S +20 role
+moves to the restored BLACKWOOD FAMILY RING, the former required watch's +12
+role moves to the BLACKWOOD HAMMER, and the silver CANDLESTICK'S +10 role moves
+to the restored CANDELABRA. The XRAY GOGGLES remain non-heirloom EYES equipment.
+The BM WATCH remains a non-heirloom WRIST utility, now visible on the STUDY
+desk, and owns the retired mirror's scrying and route-prefill behavior.
 
-Current-schema saves are recognized from their saved item definitions rather
-than a brittle global version number. Restore maps an old mirror location and
-deposit flag to the goggles, an old required-watch location and deposit flag to
-the hammer, and a deposited or transformed candlestick to an already-restored
-candelabra. A carried finite candlestick remains the portable candle so the new
-assembly puzzle stays solvable. The old optional goggles' carried/worn state is
-preserved on the utility watch when required collection progress must place the
-new goggles in the reliquary or countdown clock. Legacy score flags are copied,
-never re-awarded, so migrated saves cannot double-score.
+Save migration recognizes schemas from saved item definitions rather than a
+brittle global version number. Pre-redesign saves map Bat Sight Mirror
+collection, deposit, and transformed state to the BLACKWOOD FAMILY RING rather
+than the goggles. Saves from the immediately preceding redesign similarly move
+any erroneous goggles heirloom location or score credit to the ring, then
+return the goggles to a sensible equipment location. Historical saves that
+already contain `familyRing` preserve its location, worn state, and one-time
+deposit credit. Existing watch owners keep carried/worn state where possible;
+untouched legacy watch placements move to the STUDY. The hammer and candelabra
+migrations remain one-for-one, and score flags are transferred rather than
+re-awarded so restored games cannot double-score.

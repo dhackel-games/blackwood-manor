@@ -1,9 +1,9 @@
-# xray-goggles.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# xray-goggles.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @walkthrough
 Feature: Blackwood X-ray goggles
-  The belfry bats drop antique BM-marked XRAY GOGGLES. They are a required
-  heirloom and, worn on the EYES, provide the same clue vision and darkness
+  The belfry bats drop antique BM-marked XRAY GOGGLES. They are non-heirloom
+  equipment and, worn on the EYES, provide the same clue vision and darkness
   sight as mushrooms without consuming carrying capacity.
 
   Background:
@@ -43,12 +43,25 @@ Feature: Blackwood X-ray goggles
     When I send "wear goggles"
     Then the output contains "aren't carrying"
 
-  Scenario: Depositing the goggles awards the inherited mirror value
+  Scenario: Depositing the goggles contributes no heirloom or score credit
     Given item "xrayGoggles" is carried
     And the player is in room "grandHall"
     When I send "put goggles in reliquary"
     Then item "xrayGoggles" is in "reliquary"
-    And the output contains line "HEIRLOOMS: 1/13 +0"
-    And the game score is 20
+    And item "xrayGoggles" is not a required family heirloom
+    And the output contains line "HEIRLOOMS: 0/13 +1"
+    And the game score is 0
+
+  Scenario: PUT ALL leaves worn goggles available as equipment
+    Given item "xrayGoggles" is carried
+    And item "familyCrest" is carried
+    And the player is in room "grandHall"
+    When I send "wear goggles"
+    And I send "put all in reliquary"
+    Then item "xrayGoggles" is carried
+    And item "xrayGoggles" is worn in slot "eyes"
+    And item "familyCrest" is in "reliquary"
+    And the output contains "Still worn"
+    And the output contains "XRAY GOGGLES"
 
 # end xray-goggles.feature

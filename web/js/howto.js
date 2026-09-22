@@ -1,4 +1,4 @@
-// howto.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// howto.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 // Shared "How to Play" onboarding overlay. Builds the same tutorial the 2D map
 // shows, so the text game presents it consistently. Self-contained: owns the
 // heirloom list + lore, builds its own DOM, and wires open/close, the clickable
@@ -9,8 +9,8 @@
 
 const HEIRLOOMS = [
   ["spyglass", "spyglass"],
-  ["xrayGoggles", "xray goggles"],
   ["familyCrest", "family crest"],
+  ["familyRing", "Blackwood family ring"],
   ["candelabra", "restored candelabra"],
   ["grimoire", "grimoire"],
   ["talisman", "talisman"],
@@ -25,8 +25,8 @@ const HEIRLOOMS = [
 
 const HEIRLOOM_LORE = {
   spyglass: "A handsome brass spyglass etched BM, forever aimed from its rusted swivel cradle at the manor's distant belfry.",
-  xrayGoggles: "Antique Blackwood goggles of blackened brass and smoked crystal. Their BM-marked lenses expose hidden structure and darkness.",
   familyCrest: "The Blackwood family crest, resting on velvet beside the hoard — the proof and pride of a cursed bloodline.",
+  familyRing: "The Blackwood family ring — a heavy gold signet whose raised BM initials were polished by generations of nervous hands.",
   candelabra: "A restored silver candelabra whose mirror shard and sole candle reveal a complete Blackwood inscription. Its blue-white flames never consume the wax.",
   grimoire: "A heavy black grimoire clasped in tarnished silver — a priceless first edition. Some things are worth money, not reading.",
   talisman: "A silver talisman, warm to the touch, graven with wards against the dead and stamped with the BM crest.",

@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -264,17 +264,18 @@ export const content = {
     study: {
       name: "Study",
       desc:
-        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, " +
-        "as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
+        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it beside a BM WATCH, " +
+        "as though their owner had just stepped away. The UPSTAIRS LANDING lies NORTH.",
       searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are underlined in ink.",
+        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are " +
+        "underlined in ink. Beside it, the BM WATCH'S empty, mirror-like face reflects nothing.",
     },
 
     hallBedroom: {
       name: "Hall Bedroom",
       desc:
         "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a broken MIRROR with " +
-        "a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
+        "a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed BM-handled DRAWER.",
     },
 
     attic: {
@@ -348,9 +349,9 @@ export const content = {
       desc: "A thick BELL ROPE descending from the great bell's wheel through a fitted HOLE in the belfry floor.",
     },
     belfryBats: {
-      roomDesc: "Hundreds of black BATS crowd the rafters. Something silver glints inside their roost.",
-      desc: "Hundreds of black BATS hang in tight folds from the rafters. Something made of dark glass and " +
-        "Blackwood brass is hidden among them.",
+      roomDesc: "Hundreds of black BATS crowd the rafters. Smoked lenses glint inside their roost.",
+      desc: "Hundreds of black BATS hang in tight folds from the rafters. A pair of dark-glass goggles in " +
+        "Blackwood brass is tangled among them.",
     },
     bellCloset: {
       desc: "A narrow wooden BELL CLOSET beside the FRONT DOOR. A small brass bat is nailed above its handle.",
@@ -516,6 +517,11 @@ export const content = {
     nightDrawer: {
       desc: "A shallow wooden DRAWER in the NIGHT TABLE, fitted with a dark brass pull stamped BM.",
     },
+    familyRing: {
+      roomDesc: "A heavy BLACKWOOD FAMILY RING rests inside the drawer, its raised BM initials dark with age.",
+      desc: "A heavy gold BLACKWOOD FAMILY RING. The broad signet bears raised BM initials polished smooth by " +
+        "generations of nervous hands.",
+    },
     bedsideLamp: {
       desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
     },
@@ -618,10 +624,10 @@ export const content = {
         "blackened silver bearing only part of an inscription: \"...GLASS, THE HOUSE REMEMBERS.\"",
     },
     backwardsWatch: {
-      roomDesc: "A tarnished WOODBLACK WATCH rests in the drawer, its black crystal face glowing faintly.",
-      desc: "A tarnished brass WOODBLACK WATCH whose black crystal face has no hands or hours. Worn on the WRIST, " +
-        "it can look into any room in Blackwood Manor and prepare a route there. On the back, beneath your " +
-        "reflection, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+      roomDesc: "A BM WATCH rests visibly on the DESK beside the open DIARY, its empty face looking elsewhere.",
+      desc: "A tarnished brass BM WATCH. Its front is an empty, mirror-like face that reflects nothing but seems " +
+        "to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
+        "\"WHAT TIME TAKES, BLOOD REMEMBERS.\" Worn on the WRIST, it can scry rooms and prepare routes.",
     },
     blackwoodHammer: {
       roomDesc: "A BLACKWOOD HAMMER lies in the sawdust between the exposed beams.",

@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -96,31 +96,36 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the output contains "Still worn"
     And the output contains "BACKPACK"
 
-  Scenario: The Woodblack Watch is hidden in the hall bedroom drawer
+  Scenario: The BM Watch is visible on the Study desk
     Given the player is in room "landing"
-    When I send "north"
-    Then the current room is "hallBedroom"
-    And the output contains "NIGHT TABLE"
-    When I send "open drawer"
-    Then the output contains "WOODBLACK WATCH"
+    When I send "south"
+    Then the current room is "study"
+    And the output contains "DESK"
+    And the output contains "DIARY"
+    And the output contains "BM WATCH"
     When I send "wear watch"
-    Then the output contains "(get WOODBLACK WATCH; wear WOODBLACK WATCH)"
+    Then the output contains "(get BM WATCH; wear BM WATCH)"
     And item "backwardsWatch" is worn in slot "wrist"
     When I send "show garden in watch"
-    Then the output contains "WOODBLACK WATCH — OVERGROWN GARDEN"
+    Then the output contains "BM WATCH — OVERGROWN GARDEN"
     And the output contains "IRON KEY"
 
-  Scenario: PUT ALL leaves the worn Woodblack Watch on the player
+  Scenario: PUT ALL leaves the worn BM Watch and goggles on the player
     Given item "backwardsWatch" is carried
+    And item "xrayGoggles" is carried
     And item "familyCrest" is carried
     And the player is in room "grandHall"
     When I send "wear watch"
+    And I send "wear goggles"
     And I send "put all in reliquary"
     Then item "backwardsWatch" is carried
     And item "backwardsWatch" is worn in slot "wrist"
+    And item "xrayGoggles" is carried
+    And item "xrayGoggles" is worn in slot "eyes"
     And item "familyCrest" is in "reliquary"
     And the output contains "Still worn"
-    And the output contains "WOODBLACK WATCH"
+    And the output contains "BM WATCH"
+    And the output contains "XRAY GOGGLES"
 
   Scenario: Wearing the WINGED SHOES shows the flying-shoe art and lift-off flavor
     Given item "wingedShoes" is carried

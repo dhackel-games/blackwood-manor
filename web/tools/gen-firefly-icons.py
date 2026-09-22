@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# gen-firefly-icons.py. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
-"""Generate the 13 Blackwood heirloom icons + the reliquary icon via Adobe
+# gen-firefly-icons.py. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+"""Generate the Blackwood heirloom, equipment, and reliquary icons via Adobe
 Firefly Services, then key out the flat background to transparent PNGs that
 drop straight into web/view2d/icons/.
 
@@ -8,6 +8,7 @@ WHY THIS EXISTS
   The 2D collection tray (web/view2d/tilemap.html) shows an emoji for each
   heirloom until a matching PNG exists at:
       web/view2d/icons/heirlooms/<id>.png     (13 heirlooms)
+      web/view2d/icons/equipment/<id>.png     (non-heirloom equipment)
       web/view2d/icons/reliquary.png           (the cabinet)
   This script produces exactly those files. The tray auto-swaps emoji -> PNG.
 
@@ -22,7 +23,7 @@ AUTH (Adobe Firefly Services — https://firefly-api.adobe.io)
     export FIREFLY_CLIENT_ID=...           # still needed for x-api-key
 
 USAGE
-    python web/tools/gen-firefly-icons.py                 # all 14
+    python web/tools/gen-firefly-icons.py                 # all icons
     python web/tools/gen-firefly-icons.py spyglass talisman   # a subset
     python web/tools/gen-firefly-icons.py --keep-raw      # also save the raw
                                                           # Firefly render
@@ -75,8 +76,8 @@ STYLE = (
 # (icon key, output relative path, subject)
 ICONS = [
     ("spyglass",          "heirlooms/spyglass.png",          "a brass telescoping spyglass with the initials B M etched on the barrel"),
-    ("xrayGoggles",       "heirlooms/xrayGoggles.png",       "antique blackened-brass x-ray goggles with smoked crystal lenses and a small B M monogram on the bridge"),
     ("familyCrest",       "heirlooms/familyCrest.png",       "a blackened-silver heraldic crest showing a raven above crossed keys"),
+    ("familyRing",        "heirlooms/familyRing.png",        "a heavy antique gold signet ring with raised B M initials and no gemstone"),
     ("candelabra",        "heirlooms/candelabra.png",        "a restored ornate silver five-branched candelabra with one central white candle and five magical blue-white flames"),
     ("grimoire",          "heirlooms/grimoire.png",          "a heavy black spellbook clasped with tarnished silver corner fittings"),
     ("talisman",          "heirlooms/talisman.png",          "a round silver protective amulet on a chain, engraved with warding runes"),
@@ -87,6 +88,7 @@ ICONS = [
     ("crystalDecanter",   "heirlooms/crystalDecanter.png",   "a faceted cut-crystal decanter full of dark red wine"),
     ("ancestralPortrait", "heirlooms/ancestralPortrait.png", "a small oval portrait miniature of a pale woman in an ornate gilt frame"),
     ("blackwoodHammer",   "heirlooms/blackwoodHammer.png",   "a compact antique iron hammer with a dark ash handle branded with a B M insignia"),
+    ("xrayGoggles",       "equipment/xrayGoggles.png",       "antique blackened-brass x-ray goggles with smoked crystal lenses and a small B M monogram on the bridge"),
     ("reliquary",         "reliquary.png",                   "a tall glass-fronted gothic stone cabinet with carved doors and thirteen small recessed shelves"),
 ]
 

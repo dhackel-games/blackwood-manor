@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
 
 # Blackwood Manor
 
@@ -68,8 +68,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   HEADLAMP provides 200 turns of light with a `💡` HUD countdown; the antique
   BM-marked XRAY GOGGLES dropped by the belfry bats show `👁️ ∞` and reveal the
   same clues as mushroom vision; WINGED SHOES show `🪽 ∞` and provide permanent
-  named-room flight while worn. The HALL BEDROOM drawer holds the WRIST-slot
-  WOODBLACK WATCH, which scries rooms and prepares routes but is not an heirloom.
+  named-room flight while worn. The STUDY desk holds the WRIST-slot BM WATCH,
+  which scries rooms and prepares routes but is not an heirloom.
   The OBSIDIAN EYE must be worn on the FOREHEAD to provide permanent hidden
   sight (`👁️ ∞`); it can coexist with XRAY GOGGLES but does not illuminate darkness.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
@@ -137,22 +137,26 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   +10 heirloom. Its blue-white flames never consume fuel and can light the
   GARDEN BRAZIER with `LIGHT BRAZIER`, `LIGHT BRAZIER WITH CANDELABRA`, or
   `TOUCH CANDELABRA TO BRAZIER`.
-- **Belfry goggles and Woodblack Watch:** the great BELL and upper ROPE are in the
+- **Belfry goggles, family ring, and BM Watch:** the great BELL and upper ROPE are in the
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
-  required BLACKWOOD XRAY GOGGLES (+20 when deposited). The retired Bat Sight
-  Mirror is absent from new games. The WOODBLACK WATCH now provides its utility:
+  non-heirloom BLACKWOOD XRAY GOGGLES. Their first acquisition still awards +5,
+  and they can remain worn during `PUT ALL`. The retired Bat Sight Mirror is
+  absent from new games. The BM WATCH rests visibly on the STUDY desk beside the
+  DIARY and provides its utility:
   `SHOW <room> IN WATCH`, or simply `SHOW <room>` while carrying it, displays that room's normal and
   THIRD EYE descriptions, then prefills the unexecuted directions. `GUIDE`,
   `PATH`, or `ROUTE TO <room-or-object>` finds the destination through the
   watch and likewise leaves the route in the command entry without running it.
-  `LOOK IN WATCH AT <room>` is an exact synonym. The watch no longer reports a
-  reliquary count and stays on the player's wrist during `PUT ALL`.
-- **Thirteen heirlooms:** the required set is the BM SPYGLASS, BLACKWOOD XRAY
-  GOGGLES, BLACKWOOD FAMILY CREST, restored CANDELABRA, GRIMOIRE, TALISMAN,
-  JEWELED MUSIC BOX, RAVENBLOOD RING, GOLD LOCKET, ANCIENT COIN, CRYSTAL
-  DECANTER, ANCESTRAL PORTRAIT, and BLACKWOOD HAMMER. The MUSIC BOX remains in
-  the NURSERY with the TINY KEY inside.
+  `LOOK IN WATCH AT <room>` is an exact synonym. The watch reports neither
+  heirloom counts nor turns and stays on the player's wrist during `PUT ALL`.
+  The HALL BEDROOM keeps the broken fixed MIRROR and removable non-heirloom
+  SHARD; its NIGHT TABLE DRAWER contains the required +20 BLACKWOOD FAMILY RING.
+- **Thirteen heirlooms:** the required set is the ANCESTRAL PORTRAIT, ANCIENT
+  COIN, BLACKWOOD HAMMER, restored CANDELABRA, CRYSTAL DECANTER, BLACKWOOD
+  FAMILY CREST, BLACKWOOD FAMILY RING, GOLD LOCKET, GRIMOIRE, JEWELED MUSIC
+  BOX, RAVENBLOOD RING, BM SPYGLASS, and TALISMAN. The HALL BEDROOM has exactly
+  one required heirloom, the family ring; the MUSIC BOX remains in the NURSERY.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -194,7 +198,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   Page load, RESTART, and successful RESTORE mark timestamped transcript session
   anchors; the end-game “Jump to the top” link returns to the latest one.
 - **One-word targeting:** every room and item has a globally unique canonical
-  one-word name (for example `rq`, `frontd`, `grandbr`, `ravenblood`, and `dreadvault`).
+  one-word name (for example `rq`, `frontd`, `grandbr`, `family`, `bmwatch`,
+  `ravenblood`, and `dreadvault`).
   Existing full names remain accepted, while generated SYSOP MENU (`::`) routes use the
   compact forms so command and bug histories stay readable.
 - **Derived actions:** inferred command sequences use semicolons and full uppercase

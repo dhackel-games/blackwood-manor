@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.104:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -64,6 +64,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   headlamp: "headlamp",
   wingedShoes: "shoes",
   familyCrest: "crest",
+  familyRing: "family",
   hallBed: "hallbed",
   hallMirror: "hallmirror",
   mirrorShard: "shard",
@@ -96,7 +97,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   ancientCoin: "ancient",
   crystalDecanter: "decanter",
   ancestralPortrait: "ancestral",
-  backwardsWatch: "woodblack",
+  backwardsWatch: "bmwatch",
   blackwoodHammer: "bmhammer",
   clockTalisman: "gclock",
   emeraldOfTheQueen: "qemerald",
@@ -319,18 +320,18 @@ function prepareWatchRoute(ctx, roomId) {
   }
 }
 
-function lookThroughWoodblackWatch(ctx, cmd) {
+function lookThroughBmWatch(ctx, cmd) {
   const target = cmd.verb === "show" ? cmd.dobj : cmd.iobj;
   if (!target) {
-    return inspectWoodblackWatch(ctx) + "\n\nThe black crystal waits for a destination. Try SHOW KITCHEN, " +
+    return inspectBmWatch(ctx) + "\n\nThe empty face waits for a destination. Try SHOW KITCHEN, " +
       "SHOW KITCHEN IN WATCH, LOOK IN WATCH AT KITCHEN, or ROUTE TO DIARY.";
   }
   if (!ctx.has("backwardsWatch")) {
-    return "You need to take or wear the WOODBLACK WATCH before you can look through it.";
+    return "You need to take or wear the BM WATCH before you can look through it.";
   }
   ctx.setFlag("mirrorRoutePrefill", null);
   const match = resolveWatchRoom(ctx, target);
-  if (!match) return `The WOODBLACK WATCH finds no room called "${target}".`;
+  if (!match) return `The BM WATCH finds no room called "${target}".`;
   const [roomId, room] = match;
   const description = typeof room.desc === "function" ? room.desc(ctx) : room.desc;
   const visionSource = room.highDesc || room.searchDesc;
@@ -339,7 +340,7 @@ function lookThroughWoodblackWatch(ctx, cmd) {
     .map((item) => item.roomDesc || item.names?.[0])
     .filter(Boolean);
   const routeText = prepareWatchRoute(ctx, roomId);
-  return `WOODBLACK WATCH — ${room.name.toUpperCase()}\n` +
+  return `BM WATCH — ${room.name.toUpperCase()}\n` +
     (room.art ? MAP_MARK + room.art + MAP_MARK + "\n" : "") +
     `${description || "The room lies silent."}` +
     (vision ? `\n\nTHIRD EYE\n${vision}` : "") +
@@ -347,19 +348,19 @@ function lookThroughWoodblackWatch(ctx, cmd) {
     routeText;
 }
 
-function routeWithWoodblackWatch(ctx, cmd) {
+function routeWithBmWatch(ctx, cmd) {
   ctx.setFlag("mirrorRoutePrefill", null);
   if (!ctx.has("backwardsWatch")) {
-    return "You need the WOODBLACK WATCH before you can GUIDE, PATH, or ROUTE to a room or object.";
+    return "You need the BM WATCH before you can GUIDE, PATH, or ROUTE to a room or object.";
   }
   const target = cmd.dobj || cmd.iobj;
   if (!target) return "Route to what?";
   const destination = resolveWatchDestination(ctx, target);
-  if (!destination) return `The WOODBLACK WATCH finds no room or object called "${target}".`;
+  if (!destination) return `The BM WATCH finds no room or object called "${target}".`;
   const where = destination.item
     ? `${destination.label.toUpperCase()} is in ${destination.room.name.toUpperCase()}.`
     : destination.room.name.toUpperCase();
-  return `WOODBLACK WATCH ROUTE — ${destination.label.toUpperCase()}\n${where}` +
+  return `BM WATCH ROUTE — ${destination.label.toUpperCase()}\n${where}` +
     prepareWatchRoute(ctx, destination.roomId);
 }
 
@@ -1036,19 +1037,22 @@ function hintEntries(ctx) {
     : ctx.roomOf("blackwoodHammer") === "betweenWalls"
       ? "Go IN through the NURSERY wall-gap and TAKE the BLACKWOOD HAMMER from the sawdust."
       : "The BM HAMMER is a family heirloom. PUT BMHAMMER IN RELIQUARY.";
+  const familyRingHint = ctx.roomOf("familyRing") === "nightDrawer"
+    ? "The HALL BEDROOM'S NIGHT TABLE DRAWER holds the BLACKWOOD FAMILY RING. OPEN the drawer, TAKE the ring, and PUT FAMILY RING IN RELIQUARY."
+    : "The BLACKWOOD FAMILY RING is a required heirloom. PUT FAMILY RING IN RELIQUARY.";
   const gogglesHint = !ctx.getFlag("belfryBatsScattered")
-    ? "One heirloom is hidden among the BATS in the BELFRY. Reach the ROOF, go EAST, then PULL the upper BELL ROPE."
+    ? "Useful XRAY GOGGLES are hidden among the BATS in the BELFRY. Reach the ROOF, go EAST, then PULL the upper BELL ROPE."
     : ctx.roomOf("xrayGoggles") === "belfry"
       ? "The bats dropped BLACKWOOD XRAY GOGGLES onto the BELFRY floor. TAKE them."
-      : "The XRAY GOGGLES are the belfry heirloom. REMOVE them if worn, then PUT GOGGLES IN RELIQUARY.";
+      : "The XRAY GOGGLES are reusable EYES equipment. WEAR them for permanent clue and darkness vision.";
   const candelabraHint = ctx.getFlag("candelabraRestored")
     ? "The restored CANDELABRA is the dining-room heirloom. PUT CANDELABRA IN RELIQUARY when you no longer need its flame."
     : ctx.roomOf("mirrorShard") === "hallBedroom"
       ? "The DINING ROOM'S rundown CANDELABRA is missing part of its inscription. EXAMINE the broken MIRROR in the HALL BEDROOM and work its loose SHARD free."
       : "The rundown CANDELABRA needs the MIRROR SHARD in its central recess and the manor's sole CANDLE in its socket. Either piece can go in first.";
-  const watchHint = ctx.roomOf("backwardsWatch") === "nightDrawer"
-    ? "The HALL BEDROOM'S NIGHT TABLE DRAWER holds the WOODBLACK WATCH. Wear it on your WRIST; SHOW a room or ROUTE TO an object and its black glass will guide you."
-    : "The WOODBLACK WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
+  const watchHint = ctx.roomOf("backwardsWatch") === "study"
+    ? "The BM WATCH rests on the STUDY desk beside the DIARY. Wear it on your WRIST; SHOW a room or ROUTE TO an object and its empty face will guide you."
+    : "The BM WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
 
   return [
     { topics: ["front", "door", "key", "statue", "garden", "porch"], done: inside, text: frontDoorHint },
@@ -1072,12 +1076,14 @@ function hintEntries(ctx) {
     { topics: ["oak", "tree", "fort", "spyglass", "gem", "panel", "brazier", "platform"], done: dep("spyglass"), text: oakHint },
     { topics: ["candelabra", "candle", "candlestick", "shard", "mirror", "dining", "light"],
       done: dep("candelabra"), text: candelabraHint },
+    { topics: ["family", "ring", "blackwood", "drawer", "bedroom"], done: dep("familyRing"),
+      text: familyRingHint },
     { topics: ["hammer", "blackwood", "bm", "wallpaper", "nursery", "wall", "gap"],
       done: dep("blackwoodHammer"), text: hammerHint },
     { topics: ["bat", "bats", "goggles", "xray", "belfry", "bell", "rope"],
-      done: dep("xrayGoggles"), text: gogglesHint },
-    { topics: ["watch", "woodblack", "scry", "show", "route", "guide"],
-      done: ctx.roomOf("backwardsWatch") !== "nightDrawer", text: watchHint },
+      done: !!ctx.getFlag("progressItem:xrayGoggles"), optional: true, text: gogglesHint },
+    { topics: ["watch", "bm", "scry", "show", "route", "guide"],
+      done: ctx.roomOf("backwardsWatch") !== "study", optional: true, text: watchHint },
     { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
       text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
@@ -1087,7 +1093,7 @@ function hintEntries(ctx) {
 
 // Returns the single most relevant next-step hint for the current game state.
 function nextHint(ctx) {
-  return hintEntries(ctx).find((hint) => !hint.done).text;
+  return hintEntries(ctx).find((hint) => !hint.done && !hint.optional).text;
 }
 
 const HINT_QUERY_STOP_WORDS = new Set([
@@ -2943,14 +2949,14 @@ function deriveCommand(ctx, cmd) {
     }
     if (destination) {
       cmd.prep = "in";
-      cmd.iobj = "woodblack";
-      return [`show ${cmd.dobj} in woodblack`];
+      cmd.iobj = "bmwatch";
+      return [`show ${cmd.dobj} in bmwatch`];
     }
   }
   if (cmd.verb === "route" && cmd.dobj && !cmd.iobj && ctx.has("backwardsWatch")) {
     cmd.prep = "with";
-    cmd.iobj = "woodblack";
-    return [`route ${cmd.dobj} with woodblack`];
+    cmd.iobj = "bmwatch";
+    return [`route ${cmd.dobj} with bmwatch`];
   }
   if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
   if (!["take", "eat", "reach", "use"].includes(cmd.verb)) return [];
@@ -3500,7 +3506,7 @@ const logicWorld = {
   fireStatus,        // remaining burn turns for the always-on HUD
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   reliquaryStatusValue, // HUD-compatible RELIQUARY count text
-  routeWithMirror: routeWithWoodblackWatch,
+  routeWithMirror: routeWithBmWatch,
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -3539,43 +3545,96 @@ const logicWorld = {
       || state.flags.floorDoorOpen
       || state.flags.bellRung
       || state.won;
+    const savedFamilyRing = savedItems?.familyRing;
     const oldMirror = savedItems?.batSightMirror?.treasure
       ? savedItems.batSightMirror
       : null;
+    const oldGoggles = savedItems?.xrayGoggles;
+    const oldGogglesWasHeirloom = !!oldGoggles?.treasure;
     const oldWatch = savedItems?.backwardsWatch;
     const oldWatchWasHeirloom = !!oldWatch?.treasure;
     const oldCandlestick = savedItems?.candlestick;
     const oldCandlestickWasHeirloom = !!oldCandlestick?.treasure;
-    const needsHeirloomRedesign = !!oldMirror || oldWatchWasHeirloom || oldCandlestickWasHeirloom;
+    const preRedesignSchema = !!oldMirror || oldWatchWasHeirloom || oldCandlestickWasHeirloom;
 
-    if (needsHeirloomRedesign) {
-      const oldGoggles = savedItems?.xrayGoggles;
-      const oldGogglesLocation = oldGoggles?.loc;
-      const oldGogglesWereMoved = oldGogglesLocation != null && oldGogglesLocation !== "nightDrawer";
-      const oldMirrorLocation = oldMirror?.loc;
-      const oldMirrorWasDeposited = ["reliquary", "clockTalisman"].includes(oldMirrorLocation);
-      const gogglesLocation = oldMirrorWasDeposited
-        ? oldMirrorLocation
-        : oldMirrorLocation === "inventory"
-          ? "inventory"
-          : oldGogglesWereMoved
-            ? oldGogglesLocation
-            : oldMirrorLocation === "belfry" || state.flags.belfryBatsScattered
-              ? "belfry"
-              : null;
-      state.items.xrayGoggles.loc = gogglesLocation;
-      state.items.xrayGoggles.worn = gogglesLocation === "inventory" && !!oldGoggles?.worn;
-      state.items.backwardsWatch.loc = oldGogglesLocation == null ? "nightDrawer" : oldGogglesLocation;
-      state.items.backwardsWatch.worn =
-        state.items.backwardsWatch.loc === "inventory" && !!oldGoggles?.worn;
-
-      const mirrorClaimed = !!oldMirrorLocation && oldMirrorLocation !== "belfry";
-      if (mirrorClaimed) state.flags["progressItem:xrayGoggles"] = true;
-      if (state.flags["heirloomScore:batSightMirror"]
-          || oldMirrorWasDeposited || state.flags.heirloomsTransformed) {
-        state.flags["heirloomScore:xrayGoggles"] = true;
+    // The retired mirror and the one-build goggles mistake both represented
+    // this same +20 collection slot. Preserve an older real family ring instead.
+    if (!savedFamilyRing && (oldMirror || oldGogglesWasHeirloom)) {
+      const sourceLocation = oldMirror?.loc;
+      let familyRingLocation = "nightDrawer";
+      if (oldMirror) {
+        if (state.flags.heirloomsTransformed || sourceLocation === "clockTalisman") {
+          familyRingLocation = "clockTalisman";
+        } else if (sourceLocation) {
+          familyRingLocation = sourceLocation;
+        }
+      } else if (state.flags.heirloomsTransformed || oldGoggles?.loc === "clockTalisman") {
+        familyRingLocation = "clockTalisman";
+      } else if (oldGoggles?.loc === "reliquary") {
+        familyRingLocation = "reliquary";
       }
+      state.items.familyRing.loc = familyRingLocation;
+      state.items.familyRing.worn = false;
+    }
+    const inheritedFamilyRingCredit = state.flags["heirloomScore:batSightMirror"]
+      || (oldGogglesWasHeirloom && state.flags["heirloomScore:xrayGoggles"])
+      || ["reliquary", "clockTalisman"].includes(state.items.familyRing.loc)
+      || state.flags.heirloomsTransformed;
+    if (inheritedFamilyRingCredit) state.flags["heirloomScore:familyRing"] = true;
+    if (oldMirror) delete state.flags["heirloomScore:batSightMirror"];
+    if (oldGogglesWasHeirloom) delete state.flags["heirloomScore:xrayGoggles"];
 
+    if (preRedesignSchema) {
+      const oldGogglesLocation = oldGoggles?.loc;
+      const oldGogglesWereEnshrined =
+        ["reliquary", "clockTalisman"].includes(oldGogglesLocation);
+      const oldGogglesWereClaimed = oldGogglesLocation != null
+        && oldGogglesLocation !== "nightDrawer";
+      let gogglesLocation = oldGogglesWereClaimed ? oldGogglesLocation : null;
+      if (oldGogglesWereEnshrined
+          || (!oldGogglesWereClaimed && (state.flags.heirloomsTransformed || state.flags.partII))) {
+        gogglesLocation = "inventory";
+      } else if (!oldGogglesWereClaimed && state.flags.belfryBatsScattered) {
+        gogglesLocation = "belfry";
+      }
+      state.items.xrayGoggles.loc = gogglesLocation;
+      state.items.xrayGoggles.worn =
+        state.items.xrayGoggles.loc === "inventory" && !!oldGoggles?.worn;
+      if (oldGogglesWereClaimed) state.flags["progressItem:xrayGoggles"] = true;
+    } else if (oldGogglesWasHeirloom) {
+      const oldGogglesLocation = oldGoggles?.loc;
+      const wasEnshrined = ["reliquary", "clockTalisman"].includes(oldGogglesLocation)
+        || state.flags.heirloomsTransformed;
+      state.items.xrayGoggles.loc = wasEnshrined
+        ? "inventory"
+        : oldGogglesLocation == null && state.flags.belfryBatsScattered
+          ? "belfry"
+          : oldGogglesLocation;
+      state.items.xrayGoggles.worn =
+        state.items.xrayGoggles.loc === "inventory" && !!oldGoggles?.worn;
+      if (oldGogglesLocation && oldGogglesLocation !== "belfry") {
+        state.flags["progressItem:xrayGoggles"] = true;
+      }
+    }
+
+    // A legacy required watch still seeds the hammer, but the physical watch
+    // remains useful equipment when its saved position represents ownership.
+    if (preRedesignSchema || oldGogglesWasHeirloom) {
+      const oldWatchLocation = oldWatch?.loc;
+      const oldWatchWasTransformed =
+        oldWatchLocation === "clockTalisman" && (state.flags.heirloomsTransformed || state.flags.partII);
+      const preserveWatchLocation = oldWatchLocation === "inventory"
+        || (oldWatchLocation
+          && !["betweenWalls", "nightDrawer", "reliquary", "clockTalisman", "__void"]
+            .includes(oldWatchLocation));
+      let watchLocation = preserveWatchLocation ? oldWatchLocation : "study";
+      if (oldWatchWasTransformed) watchLocation = "inventory";
+      state.items.backwardsWatch.loc = watchLocation;
+      state.items.backwardsWatch.worn =
+        state.items.backwardsWatch.loc === "inventory" && !!oldWatch?.worn;
+    }
+
+    if (!savedItems?.blackwoodHammer) {
       const oldWatchLocation = oldWatch?.loc;
       const oldWatchWasClaimed = !!oldWatchLocation && oldWatchLocation !== "betweenWalls";
       const hammerLocation = !oldWatchWasHeirloom && completedBeforeHammer
@@ -3591,11 +3650,12 @@ const logicWorld = {
       if (!oldWatchWasHeirloom && completedBeforeHammer && !oldWatchWasClaimed) {
         state.score = (state.score || 0) + (world.items.blackwoodHammer.points || 0);
       }
+    }
 
+    if (!savedItems?.candelabra && oldCandlestickWasHeirloom) {
       const oldCandlestickLocation = oldCandlestick?.loc;
-      const restoredCandelabra = oldCandlestickWasHeirloom
-        && (["reliquary", "clockTalisman"].includes(oldCandlestickLocation)
-          || state.flags.heirloomsTransformed);
+      const restoredCandelabra = ["reliquary", "clockTalisman"].includes(oldCandlestickLocation)
+        || state.flags.heirloomsTransformed;
       if (restoredCandelabra) {
         state.items.candlestick.loc = null;
         state.items.mirrorShard.loc = null;
@@ -3607,15 +3667,18 @@ const logicWorld = {
         state.flags.candelabraCandleInstalled = true;
         state.flags.candelabraShardInstalled = true;
         state.flags.candelabraRestored = true;
-      } else if (oldCandlestickWasHeirloom && state.items.candlestick.loc == null) {
+      } else if (state.items.candlestick.loc == null) {
         state.items.candlestick.loc = "diningRoom";
       }
       if (state.flags["heirloomScore:candlestick"]
           || restoredCandelabra || state.flags.heirloomsTransformed) {
         state.flags["heirloomScore:candelabra"] = true;
       }
+    }
+    if (preRedesignSchema) {
       state.flags.heirloomRedesignMigrated = true;
     }
+    if (oldMirror || oldGogglesWasHeirloom) state.flags.heirloomCorrectionMigrated = true;
     if (state.flags["progressAward:belfryMirrorFreed"]
         && !state.flags["progressAward:belfryGogglesFreed"]) {
       state.flags["progressAward:belfryGogglesFreed"] = true;
@@ -4343,7 +4406,7 @@ const logicWorld = {
     xrayGoggles: {
       names: ["xray goggles", "goggles", "glasses"],
       adjectives: ["blackwood", "bm", "xray", "x-ray", "brass", "antique"],
-      loc: null, takeable: true, treasure: true, points: 20,
+      loc: null, takeable: true,
       wearable: true, wearSlot: "eyes",
       grantsMushroomVision: true, grantsDarkVision: true,
       progressPoints: 5, progressFlag: "progressItem:xrayGoggles",
@@ -4587,19 +4650,25 @@ const logicWorld = {
       loc: "hallBedroom", fixed: true, scenery: true,
       container: true, openable: true, open: false, capacity: 3,
     },
+    familyRing: {
+      names: ["blackwood family ring", "family ring", "ring", "signet"],
+      adjectives: ["blackwood", "family", "bm", "heavy", "gold"],
+      loc: "nightDrawer", takeable: true, treasure: true, points: 20,
+      wearable: true, worn: false, wearSlot: "finger",
+    },
     bedsideLamp: {
       names: ["lamp"], adjectives: ["night", "bedside", "table"],
       loc: "hallBedroom", fixed: true, scenery: true,
       lightSource: true, selfPowered: true, lit: false,
     },
     backwardsWatch: {
-      names: ["woodblack watch", "woodblack", "watch", "wristwatch"],
-      adjectives: ["woodblack", "tarnished", "backwards", "brass", "bm"],
-      loc: "nightDrawer", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
+      names: ["bm watch", "watch", "wristwatch"],
+      adjectives: ["bm", "blackwood", "tarnished", "backwards", "brass"],
+      loc: "study", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
       on: {
-        examine: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
-        show: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
-        read: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
+        examine: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
+        show: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
+        read: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
       },
     },
     frontDoor: {
@@ -4893,10 +4962,10 @@ const logicWorld = {
 export const world = composeWorld(logicWorld, content);
 
 // ---- handler function definitions referenced above --------------------------
-function inspectWoodblackWatch(ctx) {
-  return "The WOODBLACK WATCH has no hands and marks no hour. Its black crystal face reflects the room, then " +
-    "quietly shows someplace else. On the back, beneath your reflection, a family inscription reads: " +
-    "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"";
+function inspectBmWatch(ctx) {
+  return "The BM WATCH has an empty, mirror-like face that reflects nothing but seems to be looking into " +
+    "somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
+    "\"WHAT TIME TAKES, BLOOD REMEMBERS.\"";
 }
 
 function revealKey(ctx) {

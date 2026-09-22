@@ -1,4 +1,4 @@
-# player-name.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# player-name.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @unit
 Feature: Player name and message templates
@@ -59,8 +59,8 @@ Feature: Player name and message templates
     When I send "look"
     Then the output contains "eyes find you"
     Given item "backwardsWatch" is carried
-    When I send "examine woodblack watch"
-    Then the output contains "beneath your reflection"
+    When I send "examine bm watch"
+    Then the output contains "nonreflective back"
     And the output does not contain "Ada's reflection"
     And the output does not contain "heirlooms remain"
 

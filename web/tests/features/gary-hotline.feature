@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -18,6 +18,20 @@ Feature: Gary's hint line
     Then the output contains "NURSERY"
     And the output contains "WALLPAPER"
     And the output contains "BLACKWOOD HAMMER"
+
+  Scenario: Gary identifies the restored family ring heirloom
+    When I send "call"
+    And I send "give me a hint about the family ring"
+    Then the output contains "HALL BEDROOM"
+    And the output contains "NIGHT TABLE DRAWER"
+    And the output contains "BLACKWOOD FAMILY RING"
+
+  Scenario: Gary sends watch seekers to the Study
+    When I send "call"
+    And I send "give me a hint about the watch"
+    Then the output contains "BM WATCH"
+    And the output contains "STUDY"
+    And the output contains "DIARY"
 
   Scenario: Call Gary, converse, hang up, and resume play
     When I send "call"

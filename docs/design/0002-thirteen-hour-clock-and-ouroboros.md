@@ -1,17 +1,18 @@
-<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
 
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
-> **UPDATE 2026-09-21 — Part-I heirloom roster redesigned.** The required set
-> remains exactly thirteen and keeps its 195-point deposit total. The BELFRY
-> bats now drop +20 XRAY GOGGLES; the Bat Sight Mirror is retired. The
-> WOODBLACK WATCH moves to the HALL BEDROOM drawer as a non-heirloom WRIST
-> scry/route utility, while a +12 BLACKWOOD HAMMER takes its former place
-> between the walls. The old candlestick becomes the sole portable CANDLE; it
-> and the removable HALL BEDROOM MIRROR SHARD restore the +10 DINING ROOM
-> CANDELABRA. Hour XIII's already-implemented emerald scene remains a
-> non-reliquary Part-II set-piece, so the unbuilt Hours XII–I roster must be
-> reconciled against the current thirteen before those hours ship.
+> **CORRECTION 2026-09-21 — Part-I heirloom roster.** The required set remains
+> exactly thirteen and keeps its 195-point deposit total. The +20 slot belongs
+> to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer. The
+> BELFRY bats still drop XRAY GOGGLES, but the goggles are non-heirloom EYES
+> equipment. The BM WATCH rests visibly on the STUDY desk beside the diary as a
+> non-heirloom WRIST scry/route utility, while a +12 BLACKWOOD HAMMER holds its
+> former heirloom role between the walls. The old candlestick becomes the sole
+> portable CANDLE; it and the removable HALL BEDROOM MIRROR SHARD restore the
+> +10 DINING ROOM CANDELABRA. Hour XIII's already-implemented emerald scene
+> remains a non-reliquary Part-II set-piece, so the unbuilt Hours XII–I roster
+> must be reconciled against the current thirteen before those hours ship.
 >
 > **UPDATE 2026-09-15 — the simplified reliquary/clock seam is implemented.**
 > The game shows its title and initial AI status, composes a fallback from
@@ -195,12 +196,12 @@ claimed as final here.
 **Design law:** *the object's BM1 location must be earned by its origin.* Don't place things
 randomly — invent the moment that logically strands each heirloom exactly where BM1 finds it.
 
-**Worked example 1 — the bats / the XRAY GOGGLES (BM1: belfry).**
+**Equipment side story — the bats / the XRAY GOGGLES (BM1: belfry).**
 The great bell's rope runs from the BELFRY through the house to a closet beside
 the front door. Pulling either end rings **DONG... DONG...**, scatters the bats,
 and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The goggles
 retain their wearable EYES-slot clue vision and darkness sight. The separate
-WOODBLACK WATCH now owns the old remote-view behavior: `SHOW <room> IN WATCH`
+BM WATCH now owns the old remote-view behavior: `SHOW <room> IN WATCH`
 includes the room's third-eye text and prefills the unexecuted short directions;
 carried-watch `SHOW <room>` is shorthand. `GUIDE`, `PATH`, and `ROUTE TO
 <room-or-object>` prefill directions to a room or an item's location.
@@ -223,7 +224,7 @@ grounds set-piece when we lock the 13-row table.*
 | # | Heirloom | BM1 hiding spot (from 0001) | Proposed origin-scene seed |
 |---|---|---|---|
 | 13 | (opening item — TBD) | — | The scene that first sets the clock ticking; likely the RING or GRIMOIRE. |
-| — | XRAY GOGGLES | Belfry | Pulling either bell rope scatters the bats and drops the BM-marked goggles from their roost. |
+| — | BLACKWOOD FAMILY RING | Hall Bedroom drawer | Hidden in the BM-handled drawer beside the broken mirror; the room's only required heirloom. |
 | — | Family CREST | Dreadmaw's vault | Lost/sealed during the working; Dreadmaw set as its warden. |
 | — | GRIMOIRE | Secret chamber | The family's assembly-rite book — hidden behind the wall as the working began. |
 | — | RAVENBLOOD RING | Jewelry box | The line's ring — set aside by a family member in an ordinary moment. |
@@ -311,8 +312,9 @@ remains required and the emerald remains a Part-II set-piece.)*
    `{{player_name}}` templates. There is no second naming prompt after Gary's blow.
 7. **13 time-period scenes**: map + time-overlay + cast-overlay; one findable heirloom each +
    clue stubs. **[SUPERSEDED PROTOTYPE — all 13 hours were sketched, including hour XIII
-   Medusa/emerald and an obsolete hour-II dragon/ring scene. The current Part-I belfry heirloom is the XRAY GOGGLES
-   in the belfry; Hours XII–I remain unbuilt inline. The 11 easy
+   Medusa/emerald and an obsolete hour-II dragon/ring scene. The current Part-I
+   belfry goggles are non-heirloom equipment, while the BLACKWOOD FAMILY RING
+   occupies the required Hall Bedroom slot; Hours XII–I remain unbuilt inline. The 11 easy
    origins are first-draft flavor.]**
 8. **Clock timer**: 13 → 1, gated on correct placement; return-and-place step per item.
    **[BUILT — fixed reverse order 13 → 0. NAVIGATE-TO-PLACE (Model A, David 2026-09-14): after
@@ -369,8 +371,8 @@ confirm or override):**
 | Heirloom (BM1 id) | BM1 hiding spot | Origin-scene seed |
 |---|---|---|
 | SPYGLASS (`spyglass`) | tree fort | a child leaves it in the fort |
-| XRAY GOGGLES (`xrayGoggles`) | belfry | ring the bell, scatter the bats, and recover the BM-marked goggles |
 | FAMILY CREST (`familyCrest`) | Dreadmaw's vault | sealed in as Dreadmaw is made its warden |
+| BLACKWOOD FAMILY RING (`familyRing`) | Hall Bedroom drawer | hidden in the night table beside the broken mirror |
 | RESTORED CANDELABRA (`candelabra`) | dining room | reunite the broken mirror shard and sole candle |
 | GRIMOIRE (`grimoire`) | secret chamber | the assembly-rite, hidden behind the wall |
 | TALISMAN (`talisman`) | locked safe | locked away the night it all broke |
@@ -403,8 +405,8 @@ copied forward.
       tilemap spike.)*
 - [x] **Try-overs** retry mechanic (spend-and-rewind on a failed challenge).
 - [ ] **Wire Hours XII–I inline** using the validated Hour-XIII seam. The
-      belfry-origin scene must now return the XRAY GOGGLES; the excluded dragon/ring
-      prototype scene is retired.
+      required roster must include the BLACKWOOD FAMILY RING rather than the
+      non-heirloom XRAY GOGGLES; the excluded dragon/ring prototype scene is retired.
 - [ ] **David to confirm/override Q4 (navigate-to-place manor), Q5 (canon-13 swap), the hour order,
       the try-over count, and the 11 lighter origins.** Hours/spots are one-file edits in `HOURS`;
       the manor map is the `MANOR`/`SPOTS` tables in the same file.

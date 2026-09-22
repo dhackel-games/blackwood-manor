@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
 
 # Blackwood Manor
 
@@ -7,12 +7,12 @@ web files — with a grumpy 1-900 **hint line** ("Gary") who slowly turns into y
 therapist the more you call him. Cruel-but-fair: darkness kills, light is limited,
 and there's a hidden wing after you win.
 
-The thirteen-heirloom route now includes BM-marked XRAY GOGGLES dropped by the
-belfry bats, a BLACKWOOD HAMMER hidden between exposed wall beams, and a
-restored dining-room CANDELABRA assembled from the manor's sole candle and a
-shard worked free from the broken hall-bedroom mirror. The non-heirloom
-WOODBLACK WATCH in the hall-bedroom drawer provides remote room/object sight and
-route preparation.
+The thirteen-heirloom route includes the BLACKWOOD FAMILY RING in the
+hall-bedroom night-table drawer, a BLACKWOOD HAMMER hidden between exposed wall
+beams, and a restored dining-room CANDELABRA assembled from the manor's sole
+candle and a shard worked free from the broken hall-bedroom mirror. Belfry bats
+drop non-heirloom XRAY GOGGLES, while the non-heirloom BM WATCH rests on the
+Study desk and provides remote room/object sight and route preparation.
 
 ## Layout
 

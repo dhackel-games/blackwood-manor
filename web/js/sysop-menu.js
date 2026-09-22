@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -106,9 +106,8 @@ const POWERUP = [
   "fly belfry",
   "pull bellrope",
   "wear goggles",
-  "fly hallbr",
-  "open drawer",
-  "wear woodblack",
+  "fly study",
+  "wear bmwatch",
   "fly parlor",
   "move profile",
   "open safe with 7 3 9",
@@ -130,9 +129,11 @@ const QUICK_COLLECTION = [
   "fly belfry",
   "pull bellrope",
   "wear goggles",
+  "fly study",
+  "wear bmwatch",
   "fly hallbr",
   "open drawer",
-  "wear woodblack",
+  "take family",
   "take shard",
   "fly shaft",
   "wear backpack",
@@ -172,7 +173,6 @@ const QUICK_COLLECTION = [
   "fly attic",
   "take all",
   "fly royal",
-  "remove goggles",
 ];
 
 const BULK_DEPOSIT = ["put all in rq"];
@@ -243,8 +243,10 @@ const MAX_COLLECTION = [
   "wear talisman",
   "fly hallbr",
   "open drawer",
-  "wear woodblack",
+  "take family",
   "take shard",
+  "fly study",
+  "wear bmwatch",
   "fly astral",
   "wear obsidian",
   "fly dining",
@@ -271,7 +273,6 @@ const MAX_COLLECTION = [
   "fly attic",
   "take all",
   "fly royal",
-  "remove goggles",
 ];
 
 const MAX_TO_BELL = [
@@ -285,7 +286,7 @@ export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::powerup",
     name: "Power Up",
-    description: "Acquire and wear every reusable power item, including the Woodblack Watch.",
+    description: "Acquire and wear every reusable power item, including the BM Watch.",
     compoundPrompt: join(POWERUP),
   }),
   Object.freeze({

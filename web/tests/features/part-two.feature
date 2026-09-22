@@ -1,7 +1,10 @@
+# part-two.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+
 Feature: Part II — the Thirteenth Hour
   The Gary cliffhanger no longer ends the game; it opens Blackwood Manor Part II.
   As a ghost loose in the manor's own time you must recover the first scattered
-  heirloom — the queen's emerald — from a petrifying gaze, using a mirror-still pool.
+  temporal objective — the queen's emerald — from a petrifying gaze, using a
+  mirror-still pool.
 
   Background:
     Given a fresh manor game
@@ -120,3 +123,5 @@ Feature: Part II — the Thirteenth Hour
     And flag "hour13Done" is true
     And flag "clockHour" equals 12
     And the output contains "HOUR XIII CLOSED"
+
+# end part-two.feature

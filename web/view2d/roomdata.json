@@ -392,8 +392,13 @@
   },
   "study": {
     "name": "Study",
-    "desc": "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, as though its writer had just stepped away. The UPSTAIRS LANDING lies NORTH.",
+    "desc": "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it beside a BM WATCH, as though their owner had just stepped away. The UPSTAIRS LANDING lies NORTH.",
     "items": [
+      {
+        "id": "backwardsWatch",
+        "label": "bm watch",
+        "kind": "takeable"
+      },
       {
         "id": "diary",
         "label": "diary",
@@ -408,11 +413,11 @@
   },
   "hallBedroom": {
     "name": "Hall Bedroom",
-    "desc": "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a broken MIRROR with a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
+    "desc": "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a broken MIRROR with a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed BM-handled DRAWER.",
     "items": [
       {
-        "id": "backwardsWatch",
-        "label": "woodblack watch",
+        "id": "familyRing",
+        "label": "blackwood family ring",
         "kind": "takeable"
       },
       {

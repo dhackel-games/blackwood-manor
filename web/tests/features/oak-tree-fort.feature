@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -200,7 +200,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
   Scenario: A completed pre-watch collection gains the replacement hammer
     Given a completed pre-watch save is restored
     Then item "blackwoodHammer" is in "reliquary"
-    And item "backwardsWatch" is in "nightDrawer"
+    And item "backwardsWatch" is in "study"
     And the required family item count is 13
     And flag "curseLiftable" is set
     And flag "floorDoorOpen" is set

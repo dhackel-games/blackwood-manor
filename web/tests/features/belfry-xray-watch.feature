@@ -1,10 +1,11 @@
-# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.104:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @unit
-Feature: Belfry goggles and Woodblack Watch
+Feature: Belfry goggles, the family ring, and the BM Watch
   The manor's great bell hangs in the belfry. Its rope continues down to a
-  closet beside the front door, while bats guard the thirteenth heirloom above.
-  The Woodblack Watch supplies remote sight and route preparation.
+  closet beside the front door, while bats guard useful vision equipment above.
+  The Hall Bedroom holds its one heirloom, and the Study's BM Watch supplies
+  remote sight and route preparation.
 
   Background:
     Given a fresh manor game
@@ -39,7 +40,38 @@ Feature: Belfry goggles and Woodblack Watch
     When I send "pull rope"
     Then the game score is 10
 
-  Scenario: The Woodblack Watch can inspect any named room without moving
+  Scenario: The BM Watch rests visibly beside the diary in the Study
+    Given the player is in room "study"
+    When I send "look"
+    Then the output contains "DIARY"
+    And the output contains "BM WATCH"
+    When I send "examine watch"
+    Then the output contains "empty, mirror-like face"
+    And the output contains "reflects nothing"
+    And the output contains "looking into somewhere else"
+    And the output contains "nonreflective back"
+    And the output contains "BM insignia"
+    And the output does not contain "HEIRLOOMS:"
+    And the output does not contain "turns"
+
+  Scenario: The Hall Bedroom drawer holds the required Blackwood Family Ring
+    Given the player is in room "hallBedroom"
+    When I send "look"
+    Then the output contains "broken MIRROR"
+    And the output contains "NIGHT TABLE"
+    When I send "open drawer"
+    Then the output contains "BLACKWOOD FAMILY RING"
+    And item "familyRing" is in "nightDrawer"
+    And the Hall Bedroom has exactly one required heirloom
+    When I send "take family ring"
+    And I send "examine family ring"
+    Then the output contains "raised BM initials"
+    Given the player is in room "grandHall"
+    When I send "put family ring in reliquary"
+    Then item "familyRing" is in "reliquary"
+    And the game score is 20
+
+  Scenario: The BM Watch can inspect any named room without moving
     Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "look in watch"
@@ -47,7 +79,7 @@ Feature: Belfry goggles and Woodblack Watch
     And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
     And the output does not contain "heirloom remains"
     When I send "look in watch at kitchen"
-    Then the output contains "WOODBLACK WATCH"
+    Then the output contains "BM WATCH"
     And the output contains "KITCHEN"
     And the output contains "cavernous scullery"
     And the output contains "THIRD EYE"
@@ -56,23 +88,22 @@ Feature: Belfry goggles and Woodblack Watch
     And the current room is "belfry"
     And flag "seen:kitchen" is unset
 
-  Scenario: The visible watch must be taken before its black crystal can scry
-    Given the player is in room "hallBedroom"
-    When I send "open drawer"
-    And I send "look in watch at kitchen"
-    Then the output contains "need to take or wear the WOODBLACK WATCH"
-    And item "backwardsWatch" is in "nightDrawer"
+  Scenario: The visible watch must be taken before its mirror face can scry
+    Given the player is in room "study"
+    When I send "look in watch at kitchen"
+    Then the output contains "need to take or wear the BM WATCH"
+    And item "backwardsWatch" is in "study"
     And flag "mirrorRoutePrefill" is unset
 
-  Scenario: The Woodblack Watch covers every Part I room
-    Then the Woodblack Watch can view every Part I room
+  Scenario: The BM Watch covers every Part I room
+    Then the BM Watch can view every Part I room
 
   Scenario: SHOW reveals third-eye detail and prepares but does not execute the route
     Given item "backwardsWatch" is carried
     And flag "frontDoorOpen" is set
     And the player is in room "belfry"
     When I send "show library in watch"
-    Then the output contains "WOODBLACK WATCH — LIBRARY"
+    Then the output contains "BM WATCH — LIBRARY"
     And the output contains "THIRD EYE"
     And the output contains "brass LEVER is polished"
     And the output contains "ROUTE READY"
@@ -86,8 +117,8 @@ Feature: Belfry goggles and Woodblack Watch
     Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "show kitchen"
-    Then the output contains "(show KITCHEN in WOODBLACK WATCH)"
-    And the output contains "WOODBLACK WATCH — KITCHEN"
+    Then the output contains "(show KITCHEN in BM WATCH)"
+    And the output contains "BM WATCH — KITCHEN"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
 
   Scenario: SHOW inspects normally when the named room is the current room
@@ -95,14 +126,14 @@ Feature: Belfry goggles and Woodblack Watch
     And the player is in room "kitchen"
     When I send "show kitchen"
     Then the output contains "CLOSER INSPECTION"
-    And the output does not contain "WOODBLACK WATCH —"
+    And the output does not contain "BM WATCH —"
     And flag "mirrorRoutePrefill" is unset
 
   Scenario Outline: Guide commands infer the carried watch and prefill without moving
     Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "<command>"
-    Then the output contains "(route to KITCHEN with WOODBLACK WATCH)"
+    Then the output contains "(route to KITCHEN with BM WATCH)"
     And the output contains "ROUTE READY"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
     And the current room is "belfry"
@@ -117,7 +148,7 @@ Feature: Belfry goggles and Woodblack Watch
     Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "route to diary"
-    Then the output contains "(route to LEATHER DIARY with WOODBLACK WATCH)"
+    Then the output contains "(route to LEATHER DIARY with BM WATCH)"
     And the output contains "DIARY is in STUDY"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; s"
 
@@ -130,7 +161,7 @@ Feature: Belfry goggles and Woodblack Watch
 
   Scenario Outline: Guide commands explain their watch requirement
     When I send "<command>"
-    Then the output contains "need the WOODBLACK WATCH"
+    Then the output contains "need the BM WATCH"
 
     Examples:
       | command          |
@@ -140,15 +171,16 @@ Feature: Belfry goggles and Woodblack Watch
 
   Scenario: The redesigned required set contains exactly thirteen heirlooms
     Then the required family item count is 13
-    And the required family items are exactly "ancestralPortrait,ancientCoin,blackwoodHammer,candelabra,crystalDecanter,familyCrest,goldLocket,grimoire,musicBox,rubyRing,spyglass,talisman,xrayGoggles"
+    And the required family items are exactly "ancestralPortrait,ancientCoin,blackwoodHammer,candelabra,crystalDecanter,familyCrest,familyRing,goldLocket,grimoire,musicBox,rubyRing,spyglass,talisman"
+    And item "xrayGoggles" is not a required family heirloom
     And item "batSightMirror" is absent from game state
     And the player-facing heirloom catalogs and icons match the required set
     And the static 2D rooms show the redesigned item placements
 
   Scenario: The lower rope transforms a full closed reliquary
-    Given every treasure but the "xrayGoggles" is already in the reliquary
+    Given every treasure but the "familyRing" is already in the reliquary
     And the player is in room "grandHall"
-    When I send "put xray goggles in reliquary"
+    When I send "put family ring in reliquary"
     And I send "close reliquary"
     And I send "open bell closet"
     And I send "pull bell rope"

@@ -1,13 +1,14 @@
-<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
 
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
-> **UPDATE 2026-09-21:** The required set remains thirteen. The BELFRY bats now
-> drop BM-marked XRAY GOGGLES, which replace the retired Bat Sight Mirror as the
-> +20 heirloom while retaining wearable vision powers. The WOODBLACK WATCH moves
-> to the HALL BEDROOM drawer as a non-heirloom WRIST utility with the old
-> scry/route behavior. A BM-marked BLACKWOOD HAMMER replaces its +12 heirloom
-> role between the walls. The old candlestick is now the sole portable CANDLE;
+> **CORRECTION 2026-09-21:** The required set remains thirteen. The +20 slot
+> belongs to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer.
+> BELFRY bats still drop BM-marked XRAY GOGGLES, but the goggles are
+> non-heirloom EYES equipment. The non-heirloom BM WATCH rests visibly on the
+> STUDY desk beside the diary and retains the retired Bat Sight Mirror's
+> scry/route behavior. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
+> between the walls. The old candlestick is now the sole portable CANDLE;
 > together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10
 > DINING ROOM CANDELABRA.
 >
@@ -62,7 +63,7 @@ Any fix has to stay consistent with what bm1 already establishes:
   rung, or the curse never lifts.** (`world.content.js` letter; `world.js`
   `REQUIRED_FAMILY_ITEM_COUNT = 13`.)
 - **The heirlooms:** 13 Blackwood ("BM") family pieces scattered across the manor and
-  grounds (family ring, crest, spyglass, protective charm, Woodblack watch, …). The
+  grounds (family ring, crest, spyglass, protective charm, music box, …). The
   reliquary has 13 heirloom-shaped recesses — this placement puzzle is the spine of bm1.
 - **Gary:** a comedic ghost who works a foul basement **"Call-Cave"** beneath the Royal
   Hall (green rotary phone, burritos, mini-fridge). Room search text:
@@ -172,8 +173,8 @@ optional flavor lines).
   **Ravenblood line, practitioners.** The 13 heirlooms read naturally as **components of a
   ritual/working** ("Voltron"), not just valuables.
 - **The 13 are scattered into the deadliest, most hidden rooms:** spyglass→tree fort,
-  XRAY goggles→belfry, crest→Dreadmaw's vault, grimoire→secret chamber, talisman→a
-  locked safe, music box→nursery, Ravenblood Ring→jewelry box, locket→crypt,
+  family ring→Hall Bedroom drawer, crest→Dreadmaw's vault, grimoire→secret chamber,
+  talisman→a locked safe, music box→nursery, Ravenblood Ring→jewelry box, locket→crypt,
   decanter→wine cellar, portrait→attic, Blackwood hammer→the space-between-walls,
   restored candelabra→dining room, coin→well. This is a **deliberate hide-so-none-reassemble
   pattern**, which is exactly why bm1 is a dangerous dungeon crawl to recover them.

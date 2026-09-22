@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -47,7 +47,8 @@ Feature: Maintained sysop shortcuts
     Then sysop command "::winmax2bell" includes "g belfry"
     And sysop command "::winmax2bell" includes "pull bellrope"
     And sysop command "::winmax2bell" includes "u goggles"
-    And sysop command "::winmax2bell" includes "u woodblack"
+    And sysop command "::winmax2bell" includes "u bmwatch"
+    And sysop command "::winmax2bell" includes "t family"
     And sysop command "::winmax2bell" includes "put candle in fixture"
     And sysop command "::winmax2bell" includes "put shard in fixture"
     And sysop command "::winmax2bell" includes "t candelabra"
@@ -55,20 +56,22 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winmax2bell" includes "c rq"
     And sysop command "::winmax2bell" includes "o bellcloset"
     And sysop command "::winmax2bell" omits "pull closetrope"
-    And sysop command "::winmax2bell" omits "put woodblack in rq"
+    And sysop command "::winmax2bell" omits "put bmwatch in rq"
+    And sysop command "::winmax2bell" omits "put goggles in rq"
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: Powerup and Quick Win use the current equipment and heirloom routes
     Then sysop command "::powerup" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     Then sysop command "::powerup" includes "u shoes"
     And sysop command "::powerup" includes "u goggles"
-    And sysop command "::powerup" includes "u woodblack"
+    And sysop command "::powerup" includes "u bmwatch"
     And sysop command "::powerup" includes "u obsidian"
     And sysop command "::powerup" includes "pull bellrope"
     And sysop command "::winquick1" includes "g belfry"
     And sysop command "::winquick1" includes "pull bellrope"
     And sysop command "::winquick1" includes "u goggles"
-    And sysop command "::winquick1" includes "u woodblack"
+    And sysop command "::winquick1" includes "u bmwatch"
+    And sysop command "::winquick1" includes "t family"
     And sysop command "::winquick1" includes "t candelabra"
     And sysop command "::winquick1" includes "put all in rq"
     And sysop command "::winquick1" includes "pull closetrope"
