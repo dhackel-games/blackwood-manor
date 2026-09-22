@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 ```
 
 ---
@@ -217,7 +217,8 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **The diary** (study) reveals the **safe** combination (behind the portrait);
   the safe holds a treasure. The leather-bound diary remains on the desktop,
   while an openable desk drawer beneath it holds the non-heirloom **BM Watch**,
-  which scries rooms or prepares routes while carried.
+  whose empty mirror face behaves like a crystal ball worn on the wrist. While
+  carried or worn, it scries rooms or objects and prepares routes.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
   Ravenblood Ring.
 - **Hall Bedroom:** the night-table drawer contains the +20 **Blackwood Family
@@ -866,17 +867,23 @@ preserving spoiler hiding for both secret destinations.
 - **Belfry payoff.** Pulling either end of the bell rope awards +5, scatters the
   bats, and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The
   goggles are non-heirloom EYES equipment, retain hidden-vision and darkness
-  sight, and keep their +5 first-acquisition award.
+  sight, and keep their +5 first-acquisition award. Before the bell rings their
+  location is nested under the bat roost, keeping them unavailable to ordinary
+  sight and TAKE while still allowing the watch's containing-room resolver to
+  find the BELFRY.
 - **BM Watch utility.** The watch waits inside an openable STUDY desk drawer
   beneath the DIARY, is wearable on the WRIST, and is not a required heirloom. Its empty,
-  mirror-like face inherits the retired Bat Sight Mirror's scrying and route
-  behavior. `SHOW <room> IN WATCH` and carried-watch shorthand `SHOW <room>`
-  see the normal and third-eye descriptions without marking the room visited,
-  then prefill the short directions without executing them. `GUIDE`, `PATH`,
-  and `ROUTE TO <room-or-object>` prefill directions to rooms or item
-  locations. `LOOK IN WATCH AT <room>` is an exact synonym. Its nonreflective
-  back bears a BM inscription; the watch displays neither heirloom counts nor
-  turns.
+  mirror-like face behaves like a crystal ball worn on the wrist and inherits
+  the retired Bat Sight Mirror's scrying and route behavior. `SHOW` and `SCRY`
+  accept rooms or objects, including objects nested inside closed or hidden
+  holders, display the containing room without marking it visited, and prefill
+  the short directions without executing them. Destroyed namesakes are excluded
+  before target matching. `SHOW <target>`, `SCRY <target>`, and `LOOK IN WATCH
+  AT <target>` are supported while the watch is carried or worn. `SCRYING
+  WATCH` and `CRYSTAL BALL WATCH` are accepted noun aliases, while output keeps
+  the canonical BM WATCH name. `GUIDE`, `PATH`, and `ROUTE TO
+  <room-or-object>` use the same containing-room resolver. Its nonreflective
+  back bears a BM inscription; the watch displays neither heirloom counts nor turns.
 - **Dining-room restoration.** The former required candlestick is now the
   manor's sole portable CANDLE. A removable shard from the broken HALL BEDROOM
   MIRROR and that candle fit the rundown DINING ROOM CANDELABRA in either order.

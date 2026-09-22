@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -629,8 +629,8 @@ export const content = {
     },
     backwardsWatch: {
       roomDesc: "A BM WATCH rests inside the open DESK DRAWER, its empty face looking elsewhere.",
-      desc: "A tarnished brass BM WATCH. Its front is an empty, mirror-like face that reflects nothing but seems " +
-        "to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
+      desc: "A tarnished brass BM WATCH. Its empty mirror face behaves like a crystal ball worn on the wrist: " +
+        "it reflects nothing but seems to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
         "\"WHAT TIME TAKES, BLOOD REMEMBERS.\" Worn on the WRIST, it can scry rooms and prepare routes.",
     },
     blackwoodHammer: {

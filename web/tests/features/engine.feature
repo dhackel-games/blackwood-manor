@@ -1,4 +1,4 @@
-# engine.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# engine.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 
 @unit
 Feature: Generic text-adventure engine
@@ -219,6 +219,7 @@ Feature: Generic text-adventure engine
   Scenario: HELP is an alphabetized data block with one command per line
     When I send "help"
     Then HELP is one alphabetized command-per-line data block
+    And the output contains "show/scry <room/object> [in watch]"
     And the output contains "CALL or HINT"
     And the output contains "HELP only prints this reference"
 

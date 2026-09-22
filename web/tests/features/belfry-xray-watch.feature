@@ -1,4 +1,4 @@
-# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 
 @unit
 Feature: Belfry goggles, the family ring, and the BM Watch
@@ -40,6 +40,15 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     When I send "pull rope"
     Then the game score is 10
 
+  Scenario: Hidden goggles cannot be seen or taken before the bats scatter
+    Given the player is in room "belfry"
+    When I send "look"
+    Then the output does not contain "XRAY GOGGLES"
+    When I send "take goggles"
+    Then the output contains "can't see"
+    And item "xrayGoggles" is in "belfryBats"
+    And flag "belfryBatsScattered" is unset
+
   Scenario: The BM Watch waits inside the Study desk drawer
     Given the player is in room "study"
     When I send "look"
@@ -52,7 +61,8 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     Then the output contains "BM WATCH"
     And item "backwardsWatch" is in "studyDrawer"
     When I send "examine watch"
-    Then the output contains "empty, mirror-like face"
+    Then the output contains "empty mirror face"
+    And the output contains "crystal ball worn on the wrist"
     And the output contains "reflects nothing"
     And the output contains "looking into somewhere else"
     And the output contains "nonreflective back"
@@ -82,7 +92,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "look in watch"
-    Then the output contains "SHOW KITCHEN"
+    Then the output contains "SCRY KITCHEN"
     And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
     And the output does not contain "heirloom remains"
     When I send "look in watch at kitchen"
@@ -120,6 +130,80 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     And the current room is "belfry"
     And flag "seen:library" is unset
     And browser scry routes are prefilled after command submission
+
+  Scenario Outline: SHOW and SCRY resolve goggles hidden inside the belfry roost
+    Given item "backwardsWatch" is carried
+    And the player is in room "roof"
+    When I send "<command>"
+    Then the output contains "BM WATCH — BELFRY"
+    And the output contains "TARGET: XRAY GOGGLES IN BELFRY"
+    And the output contains "BATS"
+    And the output contains "ROUTE READY"
+    And flag "mirrorRoutePrefill" equals "e"
+    And the current room is "roof"
+    And item "xrayGoggles" is in "belfryBats"
+
+    Examples:
+      | command               |
+      | show goggles in watch |
+      | scry goggles in watch |
+      | scry goggles          |
+
+  Scenario: SCRY resolves a room through the BM Watch
+    Given item "backwardsWatch" is carried
+    And the player is in room "belfry"
+    When I send "scry kitchen in watch"
+    Then the output contains "BM WATCH — KITCHEN"
+    And the output contains "cavernous scullery"
+    And the output contains "ROUTE READY"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
+
+  Scenario Outline: The BM Watch accepts its descriptive noun aliases
+    Given item "backwardsWatch" is carried
+    And the player is in room "belfry"
+    When I send "<command>"
+    Then the output contains "BM WATCH — KITCHEN"
+    And the output does not contain "CRYSTAL BALL WATCH —"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
+
+    Examples:
+      | command                              |
+      | scry kitchen in scrying watch        |
+      | scry kitchen in crystal ball watch   |
+
+  Scenario: Object scrying follows goggles after they drop and move
+    Given item "backwardsWatch" is carried
+    And the player is in room "belfry"
+    When I send "pull rope"
+    Given the player is in room "roof"
+    When I send "show goggles in watch"
+    Then the output contains "TARGET: XRAY GOGGLES IN BELFRY"
+    And flag "mirrorRoutePrefill" equals "e"
+    Given the player is in room "belfry"
+    When I send "take goggles"
+    Given the player is in room "kitchen"
+    When I send "drop goggles"
+    Given the player is in room "belfry"
+    When I send "scry goggles"
+    Then the output contains "TARGET: XRAY GOGGLES IN KITCHEN"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
+
+  Scenario: Object scrying resolves a family ring nested in a closed drawer
+    Given item "backwardsWatch" is carried
+    And the player is in room "belfry"
+    When I send "scry family ring in crystal ball watch"
+    Then the output contains "TARGET: BLACKWOOD FAMILY RING IN HALL BEDROOM"
+    And flag "mirrorRoutePrefill" equals "w; dn; dn; n"
+
+  Scenario: Object scrying ignores a destroyed namesake
+    Given the restored candelabra is carried
+    And item "backwardsWatch" is carried
+    Given the player is in room "diningRoom"
+    When I send "drop candelabra"
+    Given the player is in room "belfry"
+    When I send "show candelabra in watch"
+    Then the output contains "TARGET: CANDELABRA IN DINING ROOM"
+    And the output contains "ROUTE READY"
 
   Scenario: SHOW infers the carried watch for a different room
     Given item "backwardsWatch" is carried

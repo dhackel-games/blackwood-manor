@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
 
 # Blackwood Manor
 
@@ -146,15 +146,21 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
   non-heirloom BLACKWOOD XRAY GOGGLES. Their first acquisition still awards +5,
-  and they can remain worn during `PUT ALL`. The retired Bat Sight Mirror is
-  absent from new games. The BM WATCH waits inside the STUDY'S DESK DRAWER,
+  and they can remain worn during `PUT ALL`. Before the bell rings, the goggles
+  are hidden inside the bat roost: ordinary sight and TAKE cannot reach them,
+  but the BM WATCH can scry their containing BELFRY. The retired Bat Sight
+  Mirror is absent from new games. The BM WATCH waits inside the STUDY'S DESK DRAWER,
   beneath the leather-bound DIARY on the desktop, and provides its utility:
-  `SHOW <room> IN WATCH`, or simply `SHOW <room>` while carrying it, displays that room's normal and
-  THIRD EYE descriptions, then prefills the unexecuted directions. `GUIDE`,
-  `PATH`, or `ROUTE TO <room-or-object>` finds the destination through the
-  watch and likewise leaves the route in the command entry without running it.
-  `LOOK IN WATCH AT <room>` is an exact synonym. The watch reports neither
-  heirloom counts nor turns and stays on the player's wrist during `PUT ALL`.
+  `SHOW` and `SCRY` accept rooms or objects, display the containing room's
+  normal and THIRD EYE descriptions, identify an object target's containing
+  room, then prefill the unexecuted directions. This includes hidden nested
+  objects such as the goggles inside the bat roost and the family ring inside
+  its closed drawer. `SHOW <target>`, `SCRY <target>`, and `LOOK IN WATCH AT
+  <target>` work while the watch is carried or worn. `SCRYING WATCH` and
+  `CRYSTAL BALL WATCH` are accepted noun aliases, but all output names it
+  BM WATCH. `GUIDE`, `PATH`, or `ROUTE TO <room-or-object>` uses the same
+  resolver. The watch reports neither heirloom counts nor turns and stays on
+  the player's wrist during `PUT ALL`.
   The HALL BEDROOM keeps the broken fixed MIRROR and removable non-heirloom
   SHARD; its NIGHT TABLE DRAWER contains the required +20 BLACKWOOD FAMILY RING.
 - **Thirteen heirlooms:** the required set is the ANCESTRAL PORTRAIT, ANCIENT

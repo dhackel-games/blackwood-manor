@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
@@ -23,7 +23,7 @@ const VERBS = {
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in", "board", "ride", "step"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
-  show: ["show"], route: ["route", "guide", "path"],
+  show: ["show", "scry"], route: ["route", "guide", "path"],
   talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],

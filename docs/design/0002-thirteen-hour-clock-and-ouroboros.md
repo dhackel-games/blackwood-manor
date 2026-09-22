@@ -1,4 +1,4 @@
-<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
+<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
 
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
@@ -7,7 +7,7 @@
 > to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer. The
 > BELFRY bats still drop XRAY GOGGLES, but the goggles are non-heirloom EYES
 > equipment. The BM WATCH waits inside the STUDY desk drawer beneath the diary as a
-> non-heirloom WRIST scry/route utility, while a +12 BLACKWOOD HAMMER holds its
+> non-heirloom WRIST crystal-ball-like `SHOW`/`SCRY` and route utility, while a +12 BLACKWOOD HAMMER holds its
 > former heirloom role between the walls. The old candlestick becomes the sole
 > portable CANDLE; it and the removable HALL BEDROOM MIRROR SHARD restore the
 > DINING ROOM CANDELABRA for a one-time +20 puzzle bonus; depositing the
@@ -202,11 +202,12 @@ The great bell's rope runs from the BELFRY through the house to a closet beside
 the front door. Pulling either end rings **DONG... DONG...**, scatters the bats,
 and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The goggles
 retain their wearable EYES-slot clue vision and darkness sight. The separate
-BM WATCH now owns the old remote-view behavior: `SHOW <room> IN WATCH`
-includes the room's third-eye text and prefills the unexecuted short directions;
-carried-watch `SHOW <room>` is shorthand. `GUIDE`, `PATH`, and `ROUTE TO
-<room-or-object>` prefill directions to a room or an item's location.
-`LOOK IN WATCH AT <room>` is an exact synonym.
+BM WATCH now owns the old remote-view behavior: `SHOW` and `SCRY` accept a room
+or object, include the containing room's third-eye text, and prefill the
+unexecuted short directions. Carried-watch `SHOW <target>` and `SCRY <target>`
+are shorthand; `LOOK IN WATCH AT <target>` is an exact synonym. Nested hidden
+objects resolve through their containing room, while destroyed namesakes do
+not create ambiguity.
 
 **Worked example 2 — the emerald / the garden STATUE (BM1: emerald gem + the leaning garden
 statue that hides the front-door key).**

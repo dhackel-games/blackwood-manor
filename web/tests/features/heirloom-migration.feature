@@ -1,4 +1,4 @@
-# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 
 @unit
 Feature: Heirloom correction save migration
@@ -137,5 +137,10 @@ Feature: Heirloom correction save migration
     When I round-trip the game snapshot
     Then flag "progressAward:candelabraRestored" is set
     And the game score is 20
+
+  Scenario: Pre-roost saves place undiscovered goggles beneath the belfry bats
+    Given a pre-roost save with undiscovered goggles is restored
+    Then item "xrayGoggles" is in "belfryBats"
+    And flag "belfryBatsScattered" is unset
 
 # end heirloom-migration.feature

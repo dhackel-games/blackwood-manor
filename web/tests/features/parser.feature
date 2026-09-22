@@ -1,4 +1,4 @@
-# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+# parser.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 
 @unit
 Feature: Player command parsing
@@ -33,6 +33,9 @@ Feature: Player command parsing
       | look at brass key                   | examine | brass key | [none]      | [none]    |
       | look in mirror at kitchen           | examine | mirror    | at          | kitchen   |
       | show library in mirror              | show    | library   | in          | mirror    |
+      | scry goggles in watch               | show    | goggles   | in          | watch     |
+      | scry kitchen in watch               | show    | kitchen   | in          | watch     |
+      | scry goggles                        | show    | goggles   | [none]      | [none]    |
       | look brass key                      | examine | brass key | [none]      | [none]    |
       | search brass key                    | examine | brass key | [none]      | [none]    |
       | ex brass key                        | examine | brass key | [none]      | [none]    |

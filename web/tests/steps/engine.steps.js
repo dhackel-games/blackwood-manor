@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -309,6 +309,7 @@ Then("HELP is one alphabetized command-per-line data block", function () {
   assert.match(HELP_TEXT, /unlock\/\(un\) <thing> with <key> \| Unlock \//);
   assert.match(HELP_TEXT, /put\/place <thing>\/all in <container\/slot> \| Put \//);
   assert.match(HELP_TEXT, /say\/talk <words\/person> \| Speak \//);
+  assert.match(HELP_TEXT, /show\/scry <room\/object> \[in watch\] \| Scry \//);
   assert.match(HELP_TEXT, /\(u\)se\/wear\/don\/eat\/drink <thing> \| Use \//);
   assert.match(HELP_TEXT, /WITH may be shortened to w\//);
   assert.match(HELP_TEXT, /\nCHAINING\n/);

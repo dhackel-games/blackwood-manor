@@ -1,4 +1,4 @@
-<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
+<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
 
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
@@ -7,7 +7,8 @@
 > BELFRY bats still drop BM-marked XRAY GOGGLES, but the goggles are
 > non-heirloom EYES equipment. The non-heirloom BM WATCH waits inside the
 > STUDY desk drawer beneath the leather-bound diary and retains the retired Bat Sight Mirror's
-> scry/route behavior. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
+> room/object `SHOW`/`SCRY` and route behavior. Its empty mirror face behaves
+> like a crystal ball worn on the wrist. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
 > between the walls. The old candlestick is now the sole portable CANDLE;
 > together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10
 > DINING ROOM CANDELABRA. Completing that restoration awards a separate,

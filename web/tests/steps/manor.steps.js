@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -359,6 +359,14 @@ Given("a pre-bonus save with the restored candelabra is restored", function () {
   this.game.restore(snapshot);
 });
 
+Given("a pre-roost save with undiscovered goggles is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.items.xrayGoggles.loc = null;
+  snapshot.state.items.belfryBats.loc = "belfry";
+  delete snapshot.state.flags.belfryBatsScattered;
+  this.game.restore(snapshot);
+});
+
 Given("a legacy pre-oak save with the ember deposited is restored", function () {
   const snapshot = this.game.snapshot();
   const addedForOak = [
@@ -421,6 +429,9 @@ Given("every treasure but the {string} is already in the reliquary", function (i
   this.game.moveItem(itemId, "inventory");
   this.game.destroy("belfryBats");
   this.game.setFlag("belfryBatsScattered", true);
+  if (this.game.roomOf("xrayGoggles") === "belfryBats") {
+    this.game.moveItem("xrayGoggles", "belfry");
+  }
 });
 
 Given("item {string} uses wear slot {string}", function (item, slot) {

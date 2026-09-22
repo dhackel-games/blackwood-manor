@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
 
 # Blackwood Manor
 
@@ -13,7 +13,9 @@ beams, and a restored dining-room CANDELABRA assembled from the manor's sole
 candle and a shard worked free from the broken hall-bedroom mirror. Belfry bats
 drop non-heirloom XRAY GOGGLES, while the non-heirloom BM WATCH rests inside
 the Study desk drawer and provides remote room/object sight and route
-preparation. The leather-bound diary remains open on the desktop. Completing
+preparation. Its empty mirror face behaves like a crystal ball worn on the
+wrist, and `SHOW` or `SCRY` can locate rooms and objects, including hidden
+nested objects. The leather-bound diary remains open on the desktop. Completing
 the candelabra puzzle awards +20; depositing the restored heirloom awards +10.
 
 ## Layout

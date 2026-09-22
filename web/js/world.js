@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -249,7 +249,7 @@ function ringBelfryBell(ctx, fromBelfry = true) {
   }
   ctx.setFlag("belfryBatsScattered", true);
   ctx.moveItem("belfryBats", null);
-  const gogglesWereHidden = ctx.roomOf("xrayGoggles") == null;
+  const gogglesWereHidden = ["belfryBats", null].includes(ctx.roomOf("xrayGoggles"));
   if (gogglesWereHidden) ctx.moveItem("xrayGoggles", "belfry");
   const points = awardProgress(ctx, "belfryGogglesFreed");
   return result + (fromBelfry
@@ -324,16 +324,16 @@ function prepareWatchRoute(ctx, roomId) {
 function lookThroughBmWatch(ctx, cmd) {
   const target = cmd.verb === "show" ? cmd.dobj : cmd.iobj;
   if (!target) {
-    return inspectBmWatch(ctx) + "\n\nThe empty face waits for a destination. Try SHOW KITCHEN, " +
-      "SHOW KITCHEN IN WATCH, LOOK IN WATCH AT KITCHEN, or ROUTE TO DIARY.";
+    return inspectBmWatch(ctx) + "\n\nThe empty face waits for a destination. Try SCRY KITCHEN, " +
+      "SHOW GOGGLES IN WATCH, LOOK IN WATCH AT KITCHEN, or ROUTE TO DIARY.";
   }
   if (!ctx.has("backwardsWatch")) {
     return "You need to take or wear the BM WATCH before you can look through it.";
   }
   ctx.setFlag("mirrorRoutePrefill", null);
-  const match = resolveWatchRoom(ctx, target);
-  if (!match) return `The BM WATCH finds no room called "${target}".`;
-  const [roomId, room] = match;
+  const destination = resolveWatchDestination(ctx, target);
+  if (!destination) return `The BM WATCH finds no room or object called "${target}".`;
+  const { roomId, room, item, label } = destination;
   const description = typeof room.desc === "function" ? room.desc(ctx) : room.desc;
   const visionSource = room.highDesc || room.searchDesc;
   const vision = typeof visionSource === "function" ? visionSource(ctx) : visionSource;
@@ -342,6 +342,7 @@ function lookThroughBmWatch(ctx, cmd) {
     .filter(Boolean);
   const routeText = prepareWatchRoute(ctx, roomId);
   return `BM WATCH — ${room.name.toUpperCase()}\n` +
+    (item ? `TARGET: ${label.toUpperCase()} IN ${room.name.toUpperCase()}\n` : "") +
     (room.art ? MAP_MARK + room.art + MAP_MARK + "\n" : "") +
     `${description || "The room lies silent."}` +
     (vision ? `\n\nTHIRD EYE\n${vision}` : "") +
@@ -2943,8 +2944,8 @@ function reachIntoToilet(ctx, cmd) {
 }
 function deriveCommand(ctx, cmd) {
   if (cmd.verb === "show" && cmd.dobj && !cmd.iobj && ctx.has("backwardsWatch")) {
-    const destination = resolveWatchRoom(ctx, cmd.dobj);
-    if (destination?.[0] === ctx.state.room) {
+    const destination = resolveWatchDestination(ctx, cmd.dobj);
+    if (destination && !destination.item && destination.roomId === ctx.state.room) {
       cmd.verb = "look";
       cmd.dobj = null;
       cmd.prep = null;
@@ -3640,6 +3641,11 @@ const logicWorld = {
     if (!savedItems?.studyDrawer && state.items.backwardsWatch.loc === "study") {
       state.items.backwardsWatch.loc = "studyDrawer";
       state.items.backwardsWatch.worn = false;
+    }
+    if (state.items.xrayGoggles.loc == null
+        && state.items.belfryBats?.loc === "belfry"
+        && !state.flags.belfryBatsScattered) {
+      state.items.xrayGoggles.loc = "belfryBats";
     }
 
     if (!savedItems?.blackwoodHammer) {
@@ -4416,7 +4422,7 @@ const logicWorld = {
     xrayGoggles: {
       names: ["xray goggles", "goggles", "glasses"],
       adjectives: ["blackwood", "bm", "xray", "x-ray", "brass", "antique"],
-      loc: null, takeable: true,
+      loc: "belfryBats", takeable: true,
       wearable: true, wearSlot: "eyes",
       grantsMushroomVision: true, grantsDarkVision: true,
       progressPoints: 5, progressFlag: "progressItem:xrayGoggles",
@@ -4672,8 +4678,8 @@ const logicWorld = {
       lightSource: true, selfPowered: true, lit: false,
     },
     backwardsWatch: {
-      names: ["bm watch", "watch", "wristwatch"],
-      adjectives: ["bm", "blackwood", "tarnished", "backwards", "brass"],
+      names: ["bm watch", "watch", "wristwatch", "scrying watch", "crystal ball watch"],
+      adjectives: ["bm", "blackwood", "tarnished", "backwards", "brass", "scrying", "crystal", "ball"],
       loc: "studyDrawer", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
       on: {
         examine: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
@@ -4978,8 +4984,8 @@ export const world = composeWorld(logicWorld, content);
 
 // ---- handler function definitions referenced above --------------------------
 function inspectBmWatch(ctx) {
-  return "The BM WATCH has an empty, mirror-like face that reflects nothing but seems to be looking into " +
-    "somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
+  return "The BM WATCH'S empty mirror face behaves like a crystal ball worn on the wrist: it reflects nothing " +
+    "but seems to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
     "\"WHAT TIME TAKES, BLOOD REMEMBERS.\"";
 }
 
