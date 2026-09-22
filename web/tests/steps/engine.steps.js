@@ -996,6 +996,74 @@ Then("the compass centers responsively beside edge-aligned action shortcuts", fu
   assert.match(css, /#controls \.verb-row \.compact-action\s*\{\s*grid-column:\s*span 1/s);
 });
 
+Then("2D command entry delegates manor verbs to the shared parser", function () {
+  const tilemap = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  const formerlyDriftedCommands = [
+    "hotline",
+    "call gary",
+    "code 1234",
+    "show library in mirror",
+    "score",
+    "sit",
+    "inventory",
+    "i",
+    "climb",
+    "yes",
+    "no",
+    "burn note",
+    "go north",
+    "leave",
+    "enter",
+  ];
+
+  assert.doesNotMatch(tilemap, /\bENGINE_VERBS\b/);
+  assert.match(tilemap, /import\("\.\.\/js\/parser\.js"\)/);
+  assert.match(tilemap, /parseCmd\s*=\s*parse/);
+  assert.match(tilemap, /parseCmd\(line\)\.verb[\s\S]*runEngine\(line\)/);
+  assert.match(tilemap, /WORD_DIRS\[verb\][\s\S]*if \(id\) \{ moveTo\(id\); return; \}[\s\S]*if \(verb === "bait"/);
+  assert.match(tilemap, /const MOVE_PREFIXES = \[[\s\S]*"go"[\s\S]*"enter"[\s\S]*"leave"[\s\S]*"exit"[\s\S]*"fly"[\s\S]*\]/);
+  assert.doesNotMatch(tilemap, /No room \$\{verb\.toUpperCase\(\)\} of here/);
+
+  for (const command of formerlyDriftedCommands) {
+    assert.ok(parse(command).verb, `${command} must remain a parser-recognized manor command`);
+  }
+});
+
+Then("2D mode reaches behavior parity with the text terminal", function () {
+  const tilemap = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+
+  // Identity: the player is the named protagonist, never labeled "Gary" (Gary
+  // is the hint-line NPC). The HUD/legend/flavor must not call the player Gary.
+  assert.doesNotMatch(tilemap, /📍 Gary in/);
+  assert.doesNotMatch(tilemap, /"Gary \(you\)"/);
+  assert.doesNotMatch(tilemap, /You are Gary/);
+  assert.doesNotMatch(tilemap, /type what Gary does/);
+  assert.match(tilemap, /function playerLabel\(\)/);
+  assert.match(tilemap, /📍 \$\{playerLabel\(\)\} in/);
+
+  // Death/win are real now — the old "Gary can't truly die" swallow is gone and
+  // the engine's game-over state is surfaced with a RESTART prompt.
+  assert.doesNotMatch(tilemap, /Gary can't truly die/);
+  assert.doesNotMatch(tilemap, /if \(game\.state\.dead\) \{ game\.state\.dead = false;/);
+  assert.doesNotMatch(tilemap, /if \(game\.state\.won\) \{ game\.state\.won = false; \}/);
+  assert.match(tilemap, /game\.state\.dead \|\| game\.state\.won[\s\S]*Type RESTART to play again/);
+
+  // RESTART / RESTART 2 work from anywhere, mirroring the text game.
+  assert.match(tilemap, /parseRestart\s*=\s*parseRestartTarget/);
+  assert.match(tilemap, /parseRestart\(line\)[\s\S]*restartGame\(restartTarget\)/);
+  assert.match(tilemap, /function restartGame\(part\)/);
+
+  // Hint-line parity: while onCall, input is routed verbatim to the engine
+  // (which owns hang-up) instead of the map intercepts half-bricking it.
+  assert.match(tilemap, /flags\.onCall\)\s*\{[\s\S]*game\.send\(raw\.trim\(\)\)/);
+
+  // Post-turn parity: mirror-route prefill + per-turn autosave via save.js.
+  assert.match(tilemap, /import\("\.\.\/js\/save\.js"\)/);
+  assert.match(tilemap, /getFlag\("mirrorRoutePrefill"\)/);
+  assert.match(tilemap, /saveApi\.saveGame\(game\)/);
+  assert.match(tilemap, /verb === "restore"[\s\S]*saveApi\.loadGame\(game\)/);
+});
+
 Then("the iOS wrapper opens new-window web links externally", function () {
   const swift = readFileSync(new URL("../../../ios/Sources/BlackwoodApp.swift", import.meta.url), "utf8");
   assert.match(swift, /WKUIDelegate/);
