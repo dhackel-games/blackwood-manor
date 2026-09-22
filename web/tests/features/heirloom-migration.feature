@@ -84,6 +84,17 @@ Feature: Heirloom correction save migration
     And flag "heirloomsTransformed" is set
     And the game score is 205
 
+  Scenario: A corrected migrated save remains stable after another save and restore
+    Given a preceding-redesign save with the goggles deposited is restored
+    When I round-trip the game snapshot
+    Then item "familyRing" is in "reliquary"
+    And item "xrayGoggles" is carried
+    And item "backwardsWatch" is worn in slot "wrist"
+    And flag "heirloomScore:familyRing" is set
+    And flag "heirloomScore:xrayGoggles" is unset
+    And flag "curseLiftable" is set
+    And the game score is 200
+
   Scenario: Withdrawn erroneous goggles credit prevents double-scoring the family ring
     Given a preceding-redesign save with withdrawn goggles credit is restored
     Then item "familyRing" is in "nightDrawer"
