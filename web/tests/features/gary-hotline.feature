@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.096:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -8,16 +8,16 @@ Feature: Gary's hint line
   Background:
     Given a fresh manor game
 
-  Scenario: Gary identifies the newly required Woodblack Watch
+  Scenario: Gary identifies the newly required Blackwood Hammer
     Given flag "frontDoorOpen" is set
     And item "candlestick" is carried
     And item "matches" is carried
     When I send "light candle"
-    Given every treasure but the "backwardsWatch" is already in the reliquary
+    Given every treasure but the "blackwoodHammer" is already in the reliquary
     When I send "call"
     Then the output contains "NURSERY"
     And the output contains "WALLPAPER"
-    And the output contains "WOODBLACK WATCH"
+    And the output contains "BLACKWOOD HAMMER"
 
   Scenario: Call Gary, converse, hang up, and resume play
     When I send "call"

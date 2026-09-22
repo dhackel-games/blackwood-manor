@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -55,6 +55,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "wingedShoes" is carried
     And item "rubyRing" is carried
     And item "talisman" is carried
+    And item "backwardsWatch" is carried
     When I play this command sequence:
       """
       wear headlamp
@@ -62,12 +63,14 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
       wear shoes
       wear ring
       wear talisman
+      wear watch
       """
     Then item "headlamp" is worn in slot "head"
     And item "xrayGoggles" is worn in slot "eyes"
     And item "wingedShoes" is worn in slot "feet"
     And item "rubyRing" is worn in slot "finger"
     And item "talisman" is worn in slot "neck"
+    And item "backwardsWatch" is worn in slot "wrist"
     And the inventory load is 0
     When the player moves directly to room "grandHall"
     And I send "put ring in reliquary"
@@ -93,21 +96,31 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the output contains "Still worn"
     And the output contains "BACKPACK"
 
-  Scenario: XRAY GOGGLES are hidden in the hall bedroom drawer
+  Scenario: The Woodblack Watch is hidden in the hall bedroom drawer
     Given the player is in room "landing"
     When I send "north"
     Then the current room is "hallBedroom"
     And the output contains "NIGHT TABLE"
     When I send "open drawer"
-    Then the output contains "GOGGLES"
-    When I send "wear goggles"
-    Then the output contains "(get XRAY GOGGLES; wear XRAY GOGGLES)"
-    And item "xrayGoggles" is worn in slot "eyes"
-    And vision status is permanent
-    When the player moves directly to room "garden"
-    And I send "look"
-    Then the output contains "THIRD EYE (👁️ ∞)"
+    Then the output contains "WOODBLACK WATCH"
+    When I send "wear watch"
+    Then the output contains "(get WOODBLACK WATCH; wear WOODBLACK WATCH)"
+    And item "backwardsWatch" is worn in slot "wrist"
+    When I send "show garden in watch"
+    Then the output contains "WOODBLACK WATCH — OVERGROWN GARDEN"
     And the output contains "IRON KEY"
+
+  Scenario: PUT ALL leaves the worn Woodblack Watch on the player
+    Given item "backwardsWatch" is carried
+    And item "familyCrest" is carried
+    And the player is in room "grandHall"
+    When I send "wear watch"
+    And I send "put all in reliquary"
+    Then item "backwardsWatch" is carried
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "familyCrest" is in "reliquary"
+    And the output contains "Still worn"
+    And the output contains "WOODBLACK WATCH"
 
   Scenario: Wearing the WINGED SHOES shows the flying-shoe art and lift-off flavor
     Given item "wingedShoes" is carried

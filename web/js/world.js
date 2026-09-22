@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -27,7 +27,6 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   bell: "bell",
   belfryBellRope: "bellrope",
   belfryBats: "bats",
-  batSightMirror: "batsight",
   bellCloset: "bellcloset",
   closetBellRope: "closetrope",
   mysteryPackage: "package",
@@ -67,12 +66,15 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   familyCrest: "crest",
   hallBed: "hallbed",
   hallMirror: "hallmirror",
+  mirrorShard: "shard",
   nightTable: "nightstand",
   nightDrawer: "drawer",
   bedsideLamp: "bedlamp",
   xrayGoggles: "goggles",
   frontDoor: "frontd",
   candlestick: "candlestick",
+  candelabraFrame: "fixture",
+  candelabra: "candelabra",
   matches: "matches",
   rope: "coil",
   cellarDoor: "cellard",
@@ -95,6 +97,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   crystalDecanter: "decanter",
   ancestralPortrait: "ancestral",
   backwardsWatch: "woodblack",
+  blackwoodHammer: "bmhammer",
   clockTalisman: "gclock",
   emeraldOfTheQueen: "qemerald",
   queenPetrified: "medusa",
@@ -244,21 +247,21 @@ function ringBelfryBell(ctx, fromBelfry = true) {
   }
   ctx.setFlag("belfryBatsScattered", true);
   ctx.moveItem("belfryBats", null);
-  const mirrorWasHidden = ctx.roomOf("batSightMirror") == null;
-  if (mirrorWasHidden) ctx.moveItem("batSightMirror", "belfry");
-  const points = awardProgress(ctx, "belfryMirrorFreed");
+  const gogglesWereHidden = ctx.roomOf("xrayGoggles") == null;
+  if (gogglesWereHidden) ctx.moveItem("xrayGoggles", "belfry");
+  const points = awardProgress(ctx, "belfryGogglesFreed");
   return result + (fromBelfry
     ? "Hundreds of BATS burst from the rafters in a black cyclone." +
-      (mirrorWasHidden
-        ? " In their panic they release something hidden above the bell: a silver HAND MIRROR. It strikes " +
-          "the boards, spins once, and settles at your feet without breaking."
+      (gogglesWereHidden
+        ? " In their panic they release something hidden above the bell: antique XRAY GOGGLES in a " +
+          "blackened-brass frame. They strike the boards and skid to your feet, the BM monogram still bright."
         : "")
     : "A violent storm of wings erupts somewhere high above. After it fades, something strikes the floor " +
       "overhead with a sharp metallic CLUNK.") +
     awardSuffix(points);
 }
 
-function resolveBatSightRoom(ctx, phrase) {
+function resolveWatchRoom(ctx, phrase) {
   const wanted = String(phrase || "").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (!wanted) return null;
   const matches = Object.entries(ctx.world.rooms)
@@ -284,8 +287,8 @@ function containingRoom(ctx, item) {
   return null;
 }
 
-function resolveBatSightDestination(ctx, phrase) {
-  const roomMatch = resolveBatSightRoom(ctx, phrase);
+function resolveWatchDestination(ctx, phrase) {
+  const roomMatch = resolveWatchRoom(ctx, phrase);
   if (roomMatch) {
     const [roomId, room] = roomMatch;
     return { roomId, room, label: room.name };
@@ -299,7 +302,7 @@ function resolveBatSightDestination(ctx, phrase) {
   return { roomId, room, item, label: item.names[0] };
 }
 
-function prepareBatSightRoute(ctx, roomId) {
+function prepareWatchRoute(ctx, roomId) {
   ctx.setFlag("mirrorRoutePrefill", null);
   try {
     const route = pathToRoom(ctx, roomId).map((step) =>
@@ -313,15 +316,15 @@ function prepareBatSightRoute(ctx, roomId) {
   }
 }
 
-function lookThroughBatSightMirror(ctx, cmd) {
+function lookThroughWoodblackWatch(ctx, cmd) {
   const target = cmd.verb === "show" ? cmd.dobj : cmd.iobj;
   if (!target) {
-    return "The BAT SIGHT MIRROR clouds, waiting for a destination. Name any room: " +
-      "SHOW KITCHEN or ROUTE TO KITCHEN, for example.";
+    return inspectWoodblackWatch(ctx) + "\n\nThe black crystal waits for a destination. Try SHOW KITCHEN, " +
+      "SHOW KITCHEN IN WATCH, LOOK IN WATCH AT KITCHEN, or ROUTE TO DIARY.";
   }
   ctx.setFlag("mirrorRoutePrefill", null);
-  const match = resolveBatSightRoom(ctx, target);
-  if (!match) return `The mirror finds no room called "${target}".`;
+  const match = resolveWatchRoom(ctx, target);
+  if (!match) return `The WOODBLACK WATCH finds no room called "${target}".`;
   const [roomId, room] = match;
   const description = typeof room.desc === "function" ? room.desc(ctx) : room.desc;
   const visionSource = room.highDesc || room.searchDesc;
@@ -329,8 +332,8 @@ function lookThroughBatSightMirror(ctx, cmd) {
   const shapes = ctx.itemsIn(roomId)
     .map((item) => item.roomDesc || item.names?.[0])
     .filter(Boolean);
-  const routeText = prepareBatSightRoute(ctx, roomId);
-  return `BAT SIGHT — ${room.name.toUpperCase()}\n` +
+  const routeText = prepareWatchRoute(ctx, roomId);
+  return `WOODBLACK WATCH — ${room.name.toUpperCase()}\n` +
     (room.art ? MAP_MARK + room.art + MAP_MARK + "\n" : "") +
     `${description || "The room lies silent."}` +
     (vision ? `\n\nTHIRD EYE\n${vision}` : "") +
@@ -338,20 +341,140 @@ function lookThroughBatSightMirror(ctx, cmd) {
     routeText;
 }
 
-function routeWithBatSightMirror(ctx, cmd) {
+function routeWithWoodblackWatch(ctx, cmd) {
   ctx.setFlag("mirrorRoutePrefill", null);
-  if (!ctx.has("batSightMirror")) {
-    return "You need the BAT SIGHT MIRROR before you can GUIDE, PATH, or ROUTE to a room or object.";
+  if (!ctx.has("backwardsWatch")) {
+    return "You need the WOODBLACK WATCH before you can GUIDE, PATH, or ROUTE to a room or object.";
   }
   const target = cmd.dobj || cmd.iobj;
   if (!target) return "Route to what?";
-  const destination = resolveBatSightDestination(ctx, target);
-  if (!destination) return `The mirror finds no room or object called "${target}".`;
+  const destination = resolveWatchDestination(ctx, target);
+  if (!destination) return `The WOODBLACK WATCH finds no room or object called "${target}".`;
   const where = destination.item
     ? `${destination.label.toUpperCase()} is in ${destination.room.name.toUpperCase()}.`
     : destination.room.name.toUpperCase();
-  return `BAT SIGHT ROUTE — ${destination.label.toUpperCase()}\n${where}` +
-    prepareBatSightRoute(ctx, destination.roomId);
+  return `WOODBLACK WATCH ROUTE — ${destination.label.toUpperCase()}\n${where}` +
+    prepareWatchRoute(ctx, destination.roomId);
+}
+
+function hallBedroomSearch(ctx) {
+  const shardStillSet = ctx.roomOf("mirrorShard") === "hallBedroom"
+    && !ctx.getFlag("mirrorShardFreed");
+  const drawer = ctx.item("nightDrawer");
+  return "The BED is untouched. " +
+    (shardStillSet
+      ? "The MIRROR'S central SHARD shifts when touched and looks as though it could be worked free. "
+      : "The broken MIRROR'S center is an empty, hand-sized gap. ") +
+    `The NIGHT TABLE'S BM-handled DRAWER is ${drawer?.open ? "open" : "closed"}.`;
+}
+
+function inspectHallMirror(ctx) {
+  const shardStillSet = ctx.roomOf("mirrorShard") === "hallBedroom"
+    && !ctx.getFlag("mirrorShardFreed");
+  return shardStillSet
+    ? "The HALL BEDROOM MIRROR is broken in a web around one palm-sized central SHARD. The shard is loose " +
+        "enough to TAKE or PULL free without bringing down the rest of the glass. What remains gives you back " +
+        "as a reflection standing slightly farther away than it should."
+    : "The HALL BEDROOM MIRROR is broken around a jagged, hand-sized hole where its central SHARD used to be. " +
+        "What remains gives you back as a reflection standing slightly farther away than it should.";
+}
+
+function freeMirrorShard(ctx) {
+  const shard = ctx.item("mirrorShard");
+  if (ctx.has("mirrorShard")) return "You already carry the MIRROR SHARD.";
+  if (shard?.loc !== "hallBedroom" || ctx.getFlag("mirrorShardFreed")) return null;
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
+    return "Your hands are full. You cannot safely work the MIRROR SHARD free.";
+  }
+  ctx.moveItem("mirrorShard", "inventory");
+  ctx.setFlag("mirrorShardFreed", true);
+  return "You brace the broken frame and work the central MIRROR SHARD free. Its reflective face catches your " +
+    "eye; its blackened, nonreflective back carries only half an inscription.";
+}
+
+function candelabraFixtureDescription(ctx) {
+  const hasShard = !!ctx.getFlag("candelabraShardInstalled");
+  const hasCandle = !!ctx.getFlag("candelabraCandleInstalled");
+  if (hasShard && !hasCandle) {
+    return "The MIRROR SHARD now fits the rundown CANDELABRA'S central recess perfectly, but the letters across " +
+      "its back remain dull. The single candle socket above it is still empty.";
+  }
+  if (hasCandle && !hasShard) {
+    return "The manor's sole CANDLE stands in the rundown CANDELABRA'S socket. Its central mirror-shaped recess " +
+      "is still empty, and the inscription around the base still ends: \"WHEN THE LAST LIGHT MEETS BROKEN—\"";
+  }
+  return "A rundown silver CANDELABRA is fixed to the dining table. One central socket waits for a single CANDLE, " +
+    "and beneath it a mirror-shaped recess breaks an inscription that ends: " +
+    "\"WHEN THE LAST LIGHT MEETS BROKEN—\"";
+}
+
+function diningRoomSearch(ctx) {
+  if (ctx.getFlag("candelabraRestored")) {
+    return ctx.roomOf("candelabra") === "diningRoom"
+      ? "The restored CANDELABRA burns without consuming its candle. The complete inscription circles its base."
+      : "Fresh scratches and a clean silver outline show where the restored CANDELABRA was lifted from the table.";
+  }
+  return candelabraFixtureDescription(ctx) + (ctx.roomOf("candlestick") === "diningRoom"
+    ? " The dry CANDLE beside it will take the manor's single MATCH."
+    : "");
+}
+
+function restoreCandelabra(ctx, installedPiece) {
+  ctx.moveItem("candelabraFrame", null);
+  ctx.moveItem("candelabra", "diningRoom");
+  ctx.setFlag("candelabraRestored", true);
+  ctx.item("candelabra").lit = true;
+  return installedPiece + "\n\nThe fitted shard catches the candle's first impossible spark. Silver branches " +
+    "straighten with a ringing sigh, and five blue-white flames flower across them without consuming the wax. " +
+    "The rundown fixture has become a beautiful, portable BLACKWOOD CANDELABRA.\n\n" +
+    "Around its base, the inscription is complete at last: " +
+    "\"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"";
+}
+
+function installCandelabraPiece(ctx, cmd) {
+  if (ctx.getFlag("candelabraRestored")) return "The BLACKWOOD CANDELABRA is already whole.";
+  const piece = cmd.itemId
+    ? ctx.item(cmd.itemId)
+    : ctx.find(cmd.dobj, ctx.inventory());
+  if (!piece || !ctx.has(piece.id)) return `You need to be carrying the ${cmd.dobj || "piece"} first.`;
+  if (!["mirrorShard", "candlestick"].includes(piece.id)) {
+    return `The ${piece.names[0].toUpperCase()} fits neither the narrow candle socket nor the central mirror recess.`;
+  }
+
+  if (piece.id === "mirrorShard") {
+    if (ctx.getFlag("candelabraShardInstalled")) return "The MIRROR SHARD is already fitted into the central recess.";
+    ctx.moveItem(piece.id, null);
+    ctx.setFlag("candelabraShardInstalled", true);
+    const installed = "You press the MIRROR SHARD into the central recess. It settles flush with a tiny silver click, " +
+      "but its half of the inscription remains soot-dark.";
+    return ctx.getFlag("candelabraCandleInstalled")
+      ? restoreCandelabra(ctx, installed)
+      : installed + " The empty candle socket above it still waits.";
+  }
+
+  if (ctx.getFlag("candelabraCandleInstalled")) return "The sole CANDLE is already seated in the candelabra.";
+  const wasLit = !!piece.lit;
+  piece.lit = false;
+  ctx.moveItem(piece.id, null);
+  ctx.setFlag("candelabraCandleInstalled", true);
+  const installed = "You seat the manor's sole CANDLE in the candelabra's central socket." +
+    (wasLit ? " Its ordinary flame gutters out as the silver grips it." : "");
+  return ctx.getFlag("candelabraShardInstalled")
+    ? restoreCandelabra(ctx, installed)
+    : installed + " The mirror-shaped recess beneath it is still empty.";
+}
+
+function touchCandelabra(ctx, cmd) {
+  const target = `${cmd.iobj || ""} ${cmd.dobj || ""}`.toLowerCase();
+  if (!/\bbrazier\b/.test(target) || ctx.state.room !== "garden") return null;
+  if (!ctx.has("candelabra")) return "You need to carry the CANDELABRA to touch its flame to the BRAZIER.";
+  return lightBrazier(ctx);
+}
+
+function keepCandelabraLit(ctx) {
+  ctx.item("candelabra").lit = true;
+  return "You try to smother the CANDELABRA'S blue-white flames. They bend around your hand and rise again, " +
+    "steady and untouched. This fire has no fuel to spend.";
 }
 
 function pullClosetBellRope(ctx) {
@@ -661,7 +784,7 @@ const PROGRESS_AWARDS = Object.freeze({
   wraithPassed: 5,
   oakPanelAligned: 5,
   trollRiddleSolved: 5,
-  belfryMirrorFreed: 5,
+  belfryGogglesFreed: 5,
   mushroomVisionOpened: 10,
   atticLadderLowered: 5,
   reliquarySealed: 5,
@@ -877,14 +1000,16 @@ function hintEntries(ctx) {
   const dep = (id) => ctx.roomOf(id) === "reliquary";
   const inside = ctx.getFlag("frontDoorOpen");
   const candle = ctx.item("candlestick");
-  const lit = candle && candle.lit;
+  const candelabra = ctx.item("candelabra");
+  const lit = (candle?.loc === "inventory" && candle.lit)
+    || (candelabra?.loc === "inventory" && candelabra.lit);
   const frontDoorHint = ctx.getFlag("statueMoved") || ctx.has("frontKey")
     || ctx.roomOf("frontKey") === "garden"
     ? "You've got the iron key — or it's sitting right there in the garden. TAKE it, go to the PORCH, then UNLOCK DOOR WITH IRON KEY, OPEN DOOR, and go NORTH. That's the entire trick."
     : "The front door's locked, shocker. Some genius buried the key under that leaning STATUE in the garden. MOVE the statue, grab the key, then unlock the front door. In you go. Riveting.";
   const lightHint = ctx.roomOf("matches") === null
-    ? "You burned your only match already, didn't you. DIDN'T YOU. The CANDLESTICK is still in the DINING ROOM, but without that match it is now an extremely expensive paperweight. Next time don't waste the match, pal."
-    : "You want to survive downstairs? TAKE the CANDLESTICK (dining room) and the MATCHES (kitchen), then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
+    ? "You burned your only match already, didn't you. DIDN'T YOU. The CANDLE is still useful in the DINING ROOM'S restoration puzzle, but it will not light by itself until the CANDELABRA is whole."
+    : "You want to survive downstairs? TAKE the CANDLE in the DINING ROOM and the MATCHES in the KITCHEN, then LIGHT CANDLE. You get exactly ONE match. Try to rise to the occasion.";
   const coinHint = ctx.has("rope")
     ? "You've got the rope, congratulations. Go to the garden and ENTER WELL — or just go DOWN. Coin's at the bottom. Try not to end up down there permanently."
     : "There's a coin down the garden WELL. Go down without a ROPE and you SPLATTER — dead, instantly, no do-overs. There's a rope in the KITCHEN. Get it FIRST. I cannot stress this enough.";
@@ -894,22 +1019,30 @@ function hintEntries(ctx) {
       ? "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE."
       : "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   const oakHint = !ctx.getFlag("brazierLit")
-    ? "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry a LIT CANDLESTICK and LIGHT BRAZIER, or LIGHT YOURSELF ON FIRE first."
+    ? "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry the LIT CANDLE, carry the restored CANDELABRA, or LIGHT YOURSELF ON FIRE first."
     : !ctx.getFlag("oakLightAligned")
       ? "TAKE the EMERALD GEM, then follow the path EAST through the PRIVY to the GREAT OAK. EXAMINE the PANEL and PLACE the gems into its BOTTOM, MIDDLE, and TOP SLOTS until the mirrored sunlight converges."
       : ctx.roomOf("spyglass") === "treeFort"
         ? "The oak's PLATFORM alternates between the roots and TREE FORT. ENTER PLATFORM while it's beside you, WAIT for it to rise, then TAKE the BM SPYGLASS."
         : "The BM SPYGLASS from the TREE FORT is the heirloom. PUT SPYGLASS IN RELIQUARY.";
-  const watchHint = !ctx.getFlag("wallGapFound")
-    ? "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER, go IN, and TAKE the WOODBLACK WATCH bearing a Blackwood family inscription."
-    : ctx.roomOf("backwardsWatch") === "betweenWalls"
-      ? "Go IN through the NURSERY wall-gap and TAKE the WOODBLACK WATCH. The inscription on its back makes it a family heirloom, however badly time behaves around it."
-      : "The WOODBLACK WATCH is a Blackwood heirloom, not pocket clutter. PUT WOODBLACK IN TROPHY CASE.";
-  const mirrorHint = !ctx.getFlag("belfryBatsScattered")
-    ? "The last heirloom is hidden among the BATS in the BELFRY. Reach the ROOF, go EAST, then PULL the upper BELL ROPE."
-    : ctx.roomOf("batSightMirror") === "belfry"
-      ? "The bats dropped a silver BAT SIGHT MIRROR onto the BELFRY floor. TAKE it."
-      : "The BAT SIGHT MIRROR is the final family heirloom. PUT BATSIGHT IN RELIQUARY.";
+  const hammerHint = !ctx.getFlag("wallGapFound")
+    ? "The NURSERY'S loose WALLPAPER hides a crawl-gap. PULL WALLPAPER and go IN; a BM-marked BLACKWOOD HAMMER lies in the sawdust between the beams."
+    : ctx.roomOf("blackwoodHammer") === "betweenWalls"
+      ? "Go IN through the NURSERY wall-gap and TAKE the BLACKWOOD HAMMER from the sawdust."
+      : "The BM HAMMER is a family heirloom. PUT BMHAMMER IN RELIQUARY.";
+  const gogglesHint = !ctx.getFlag("belfryBatsScattered")
+    ? "One heirloom is hidden among the BATS in the BELFRY. Reach the ROOF, go EAST, then PULL the upper BELL ROPE."
+    : ctx.roomOf("xrayGoggles") === "belfry"
+      ? "The bats dropped BLACKWOOD XRAY GOGGLES onto the BELFRY floor. TAKE them."
+      : "The XRAY GOGGLES are the belfry heirloom. REMOVE them if worn, then PUT GOGGLES IN RELIQUARY.";
+  const candelabraHint = ctx.getFlag("candelabraRestored")
+    ? "The restored CANDELABRA is the dining-room heirloom. PUT CANDELABRA IN RELIQUARY when you no longer need its flame."
+    : ctx.roomOf("mirrorShard") === "hallBedroom"
+      ? "The DINING ROOM'S rundown CANDELABRA is missing part of its inscription. EXAMINE the broken MIRROR in the HALL BEDROOM and work its loose SHARD free."
+      : "The rundown CANDELABRA needs the MIRROR SHARD in its central recess and the manor's sole CANDLE in its socket. Either piece can go in first.";
+  const watchHint = ctx.roomOf("backwardsWatch") === "nightDrawer"
+    ? "The HALL BEDROOM'S NIGHT TABLE DRAWER holds the WOODBLACK WATCH. Wear it on your WRIST; SHOW a room or ROUTE TO an object and its black glass will guide you."
+    : "The WOODBLACK WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
 
   return [
     { topics: ["front", "door", "key", "statue", "garden", "porch"], done: inside, text: frontDoorHint },
@@ -931,10 +1064,14 @@ function hintEntries(ctx) {
       text: "The TALISMAN that protected you from the WRAITH bears the BM crest on its back. Once the GOLD LOCKET is safely recovered, REMOVE TALISMAN and PUT it in the RELIQUARY as another family heirloom." },
     { topics: ["dragon", "dreadmaw", "apple", "maze", "troll", "vault", "crest", "cave"], done: dep("familyCrest"), text: dragonHint },
     { topics: ["oak", "tree", "fort", "spyglass", "gem", "panel", "brazier", "platform"], done: dep("spyglass"), text: oakHint },
-    { topics: ["candlestick", "candle", "dining", "light"], done: dep("candlestick"),
-      text: "Home stretch. Once every dark room's cleared, the candlestick itself is a treasure — PUT it in the RELIQUARY last. You won't need light in the lit hall." },
-    { topics: ["watch", "woodblack", "wallpaper", "nursery", "wall", "gap"], done: dep("backwardsWatch"), text: watchHint },
-    { topics: ["bat", "bats", "mirror", "belfry", "bell", "rope"], done: dep("batSightMirror"), text: mirrorHint },
+    { topics: ["candelabra", "candle", "candlestick", "shard", "mirror", "dining", "light"],
+      done: dep("candelabra"), text: candelabraHint },
+    { topics: ["hammer", "blackwood", "bm", "wallpaper", "nursery", "wall", "gap"],
+      done: dep("blackwoodHammer"), text: hammerHint },
+    { topics: ["bat", "bats", "goggles", "xray", "belfry", "bell", "rope"],
+      done: dep("xrayGoggles"), text: gogglesHint },
+    { topics: ["watch", "woodblack", "scry", "show", "route", "guide"],
+      done: ctx.roomOf("backwardsWatch") !== "nightDrawer", text: watchHint },
     { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
       text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
@@ -1384,7 +1521,7 @@ function hotlineTalk(ctx, text) {
   }
   if (/\b(feeling|alright)\b/.test(t) || /how are (you|things|ya)/.test(t) || /you (ok|okay|good)/.test(t) || /how.?s it going/.test(t)) {
     return say(ctx, [
-      "How am I, {{player_name}}? It's dark, I'm starving, and you keep calling about a candlestick. Living the dream.",
+      "How am I, {{player_name}}? It's dark, I'm starving, and you keep calling about a candle. Living the dream.",
       "How am I? ...Huh. Nobody asks, {{player_name}}. I'm tired. But this helps, weirdly.",
       "How am I? I'm processing, {{player_name}}. Genuinely. Now, how are YOU? Don't say 'fine.'",
       "How am I? Present. Grateful. Still underpaid. More importantly, {{player_name}}, how's your heart?",
@@ -1524,7 +1661,7 @@ const BURN_LINES = [
 ];
 const BURN_DEATH =
   "With a final, dignified WHUMP, you go up like dry tinder. When the smoke clears there is only a tasteful " +
-  "pile of ash, a faintly scorched candlestick, and — somewhere, unanswered — a phone ringing off the hook.";
+  "pile of ash, a faintly scorched candle, and — somewhere, unanswered — a phone ringing off the hook.";
 function fireStatus(ctx) {
   if (!ctx.getFlag("onFire")) return null;
   return { remaining: Math.max(0, BURN_LINES.length + 1 - (ctx.getFlag("burnTurns") || 0)) };
@@ -2095,18 +2232,26 @@ function lightBrazier(ctx) {
   if (ctx.getFlag("brazierLit")) return "The brazier already blazes, throwing gold-and-green light across the garden.";
   const candle = ctx.item("candlestick");
   const hasLitCandle = candle?.loc === "inventory" && candle.lit && candle.fuel > 0;
-  if (!ctx.getFlag("onFire") && !hasLitCandle) {
+  const candelabra = ctx.item("candelabra");
+  const hasLitCandelabra = candelabra?.loc === "inventory" && candelabra.lit;
+  if (!ctx.getFlag("onFire") && !hasLitCandle && !hasLitCandelabra) {
     return "The moss is grave-damp and the kindling packed tight. A lone MATCH flares too briefly; you need a " +
-      "carried LIT CANDLESTICK to work around the whole bowl, or a far bigger, more reckless flame.";
+      "carried LIT CANDLE, the restored CANDELABRA, or a far bigger, more reckless flame.";
   }
   ctx.setFlag("brazierLit", true);
   const usedBodyFire = ctx.getFlag("onFire");
   const points = usedBodyFire ? STANDALONE_MAX_AWARDS.brazier : 10;
   ctx.addScore(points);
   ctx.moveItem("emberStone", "garden");
+  if (hasLitCandelabra && !usedBodyFire) {
+    ctx.setFlag("brazierMethod", "candelabra");
+    return "You touch one of the CANDELABRA'S steady blue-white flames to the grave-damp moss. Fire races around " +
+      "the bowl in a single bright circle, and the BRAZIER roars up in gold and green.\n\n" +
+      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})`;
+  }
   if (hasLitCandle && !usedBodyFire) {
     ctx.setFlag("brazierMethod", "candle");
-    return "You press the LIT CANDLESTICK to one sodden knot of moss after another, patiently building heat " +
+    return "You press the LIT CANDLE to one sodden knot of moss after another, patiently building heat " +
       "until the scattered flames join. The BRAZIER roars up in gold-and-green fire.\n\n" +
       `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})`;
   }
@@ -2781,8 +2926,8 @@ function reachIntoToilet(ctx, cmd) {
   return takeToiletMushrooms(ctx);
 }
 function deriveCommand(ctx, cmd) {
-  if (cmd.verb === "show" && cmd.dobj && !cmd.iobj && ctx.has("batSightMirror")) {
-    const destination = resolveBatSightRoom(ctx, cmd.dobj);
+  if (cmd.verb === "show" && cmd.dobj && !cmd.iobj && ctx.has("backwardsWatch")) {
+    const destination = resolveWatchRoom(ctx, cmd.dobj);
     if (destination?.[0] === ctx.state.room) {
       cmd.verb = "look";
       cmd.dobj = null;
@@ -2792,14 +2937,14 @@ function deriveCommand(ctx, cmd) {
     }
     if (destination) {
       cmd.prep = "in";
-      cmd.iobj = "batsight";
-      return [`show ${cmd.dobj} in batsight`];
+      cmd.iobj = "woodblack";
+      return [`show ${cmd.dobj} in woodblack`];
     }
   }
-  if (cmd.verb === "route" && cmd.dobj && !cmd.iobj && ctx.has("batSightMirror")) {
+  if (cmd.verb === "route" && cmd.dobj && !cmd.iobj && ctx.has("backwardsWatch")) {
     cmd.prep = "with";
-    cmd.iobj = "batsight";
-    return [`route ${cmd.dobj} with batsight`];
+    cmd.iobj = "woodblack";
+    return [`route ${cmd.dobj} with woodblack`];
   }
   if (ctx.state.room !== "privy" || ctx.getFlag("outhouseMushroomsFound")) return [];
   if (!["take", "eat", "reach", "use"].includes(cmd.verb)) return [];
@@ -3117,8 +3262,10 @@ function endBadges(ctx) {
     b.push("🔥 BADGE: \"Out Of The Frying Pan\" — you escaped Blackwood Manor WHILE STILL ON FIRE. Gary is, for once, speechless.");
   if (ctx.getFlag("brazierMethod") === "body")
     b.push("🕯️ BADGE: \"The Old Ways\" — you lit the ceremonial brazier with your own burning body.");
+  else if (ctx.getFlag("brazierMethod") === "candelabra")
+    b.push("🕯️ BADGE: \"Remembered Flame\" — the restored Blackwood candelabra kindled the ceremonial brazier.");
   else if (ctx.getFlag("brazierMethod") === "candle")
-    b.push("🕯️ BADGE: \"Patient Flame\" — you coaxed the ceremonial brazier alight with the candlestick.");
+    b.push("🕯️ BADGE: \"Patient Flame\" — you coaxed the ceremonial brazier alight with the candle.");
   if ((ctx.getFlag("maxBurnTurns") || 0) >= 4)
     b.push("🥵 BADGE: \"Slow Burn\" — you stayed ablaze for " + ctx.getFlag("maxBurnTurns") + " turns and lived to tell it.");
   if (ctx.getFlag("drankMilk"))
@@ -3347,7 +3494,7 @@ const logicWorld = {
   fireStatus,        // remaining burn turns for the always-on HUD
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   reliquaryStatusValue, // HUD-compatible RELIQUARY count text
-  routeWithMirror: routeWithBatSightMirror,
+  routeWithMirror: routeWithWoodblackWatch,
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -3382,23 +3529,93 @@ const logicWorld = {
       state.items.talisman.worn = false;
       state.score += world.items.talisman.points || 0;
     }
-    const completedBeforeWatch = state.flags.curseLiftable
+    const completedBeforeHammer = state.flags.curseLiftable
       || state.flags.floorDoorOpen
       || state.flags.bellRung
       || state.won;
-    const legacyWatchWasOptional = !savedItems?.backwardsWatch?.treasure;
-    if (legacyWatchWasOptional) {
-      const oldWatchLocation = savedItems?.backwardsWatch?.loc;
-      const watchScoreFlag = world.items.backwardsWatch.depositScoreFlag;
+    const oldMirror = savedItems?.batSightMirror?.treasure
+      ? savedItems.batSightMirror
+      : null;
+    const oldWatch = savedItems?.backwardsWatch;
+    const oldWatchWasHeirloom = !!oldWatch?.treasure;
+    const oldCandlestick = savedItems?.candlestick;
+    const oldCandlestickWasHeirloom = !!oldCandlestick?.treasure;
+    const needsHeirloomRedesign = !!oldMirror || oldWatchWasHeirloom || oldCandlestickWasHeirloom;
+
+    if (needsHeirloomRedesign) {
+      const oldGoggles = savedItems?.xrayGoggles;
+      const oldGogglesLocation = oldGoggles?.loc;
+      const oldGogglesWereMoved = oldGogglesLocation != null && oldGogglesLocation !== "nightDrawer";
+      const oldMirrorLocation = oldMirror?.loc;
+      const oldMirrorWasDeposited = ["reliquary", "clockTalisman"].includes(oldMirrorLocation);
+      const gogglesLocation = oldMirrorWasDeposited
+        ? oldMirrorLocation
+        : oldMirrorLocation === "inventory"
+          ? "inventory"
+          : oldGogglesWereMoved
+            ? oldGogglesLocation
+            : oldMirrorLocation === "belfry" || state.flags.belfryBatsScattered
+              ? "belfry"
+              : null;
+      state.items.xrayGoggles.loc = gogglesLocation;
+      state.items.xrayGoggles.worn = gogglesLocation === "inventory" && !!oldGoggles?.worn;
+      state.items.backwardsWatch.loc = oldGogglesLocation == null ? "nightDrawer" : oldGogglesLocation;
+      state.items.backwardsWatch.worn =
+        state.items.backwardsWatch.loc === "inventory" && !!oldGoggles?.worn;
+
+      const mirrorClaimed = !!oldMirrorLocation && oldMirrorLocation !== "belfry";
+      if (mirrorClaimed) state.flags["progressItem:xrayGoggles"] = true;
+      if (state.flags["heirloomScore:batSightMirror"]
+          || oldMirrorWasDeposited || state.flags.heirloomsTransformed) {
+        state.flags["heirloomScore:xrayGoggles"] = true;
+      }
+
+      const oldWatchLocation = oldWatch?.loc;
       const oldWatchWasClaimed = !!oldWatchLocation && oldWatchLocation !== "betweenWalls";
-      if (oldWatchWasClaimed) state.flags[watchScoreFlag] = true;
-      if (completedBeforeWatch) {
-        state.items.backwardsWatch.loc = "reliquary";
+      const hammerLocation = !oldWatchWasHeirloom && completedBeforeHammer
+        ? (state.flags.heirloomsTransformed ? "clockTalisman" : "reliquary")
+        : (oldWatchLocation ?? "betweenWalls");
+      state.items.blackwoodHammer.loc = hammerLocation;
+      if (state.flags["heirloomScore:backwardsWatch"]
+          || ["reliquary", "clockTalisman"].includes(hammerLocation)
+          || (!oldWatchWasHeirloom && oldWatchWasClaimed)
+          || state.flags.heirloomsTransformed) {
+        state.flags["heirloomScore:blackwoodHammer"] = true;
       }
-      if (completedBeforeWatch && !oldWatchWasClaimed) {
-        state.score = (state.score || 0) + (world.items.backwardsWatch.points || 0);
-        state.flags[watchScoreFlag] = true;
+      if (!oldWatchWasHeirloom && completedBeforeHammer && !oldWatchWasClaimed) {
+        state.score = (state.score || 0) + (world.items.blackwoodHammer.points || 0);
       }
+
+      const oldCandlestickLocation = oldCandlestick?.loc;
+      const restoredCandelabra = oldCandlestickWasHeirloom
+        && (["reliquary", "clockTalisman"].includes(oldCandlestickLocation)
+          || state.flags.heirloomsTransformed);
+      if (restoredCandelabra) {
+        state.items.candlestick.loc = null;
+        state.items.mirrorShard.loc = null;
+        state.items.candelabraFrame.loc = null;
+        state.items.candelabra.loc =
+          oldCandlestickLocation === "clockTalisman" || state.flags.heirloomsTransformed
+            ? "clockTalisman"
+            : "reliquary";
+        state.flags.candelabraCandleInstalled = true;
+        state.flags.candelabraShardInstalled = true;
+        state.flags.candelabraRestored = true;
+      } else if (oldCandlestickWasHeirloom && state.items.candlestick.loc == null) {
+        state.items.candlestick.loc = "diningRoom";
+      }
+      if (state.flags["heirloomScore:candlestick"]
+          || restoredCandelabra || state.flags.heirloomsTransformed) {
+        state.flags["heirloomScore:candelabra"] = true;
+      }
+      state.flags.heirloomRedesignMigrated = true;
+    }
+    if (state.flags["progressAward:belfryMirrorFreed"]
+        && !state.flags["progressAward:belfryGogglesFreed"]) {
+      state.flags["progressAward:belfryGogglesFreed"] = true;
+    }
+    if (state.flags.candelabraRestored || state.items.candelabra.loc !== null) {
+      state.items.candelabra.lit = true;
     }
     const collectionComplete = Object.entries(world.items)
       .filter(([, definition]) => definition.treasure)
@@ -3441,6 +3658,7 @@ const logicWorld = {
       wraithPassed: state.flags["seen:crypt"],
       oakPanelAligned: state.flags.oakLightAligned,
       trollRiddleSolved: state.flags.dragonVaultOpen,
+      belfryGogglesFreed: state.flags.belfryBatsScattered,
       mushroomVisionOpened: state.flags.vaultFound,
       atticLadderLowered: state.flags.ladderDown,
       reliquarySealed: state.flags.curseLiftable && state.flags.reliquarySealed,
@@ -3821,6 +4039,7 @@ const logicWorld = {
 
     diningRoom: {
       art: ROOM_ART.diningRoom,
+      searchDesc: diningRoomSearch,
       exits: { east: "grandHall", south: "kitchen" },
     },
 
@@ -3931,10 +4150,11 @@ const logicWorld = {
     hallBedroom: {
       art: [
         "  .--------------.",
-        "  | BED    ( O ) |",
+        "  | BED    ( / ) |",
         "  |        [_]   |",
         "  '----DOOR------'",
       ].join("\n"),
+      searchDesc: hallBedroomSearch,
       exits: { south: "landing" },
     },
 
@@ -4110,19 +4330,17 @@ const logicWorld = {
       names: ["bats", "bat", "colony"], adjectives: ["roosting", "black"],
       loc: "belfry", fixed: true, scenery: true,
       on: {
-        examine: () => "Hundreds of black BATS crowd the belfry rafters above the BELL. Something silver glints among them.",
+        examine: () => "Hundreds of black BATS crowd the belfry rafters above the BELL. Dark lenses and " +
+          "Blackwood brass glint among them.",
       },
     },
-    batSightMirror: {
-      names: ["bat sight mirror", "mirror", "hand mirror"],
-      adjectives: ["bat", "sight", "bat-sight", "silver", "hand"],
+    xrayGoggles: {
+      names: ["xray goggles", "goggles", "glasses"],
+      adjectives: ["blackwood", "bm", "xray", "x-ray", "brass", "antique"],
       loc: null, takeable: true, treasure: true, points: 20,
-      on: {
-        examine: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
-        show: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
-        use: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
-        read: (ctx, cmd) => lookThroughBatSightMirror(ctx, cmd),
-      },
+      wearable: true, wearSlot: "eyes",
+      grantsMushroomVision: true, grantsDarkVision: true,
+      progressPoints: 5, progressFlag: "progressItem:xrayGoggles",
     },
     bellCloset: {
       names: ["closet", "bell closet"], adjectives: ["bell", "narrow", "wooden"],
@@ -4175,7 +4393,13 @@ const logicWorld = {
     brazier: {
       names: ["brazier", "firebowl", "bowl"], adjectives: ["iron", "cold", "ceremonial", "old"],
       loc: "garden", fixed: true,
-      on: { light: lightBrazier, burn: lightBrazier },
+      on: {
+        light: lightBrazier,
+        burn: lightBrazier,
+        touch(ctx, cmd) {
+          return /\bcandelabra\b/i.test(cmd.iobj || "") ? lightBrazier(ctx) : null;
+        },
+      },
     },
     emberStone: {
       names: ["emerald gem", "gem", "emerald", "stone"], adjectives: ["emerald", "green", "glassy"],
@@ -4332,8 +4556,21 @@ const logicWorld = {
       loc: "hallBedroom", fixed: true, scenery: true,
     },
     hallMirror: {
-      names: ["mirror"], adjectives: ["hall", "bedroom", "tarnished"],
+      names: ["mirror", "bedroom mirror", "broken mirror"],
+      adjectives: ["hall", "bedroom", "tarnished", "broken"],
       loc: "hallBedroom", fixed: true, scenery: true,
+      on: { examine: inspectHallMirror, search: inspectHallMirror },
+    },
+    mirrorShard: {
+      names: ["mirror shard", "shard", "glass shard"],
+      adjectives: ["mirror", "glass", "jagged", "central"],
+      loc: "hallBedroom", takeable: true,
+      on: {
+        take: freeMirrorShard,
+        pull: freeMirrorShard,
+        move: freeMirrorShard,
+        remove: freeMirrorShard,
+      },
     },
     nightTable: {
       names: ["table", "nightstand"], adjectives: ["night", "bedside", "small"],
@@ -4349,11 +4586,15 @@ const logicWorld = {
       loc: "hallBedroom", fixed: true, scenery: true,
       lightSource: true, selfPowered: true, lit: false,
     },
-    xrayGoggles: {
-      names: ["goggles", "glasses"], adjectives: ["xray", "x-ray", "plastic", "cheap"],
-      loc: "nightDrawer", takeable: true, wearable: true, wearSlot: "eyes",
-      grantsMushroomVision: true, grantsDarkVision: true,
-      progressPoints: 5, progressFlag: "progressItem:xrayGoggles",
+    backwardsWatch: {
+      names: ["woodblack watch", "woodblack", "watch", "wristwatch"],
+      adjectives: ["woodblack", "tarnished", "backwards", "brass", "bm"],
+      loc: "nightDrawer", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
+      on: {
+        examine: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
+        show: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
+        read: (ctx, cmd) => lookThroughWoodblackWatch(ctx, cmd),
+      },
     },
     frontDoor: {
       names: ["door", "house", "manor", "mansion"], adjectives: ["front", "oak", "great"],
@@ -4375,8 +4616,8 @@ const logicWorld = {
 
     // --- light ---
     candlestick: {
-      names: ["candlestick", "candle"], adjectives: ["silver", "tarnished"], loc: "diningRoom",
-      takeable: true, treasure: true, points: 10, lightSource: true, lit: false, fuel: 120,
+      names: ["candle", "candlestick"], adjectives: ["white", "wax", "silver", "portable"], loc: "diningRoom",
+      takeable: true, lightSource: true, lit: false, fuel: 120,
       on: {
         light(ctx) {
           const c = ctx.item("candlestick");
@@ -4386,9 +4627,33 @@ const logicWorld = {
           if (!match) return "You have nothing to light it with.";
           c.lit = true;
           ctx.destroy(match.id);
-          return "You strike a match and touch it to the wick. The candle flares to life, throwing " +
+          return "You strike the manor's single match and touch it to the wick. The CANDLE flares to life, throwing " +
             "long shadows — and the spent match crumbles to ash. (You have no more matches.)";
         },
+      },
+    },
+    candelabraFrame: {
+      names: ["candelabra", "fixture", "socket", "recess"],
+      adjectives: ["rundown", "incomplete", "silver", "dining"],
+      loc: "diningRoom", fixed: true, container: true, capacity: 2,
+      bulkTransfer: false,
+      bulkTransferMsg: "The rundown CANDELABRA must be restored one deliberate piece at a time.",
+      on: {
+        examine: candelabraFixtureDescription,
+        search: candelabraFixtureDescription,
+        put: installCandelabraPiece,
+      },
+    },
+    candelabra: {
+      names: ["candelabra", "candleholder"],
+      adjectives: ["blackwood", "restored", "silver", "lit", "bm"],
+      loc: null, takeable: true, treasure: true, points: 10,
+      lightSource: true, selfPowered: true, lit: true,
+      on: {
+        light: () => "The CANDELABRA already burns with five steady blue-white flames.",
+        extinguish: keepCandelabraLit,
+        off: keepCandelabraLit,
+        touch: touchCandelabra,
       },
     },
     matches: {
@@ -4552,13 +4817,11 @@ const logicWorld = {
       takeable: true, treasure: true, points: 20, scenery: true,
     },
 
-    // --- the only thing in the space between the walls ---
-    backwardsWatch: {
-      names: ["woodblack watch", "woodblack", "watch", "pocket watch"],
-      adjectives: ["tarnished", "woodblack", "backwards", "brass"],
+    // --- the heirloom hidden in the space between the walls ---
+    blackwoodHammer: {
+      names: ["blackwood hammer", "bm hammer", "hammer"],
+      adjectives: ["blackwood", "bm", "iron", "ash-handled"],
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
-      depositScoreFlag: "heirloomScore:backwardsWatch",
-      on: { examine: inspectWoodblackWatch, read: inspectWoodblackWatch },
     },
 
     // ===== BLACKWOOD MANOR II — Part II items (the thirteen-hour clock) =======
@@ -4625,11 +4888,9 @@ export const world = composeWorld(logicWorld, content);
 
 // ---- handler function definitions referenced above --------------------------
 function inspectWoodblackWatch(ctx) {
-  const remaining = Math.max(0, REQUIRED_FAMILY_ITEM_COUNT - depositedFamilyItemCount(ctx));
-  const heirlooms = remaining === 1 ? "heirloom remains" : "heirlooms remain";
-  return "The WOODBLACK WATCH has no hands and marks no hour. Its face shows only the number " +
-    `${remaining}: ${remaining} ${heirlooms} to place in the RELIQUARY TROPHY CASE. On the back, beneath your reflection, ` +
-    "a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"";
+  return "The WOODBLACK WATCH has no hands and marks no hour. Its black crystal face reflects the room, then " +
+    "quietly shows someplace else. On the back, beneath your reflection, a family inscription reads: " +
+    "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"";
 }
 
 function revealKey(ctx) {

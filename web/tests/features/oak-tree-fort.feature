@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -197,19 +197,20 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And flag "floorDoorOpen" is set
     And item "talisman" is in "reliquary"
 
-  Scenario: A completed pre-watch collection gains the newly required heirloom
+  Scenario: A completed pre-watch collection gains the replacement hammer
     Given a completed pre-watch save is restored
-    Then item "backwardsWatch" is in "reliquary"
+    Then item "blackwoodHammer" is in "reliquary"
+    And item "backwardsWatch" is in "nightDrawer"
     And the required family item count is 13
     And flag "curseLiftable" is set
     And flag "floorDoorOpen" is set
     And the game score is 12
 
-  Scenario: A claimed legacy watch does not score again when deposited
+  Scenario: A claimed legacy watch maps to the hammer without scoring twice
     Given an in-progress pre-watch save with the watch already claimed is restored
     And the player is in room "grandHall"
-    When I send "put woodblack in reliquary"
-    Then item "backwardsWatch" is in "reliquary"
+    When I send "put hammer in reliquary"
+    Then item "blackwoodHammer" is in "reliquary"
     And the game score is 12
 
 # end oak-tree-fort.feature

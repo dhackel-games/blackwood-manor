@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
 
 # Blackwood Manor
 
@@ -65,9 +65,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   diverge. Supernatural hazards still apply.
 - **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
-  HEADLAMP provides 200 turns of light with a `💡` HUD countdown; XRAY GOGGLES
-  show `👁️ ∞` and reveal the same clues as mushroom vision; WINGED SHOES show
-  `🪽 ∞` and provide permanent named-room flight while worn.
+  HEADLAMP provides 200 turns of light with a `💡` HUD countdown; the antique
+  BM-marked XRAY GOGGLES dropped by the belfry bats show `👁️ ∞` and reveal the
+  same clues as mushroom vision; WINGED SHOES show `🪽 ∞` and provide permanent
+  named-room flight while worn. The HALL BEDROOM drawer holds the WRIST-slot
+  WOODBLACK WATCH, which scries rooms and prepares routes but is not an heirloom.
   The OBSIDIAN EYE must be worn on the FOREHEAD to provide permanent hidden
   sight (`👁️ ∞`); it can coexist with XRAY GOGGLES but does not illuminate darkness.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
@@ -108,7 +110,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   clean front-door ending; `::winmaxgary` instead takes the clock and descends
   to Gary. `::powerup` equips reusable powers, while `::winquick1` completes the
   shorter required-heirloom route and stops after the bell but before walking
-  out. The maximum routes intentionally leave the random MYSTERY PACKAGE unopened.
+  out. The replacement set keeps the 195-point heirloom total and the maintained
+  maximum checkpoints: 440 before the bell, 445 on the Gary route after it, and
+  490 through the front-door ending. The maximum routes intentionally leave the
+  random MYSTERY PACKAGE unopened.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,
@@ -124,17 +129,30 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   DOOR shut and then wide open, and opens the floor trapdoor. EXAMINE the
   RELIQUARY to discover the clock. Leaving ends the game; carrying the clock is
   required before descending to Gary.
-- **Belfry and Bat Sight Mirror:** the great BELL and upper ROPE are in the
+- **Broken mirror and candelabra:** the HALL BEDROOM MIRROR has a removable
+  central SHARD whose nonreflective back carries half an inscription. The
+  DINING ROOM'S rundown CANDELABRA has the complementary inscription, a
+  mirror-shaped recess, and one empty candle socket. Fit the SHARD and the
+  manor's sole portable CANDLE in either order to restore a beautiful, takeable
+  +10 heirloom. Its blue-white flames never consume fuel and can light the
+  GARDEN BRAZIER with `LIGHT BRAZIER`, `LIGHT BRAZIER WITH CANDELABRA`, or
+  `TOUCH CANDELABRA TO BRAZIER`.
+- **Belfry goggles and Woodblack Watch:** the great BELL and upper ROPE are in the
   BELFRY, where the rope continues through a hole in the floor. Pulling either
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
-  required BAT SIGHT MIRROR (+20 when deposited). `SHOW <room> IN MIRROR`,
-  or simply `SHOW <room>` while carrying it, displays that room's normal and
+  required BLACKWOOD XRAY GOGGLES (+20 when deposited). The retired Bat Sight
+  Mirror is absent from new games. The WOODBLACK WATCH now provides its utility:
+  `SHOW <room> IN WATCH`, or simply `SHOW <room>` while carrying it, displays that room's normal and
   THIRD EYE descriptions, then prefills the unexecuted directions. `GUIDE`,
   `PATH`, or `ROUTE TO <room-or-object>` finds the destination through the
-  mirror and likewise leaves the route in the command entry without running
-  it. `LOOK IN MIRROR AT <room>` remains an exact synonym. `::powerup` now
-  collects the mirror. The mirror replaces the removed Family Ring; the
-  Ravenblood Signet is now the **Ravenblood Ring**.
+  watch and likewise leaves the route in the command entry without running it.
+  `LOOK IN WATCH AT <room>` is an exact synonym. The watch no longer reports a
+  reliquary count and stays on the player's wrist during `PUT ALL`.
+- **Thirteen heirlooms:** the required set is the BM SPYGLASS, BLACKWOOD XRAY
+  GOGGLES, BLACKWOOD FAMILY CREST, restored CANDELABRA, GRIMOIRE, TALISMAN,
+  JEWELED MUSIC BOX, RAVENBLOOD RING, GOLD LOCKET, ANCIENT COIN, CRYSTAL
+  DECANTER, ANCESTRAL PORTRAIT, and BLACKWOOD HAMMER. The MUSIC BOX remains in
+  the NURSERY with the TINY KEY inside.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -190,8 +208,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 
 - **Never move in the dark.** "It is pitch black. You are likely to be eaten by
   a grue." is your only warning. Keep a light burning.
-- Your candle's fuel is **finite**, and you have exactly **one match**. Don't
-  waste either — it is possible to strand yourself. `save` often.
+- Your loose candle's fuel is **finite**, and you have exactly **one match**.
+  Restoring the candelabra makes its flame permanent. `save` often.
 - Some doors, drops, and the crypt are **lethal** without the right preparation.
 
 ## Project layout
@@ -202,7 +220,8 @@ css/style.css         green-on-black CRT styling
 js/core.js            game state + rules (DOM-free, testable in Node)
 js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
-js/world.js           ★ ALL CONTENT — rooms, items, puzzles (edit this to expand)
+js/world.js           world structure, handlers, and dynamic prose
+js/world.content.js   static player-facing room and item prose
 js/hud.js             declarative HudSlot definitions and renderer
 js/native.js          native bridge detection, messaging, and version formatting
 js/ui.js              browser terminal adapter

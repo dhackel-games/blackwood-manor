@@ -1,4 +1,4 @@
-# player-name.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
+# player-name.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @unit
 Feature: Player name and message templates
@@ -62,6 +62,7 @@ Feature: Player name and message templates
     When I send "examine woodblack watch"
     Then the output contains "beneath your reflection"
     And the output does not contain "Ada's reflection"
+    And the output does not contain "heirlooms remain"
 
   Scenario: Gary addresses the player by the authored name token
     Given a fresh unnamed manor game

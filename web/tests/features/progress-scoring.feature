@@ -1,4 +1,4 @@
-# progress-scoring.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-12.069:acoven.
+# progress-scoring.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @unit
 Feature: One-time rewards for meaningful progress
@@ -116,7 +116,7 @@ Feature: One-time rewards for meaningful progress
     Then the current room is "betweenWalls"
     And the output contains "(+20)"
     And the game score is 25
-    When I send "take woodblack"
+    When I send "take hammer"
     Then the game score is 25
 
   Scenario: Passing the wraith with the talisman awards once
@@ -151,8 +151,9 @@ Feature: One-time rewards for meaningful progress
     When I send "take winged shoes"
     Then the output contains "(+5)"
     And the game score is 25
-    Given the player is in room "hallBedroom"
-    When I send "open drawer"
+    Given flag "progressAward:belfryGogglesFreed" is set
+    And the player is in room "belfry"
+    When I send "pull rope"
     And I send "take xray goggles"
     Then the output contains "(+5)"
     And the game score is 30

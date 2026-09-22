@@ -1,5 +1,18 @@
+<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
+> **UPDATE 2026-09-21 — Part-I heirloom roster redesigned.** The required set
+> remains exactly thirteen and keeps its 195-point deposit total. The BELFRY
+> bats now drop +20 XRAY GOGGLES; the Bat Sight Mirror is retired. The
+> WOODBLACK WATCH moves to the HALL BEDROOM drawer as a non-heirloom WRIST
+> scry/route utility, while a +12 BLACKWOOD HAMMER takes its former place
+> between the walls. The old candlestick becomes the sole portable CANDLE; it
+> and the removable HALL BEDROOM MIRROR SHARD restore the +10 DINING ROOM
+> CANDELABRA. Hour XIII's already-implemented emerald scene remains a
+> non-reliquary Part-II set-piece, so the unbuilt Hours XII–I roster must be
+> reconciled against the current thirteen before those hours ship.
+>
 > **UPDATE 2026-09-15 — the simplified reliquary/clock seam is implemented.**
 > The game shows its title and initial AI status, composes a fallback from
 > 12 titles × 12 spooky moods × 12 garments, greets the player with it, asks
@@ -178,14 +191,16 @@ worked out; the rest are seeds to fill.
 **Design law:** *the object's BM1 location must be earned by its origin.* Don't place things
 randomly — invent the moment that logically strands each heirloom exactly where BM1 finds it.
 
-**Worked example 1 — the bats / the BAT SIGHT MIRROR (BM1: belfry).**
+**Worked example 1 — the bats / the XRAY GOGGLES (BM1: belfry).**
 The great bell's rope runs from the BELFRY through the house to a closet beside
 the front door. Pulling either end rings **DONG... DONG...**, scatters the bats,
-and drops their silver mirror onto the belfry floor. Its black glass can scry any
-named Part-I room. `SHOW <room> IN MIRROR` includes the room's third-eye text and
-prefills the unexecuted short directions; carried-mirror `SHOW <room>` is
-shorthand. `GUIDE`, `PATH`, and `ROUTE TO <room-or-object>` prefill directions
-to a room or an item's location. `LOOK IN MIRROR AT <room>` is an exact synonym.
+and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The goggles
+retain their wearable EYES-slot clue vision and darkness sight. The separate
+WOODBLACK WATCH now owns the old remote-view behavior: `SHOW <room> IN WATCH`
+includes the room's third-eye text and prefills the unexecuted short directions;
+carried-watch `SHOW <room>` is shorthand. `GUIDE`, `PATH`, and `ROUTE TO
+<room-or-object>` prefill directions to a room or an item's location.
+`LOOK IN WATCH AT <room>` is an exact synonym.
 
 **Worked example 2 — the emerald / the garden STATUE (BM1: emerald gem + the leaning garden
 statue that hides the front-door key).**
@@ -204,7 +219,7 @@ grounds set-piece when we lock the 13-row table.*
 | # | Heirloom | BM1 hiding spot (from 0001) | Proposed origin-scene seed |
 |---|---|---|---|
 | 13 | (opening item — TBD) | — | The scene that first sets the clock ticking; likely the RING or GRIMOIRE. |
-| — | BAT SIGHT MIRROR | Belfry | Pulling either bell rope scatters the bats and drops it from their roost. |
+| — | XRAY GOGGLES | Belfry | Pulling either bell rope scatters the bats and drops the BM-marked goggles from their roost. |
 | — | Family CREST | Dreadmaw's vault | Lost/sealed during the working; Dreadmaw set as its warden. |
 | — | GRIMOIRE | Secret chamber | The family's assembly-rite book — hidden behind the wall as the working began. |
 | — | RAVENBLOOD RING | Jewelry box | The line's ring — set aside by a family member in an ordinary moment. |
@@ -213,17 +228,19 @@ grounds set-piece when we lock the 13-row table.*
 | — | LOCKET | Crypt | Buried with someone; the crypt is its true home. |
 | — | DECANTER | Wine cellar | Left mid-pour the night of the struggle. |
 | — | PORTRAIT | Attic | Painted, then exiled to the attic (ties to the painter/dragon magic?). |
-| — | WOODBLACK WATCH | Space-between-walls | Dropped/hidden in a chase through the manor's guts. |
-| — | CANDLESTICK | Dining room | Ordinary object frozen at the scene of a family dinner gone wrong. |
+| — | BLACKWOOD HAMMER | Space-between-walls | Dropped in sawdust during a chase through the manor's exposed beams. |
+| — | RESTORED CANDELABRA | Dining room | Its broken mirror shard and sole candle reunite at the scene of a family dinner gone wrong. |
 | — | SPYGLASS | Tree fort | A child's treasure, carried up to the fort. |
 | — | COIN | (dynamic) | The wildcard — placement chosen at runtime, as today. |
 | — | *(emerald / garden statue tableau)* | Garden (under the statue) | **Worked ex. 2** — Medusa/queen; emerald beneath the petrified woman. |
 
-*(Table shows 14 candidates; the canon 13 must include the emerald — see below — so one current
-entry is swapped out to keep the count at 13. Which one is still open, Q5.)*
+*(Historical note: this table once proposed fourteen candidates and an emerald
+swap. The 2026-09-21 roster above supersedes that proposal; the ancient coin
+remains required and the emerald remains a Part-II set-piece.)*
 
-### RATIFIED 2026-09-14 (David) — the emerald & the Medusa (a HARD hero scene)
-- **The emerald is one of the canon 13.** The garden **statue is critical to the house** — she is
+### SUPERSEDED ROSTER NOTE 2026-09-14 — the emerald & the Medusa (a HARD hero scene)
+- The emerald was proposed as one of the canon 13, but the 2026-09-21 redesign
+  keeps it outside the reliquary set. The garden **statue is critical to the house** — she is
   a **Medusa** who, in the struggle, **turns to stone herself.**
 - **The challenge = make her drop the emerald** *before* she petrifies. **Fail → the emerald turns
   to stone too, and that attempt fails.** One of the "several hard" scenes (see Retry below).
@@ -290,7 +307,7 @@ entry is swapped out to keep the count at 13. Which one is still open, Q5.)*
    `{{player_name}}` templates. There is no second naming prompt after Gary's blow.
 7. **13 time-period scenes**: map + time-overlay + cast-overlay; one findable heirloom each +
    clue stubs. **[SUPERSEDED PROTOTYPE — all 13 hours were sketched, including hour XIII
-   Medusa/emerald and an obsolete hour-II dragon/ring scene. Current hour II is the Bat Sight Mirror
+   Medusa/emerald and an obsolete hour-II dragon/ring scene. The current Part-I belfry heirloom is the XRAY GOGGLES
    in the belfry; Hours XII–I remain unbuilt inline. The 11 easy
    origins are first-draft flavor.]**
 8. **Clock timer**: 13 → 1, gated on correct placement; return-and-place step per item.
@@ -336,37 +353,41 @@ confirm or override):**
   the clock. Continuity is echoed (the garden STATUE is the petrified queen; the antechamber
   PEDESTAL is where the painted dragon will sleep). *Supersedes the earlier single "zero-time hub"
   (Model B).*
-- **Q5 — the canon 13 → the emerald replaces the COIN.** The dynamic wildcard COIN is dropped; the
-  EMERALD joins as hour XIII. The other twelve mirror BM1's `treasure` items exactly.
+- **Q5 — superseded by the 2026-09-21 Part-I roster.** The EMERALD remains the
+  implemented Hour-XIII objective but is not a reliquary heirloom. The ANCIENT
+  COIN remains one of the thirteen required Part-I items.
 - **Try-over count → 5.** (Within your "≈3–5"; at 0, RESTORE/RESTART.)
 - **Hour order → fixed reverse 13 → 1** (below), hard scenes at **XIII** (emerald) and **II**
   (dragon), ouroboros at the **empty hour (0)** after the last placement.
 
-**The provisional canon 13 (hour → heirloom → BM1 hiding spot), as built:**
+**The current Part-I required thirteen (heirloom → BM1 hiding spot):**
 
-| Hour | Heirloom (BM1 id) | BM1 hiding spot | Origin scene |
-|---|---|---|---|
-| XIII | EMERALD *(new; replaces coin)* | under the garden statue | **HARD** — Medusa/queen; wail to free the gem before she petrifies |
-| XII | SPYGLASS (`spyglass`) | tree fort | a child leaves it in the fort |
-| XI | CANDLESTICK (`candlestick`) | dining room | a family dinner before it curdled |
-| X | DECANTER (`crystalDecanter`) | wine cellar | left mid-pour the night of the struggle |
-| IX | MUSIC BOX (`musicBox`) | nursery | the Blackwood child's; never leaves |
-| VIII | LOCKET (`goldLocket`) | crypt | lowered into the earth with its owner |
-| VII | GRIMOIRE (`grimoire`) | secret chamber | the assembly-rite, hidden behind the wall |
-| VI | RAVENBLOOD RING (`rubyRing`) | jewelry box | slipped off and set aside |
-| V | WOODBLACK WATCH (`backwardsWatch`) | between the walls | dropped in a chase |
-| IV | PORTRAIT (`ancestralPortrait`) | attic | painted, then exiled (painter tie-in) |
-| III | FAMILY CREST (`familyCrest`) | Dreadmaw's vault | sealed in as Dreadmaw is made its warden |
-| II | BAT SIGHT MIRROR (`batSightMirror`) | belfry | **HARD** — ring the bell, scatter the bats, and recover the mirror dropped from their roost |
-| I | TALISMAN (`talisman`) | locked safe | locked away the night it all broke — the final placement triggers the ouroboros |
+| Heirloom (BM1 id) | BM1 hiding spot | Origin-scene seed |
+|---|---|---|
+| SPYGLASS (`spyglass`) | tree fort | a child leaves it in the fort |
+| XRAY GOGGLES (`xrayGoggles`) | belfry | ring the bell, scatter the bats, and recover the BM-marked goggles |
+| FAMILY CREST (`familyCrest`) | Dreadmaw's vault | sealed in as Dreadmaw is made its warden |
+| RESTORED CANDELABRA (`candelabra`) | dining room | reunite the broken mirror shard and sole candle |
+| GRIMOIRE (`grimoire`) | secret chamber | the assembly-rite, hidden behind the wall |
+| TALISMAN (`talisman`) | locked safe | locked away the night it all broke |
+| MUSIC BOX (`musicBox`) | nursery | the Blackwood child's; never leaves |
+| RAVENBLOOD RING (`rubyRing`) | jewelry box | slipped off and set aside |
+| GOLD LOCKET (`goldLocket`) | crypt | lowered into the earth with its owner |
+| ANCIENT COIN (`ancientCoin`) | well | lost where a rope is required to retrieve it |
+| CRYSTAL DECANTER (`crystalDecanter`) | wine cellar | left mid-pour the night of the struggle |
+| ANCESTRAL PORTRAIT (`ancestralPortrait`) | attic | painted, then exiled |
+| BLACKWOOD HAMMER (`blackwoodHammer`) | between the walls | dropped in sawdust during a chase through exposed beams |
 
-*(The eleven lighter origins are FIRST-DRAFT flavor — provisional, trivially editable in
-`web/examples/bm2/world.js`'s `HOURS` table.)*
+Hour XIII's EMERALD is already implemented as a non-heirloom temporal objective.
+Assigning the current thirteen across the remaining unbuilt hours is future
+Part-II work; the retired mirror/watch/candlestick hour mapping must not be
+copied forward.
 
 **Still genuinely open (need David/Andy):**
 - **Confirm or override Q4 / Q5** and the eleven lighter origins above.
 - **Hours XII–I and the ouroboros close:** implement them inline after the
-  validated Hour-XIII pattern.
+  validated Hour-XIII pattern, using the 2026-09-21 heirloom roster rather than
+  the retired mirror/watch/candlestick mapping.
 
 ---
 
@@ -377,8 +398,8 @@ confirm or override):**
 - [x] Text-first clock-back **map** (EXAMINE/READ the clock). *(8-bit pass still scheduled off the
       tilemap spike.)*
 - [x] **Try-overs** retry mechanic (spend-and-rewind on a failed challenge).
-- [ ] **Wire Hours XII–I inline** using the validated Hour-XIII seam. Hour II now
-      returns the BAT SIGHT MIRROR to the BELFRY; the excluded dragon/ring
+- [ ] **Wire Hours XII–I inline** using the validated Hour-XIII seam. The
+      belfry-origin scene must now return the XRAY GOGGLES; the excluded dragon/ring
       prototype scene is retired.
 - [ ] **David to confirm/override Q4 (navigate-to-place manor), Q5 (canon-13 swap), the hour order,
       the try-over count, and the 11 lighter origins.** Hours/spots are one-file edits in `HOURS`;

@@ -1,9 +1,10 @@
-# belfry-bat-sight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @unit
-Feature: Belfry bell and Bat Sight Mirror
+Feature: Belfry goggles and Woodblack Watch
   The manor's great bell hangs in the belfry. Its rope continues down to a
   closet beside the front door, while bats guard the thirteenth heirloom above.
+  The Woodblack Watch supplies remote sight and route preparation.
 
   Background:
     Given a fresh manor game
@@ -16,27 +17,37 @@ Feature: Belfry bell and Bat Sight Mirror
     And the output contains "ROPE"
     And the output contains "HOLE in the floor"
 
-  Scenario: Pulling the upper rope rings the bell and drops the mirror
+  Scenario: Pulling the upper rope rings the bell and drops the Blackwood goggles
     Given the player is in room "belfry"
     When I send "pull rope"
     Then the output contains "DONG... DONG..."
     And the output contains "BATS burst"
-    And the output contains "HAND MIRROR"
+    And the output contains "XRAY GOGGLES"
+    And the output contains "BM monogram"
     And the output contains "(+5)"
     And the game score is 5
-    And item "batSightMirror" is in "belfry"
+    And item "xrayGoggles" is in "belfry"
     And item "belfryBats" is destroyed
     And flag "belfryBatsScattered" is true
+    When I send "take goggles"
+    Then the output contains "(+5)"
+    And the game score is 10
+    When I send "examine goggles"
+    Then the output contains "blackened brass"
+    And the output contains "BM"
+    And the output does not contain "cheap plastic"
     When I send "pull rope"
-    Then the game score is 5
+    Then the game score is 10
 
-  Scenario: The Bat Sight Mirror can inspect any named room without moving
-    Given item "batSightMirror" is carried
+  Scenario: The Woodblack Watch can inspect any named room without moving
+    Given item "backwardsWatch" is carried
     And the player is in room "belfry"
-    When I send "look in mirror"
+    When I send "look in watch"
     Then the output contains "SHOW KITCHEN"
-    When I send "look in mirror at kitchen"
-    Then the output contains "BAT SIGHT"
+    And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
+    And the output does not contain "heirloom remains"
+    When I send "look in watch at kitchen"
+    Then the output contains "WOODBLACK WATCH"
     And the output contains "KITCHEN"
     And the output contains "cavernous scullery"
     And the output contains "THIRD EYE"
@@ -45,15 +56,15 @@ Feature: Belfry bell and Bat Sight Mirror
     And the current room is "belfry"
     And flag "seen:kitchen" is unset
 
-  Scenario: The Bat Sight Mirror covers every Part I room
-    Then the Bat Sight Mirror can view every Part I room
+  Scenario: The Woodblack Watch covers every Part I room
+    Then the Woodblack Watch can view every Part I room
 
   Scenario: SHOW reveals third-eye detail and prepares but does not execute the route
-    Given item "batSightMirror" is carried
+    Given item "backwardsWatch" is carried
     And flag "frontDoorOpen" is set
     And the player is in room "belfry"
-    When I send "show library in mirror"
-    Then the output contains "BAT SIGHT — LIBRARY"
+    When I send "show library in watch"
+    Then the output contains "WOODBLACK WATCH — LIBRARY"
     And the output contains "THIRD EYE"
     And the output contains "brass LEVER is polished"
     And the output contains "ROUTE READY"
@@ -61,29 +72,29 @@ Feature: Belfry bell and Bat Sight Mirror
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; e; s"
     And the current room is "belfry"
     And flag "seen:library" is unset
-    And browser mirror routes are prefilled after command submission
+    And browser scry routes are prefilled after command submission
 
-  Scenario: SHOW infers the carried mirror for a different room
-    Given item "batSightMirror" is carried
+  Scenario: SHOW infers the carried watch for a different room
+    Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "show kitchen"
-    Then the output contains "(show KITCHEN in BAT SIGHT MIRROR)"
-    And the output contains "BAT SIGHT — KITCHEN"
+    Then the output contains "(show KITCHEN in WOODBLACK WATCH)"
+    And the output contains "WOODBLACK WATCH — KITCHEN"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
 
   Scenario: SHOW inspects normally when the named room is the current room
-    Given item "batSightMirror" is carried
+    Given item "backwardsWatch" is carried
     And the player is in room "kitchen"
     When I send "show kitchen"
     Then the output contains "CLOSER INSPECTION"
-    And the output does not contain "BAT SIGHT"
+    And the output does not contain "WOODBLACK WATCH —"
     And flag "mirrorRoutePrefill" is unset
 
-  Scenario Outline: Guide commands infer the carried mirror and prefill without moving
-    Given item "batSightMirror" is carried
+  Scenario Outline: Guide commands infer the carried watch and prefill without moving
+    Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "<command>"
-    Then the output contains "(route to KITCHEN with BAT SIGHT MIRROR)"
+    Then the output contains "(route to KITCHEN with WOODBLACK WATCH)"
     And the output contains "ROUTE READY"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; w; s"
     And the current room is "belfry"
@@ -94,17 +105,17 @@ Feature: Belfry bell and Bat Sight Mirror
       | path to kitchen  |
       | route to kitchen |
 
-  Scenario: A mirror route can target an object
-    Given item "batSightMirror" is carried
+  Scenario: A watch route can target an object
+    Given item "backwardsWatch" is carried
     And the player is in room "belfry"
     When I send "route to diary"
-    Then the output contains "(route to LEATHER DIARY with BAT SIGHT MIRROR)"
+    Then the output contains "(route to LEATHER DIARY with WOODBLACK WATCH)"
     And the output contains "DIARY is in STUDY"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; s"
 
-  Scenario Outline: Guide commands explain their mirror requirement
+  Scenario Outline: Guide commands explain their watch requirement
     When I send "<command>"
-    Then the output contains "need the BAT SIGHT MIRROR"
+    Then the output contains "need the WOODBLACK WATCH"
 
     Examples:
       | command          |
@@ -112,18 +123,17 @@ Feature: Belfry bell and Bat Sight Mirror
       | path to kitchen  |
       | route to kitchen |
 
-  Scenario: The mirror replaces the removed Family Ring in the thirteen heirlooms
+  Scenario: The redesigned required set contains exactly thirteen heirlooms
     Then the required family item count is 13
-    And item "familyRing" is absent from game state
-    Given item "rubyRing" is carried
-    When I send "examine ravenblood"
-    Then the output contains "RAVENBLOOD RING"
-    And the output does not contain "RAVENBLOOD SIGNET"
+    And the required family items are exactly "ancestralPortrait,ancientCoin,blackwoodHammer,candelabra,crystalDecanter,familyCrest,goldLocket,grimoire,musicBox,rubyRing,spyglass,talisman,xrayGoggles"
+    And item "batSightMirror" is absent from game state
+    And the player-facing heirloom catalogs and icons match the required set
+    And the static 2D rooms show the redesigned item placements
 
   Scenario: The lower rope transforms a full closed reliquary
-    Given every treasure but the "batSightMirror" is already in the reliquary
+    Given every treasure but the "xrayGoggles" is already in the reliquary
     And the player is in room "grandHall"
-    When I send "put bat sight mirror in reliquary"
+    When I send "put xray goggles in reliquary"
     And I send "close reliquary"
     And I send "open bell closet"
     And I send "pull bell rope"
@@ -154,11 +164,11 @@ Feature: Belfry bell and Bat Sight Mirror
     And the output contains line "HEIRLOOMS: 0/13 +0"
     And flag "bellRung" is unset
     And flag "floorDoorOpen" is unset
-    And item "batSightMirror" is in "belfry"
+    And item "xrayGoggles" is in "belfry"
     And item "belfryBats" is destroyed
     When the player moves directly to room "belfry"
     And I send "look"
-    Then the output contains "BAT SIGHT MIRROR lies on the belfry boards"
+    Then the output contains "BLACKWOOD XRAY GOGGLES rest"
     And the output does not contain "Hundreds of black BATS crowd the rafters"
 
-# end belfry-bat-sight.feature
+# end belfry-xray-watch.feature

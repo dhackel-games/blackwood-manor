@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -43,27 +43,33 @@ Feature: Maintained sysop shortcuts
       | enter platform                    | in platform              |
       | wait                              | z                        |
 
-  Scenario: Winmax2bell includes the new mirror route and stops before the ritual
+  Scenario: Winmax2bell includes the redesigned heirloom route and stops before the ritual
     Then sysop command "::winmax2bell" includes "g belfry"
     And sysop command "::winmax2bell" includes "pull bellrope"
-    And sysop command "::winmax2bell" includes "t batsight"
+    And sysop command "::winmax2bell" includes "u goggles"
+    And sysop command "::winmax2bell" includes "u woodblack"
+    And sysop command "::winmax2bell" includes "put candle in fixture"
+    And sysop command "::winmax2bell" includes "put shard in fixture"
+    And sysop command "::winmax2bell" includes "t candelabra"
     And sysop command "::winmax2bell" includes "put all in rq"
     And sysop command "::winmax2bell" includes "c rq"
     And sysop command "::winmax2bell" includes "o bellcloset"
     And sysop command "::winmax2bell" omits "pull closetrope"
-    And sysop command "::winmax2bell" omits "put batsight in rq"
+    And sysop command "::winmax2bell" omits "put woodblack in rq"
     And every hidden prompt avoids an explicit take immediately before direct use
 
-  Scenario: Powerup and Quick Win use the current equipment and mirror routes
+  Scenario: Powerup and Quick Win use the current equipment and heirloom routes
     Then sysop command "::powerup" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     Then sysop command "::powerup" includes "u shoes"
     And sysop command "::powerup" includes "u goggles"
+    And sysop command "::powerup" includes "u woodblack"
     And sysop command "::powerup" includes "u obsidian"
     And sysop command "::powerup" includes "pull bellrope"
-    And sysop command "::powerup" includes "t batsight"
     And sysop command "::winquick1" includes "g belfry"
     And sysop command "::winquick1" includes "pull bellrope"
-    And sysop command "::winquick1" includes "t batsight"
+    And sysop command "::winquick1" includes "u goggles"
+    And sysop command "::winquick1" includes "u woodblack"
+    And sysop command "::winquick1" includes "t candelabra"
     And sysop command "::winquick1" includes "put all in rq"
     And sysop command "::winquick1" includes "pull closetrope"
     And sysop command "::winquick1" omits "south"
@@ -79,7 +85,8 @@ Feature: Maintained sysop shortcuts
     And item "wingedShoes" is worn in slot "feet"
     And item "talisman" is worn in slot "neck"
     And item "obsidianEye" is worn in slot "forehead"
-    And item "batSightMirror" is carried
+    And item "backwardsWatch" is worn in slot "wrist"
+    And item "batSightMirror" is absent from game state
     And the game is not won
     And the game score is 60
 
@@ -103,7 +110,7 @@ Feature: Maintained sysop shortcuts
     And item "bellCloset" is open
     And flag "progressAward:trollRiddleSolved" is set
     And flag "progressAward:oakPanelAligned" is set
-    And flag "progressAward:belfryMirrorFreed" is set
+    And flag "progressAward:belfryGogglesFreed" is set
     And flag "progressAward:burritoSurvived" is set
     And flag "progressAward:selfFireSurvived" is set
     And flag "progressAward:mushroomVisionOpened" is set

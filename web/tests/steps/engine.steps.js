@@ -1,4 +1,4 @@
-// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
+// engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
@@ -390,7 +390,7 @@ Then("browser restart handling supports both game parts", function () {
     /function beginSession\([\s\S]*game\.needsPlayerName\(\)\) game\.useDefaultPlayerName\(\)/s);
 });
 
-Then("browser mirror routes are prefilled after command submission", function () {
+Then("browser scry routes are prefilled after command submission", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui,
     /const mirrorRoute = game\.getFlag\("mirrorRoutePrefill"\)[\s\S]*game\.setFlag\("mirrorRoutePrefill", null\)/s);

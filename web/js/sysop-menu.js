@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.098:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -105,10 +105,10 @@ const POWERUP = [
   "wear shoes",
   "fly belfry",
   "pull bellrope",
-  "take batsight",
+  "wear goggles",
   "fly hallbr",
   "open drawer",
-  "wear goggles",
+  "wear woodblack",
   "fly parlor",
   "move profile",
   "open safe with 7 3 9",
@@ -129,10 +129,11 @@ const QUICK_COLLECTION = [
   "take all",
   "fly belfry",
   "pull bellrope",
-  "take batsight",
+  "wear goggles",
   "fly hallbr",
   "open drawer",
-  "wear goggles",
+  "wear woodblack",
+  "take shard",
   "fly shaft",
   "wear backpack",
   "fly dining",
@@ -144,6 +145,10 @@ const QUICK_COLLECTION = [
   "{{oakspyglass}}",
   "down",
   "take ancient",
+  "fly dining",
+  "put candle in fixture",
+  "put shard in fixture",
+  "take candelabra",
   "fly hidden",
   "take all",
   "fly nursery",
@@ -167,6 +172,7 @@ const QUICK_COLLECTION = [
   "fly attic",
   "take all",
   "fly royal",
+  "remove goggles",
 ];
 
 const BULK_DEPOSIT = ["put all in rq"];
@@ -209,7 +215,7 @@ const MAX_COLLECTION = [
   "take all",
   "fly belfry",
   "pull bellrope",
-  "take batsight",
+  "wear goggles",
   "fly kitchen",
   "take rope",
   "open cellard",
@@ -237,11 +243,15 @@ const MAX_COLLECTION = [
   "wear talisman",
   "fly hallbr",
   "open drawer",
-  "wear goggles",
+  "wear woodblack",
+  "take shard",
   "fly astral",
   "wear obsidian",
   "fly dining",
   "take all",
+  "put candle in fixture",
+  "put shard in fixture",
+  "take candelabra",
   "fly nursery",
   "pull wallpaper",
   "in",
@@ -261,6 +271,7 @@ const MAX_COLLECTION = [
   "fly attic",
   "take all",
   "fly royal",
+  "remove goggles",
 ];
 
 const MAX_TO_BELL = [
@@ -274,7 +285,7 @@ export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::powerup",
     name: "Power Up",
-    description: "Acquire every reusable power item and the Bat Sight Mirror.",
+    description: "Acquire and wear every reusable power item, including the Woodblack Watch.",
     compoundPrompt: join(POWERUP),
   }),
   Object.freeze({

@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// native.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.100:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 ```
 
 ---
@@ -90,11 +90,11 @@ rooms: {
 }
 
 items: {
-  candlestick: {
-    names: ["candlestick", "candle"], adjectives: ["silver"],
-    loc: "diningRoom", takeable: true, treasure: true, points: 10,
-    lightSource: true, lit: false, fuel: 60,   // burns down each turn when lit
-    desc: "A tarnished silver candlestick.",
+  candelabra: {
+    names: ["candelabra"], adjectives: ["blackwood", "restored"],
+    loc: null, takeable: true, treasure: true, points: 10,
+    lightSource: true, selfPowered: true, lit: true,
+    desc: "A restored Blackwood candelabra.",
   }
 }
 ```
@@ -163,8 +163,9 @@ Classic Infocom style, richer than strict two-word.
 - **Darkness = death.** Enter a dark room with no active light source:
   *"It is pitch black. You are likely to be eaten by a grue."* Act again while still in
   the dark → eaten. Instant death.
-- **Light is limited.** The candlestick has fuel that burns each turn while lit, with
-  low-fuel warnings before it dies. Matches (to light it) are consumable.
+- **Light begins limited.** The portable candle has fuel that burns each turn
+  while lit, with low-fuel warnings before it dies. The single match is
+  consumable. Restoring the candelabra later creates a permanent magical flame.
 - **Sudden-death traps:** the dry well (climb down without a rope → fatal fall), the crypt
   wraith (fatal without protection), the rotted attic floor (crashes through if you're
   overloaded).
@@ -206,25 +207,35 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 
 - **Get inside:** mailbox on the porch (a wink at Zork) holds a warning letter; the
   front-door key is hidden in the garden — under the statue, or down the well (needs a rope).
-- **Make light:** silver candlestick (dining room) + matches (kitchen) → survive the
+- **Make light:** portable candle (dining room) + matches (kitchen) → survive the
   cellar & crypt.
+- **Restore the candelabra:** work the central shard free from the broken HALL
+  BEDROOM MIRROR, then fit it and the sole candle into the rundown DINING ROOM
+  fixture in either order. The restored candelabra becomes the +10 heirloom and
+  a permanent light source.
 - **The diary** (study) reveals the **safe** combination (behind the portrait); the safe
   holds a treasure.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
   Ravenblood Ring.
 - **Belfry:** pull either end of the bell rope to scatter the bats and drop the
-  Bat Sight Mirror. Looking into it at a named room scries that room remotely.
+  antique BM-marked XRAY GOGGLES. Worn on the EYES, they reveal hidden clues and
+  darkness.
+- **Watch:** the HALL BEDROOM drawer holds the non-heirloom WOODBLACK WATCH.
+  Its black crystal face scries named rooms and prepares routes to rooms or
+  objects.
+- **Between the walls:** the nursery wallpaper hides a crawl-gap whose single
+  heirloom is the BM-marked BLACKWOOD HAMMER in the sawdust.
 - **Library lever** opens the **secret chamber** → the curse's focus.
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
 
-**13 required family heirlooms**, each worth points: silver candlestick, gold locket,
-first-edition grimoire, jeweled music box, Ravenblood Ring, ancient coin (well), crystal
-decanter (wine cellar), ancestral portrait, the Blackwood family crest, the BM
-spyglass recovered from the tree fort, the BM-crested protective talisman after
-it has served against the crypt wraith, the family-inscribed WOODBLACK WATCH
-hidden inside the nursery wall, and the Bat Sight Mirror dropped by the belfry bats.
+**13 required family heirlooms**, each worth points: restored candelabra, gold
+locket, first-edition grimoire, jeweled music box, Ravenblood Ring, ancient coin
+(well), crystal decanter (wine cellar), ancestral portrait, the Blackwood family
+crest, the BM spyglass recovered from the tree fort, the BM-crested protective
+talisman after it has served against the crypt wraith, the BLACKWOOD HAMMER
+hidden inside the nursery wall, and the XRAY GOGGLES dropped by the belfry bats.
 
 ---
 
@@ -238,10 +249,11 @@ self-immolation the first time is +10. Repeating a solved action cannot farm its
 award; deliberately igniting yourself again after that first survival costs 5
 points.
 
-The BRAZIER awards +10 when lit patiently with the CANDLESTICK or +30 when the
-player transfers their own flames. Reading the mailbox LETTER awards +5.
-DREADMAW'S apple remains +10. Scattering the belfry bats and freeing the Bat
-Sight Mirror awards +5; depositing the mirror awards its 20 heirloom points.
+The BRAZIER awards +10 when lit patiently with the CANDLE or restored
+CANDELABRA, or +30 when the player transfers their own flames. Reading the
+mailbox LETTER awards +5. DREADMAW'S apple remains +10. Scattering the belfry
+bats and freeing the XRAY GOGGLES awards +5; depositing the goggles awards
+their 20 heirloom points.
 Opening mushroom vision for the first time awards +10. First acquisition of
 the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
 lowering the ATTIC ladder for the first time awards +5.
@@ -251,6 +263,9 @@ immediately before the closet rope. `::winmaxfrontd` continues through the
 clean front-door ending; `::winmaxgary` instead takes the clock and descends
 to Gary. All maximum routes leave the MYSTERY PACKAGE untouched because its
 outcome is random. `::powerup` and the shorter `::winquick1` remain available.
+The replacement heirlooms preserve the 195-point deposit pool and the maintained
+maximum checkpoints: 440 before the final bell, 445 after the bell on the Gary
+route, and 490 through the front-door ending with all deterministic end awards.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*
@@ -405,8 +420,9 @@ the mansion.
 
 ## 12.7 The brazier fire-puzzle (garden)
 - A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
-  **lit candlestick** can ignite it by patiently lighting several points, or the player
-  can be **on fire** and `light brazier` to transfer the whole blaze. Either route yields
+  **lit candle** can ignite it by patiently lighting several points; the restored
+  **candelabra** ignites it immediately; or the player can be **on fire** and
+  `light brazier` to transfer the whole blaze. Any route yields
   the green **EMERALD GEM** needed by the GREAT OAK'S mirrored PANEL. The careful
   candle route awards +10; the dangerous body-fire route awards +30 and also
   qualifies for the first-time self-fire survival bonus.
@@ -808,9 +824,12 @@ afterward; worn equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The HALL BEDROOM lies NORTH of
-the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains cheap plastic XRAY GOGGLES
-that provide permanent mushroom-style clue vision and darkness sight while worn,
-shown as `👁️ ∞`. WINGED SHOES similarly show permanent flight as `🪽 ∞`.
+the UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains the WOODBLACK WATCH. Worn
+on the WRIST, the watch stays with the player during bulk deposits and provides
+room/object scrying plus route prefill. The antique BM-marked XRAY GOGGLES fall
+from the BELFRY bat roost and provide permanent mushroom-style clue vision and
+darkness sight while worn, shown as `👁️ ∞`. WINGED SHOES similarly show
+permanent flight as `🪽 ∞`.
 The OBSIDIAN EYE must be worn on the FOREHEAD, where it can coexist with EYES-slot
 goggles. It permanently reveals hidden details (`👁️ ∞`) but does not illuminate
 dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light source.
@@ -818,25 +837,40 @@ dark rooms or affect the `💡` slot; the HEADLAMP remains the durable light sou
 Either an active mushroom high or worn WINGED SHOES enables named-room flight.
 From the ATTIC, `UP` reaches the MANOR ROOF; the ROOF connects EAST to the BELFRY,
 where bats roost above the great BELL and its rope drops through a floor hole to
-the entry closet. Pulling the rope scatters the bats and drops the BAT SIGHT
-MIRROR. The belfry ladder descends into the ASTRAL CHAMBER. Both flight sources can also target
+the entry closet. Pulling the rope scatters the bats and drops the XRAY GOGGLES.
+The belfry ladder descends into the ASTRAL CHAMBER. Both flight sources can also target
 ROOF, BELFRY, ASTRAL CHAMBER, and every other named room directly. MAP renders the
 HALL BEDROOM, a separate ROOFLINE, and the expanded DREADMAW'S CAVE mine while
 preserving spoiler hiding for both secret destinations.
 
-## 12.28 West-wing payoff, belfry mirror, and open reliquary deposits
+## 12.28 West-wing payoff, belfry goggles, and open reliquary deposits
 
 - **West-wing payoff.** The CAVE ANTECHAMBER'S ore carts are empty.
   DREADMAW'S VAULT holds the required BLACKWOOD FAMILY CREST (+15) and the
   wearable WINGED SHOES.
-- **Belfry payoff.** The Bat Sight Mirror replaces the removed Family Ring as a
+- **Belfry payoff.** The XRAY GOGGLES replace the retired Bat Sight Mirror as a
   required +20 heirloom. Pulling either end of the bell rope awards +5, scatters
-  the bats, and drops the mirror onto the belfry floor. `SHOW <room> IN MIRROR`
-  and carried-mirror shorthand `SHOW <room>` see the normal and third-eye
+  the bats, and drops the antique BM-marked goggles onto the belfry floor. They
+  retain their EYES-slot hidden-vision and darkness powers.
+- **Woodblack Watch utility.** The watch moves to the HALL BEDROOM drawer,
+  becomes wearable on the WRIST, and is no longer a required heirloom. It
+  inherits the retired mirror's scrying and route behavior. `SHOW <room> IN
+  WATCH` and carried-watch shorthand `SHOW <room>` see the normal and third-eye
   descriptions without marking the room visited, then prefill the short
   directions without executing them. `GUIDE`, `PATH`, and `ROUTE TO
-  <room-or-object>` use the carried mirror to prefill directions to rooms or
-  item locations. `LOOK IN MIRROR AT <room>` is an exact synonym.
+  <room-or-object>` prefill directions to rooms or item locations.
+  `LOOK IN WATCH AT <room>` is an exact synonym. The inscription remains, but
+  the watch no longer displays the reliquary count.
+- **Dining-room restoration.** The former required candlestick is now the
+  manor's sole portable CANDLE. A removable shard from the broken HALL BEDROOM
+  MIRROR and that candle fit the rundown DINING ROOM CANDELABRA in either order.
+  Once both are installed, the pieces are incorporated into a beautiful,
+  permanently lit, portable +10 heirloom. Wrong items are refused. The restored
+  candelabra lights the garden BRAZIER through the normal `LIGHT BRAZIER` path
+  or explicit candelabra/touch wording.
+- **Between-walls heirloom.** The WOODBLACK WATCH'S former +12 role moves
+  one-for-one to the BLACKWOOD HAMMER, found in sawdust between exposed beams
+  with a BM insignia branded into its handle.
 - **Oak route.** The garden brazier's EMERALD GEM completes the GREAT OAK'S
   mirrored PANEL. Seating the RUBY, EMERALD, and SAPPHIRE GEMS in the correct
   named slots opens the route to the required BM SPYGLASS (+8) in the TREE FORT.
@@ -937,9 +971,9 @@ The fort contains old signal flags, a blanket hideout, a nailed-up slingshot,
 and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
 through it reveals the maintenance hatch inside the roofline and hints that the
 ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
-EMERALD GEM as a +8 required heirloom; the newly BM-crested TALISMAN and the
-family-inscribed WOODBLACK WATCH bring the collection to thirteen required
-heirlooms.
+EMERALD GEM as a +8 required heirloom; the BM-crested TALISMAN, restored
+CANDELABRA, BLACKWOOD HAMMER, and XRAY GOGGLES keep the collection at exactly
+thirteen required heirlooms.
 
 ### 12.32 Twelve-line flavor cycles
 
@@ -1009,3 +1043,23 @@ owns `isMobileApp()`, native message-handler lookup and posting, installed app
 identity, `contentLocal` / `contentSource`, and the complete `version()` display.
 UI and Gary code must use this class rather than reading `window.webkit` or
 reconstructing platform/version strings independently.
+
+### 12.35 Heirloom-role redesign and current-save migration
+
+The required set remains exactly thirteen and keeps the same 195-point deposit
+total. Three roles move one-for-one: the BAT SIGHT MIRROR'S +20 role moves to
+the wearable XRAY GOGGLES, the required WOODBLACK WATCH'S +12 role moves to the
+BLACKWOOD HAMMER, and the silver CANDLESTICK'S +10 role moves to the restored
+CANDELABRA. The standalone Bat Sight Mirror no longer exists in new games. The
+WOODBLACK WATCH remains as a non-heirloom WRIST utility in the HALL BEDROOM
+drawer and owns the former mirror's scrying and route-prefill behavior.
+
+Current-schema saves are recognized from their saved item definitions rather
+than a brittle global version number. Restore maps an old mirror location and
+deposit flag to the goggles, an old required-watch location and deposit flag to
+the hammer, and a deposited or transformed candlestick to an already-restored
+candelabra. A carried finite candlestick remains the portable candle so the new
+assembly puzzle stays solvable. The old optional goggles' carried/worn state is
+preserved on the utility watch when required collection progress must place the
+new goggles in the reliquary or countdown clock. Legacy score flags are copied,
+never re-awarded, so migrated saves cannot double-score.

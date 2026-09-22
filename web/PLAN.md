@@ -1,8 +1,15 @@
+<!-- PLAN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+
 # Blackwood Manor — Implementation Plan
 
 > **Current test layout (2026-09-10):** This is the original implementation plan, so its
 > references to `tests/walkthrough.js` are historical. All executable tests now live as
 > Gherkin in `tests/features/`, with Cucumber definitions in `tests/steps/`; run `npm test`.
+>
+> **Current heirloom roster (2026-09-21):** the Bat Sight Mirror is retired;
+> XRAY GOGGLES, the BLACKWOOD HAMMER, and the restored CANDELABRA hold the
+> replacement +20/+12/+10 heirloom roles. The WOODBLACK WATCH is a non-heirloom
+> WRIST utility, and the former candlestick is the sole portable CANDLE.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
@@ -946,7 +953,7 @@ export const world = {
 
 Fill every `desc` with atmospheric prose (2–4 sentences, present tense, second person).
 
-- [ ] **Step 2: Add items** — treasures, tools, keys, scenery — per DESIGN.md §7. Each with `names`, `adjectives`, `loc`, flags, `desc`, and `points` for treasures. Include: `mailbox` (container, fixed) + `letter`; `statue` (scenery) hiding `frontKey`; `rope`; `candlestick` (lightSource, fuel:60, treasure); `matches`; `diary` (readable); `portrait` (scenery, hides `safe`); `safe` (container, locked, combination); `musicBox` → `tinyKey`; `jewelryBox` (container, locked, keyId:tinyKey) + `rubyRing`; `lever` (scenery); `salt` or `talisman`; `wraith` (fixed, lethal); `reliquary` (container, fixed, in grandHall); treasures `goldLocket`, `grimoire`, `ancientCoin`, `crystalDecanter`, `jeweledMusicBox`.
+- [ ] **Step 2: Add items** — treasures, tools, keys, scenery — per DESIGN.md §7. Each with `names`, `adjectives`, `loc`, flags, `desc`, and `points` for treasures. Include: `mailbox` (container, fixed) + `letter`; `statue` (scenery) hiding `frontKey`; `rope`; portable `candle` (lightSource, fuel:60) plus the restored `candelabra` treasure; `matches`; `diary` (readable); `portrait` (scenery, hides `safe`); `safe` (container, locked, combination); `musicBox` → `tinyKey`; `jewelryBox` (container, locked, keyId:tinyKey) + `rubyRing`; `lever` (scenery); `salt` or `talisman`; `wraith` (fixed, lethal); `reliquary` (container, fixed, in grandHall); treasures `goldLocket`, `grimoire`, `ancientCoin`, `crystalDecanter`, `jeweledMusicBox`.
 
 - [ ] **Step 3: Add puzzle handlers** via `on:` using the `ctx` API. Examples to implement:
   - Front door: `frontDoor` item `on:{ unlock }` sets `frontDoorOpen`; or opening with `frontKey`.

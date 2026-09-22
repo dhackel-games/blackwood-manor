@@ -260,12 +260,17 @@
   },
   "diningRoom": {
     "name": "Dining Room",
-    "desc": "A long banquet table lies buried under dust and fallen plaster. Upon it, improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The ROYAL HALL is EAST; a swinging door leads SOUTH to the KITCHEN.",
+    "desc": "A long banquet table lies buried under dust and fallen plaster. Old silver fittings for a CANDELABRA and its single CANDLE scar the table's center. The ROYAL HALL is EAST; a swinging door leads SOUTH to the KITCHEN.",
     "items": [
       {
         "id": "candlestick",
-        "label": "candlestick",
+        "label": "candle",
         "kind": "takeable"
+      },
+      {
+        "id": "candelabraFrame",
+        "label": "incomplete candelabra",
+        "kind": "scenery"
       }
     ]
   },
@@ -403,11 +408,16 @@
   },
   "hallBedroom": {
     "name": "Hall Bedroom",
-    "desc": "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
+    "desc": "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a broken MIRROR with a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
     "items": [
       {
-        "id": "xrayGoggles",
-        "label": "goggles",
+        "id": "backwardsWatch",
+        "label": "woodblack watch",
+        "kind": "takeable"
+      },
+      {
+        "id": "mirrorShard",
+        "label": "mirror shard",
         "kind": "takeable"
       },
       {
@@ -492,11 +502,11 @@
   },
   "betweenWalls": {
     "name": "The Space Between the Walls",
-    "desc": "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — only the cramped gap OUT.",
+    "desc": "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap between exposed beams, lit by no source you can name. Old newspaper insulation bulges from the studs. A BLACKWOOD HAMMER lies half-buried in sawdust, its dark handle stamped with a BM insignia. There is no proper door here — only the cramped gap OUT.",
     "items": [
       {
-        "id": "backwardsWatch",
-        "label": "woodblack watch",
+        "id": "blackwoodHammer",
+        "label": "blackwood hammer",
         "kind": "takeable"
       }
     ]

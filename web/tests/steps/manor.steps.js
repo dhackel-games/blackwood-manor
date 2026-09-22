@@ -1,6 +1,6 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 import assert from "node:assert";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
 import { composeDefaultPlayerName, createGame } from "../../js/core.js";
 import { MAP_MARK } from "../../js/map.js";
@@ -116,7 +116,7 @@ Given("the player is on fire", function () {
 
 Given("item {string} is carried", function (item) {
   this.game.moveItem(item, "inventory");
-  if (item === "batSightMirror") {
+  if (item === "xrayGoggles") {
     this.game.destroy("belfryBats");
     this.game.setFlag("belfryBatsScattered", true);
   }
@@ -124,6 +124,105 @@ Given("item {string} is carried", function (item) {
 
 Given("item {string} has been destroyed", function (item) {
   this.game.destroy(item);
+});
+
+Given("the restored candelabra is carried", function () {
+  this.game.destroy("mirrorShard");
+  this.game.destroy("candlestick");
+  this.game.destroy("candelabraFrame");
+  this.game.moveItem("candelabra", "inventory");
+  this.game.item("candelabra").lit = true;
+  this.game.setFlag("candelabraShardInstalled");
+  this.game.setFlag("candelabraCandleInstalled");
+  this.game.setFlag("candelabraRestored");
+});
+
+const CURRENT_HEAD_TREASURES = [
+  "batSightMirror", "spyglass", "familyCrest", "candlestick", "grimoire",
+  "talisman", "musicBox", "rubyRing", "goldLocket", "ancientCoin",
+  "crystalDecanter", "ancestralPortrait", "backwardsWatch",
+];
+
+function currentHeadSnapshot(game) {
+  const snapshot = game.snapshot();
+  for (const id of ["blackwoodHammer", "candelabra", "candelabraFrame", "mirrorShard"]) {
+    delete snapshot.state.items[id];
+  }
+  snapshot.state.items.batSightMirror = {
+    id: "batSightMirror",
+    names: ["bat sight mirror", "mirror", "hand mirror"],
+    loc: null,
+    takeable: true,
+    treasure: true,
+    points: 20,
+  };
+  snapshot.state.items.backwardsWatch.loc = "betweenWalls";
+  snapshot.state.items.backwardsWatch.worn = false;
+  snapshot.state.items.backwardsWatch.treasure = true;
+  snapshot.state.items.backwardsWatch.points = 12;
+  snapshot.state.items.candlestick.loc = "diningRoom";
+  snapshot.state.items.candlestick.treasure = true;
+  snapshot.state.items.candlestick.points = 10;
+  snapshot.state.items.xrayGoggles.loc = "nightDrawer";
+  snapshot.state.items.xrayGoggles.worn = false;
+  delete snapshot.state.items.xrayGoggles.treasure;
+  delete snapshot.state.items.xrayGoggles.points;
+  delete snapshot.state.flags.heirloomRedesignMigrated;
+  delete snapshot.state.flags.candelabraShardInstalled;
+  delete snapshot.state.flags.candelabraCandleInstalled;
+  delete snapshot.state.flags.candelabraRestored;
+  return snapshot;
+}
+
+Given("a current-head save with replaced heirlooms deposited is restored", function () {
+  const snapshot = currentHeadSnapshot(this.game);
+  for (const id of CURRENT_HEAD_TREASURES) snapshot.state.items[id].loc = "reliquary";
+  snapshot.state.items.xrayGoggles.loc = "inventory";
+  snapshot.state.items.xrayGoggles.worn = true;
+  snapshot.state.flags["progressItem:xrayGoggles"] = true;
+  snapshot.state.flags["progressAward:belfryMirrorFreed"] = true;
+  snapshot.state.flags.belfryBatsScattered = true;
+  snapshot.state.flags["heirloomScore:batSightMirror"] = true;
+  snapshot.state.flags["heirloomScore:backwardsWatch"] = true;
+  snapshot.state.flags["heirloomScore:candlestick"] = true;
+  snapshot.state.flags.curseLiftable = true;
+  snapshot.state.score = 200;
+  this.game.restore(snapshot);
+});
+
+Given("a current-head transformed heirloom save is restored", function () {
+  const snapshot = currentHeadSnapshot(this.game);
+  for (const id of CURRENT_HEAD_TREASURES) snapshot.state.items[id].loc = "clockTalisman";
+  snapshot.state.items.xrayGoggles.loc = "inventory";
+  snapshot.state.items.xrayGoggles.worn = true;
+  snapshot.state.items.clockTalisman.loc = "reliquary";
+  snapshot.state.flags["progressItem:xrayGoggles"] = true;
+  snapshot.state.flags["progressAward:belfryMirrorFreed"] = true;
+  snapshot.state.flags["progressAward:bellRung"] = true;
+  snapshot.state.flags.belfryBatsScattered = true;
+  snapshot.state.flags["heirloomScore:batSightMirror"] = true;
+  snapshot.state.flags["heirloomScore:backwardsWatch"] = true;
+  snapshot.state.flags["heirloomScore:candlestick"] = true;
+  snapshot.state.flags.curseLiftable = true;
+  snapshot.state.flags.bellRung = true;
+  snapshot.state.flags.floorDoorOpen = true;
+  snapshot.state.flags.heirloomsTransformed = true;
+  snapshot.state.score = 205;
+  this.game.restore(snapshot);
+});
+
+Given("a current-head carried-equipment save is restored", function () {
+  const snapshot = currentHeadSnapshot(this.game);
+  snapshot.state.items.batSightMirror.loc = "inventory";
+  snapshot.state.items.backwardsWatch.loc = "inventory";
+  snapshot.state.items.candlestick.loc = "inventory";
+  snapshot.state.items.candlestick.lit = true;
+  snapshot.state.items.candlestick.fuel = 73;
+  snapshot.state.items.xrayGoggles.loc = "inventory";
+  snapshot.state.items.xrayGoggles.worn = true;
+  snapshot.state.flags["progressItem:xrayGoggles"] = true;
+  snapshot.state.score = 5;
+  this.game.restore(snapshot);
 });
 
 Given("a legacy pre-oak save with the ember deposited is restored", function () {
@@ -149,11 +248,9 @@ Given("a legacy pre-oak save with the ember deposited is restored", function () 
 });
 
 Given("a completed pre-watch save is restored", function () {
-  const snapshot = this.game.snapshot();
-  for (const [id, definition] of Object.entries(world.items)) {
-    if (definition.treasure && id !== "backwardsWatch") {
-      snapshot.state.items[id].loc = "reliquary";
-    }
+  const snapshot = currentHeadSnapshot(this.game);
+  for (const id of CURRENT_HEAD_TREASURES) {
+    if (id !== "backwardsWatch") snapshot.state.items[id].loc = "reliquary";
   }
   delete snapshot.state.items.backwardsWatch.treasure;
   snapshot.state.items.backwardsWatch.loc = "betweenWalls";
@@ -164,7 +261,7 @@ Given("a completed pre-watch save is restored", function () {
 });
 
 Given("an in-progress pre-watch save with the watch already claimed is restored", function () {
-  const snapshot = this.game.snapshot();
+  const snapshot = currentHeadSnapshot(this.game);
   delete snapshot.state.items.backwardsWatch.treasure;
   snapshot.state.items.backwardsWatch.loc = "inventory";
   snapshot.state.score = 12;
@@ -509,14 +606,14 @@ Then("every required family item is inside the countdown clock", function () {
   }
 });
 
-Then("the Bat Sight Mirror can view every Part I room", function () {
-  this.game.moveItem("batSightMirror", "inventory");
+Then("the Woodblack Watch can view every Part I room", function () {
+  this.game.moveItem("backwardsWatch", "inventory");
   const originalRoom = this.game.state.room;
   for (const [id, room] of Object.entries(world.rooms)) {
     if (room.phase === 2) continue;
     const seenBefore = this.game.getFlag(`seen:${id}`);
-    const output = this.game.send(`look in mirror at ${world.roomShortNames[id]}`);
-    assert.match(output, /BAT SIGHT/i, id);
+    const output = this.game.send(`look in watch at ${world.roomShortNames[id]}`);
+    assert.match(output, /WOODBLACK WATCH/i, id);
     assert.match(output, new RegExp(room.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), id);
     assert.equal(this.game.state.room, originalRoom, id);
     assert.equal(this.game.getFlag(`seen:${id}`), seenBefore, id);
@@ -527,6 +624,68 @@ Then("the required family item count is {int}", function (count) {
   assert.equal(REQUIRED_FAMILY_ITEM_COUNT, count);
   assert.equal(this.game.world.config.requiredFamilyItemCount, count);
   assert.equal(Object.values(this.game.world.items).filter((item) => item.treasure).length, count);
+});
+
+Then("the required family items are exactly {string}", function (items) {
+  const expected = items.split(",").sort();
+  const actual = Object.entries(this.game.world.items)
+    .filter(([, item]) => item.treasure)
+    .map(([id]) => id)
+    .sort();
+  assert.deepEqual(actual, expected);
+});
+
+Then("the player-facing heirloom catalogs and icons match the required set", function () {
+  const expected = Object.entries(world.items)
+    .filter(([, item]) => item.treasure)
+    .map(([id]) => id)
+    .sort();
+  const parseJavascriptCatalog = (relativePath) => {
+    const source = readFileSync(new URL(relativePath, import.meta.url), "utf8");
+    const body = source.match(/const HEIRLOOMS = \[([\s\S]*?)\n\s*\];/)?.[1];
+    assert.ok(body, `Missing HEIRLOOMS catalog in ${relativePath}`);
+    return [...body.matchAll(/\["([^"]+)"/g)].map((match) => match[1]).sort();
+  };
+  assert.deepEqual(parseJavascriptCatalog("../../js/howto.js"), expected);
+  assert.deepEqual(parseJavascriptCatalog("../../view2d/tilemap.html"), expected);
+
+  const generator = readFileSync(new URL("../../tools/gen-firefly-icons.py", import.meta.url), "utf8");
+  const generated = [...generator.matchAll(
+    /^\s*\("([^"]+)",\s+"heirlooms\/[^"]+\.png"/gm,
+  )].map((match) => match[1]).sort();
+  assert.deepEqual(generated, expected);
+
+  const versions = JSON.parse(readFileSync(new URL("../../versions.json", import.meta.url), "utf8"));
+  const manifested = versions.CONTENT_FILES
+    .filter((path) => path.startsWith("view2d/icons/heirlooms/"))
+    .map((path) => path.split("/").at(-1).replace(/\.png$/, ""))
+    .sort();
+  assert.deepEqual(manifested, expected);
+  for (const id of expected) {
+    assert.equal(existsSync(new URL(`../../view2d/icons/heirlooms/${id}.png`, import.meta.url)), true, id);
+  }
+  for (const retired of ["batSightMirror", "backwardsWatch", "candlestick"]) {
+    assert.equal(existsSync(
+      new URL(`../../view2d/icons/heirlooms/${retired}.png`, import.meta.url),
+    ), false, retired);
+  }
+});
+
+Then("the static 2D rooms show the redesigned item placements", function () {
+  const data = JSON.parse(readFileSync(new URL("../../view2d/roomdata.json", import.meta.url), "utf8"));
+  const ids = (room) => data[room].items.map((item) => item.id).sort();
+  assert.deepEqual(ids("diningRoom"), ["candelabraFrame", "candlestick"]);
+  assert.deepEqual(ids("hallBedroom"),
+    ["backwardsWatch", "bedsideLamp", "hallBed", "hallMirror", "mirrorShard", "nightDrawer", "nightTable"]);
+  assert.deepEqual(ids("betweenWalls"), ["blackwoodHammer"]);
+});
+
+Then("item {string} is lit", function (item) {
+  assert.equal(this.game.item(item).lit, true);
+});
+
+Then("item {string} has fuel {int}", function (item, fuel) {
+  assert.equal(this.game.item(item).fuel, fuel);
 });
 
 Then("the default name uses three distinct twelve-entry pools", function () {

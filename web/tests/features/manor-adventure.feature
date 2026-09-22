@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -20,7 +20,7 @@ Feature: Blackwood Manor adventure
       open door
       north
       west
-      take candlestick
+      take candle
       south
       take matches
       take rope
@@ -101,12 +101,23 @@ Feature: Blackwood Manor adventure
       south
       read diary
       north
+      north
+      examine mirror
+      take shard
+      open drawer
+      wear watch
+      south
       west
       pull wallpaper
       in
-      take woodblack
+      take hammer
       out
-      put woodblack in reliquary
+      put hammer in reliquary
+      west
+      put shard in candelabra
+      put candle in candelabra
+      take candelabra
+      east
       up
       west
       open music box
@@ -127,7 +138,7 @@ Feature: Blackwood Manor adventure
       up
       east
       pull bell rope
-      take bat sight mirror
+      take xray goggles
       west
       down
       down
@@ -162,15 +173,15 @@ Feature: Blackwood Manor adventure
       put locket in reliquary
       remove talisman
       put talisman in reliquary
-      put candlestick in reliquary
-      put bat sight mirror in reliquary
+      put candelabra in reliquary
+      put xray goggles in reliquary
       close reliquary
       open bell closet
       pull bell rope
       south
       """
     Then the game is won
-    And the game score is 435
+    And the game score is 440
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal
@@ -193,7 +204,7 @@ Feature: Blackwood Manor adventure
       open door
       north
       west
-      take candlestick
+      take candle
       south
       take matches
       light candle
@@ -215,7 +226,7 @@ Feature: Blackwood Manor adventure
       open door
       north
       west
-      take candlestick
+      take candle
       south
       take rope
       take apple
@@ -444,7 +455,7 @@ Feature: Blackwood Manor adventure
       | grandHall     | RELIQUARY,FRONT DOOR,BELL CLOSET |
       | parlor        | PROFILE PAINTING                 |
       | library       | LEVER                            |
-      | diningRoom    | CANDLESTICK                      |
+      | diningRoom    | CANDELABRA,CANDLE                |
       | kitchen       | ROPE,MATCHES,CELLAR DOOR         |
       | wineCellar    | CRYSTAL DECANTER                 |
       | crypt         | WRAITH,GOLD LOCKET               |
@@ -452,6 +463,7 @@ Feature: Blackwood Manor adventure
       | nursery       | JEWELED MUSIC BOX                |
       | masterBedroom | JEWELRY BOX                      |
       | study         | DESK,DIARY                       |
+      | hallBedroom   | MIRROR,NIGHT TABLE               |
       | attic         | ANCESTRAL PORTRAIT               |
 
   Scenario: Portrait and miniature refer to one attic object

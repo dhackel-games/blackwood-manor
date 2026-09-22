@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# gen-firefly-icons.py. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 """Generate the 13 Blackwood heirloom icons + the reliquary icon via Adobe
 Firefly Services, then key out the flat background to transparent PNGs that
 drop straight into web/view2d/icons/.
@@ -74,9 +75,9 @@ STYLE = (
 # (icon key, output relative path, subject)
 ICONS = [
     ("spyglass",          "heirlooms/spyglass.png",          "a brass telescoping spyglass with the initials B M etched on the barrel"),
-    ("batSightMirror",    "heirlooms/batSightMirror.png",    "a silver hand mirror with black glass, its rim embossed with tiny flying bats"),
+    ("xrayGoggles",       "heirlooms/xrayGoggles.png",       "antique blackened-brass x-ray goggles with smoked crystal lenses and a small B M monogram on the bridge"),
     ("familyCrest",       "heirlooms/familyCrest.png",       "a blackened-silver heraldic crest showing a raven above crossed keys"),
-    ("candlestick",       "heirlooms/candlestick.png",       "a tall tarnished silver candlestick holding one unlit white candle"),
+    ("candelabra",        "heirlooms/candelabra.png",        "a restored ornate silver five-branched candelabra with one central white candle and five magical blue-white flames"),
     ("grimoire",          "heirlooms/grimoire.png",          "a heavy black spellbook clasped with tarnished silver corner fittings"),
     ("talisman",          "heirlooms/talisman.png",          "a round silver protective amulet on a chain, engraved with warding runes"),
     ("musicBox",          "heirlooms/musicBox.png",          "a small jeweled music box, its lid inlaid with iridescent mother-of-pearl"),
@@ -85,7 +86,7 @@ ICONS = [
     ("ancientCoin",       "heirlooms/ancientCoin.png",       "a worn round ancient gold coin stamped with a faded weathered face"),
     ("crystalDecanter",   "heirlooms/crystalDecanter.png",   "a faceted cut-crystal decanter full of dark red wine"),
     ("ancestralPortrait", "heirlooms/ancestralPortrait.png", "a small oval portrait miniature of a pale woman in an ornate gilt frame"),
-    ("backwardsWatch",    "heirlooms/backwardsWatch.png",    "a tarnished brass pocket watch whose face has no hands, only one glowing number"),
+    ("blackwoodHammer",   "heirlooms/blackwoodHammer.png",   "a compact antique iron hammer with a dark ash handle branded with a B M insignia"),
     ("reliquary",         "reliquary.png",                   "a tall glass-fronted gothic stone cabinet with carved doors and thirteen small recessed shelves"),
 ]
 

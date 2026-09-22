@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -124,7 +124,7 @@ Feature: Fire and food consequences
     And the game score is 40
     And the output contains line "HEIRLOOMS: 0/13 +1"
 
-  Scenario: A lit candlestick can patiently ignite the garden brazier
+  Scenario: The lit portable candle can patiently ignite the garden brazier
     Given the player is in room "garden"
     And item "candlestick" is carried
     And item "matches" is carried
@@ -133,7 +133,7 @@ Feature: Fire and food consequences
     Then flag "brazierLit" is true
     And flag "onFire" is unset
     And item "emberStone" is in "garden"
-    And the output contains "LIT CANDLESTICK"
+    And the output contains "LIT CANDLE"
     And the output contains "EMERALD GEM"
     And the output contains "(+10)"
     And the game score is 10

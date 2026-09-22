@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.082:acoven.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -195,12 +195,9 @@ export const content = {
     diningRoom: {
       name: "Dining Room",
       desc:
-        "A long banquet table lies buried under dust and fallen plaster. Upon it, " +
-        "improbably, stands a tarnished silver CANDLESTICK, its candle unburnt. The ROYAL HALL " +
-        "is EAST; a swinging door leads SOUTH to the KITCHEN.",
-      searchDesc:
-        "Everything is dust-choked except the CANDLESTICK's wick. It is dry and usable, but it will need the MANOR'S " +
-        "single precious MATCH.",
+        "A long banquet table lies buried under dust and fallen plaster. Old silver fittings for a CANDELABRA " +
+        "and its single CANDLE scar the table's center. " +
+        "The ROYAL HALL is EAST; a swinging door leads SOUTH to the KITCHEN.",
     },
 
     kitchen: {
@@ -276,10 +273,8 @@ export const content = {
     hallBedroom: {
       name: "Hall Bedroom",
       desc:
-        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a tarnished MIRROR. " +
-        "Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
-      searchDesc:
-        "The BED is untouched, the MIRROR is clouded, and the NIGHT TABLE'S DRAWER has a cheap plastic handle.",
+        "A narrow HALL BEDROOM lies NORTH of the UPSTAIRS LANDING. A neatly made BED faces a broken MIRROR with " +
+        "a jagged center. Beside it stands a NIGHT TABLE with a small LAMP and a closed DRAWER.",
     },
 
     attic: {
@@ -335,12 +330,12 @@ export const content = {
       name: "The Space Between the Walls",
       desc:
         "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
-        "between two walls, lit by no source you can name. Old newspaper insulation bulges from the studs, " +
-        "and a tarnished WOODBLACK WATCH hangs from a bent nail. There is no proper door here — " +
+        "between exposed beams, lit by no source you can name. Old newspaper insulation bulges from the studs. " +
+        "A BLACKWOOD HAMMER lies half-buried in sawdust, its dark handle stamped with a BM insignia. There is no proper door here — " +
         "only the cramped gap OUT.",
       searchDesc:
-        "Whoever built this space built it to be forgotten. The WOODBLACK WATCH is the only thing in it that " +
-        "isn't dust.",
+        "Whoever built this space built it to be forgotten. Between the exposed beams, the BLACKWOOD HAMMER'S " +
+        "BM-marked handle is the only thing the sawdust has not swallowed.",
     },
   },
 
@@ -354,12 +349,8 @@ export const content = {
     },
     belfryBats: {
       roomDesc: "Hundreds of black BATS crowd the rafters. Something silver glints inside their roost.",
-      desc: "Hundreds of black BATS hang in tight folds from the rafters. Something silver is hidden among them.",
-    },
-    batSightMirror: {
-      roomDesc: "A silver BAT SIGHT MIRROR lies on the belfry boards beneath the abandoned roost.",
-      desc: "A silver hand mirror embossed with tiny flying bats and the initials BM. Its black glass can look " +
-        "into any room in Blackwood Manor. Try LOOK IN MIRROR AT KITCHEN.",
+      desc: "Hundreds of black BATS hang in tight folds from the rafters. Something made of dark glass and " +
+        "Blackwood brass is hidden among them.",
     },
     bellCloset: {
       desc: "A narrow wooden BELL CLOSET beside the FRONT DOOR. A small brass bat is nailed above its handle.",
@@ -516,25 +507,42 @@ export const content = {
     },
     hallMirror: {
       desc:
-        "A tarnished MIRROR that gives you back as a reflection standing slightly farther away than it should.",
+        "The HALL BEDROOM MIRROR is broken around its center. Its surviving glass gives you back as a reflection " +
+        "standing slightly farther away than it should.",
     },
     nightTable: {
       desc: "A small NIGHT TABLE holding a LAMP and a shallow DRAWER.",
     },
     nightDrawer: {
-      desc: "A cheap wooden DRAWER in the NIGHT TABLE.",
+      desc: "A shallow wooden DRAWER in the NIGHT TABLE, fitted with a dark brass pull stamped BM.",
     },
     bedsideLamp: {
       desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
     },
     xrayGoggles: {
-      desc: "Cheap plastic XRAY GOGGLES with red lenses and lightning bolts on the arms. Somehow, they actually work.",
+      roomDesc: "BLACKWOOD XRAY GOGGLES rest beneath the abandoned bat roost.",
+      desc: "Antique XRAY GOGGLES built from blackened brass, smoked crystal, and fitted leather. A tiny BM " +
+        "monogram is worked into the bridge. Worn over the EYES, the lenses expose hidden structure and make " +
+        "darkness legible.",
     },
     frontDoor: {
       desc: "A great oak door, black with age, with a heavy iron lock.",
     },
     candlestick: {
-      desc: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt.",
+      roomDesc: "A single unburnt CANDLE lies beside the incomplete candelabra.",
+      desc: "The manor's sole portable CANDLE: old white wax around a silver socket, dry enough to take the " +
+        "single MATCH. The socket looks made for the candelabra on the dining table.",
+    },
+    candelabraFrame: {
+      roomDesc: "A rundown, incomplete CANDELABRA is fixed to the table beside the manor's sole CANDLE.",
+      desc: "A rundown silver CANDELABRA fixed to the dining table. Its central candle socket is empty, and a " +
+        "mirror-shaped recess interrupts the inscription around its base.",
+    },
+    candelabra: {
+      roomDesc: "A beautiful BLACKWOOD CANDELABRA burns with steady blue-white light.",
+      desc: "A restored silver BLACKWOOD CANDELABRA, its central mirror shard and sole candle held in a BM-marked " +
+        "setting. Five blue-white flames burn without consuming the wax. Around its base the complete inscription " +
+        "reads: \"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"",
     },
     matches: {
       desc: "A box holding a single dry match. Just one.",
@@ -604,11 +612,21 @@ export const content = {
       desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
         "unsettlingly like the STATUE in the GARDEN. Her gaze settles on you.",
     },
+    mirrorShard: {
+      roomDesc: "A jagged MIRROR SHARD sits loose in the broken frame's center.",
+      desc: "A palm-sized MIRROR SHARD worked free from the HALL BEDROOM MIRROR. Its nonreflective back is " +
+        "blackened silver bearing only part of an inscription: \"...GLASS, THE HOUSE REMEMBERS.\"",
+    },
     backwardsWatch: {
-      roomDesc: "A tarnished WOODBLACK WATCH hangs from a bent nail, its number-only face glowing faintly.",
-      desc: "A tarnished brass WOODBLACK WATCH whose face has no hands or hours, only a single changing number. " +
-        "On the back, beneath your reflection, a family inscription reads: " +
-        "\"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+      roomDesc: "A tarnished WOODBLACK WATCH rests in the drawer, its black crystal face glowing faintly.",
+      desc: "A tarnished brass WOODBLACK WATCH whose black crystal face has no hands or hours. Worn on the WRIST, " +
+        "it can look into any room in Blackwood Manor and prepare a route there. On the back, beneath your " +
+        "reflection, a family inscription reads: \"B.W. — WHAT TIME TAKES, BLOOD REMEMBERS.\"",
+    },
+    blackwoodHammer: {
+      roomDesc: "A BLACKWOOD HAMMER lies in the sawdust between the exposed beams.",
+      desc: "A compact iron BLACKWOOD HAMMER with a dark ash handle. A deep BM insignia is branded into the grip, " +
+        "marking it as a family heirloom rather than an ordinary tool.",
     },
   },
 };

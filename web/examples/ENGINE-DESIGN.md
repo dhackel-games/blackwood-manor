@@ -1,3 +1,5 @@
+<!-- ENGINE-DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+
 # Engine design & simplification backlog — Dave & Andy Games
 
 A living design doc for turning the Blackwood Manor engine into a genre-neutral
@@ -26,8 +28,9 @@ office game, or a submarine adventure.
 
 ### 1. Item capability table
 - **Today:** most items are clean data, but the interesting ones hand-roll logic
-  in `on:{verb}` (candlestick `light`, `brazier`, match/self-fire, mystery
-  package) — see `web/js/world.js` `candlestick:` (~4151), `brazier:` (~lightBrazier).
+  in `on:{verb}` (candle/candelabra restoration, `brazier`, match/self-fire,
+  mystery package) — see `web/js/world.js` (`candlestick`, `candelabraFrame`,
+  and `lightBrazier`).
 - **Target:** declarative capabilities: `flame:{lightsWith:"match", duration:120,
   oneTimeSource:true}`, `goesIn:"reliquary"`, `grants:["flight"]`. Extend the
   property vocabulary the engine already interprets; delete the bespoke handlers.

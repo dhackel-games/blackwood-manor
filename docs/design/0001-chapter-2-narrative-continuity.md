@@ -1,11 +1,15 @@
+<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven. -->
+
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
-> **UPDATE 2026-09-15:** The Family Ring has been removed. The Bat Sight Mirror
-> in the BELFRY replaces it in the thirteen required heirlooms, and the former
-> Ravenblood Signet is now the Ravenblood Ring. Pulling either bell rope scatters
-> the bats and drops the mirror. The completed ritual is performed from the
-> BELL CLOSET beside the front door; older Family Ring/Signet/hall-bell passages
-> below are retained only as design history.
+> **UPDATE 2026-09-21:** The required set remains thirteen. The BELFRY bats now
+> drop BM-marked XRAY GOGGLES, which replace the retired Bat Sight Mirror as the
+> +20 heirloom while retaining wearable vision powers. The WOODBLACK WATCH moves
+> to the HALL BEDROOM drawer as a non-heirloom WRIST utility with the old
+> scry/route behavior. A BM-marked BLACKWOOD HAMMER replaces its +12 heirloom
+> role between the walls. The old candlestick is now the sole portable CANDLE;
+> together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10
+> DINING ROOM CANDELABRA.
 >
 > **➡️ UPDATE 2026-09-14 — see [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md).**
 > Major evolution of this doc: the **13-hour clock**, a reworked **BM1 ending** (ring →
@@ -168,10 +172,10 @@ optional flavor lines).
   **Ravenblood line, practitioners.** The 13 heirlooms read naturally as **components of a
   ritual/working** ("Voltron"), not just valuables.
 - **The 13 are scattered into the deadliest, most hidden rooms:** spyglass→tree fort,
-  ring→dragon antechamber, crest→Dreadmaw's vault, grimoire→secret chamber, talisman→a
-  locked safe, music box→nursery, ravenblood signet→jewelry box, locket→crypt,
-  decanter→wine cellar, portrait→attic, woodblack watch→the space-between-walls,
-  candlestick→dining room, coin→(dynamic). This is a **deliberate hide-so-none-reassemble
+  XRAY goggles→belfry, crest→Dreadmaw's vault, grimoire→secret chamber, talisman→a
+  locked safe, music box→nursery, Ravenblood Ring→jewelry box, locket→crypt,
+  decanter→wine cellar, portrait→attic, Blackwood hammer→the space-between-walls,
+  restored candelabra→dining room, coin→well. This is a **deliberate hide-so-none-reassemble
   pattern**, which is exactly why bm1 is a dangerous dungeon crawl to recover them.
 
 ### The theory (spine)

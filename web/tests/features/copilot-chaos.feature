@@ -1,4 +1,4 @@
-# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-13.083:acoven.
+# copilot-chaos.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 
 @chaos
 Feature: Copilot's mystery package and lightning jumps
@@ -61,25 +61,24 @@ Feature: Copilot's mystery package and lightning jumps
     Then the current room is "betweenWalls"
     And the game score is 0
 
-  Scenario: The space between the walls holds the Woodblack Watch
+  Scenario: The space between the walls holds the Blackwood Hammer
     When the player moves directly to room "betweenWalls"
     And I send "look"
-    Then the output contains "WOODBLACK WATCH"
-    When I send "examine woodblack"
-    Then the output contains "13 heirlooms remain"
-    Then the output contains "B.W."
-    And the output contains "WHAT TIME TAKES, BLOOD REMEMBERS"
-    When I send "take woodblack"
+    Then the output contains "BLACKWOOD HAMMER"
+    And the output contains "sawdust"
+    And the output contains "exposed beams"
+    When I send "examine bm hammer"
+    Then the output contains "BM insignia"
+    And the output contains "family heirloom"
+    When I send "take hammer"
     Then the output contains "Taken"
-    And item "backwardsWatch" is in "inventory"
+    And item "blackwoodHammer" is in "inventory"
     And the game score is 0
     When I send "out"
     Then the current room is "grandHall"
-    When I send "put woodblack in reliquary"
+    When I send "put bm hammer in reliquary"
     Then the output contains line "HEIRLOOMS: 1/13 +0"
     And the game score is 12
-    When I send "examine woodblack"
-    Then the output contains "12 heirlooms remain"
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
     Given the mystery package teleport selects room "crypt"
@@ -97,7 +96,7 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "pull wallpaper"
     And I send "go in"
     Then the current room is "betweenWalls"
-    And the output contains "WOODBLACK WATCH"
+    And the output contains "BLACKWOOD HAMMER"
 
   Scenario: Flying between the walls preserves its one-time discovery award
     Given item "wingedShoes" is carried

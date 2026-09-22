@@ -1,3 +1,4 @@
+// howto.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
 // Shared "How to Play" onboarding overlay. Builds the same tutorial the 2D map
 // shows, so the text game presents it consistently. Self-contained: owns the
 // heirloom list + lore, builds its own DOM, and wires open/close, the clickable
@@ -8,9 +9,9 @@
 
 const HEIRLOOMS = [
   ["spyglass", "spyglass"],
-  ["batSightMirror", "bat-sight mirror"],
+  ["xrayGoggles", "xray goggles"],
   ["familyCrest", "family crest"],
-  ["candlestick", "candlestick"],
+  ["candelabra", "restored candelabra"],
   ["grimoire", "grimoire"],
   ["talisman", "talisman"],
   ["musicBox", "music box"],
@@ -19,14 +20,14 @@ const HEIRLOOMS = [
   ["ancientCoin", "ancient coin"],
   ["crystalDecanter", "crystal decanter"],
   ["ancestralPortrait", "ancestral portrait"],
-  ["backwardsWatch", "woodblack watch"],
+  ["blackwoodHammer", "blackwood hammer"],
 ];
 
 const HEIRLOOM_LORE = {
   spyglass: "A handsome brass spyglass etched BM, forever aimed from its rusted swivel cradle at the manor's distant belfry.",
-  batSightMirror: "A silver hand-mirror embossed with tiny bats and the initials BM. Its black glass can spy into any room in Blackwood Manor.",
+  xrayGoggles: "Antique Blackwood goggles of blackened brass and smoked crystal. Their BM-marked lenses expose hidden structure and darkness.",
   familyCrest: "The Blackwood family crest, resting on velvet beside the hoard — the proof and pride of a cursed bloodline.",
-  candlestick: "A tarnished silver candlestick, heavy and fine, its candle miraculously unburnt after all these years.",
+  candelabra: "A restored silver candelabra whose mirror shard and sole candle reveal a complete Blackwood inscription. Its blue-white flames never consume the wax.",
   grimoire: "A heavy black grimoire clasped in tarnished silver — a priceless first edition. Some things are worth money, not reading.",
   talisman: "A silver talisman, warm to the touch, graven with wards against the dead and stamped with the BM crest.",
   musicBox: "A jeweled music box, its lid inlaid with mother-of-pearl. Wind it and it still remembers a lullaby no one living taught it.",
@@ -35,7 +36,7 @@ const HEIRLOOM_LORE = {
   ancientCoin: "An ancient coin worn smooth, stamped with a face no one alive remembers — and no one dead will name.",
   crystalDecanter: "A cut-crystal decanter, still full, throwing splinters of colour even in the manor's deepest gloom.",
   ancestralPortrait: "A miniature portrait of a woman who looks unsettlingly like the garden statue. Her painted gaze follows you across the room.",
-  backwardsWatch: "A tarnished Woodblack Watch with no hands or hours — only a single changing number. On the back: \u201CWhat time takes, blood remembers.\u201D",
+  blackwoodHammer: "A compact iron hammer found in sawdust between exposed beams, with the Blackwood BM insignia branded deep into its ash handle.",
 };
 
 const SEEN_KEY = "blackwood-howto-seen-v1";
@@ -80,8 +81,9 @@ export function initHowto(opts = {}) {
           <span class="g-ic"><img src="${ib}clockTalisman.png" alt="Countdown clock" /></span>
           <div>
             <p style="margin:0"><b>Your quest:</b> enshrine all thirteen relics in the
-            Reliquary's recesses. Set the last one in place and they fuse into the
-            <b>Countdown Clock</b> \u2014 and the manor tolls its <b>thirteenth hour</b>.</p>
+            Reliquary's recesses, close its doors, and ring the bell. The completed rite
+            fuses them into the <b>Countdown Clock</b> \u2014 and the manor tolls its
+            <b>thirteenth hour</b>.</p>
           </div>
         </div>
 
