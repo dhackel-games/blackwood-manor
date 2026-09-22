@@ -1,4 +1,4 @@
-# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+# cave-gear.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 @gear
 Feature: Dreadmaw's mine, wearable gear, and the roof route
@@ -96,13 +96,15 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the output contains "Still worn"
     And the output contains "BACKPACK"
 
-  Scenario: The BM Watch is visible on the Study desk
+  Scenario: The BM Watch is inside the Study desk drawer
     Given the player is in room "landing"
     When I send "south"
     Then the current room is "study"
     And the output contains "DESK"
     And the output contains "DIARY"
-    And the output contains "BM WATCH"
+    And the output contains "DRAWER"
+    When I send "open desk drawer"
+    Then the output contains "BM WATCH"
     When I send "wear watch"
     Then the output contains "(get BM WATCH; wear BM WATCH)"
     And item "backwardsWatch" is worn in slot "wrist"

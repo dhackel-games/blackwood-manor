@@ -1,4 +1,4 @@
-<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- 0002-thirteen-hour-clock-and-ouroboros.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
@@ -6,7 +6,7 @@
 > exactly thirteen and keeps its 195-point deposit total. The +20 slot belongs
 > to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer. The
 > BELFRY bats still drop XRAY GOGGLES, but the goggles are non-heirloom EYES
-> equipment. The BM WATCH rests visibly on the STUDY desk beside the diary as a
+> equipment. The BM WATCH waits inside the STUDY desk drawer beneath the diary as a
 > non-heirloom WRIST scry/route utility, while a +12 BLACKWOOD HAMMER holds its
 > former heirloom role between the walls. The old candlestick becomes the sole
 > portable CANDLE; it and the removable HALL BEDROOM MIRROR SHARD restore the

@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Blackwood Manor
 
@@ -11,8 +11,9 @@ The thirteen-heirloom route includes the BLACKWOOD FAMILY RING in the
 hall-bedroom night-table drawer, a BLACKWOOD HAMMER hidden between exposed wall
 beams, and a restored dining-room CANDELABRA assembled from the manor's sole
 candle and a shard worked free from the broken hall-bedroom mirror. Belfry bats
-drop non-heirloom XRAY GOGGLES, while the non-heirloom BM WATCH rests on the
-Study desk and provides remote room/object sight and route preparation.
+drop non-heirloom XRAY GOGGLES, while the non-heirloom BM WATCH rests inside
+the Study desk drawer and provides remote room/object sight and route
+preparation. The leather-bound diary remains open on the desktop.
 
 ## Layout
 

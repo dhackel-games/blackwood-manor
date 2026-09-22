@@ -1,4 +1,4 @@
-# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+# heirloom-migration.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 @unit
 Feature: Heirloom correction save migration
@@ -18,7 +18,7 @@ Feature: Heirloom correction save migration
     And item "mirrorShard" is destroyed
     And item "candelabraFrame" is destroyed
     And item "xrayGoggles" is worn in slot "eyes"
-    And item "backwardsWatch" is in "study"
+    And item "backwardsWatch" is in "studyDrawer"
     And item "batSightMirror" is absent from game state
     And flag "candelabraRestored" is set
     And flag "heirloomScore:familyRing" is set
@@ -112,7 +112,15 @@ Feature: Heirloom correction save migration
     Given a historical save with the family ring worn is restored
     Then item "familyRing" is worn in slot "finger"
     And flag "heirloomScore:familyRing" is set
-    And item "backwardsWatch" is in "study"
+    And item "backwardsWatch" is in "studyDrawer"
     And the game score is 20
+
+  Scenario: Build-three untouched desk watches move inside the new drawer
+    Given a build-three save with the untouched desk watch is restored
+    Then item "studyDrawer" is in "study"
+    And item "backwardsWatch" is in "studyDrawer"
+    Given the player is in room "study"
+    When I send "open desk drawer"
+    Then the output contains "BM WATCH"
 
 # end heirloom-migration.feature

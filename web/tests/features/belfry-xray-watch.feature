@@ -1,4 +1,4 @@
-# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 @unit
 Feature: Belfry goggles, the family ring, and the BM Watch
@@ -40,11 +40,17 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     When I send "pull rope"
     Then the game score is 10
 
-  Scenario: The BM Watch rests visibly beside the diary in the Study
+  Scenario: The BM Watch waits inside the Study desk drawer
     Given the player is in room "study"
     When I send "look"
     Then the output contains "DIARY"
-    And the output contains "BM WATCH"
+    And the output contains "DESK DRAWER"
+    And the output does not contain "BM WATCH"
+    And item "diary" is in "study"
+    And item "diary" is not a required family heirloom
+    When I send "open desk drawer"
+    Then the output contains "BM WATCH"
+    And item "backwardsWatch" is in "studyDrawer"
     When I send "examine watch"
     Then the output contains "empty, mirror-like face"
     And the output contains "reflects nothing"
@@ -90,9 +96,10 @@ Feature: Belfry goggles, the family ring, and the BM Watch
 
   Scenario: The visible watch must be taken before its mirror face can scry
     Given the player is in room "study"
-    When I send "look in watch at kitchen"
+    When I send "open drawer"
+    And I send "look in watch at kitchen"
     Then the output contains "need to take or wear the BM WATCH"
-    And item "backwardsWatch" is in "study"
+    And item "backwardsWatch" is in "studyDrawer"
     And flag "mirrorRoutePrefill" is unset
 
   Scenario: The BM Watch covers every Part I room

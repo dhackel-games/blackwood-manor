@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -264,11 +264,12 @@ export const content = {
     study: {
       name: "Study",
       desc:
-        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it beside a BM WATCH, " +
-        "as though their owner had just stepped away. The UPSTAIRS LANDING lies NORTH.",
+        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, as though its writer " +
+        "had just stepped away. Beneath the writing surface is a shallow DESK DRAWER with a BM-stamped brass pull. " +
+        "The UPSTAIRS LANDING lies NORTH.",
       searchDesc:
         "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are " +
-        "underlined in ink. Beside it, the BM WATCH'S empty, mirror-like face reflects nothing.",
+        "underlined in ink. The shallow DESK DRAWER beneath it looks intact and easy to OPEN.",
     },
 
     hallBedroom: {
@@ -577,7 +578,10 @@ export const content = {
         "bears the BM crest, identifying the protective charm as a Blackwood family heirloom.",
     },
     desk: {
-      desc: "A great oak desk, its drawers swollen shut.",
+      desc: "A great oak DESK with the leather-bound DIARY open on top and one shallow DRAWER beneath the writing surface.",
+    },
+    studyDrawer: {
+      desc: "A shallow oak DESK DRAWER with a BM-stamped brass pull. Unlike the desk's other seams, it looks ready to OPEN.",
     },
     diary: {
       desc: "A leather-bound diary in a spidery hand. Its ink feathers as you watch, as though freshly written.",
@@ -624,7 +628,7 @@ export const content = {
         "blackened silver bearing only part of an inscription: \"...GLASS, THE HOUSE REMEMBERS.\"",
     },
     backwardsWatch: {
-      roomDesc: "A BM WATCH rests visibly on the DESK beside the open DIARY, its empty face looking elsewhere.",
+      roomDesc: "A BM WATCH rests inside the open DESK DRAWER, its empty face looking elsewhere.",
       desc: "A tarnished brass BM WATCH. Its front is an empty, mirror-like face that reflects nothing but seems " +
         "to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
         "\"WHAT TIME TAKES, BLOOD REMEMBERS.\" Worn on the WRIST, it can scry rooms and prepare routes.",

@@ -1,4 +1,4 @@
-# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+# gary-hotline.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 @walkthrough
 Feature: Gary's hint line
@@ -31,6 +31,7 @@ Feature: Gary's hint line
     And I send "give me a hint about the watch"
     Then the output contains "BM WATCH"
     And the output contains "STUDY"
+    And the output contains "DESK DRAWER"
     And the output contains "DIARY"
 
   Scenario: Call Gary, converse, hang up, and resume play

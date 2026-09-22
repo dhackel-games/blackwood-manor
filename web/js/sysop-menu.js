@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
@@ -107,6 +107,7 @@ const POWERUP = [
   "pull bellrope",
   "wear goggles",
   "fly study",
+  "open studrawer",
   "wear bmwatch",
   "fly parlor",
   "move profile",
@@ -130,6 +131,7 @@ const QUICK_COLLECTION = [
   "pull bellrope",
   "wear goggles",
   "fly study",
+  "open studrawer",
   "wear bmwatch",
   "fly hallbr",
   "open drawer",
@@ -237,6 +239,8 @@ const MAX_COLLECTION = [
   "take all",
   "fly study",
   "read diary",
+  "open studrawer",
+  "wear bmwatch",
   "fly parlor",
   "move painting",
   "open safe with 7 3 9",
@@ -245,8 +249,6 @@ const MAX_COLLECTION = [
   "open drawer",
   "take family",
   "take shard",
-  "fly study",
-  "wear bmwatch",
   "fly astral",
   "wear obsidian",
   "fly dining",

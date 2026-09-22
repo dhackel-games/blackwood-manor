@@ -1,4 +1,4 @@
-<!-- PLAN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- PLAN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Blackwood Manor — Implementation Plan
 
@@ -9,8 +9,8 @@
 > **Current heirloom roster (2026-09-21):** the Bat Sight Mirror is retired;
 > the BLACKWOOD FAMILY RING, BLACKWOOD HAMMER, and restored CANDELABRA hold the
 > +20/+12/+10 heirloom roles. XRAY GOGGLES are non-heirloom EYES equipment, the
-> BM WATCH is a non-heirloom WRIST utility on the STUDY desk, and the former
-> candlestick is the sole portable CANDLE.
+> BM WATCH is a non-heirloom WRIST utility inside the STUDY desk drawer, and
+> the former candlestick is the sole portable CANDLE.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 >

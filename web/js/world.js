@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -85,6 +85,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   safe: "safe",
   talisman: "talisman",
   desk: "desk",
+  studyDrawer: "studrawer",
   diary: "diary",
   wallpaper: "wallpaper",
   musicBox: "musicbox",
@@ -1050,8 +1051,8 @@ function hintEntries(ctx) {
     : ctx.roomOf("mirrorShard") === "hallBedroom"
       ? "The DINING ROOM'S rundown CANDELABRA is missing part of its inscription. EXAMINE the broken MIRROR in the HALL BEDROOM and work its loose SHARD free."
       : "The rundown CANDELABRA needs the MIRROR SHARD in its central recess and the manor's sole CANDLE in its socket. Either piece can go in first.";
-  const watchHint = ctx.roomOf("backwardsWatch") === "study"
-    ? "The BM WATCH rests on the STUDY desk beside the DIARY. Wear it on your WRIST; SHOW a room or ROUTE TO an object and its empty face will guide you."
+  const watchHint = ctx.roomOf("backwardsWatch") === "studyDrawer"
+    ? "The BM WATCH is inside the STUDY'S DESK DRAWER beneath the DIARY. OPEN the drawer and wear the watch on your WRIST; SHOW a room or ROUTE TO an object and its empty face will guide you."
     : "The BM WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
 
   return [
@@ -1083,7 +1084,7 @@ function hintEntries(ctx) {
     { topics: ["bat", "bats", "goggles", "xray", "belfry", "bell", "rope"],
       done: !!ctx.getFlag("progressItem:xrayGoggles"), optional: true, text: gogglesHint },
     { topics: ["watch", "bm", "scry", "show", "route", "guide"],
-      done: ctx.roomOf("backwardsWatch") !== "study", optional: true, text: watchHint },
+      done: ctx.roomOf("backwardsWatch") !== "studyDrawer", optional: true, text: watchHint },
     { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
       text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
@@ -3633,6 +3634,10 @@ const logicWorld = {
       state.items.backwardsWatch.worn =
         state.items.backwardsWatch.loc === "inventory" && !!oldWatch?.worn;
     }
+    if (!savedItems?.studyDrawer && state.items.backwardsWatch.loc === "study") {
+      state.items.backwardsWatch.loc = "studyDrawer";
+      state.items.backwardsWatch.worn = false;
+    }
 
     if (!savedItems?.blackwoodHammer) {
       const oldWatchLocation = oldWatch?.loc;
@@ -4664,7 +4669,7 @@ const logicWorld = {
     backwardsWatch: {
       names: ["bm watch", "watch", "wristwatch"],
       adjectives: ["bm", "blackwood", "tarnished", "backwards", "brass"],
-      loc: "study", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
+      loc: "studyDrawer", takeable: true, wearable: true, worn: false, wearSlot: "wrist",
       on: {
         examine: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
         show: (ctx, cmd) => lookThroughBmWatch(ctx, cmd),
@@ -4791,6 +4796,11 @@ const logicWorld = {
     // --- study diary ---
     desk: {
       names: ["desk"], adjectives: ["oak"], loc: "study", fixed: true, scenery: true,
+    },
+    studyDrawer: {
+      names: ["drawer", "desk drawer"], adjectives: ["desk", "study", "oak", "shallow"],
+      loc: "study", fixed: true, scenery: true,
+      container: true, openable: true, open: false, capacity: 2,
     },
     diary: {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,

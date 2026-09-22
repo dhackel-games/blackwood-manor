@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Blackwood Manor
 
@@ -68,8 +68,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   HEADLAMP provides 200 turns of light with a `💡` HUD countdown; the antique
   BM-marked XRAY GOGGLES dropped by the belfry bats show `👁️ ∞` and reveal the
   same clues as mushroom vision; WINGED SHOES show `🪽 ∞` and provide permanent
-  named-room flight while worn. The STUDY desk holds the WRIST-slot BM WATCH,
-  which scries rooms and prepares routes but is not an heirloom.
+  named-room flight while worn. A DRAWER in the STUDY desk holds the WRIST-slot
+  BM WATCH, which scries rooms and prepares routes but is not an heirloom. The
+  leather-bound DIARY remains open on the desk.
   The OBSIDIAN EYE must be worn on the FOREHEAD to provide permanent hidden
   sight (`👁️ ∞`); it can coexist with XRAY GOGGLES but does not illuminate darkness.
 - **Look around:** `look` (`l`), `examine` (`ex`/`x`), and `search` without an
@@ -142,8 +143,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   end rings `DONG... DONG...`, scatters the bats, awards +5, and drops the
   non-heirloom BLACKWOOD XRAY GOGGLES. Their first acquisition still awards +5,
   and they can remain worn during `PUT ALL`. The retired Bat Sight Mirror is
-  absent from new games. The BM WATCH rests visibly on the STUDY desk beside the
-  DIARY and provides its utility:
+  absent from new games. The BM WATCH waits inside the STUDY'S DESK DRAWER,
+  beneath the leather-bound DIARY on the desktop, and provides its utility:
   `SHOW <room> IN WATCH`, or simply `SHOW <room>` while carrying it, displays that room's normal and
   THIRD EYE descriptions, then prefills the unexecuted directions. `GUIDE`,
   `PATH`, or `ROUTE TO <room-or-object>` finds the destination through the

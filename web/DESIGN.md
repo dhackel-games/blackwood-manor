@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -70,7 +70,7 @@ editor. Use the language's native comment delimiter (`//`, `#`, `/* ... */`, or
 line two. Example for this build:
 
 ```js
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 ```
 
 ---
@@ -214,8 +214,9 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
   fixture in either order. The restored candelabra becomes the +10 heirloom and
   a permanent light source.
 - **The diary** (study) reveals the **safe** combination (behind the portrait);
-  the safe holds a treasure. A non-heirloom **BM Watch** rests visibly on the
-  desk beside the diary and scries rooms or prepares routes while carried.
+  the safe holds a treasure. The leather-bound diary remains on the desktop,
+  while an openable desk drawer beneath it holds the non-heirloom **BM Watch**,
+  which scries rooms or prepares routes while carried.
 - **Music box** (nursery) yields a tiny key → opens the **jewelry box** (grand bedroom) →
   Ravenblood Ring.
 - **Hall Bedroom:** the night-table drawer contains the +20 **Blackwood Family
@@ -825,8 +826,8 @@ The HUD displays used slots as `👤 used/6` before acquisition and `👜 used/2
 afterward; worn equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
-and reports remaining power in the `💡` HUD slot. The STUDY'S DESK visibly holds
-the BM WATCH beside the DIARY. Worn on the WRIST, the watch stays with the
+and reports remaining power in the `💡` HUD slot. The STUDY'S DESK keeps the
+leather-bound DIARY on top and the BM WATCH inside a shallow DRAWER. Worn on the WRIST, the watch stays with the
 player during bulk deposits and provides room/object scrying plus route prefill
 without reporting heirloom counts or turns. The HALL BEDROOM lies NORTH of the
 UPSTAIRS LANDING; its NIGHT TABLE DRAWER contains the BLACKWOOD FAMILY RING,
@@ -860,8 +861,8 @@ preserving spoiler hiding for both secret destinations.
   bats, and drops antique BM-marked XRAY GOGGLES onto the belfry floor. The
   goggles are non-heirloom EYES equipment, retain hidden-vision and darkness
   sight, and keep their +5 first-acquisition award.
-- **BM Watch utility.** The watch rests visibly on the STUDY desk beside the
-  DIARY, is wearable on the WRIST, and is not a required heirloom. Its empty,
+- **BM Watch utility.** The watch waits inside an openable STUDY desk drawer
+  beneath the DIARY, is wearable on the WRIST, and is not a required heirloom. Its empty,
   mirror-like face inherits the retired Bat Sight Mirror's scrying and route
   behavior. `SHOW <room> IN WATCH` and carried-watch shorthand `SHOW <room>`
   see the normal and third-eye descriptions without marking the room visited,
@@ -1060,8 +1061,8 @@ total. Three roles move one-for-one: the retired BAT SIGHT MIRROR'S +20 role
 moves to the restored BLACKWOOD FAMILY RING, the former required watch's +12
 role moves to the BLACKWOOD HAMMER, and the silver CANDLESTICK'S +10 role moves
 to the restored CANDELABRA. The XRAY GOGGLES remain non-heirloom EYES equipment.
-The BM WATCH remains a non-heirloom WRIST utility, now visible on the STUDY
-desk, and owns the retired mirror's scrying and route-prefill behavior.
+The BM WATCH remains a non-heirloom WRIST utility, now inside the STUDY desk
+drawer, and owns the retired mirror's scrying and route-prefill behavior.
 
 Save migration recognizes schemas from saved item definitions rather than a
 brittle global version number. Pre-redesign saves map Bat Sight Mirror
@@ -1071,6 +1072,6 @@ any erroneous goggles heirloom location or score credit to the ring, then
 return the goggles to a sensible equipment location. Historical saves that
 already contain `familyRing` preserve its location, worn state, and one-time
 deposit credit. Existing watch owners keep carried/worn state where possible;
-untouched legacy watch placements move to the STUDY. The hammer and candelabra
-migrations remain one-for-one, and score flags are transferred rather than
-re-awarded so restored games cannot double-score.
+untouched legacy watch placements move inside the STUDY desk drawer. The
+hammer and candelabra migrations remain one-for-one, and score flags are
+transferred rather than re-awarded so restored games cannot double-score.

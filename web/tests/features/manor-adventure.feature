@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -100,6 +100,7 @@ Feature: Blackwood Manor adventure
       up
       south
       read diary
+      open desk drawer
       wear watch
       north
       north
@@ -464,7 +465,7 @@ Feature: Blackwood Manor adventure
       | landing       | CORD                             |
       | nursery       | JEWELED MUSIC BOX                |
       | masterBedroom | JEWELRY BOX                      |
-      | study         | DESK,DIARY                       |
+      | study         | DESK,DIARY,DRAWER                |
       | hallBedroom   | MIRROR,NIGHT TABLE               |
       | attic         | ANCESTRAL PORTRAIT               |
 

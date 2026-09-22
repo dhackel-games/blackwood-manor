@@ -392,7 +392,7 @@
   },
   "study": {
     "name": "Study",
-    "desc": "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it beside a BM WATCH, as though their owner had just stepped away. The UPSTAIRS LANDING lies NORTH.",
+    "desc": "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, as though its writer had just stepped away. Beneath the writing surface is a shallow DESK DRAWER with a BM-stamped brass pull. The UPSTAIRS LANDING lies NORTH.",
     "items": [
       {
         "id": "backwardsWatch",
@@ -403,6 +403,11 @@
         "id": "diary",
         "label": "diary",
         "kind": "takeable"
+      },
+      {
+        "id": "studyDrawer",
+        "label": "drawer",
+        "kind": "container"
       },
       {
         "id": "desk",

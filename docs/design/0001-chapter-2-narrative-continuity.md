@@ -1,12 +1,12 @@
-<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven. -->
+<!-- 0001-chapter-2-narrative-continuity.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven. -->
 
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
 > **CORRECTION 2026-09-21:** The required set remains thirteen. The +20 slot
 > belongs to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer.
 > BELFRY bats still drop BM-marked XRAY GOGGLES, but the goggles are
-> non-heirloom EYES equipment. The non-heirloom BM WATCH rests visibly on the
-> STUDY desk beside the diary and retains the retired Bat Sight Mirror's
+> non-heirloom EYES equipment. The non-heirloom BM WATCH waits inside the
+> STUDY desk drawer beneath the leather-bound diary and retains the retired Bat Sight Mirror's
 > scry/route behavior. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
 > between the walls. The old candlestick is now the sole portable CANDLE;
 > together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10

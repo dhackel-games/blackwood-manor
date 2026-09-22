@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.106:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -151,7 +151,7 @@ const INCORRECT_REDESIGN_TREASURES = [
 
 function preRedesignSnapshot(game) {
   const snapshot = game.snapshot();
-  for (const id of ["familyRing", "blackwoodHammer", "candelabra", "candelabraFrame", "mirrorShard"]) {
+  for (const id of ["familyRing", "blackwoodHammer", "candelabra", "candelabraFrame", "mirrorShard", "studyDrawer"]) {
     delete snapshot.state.items[id];
   }
   snapshot.state.items.batSightMirror = {
@@ -183,6 +183,7 @@ function preRedesignSnapshot(game) {
 function precedingRedesignSnapshot(game) {
   const snapshot = game.snapshot();
   delete snapshot.state.items.familyRing;
+  delete snapshot.state.items.studyDrawer;
   snapshot.state.items.xrayGoggles.treasure = true;
   snapshot.state.items.xrayGoggles.points = 20;
   snapshot.state.items.backwardsWatch.loc = "nightDrawer";
@@ -196,7 +197,7 @@ function precedingRedesignSnapshot(game) {
 
 function historicalFamilyRingSnapshot(game) {
   const snapshot = game.snapshot();
-  for (const id of ["blackwoodHammer", "candelabra", "candelabraFrame", "mirrorShard"]) {
+  for (const id of ["blackwoodHammer", "candelabra", "candelabraFrame", "mirrorShard", "studyDrawer"]) {
     delete snapshot.state.items[id];
   }
   snapshot.state.items.backwardsWatch.loc = "betweenWalls";
@@ -326,6 +327,14 @@ Given("a historical save with the family ring worn is restored", function () {
   snapshot.state.items.familyRing.worn = true;
   snapshot.state.flags["heirloomScore:familyRing"] = true;
   snapshot.state.score = 20;
+  this.game.restore(snapshot);
+});
+
+Given("a build-three save with the untouched desk watch is restored", function () {
+  const snapshot = this.game.snapshot();
+  delete snapshot.state.items.studyDrawer;
+  snapshot.state.items.backwardsWatch.loc = "study";
+  snapshot.state.items.backwardsWatch.worn = false;
   this.game.restore(snapshot);
 });
 
@@ -807,7 +816,7 @@ Then("the static 2D rooms show the redesigned item placements", function () {
   assert.deepEqual(ids("diningRoom"), ["candelabraFrame", "candlestick"]);
   assert.deepEqual(ids("hallBedroom"),
     ["bedsideLamp", "familyRing", "hallBed", "hallMirror", "mirrorShard", "nightDrawer", "nightTable"]);
-  assert.deepEqual(ids("study"), ["backwardsWatch", "desk", "diary"]);
+  assert.deepEqual(ids("study"), ["backwardsWatch", "desk", "diary", "studyDrawer"]);
   assert.deepEqual(ids("belfry"), ["belfryBats", "belfryBellRope", "bell"]);
   assert.deepEqual(ids("betweenWalls"), ["blackwoodHammer"]);
   assert.deepEqual(ids("nursery"), ["musicBox", "tinyKey", "wallpaper"]);
