@@ -1,4 +1,4 @@
-# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# belfry-xray-watch.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.104:acoven.
 
 @unit
 Feature: Belfry goggles and Woodblack Watch
@@ -56,6 +56,14 @@ Feature: Belfry goggles and Woodblack Watch
     And the current room is "belfry"
     And flag "seen:kitchen" is unset
 
+  Scenario: The visible watch must be taken before its black crystal can scry
+    Given the player is in room "hallBedroom"
+    When I send "open drawer"
+    And I send "look in watch at kitchen"
+    Then the output contains "need to take or wear the WOODBLACK WATCH"
+    And item "backwardsWatch" is in "nightDrawer"
+    And flag "mirrorRoutePrefill" is unset
+
   Scenario: The Woodblack Watch covers every Part I room
     Then the Woodblack Watch can view every Part I room
 
@@ -112,6 +120,13 @@ Feature: Belfry goggles and Woodblack Watch
     Then the output contains "(route to LEATHER DIARY with WOODBLACK WATCH)"
     And the output contains "DIARY is in STUDY"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; s"
+
+  Scenario: A watch route ignores a destroyed namesake when targeting an object
+    Given item "backwardsWatch" is carried
+    And the player is in room "belfry"
+    When I send "route to candelabra"
+    Then the output contains "CANDELABRA is in DINING ROOM"
+    And the output contains "ROUTE READY"
 
   Scenario Outline: Guide commands explain their watch requirement
     When I send "<command>"

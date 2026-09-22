@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.104:acoven.
 // ALL CONTENT for Blackwood Manor.
 // This is the ONLY file you edit to expand the game. The engine (core/parser/
 // commands) never needs to change. See README.md for the "how to add a room" guide.
@@ -293,13 +293,16 @@ function resolveWatchDestination(ctx, phrase) {
     const [roomId, room] = roomMatch;
     return { roomId, room, label: room.name };
   }
-  const matches = ctx.findItems(phrase, Object.values(ctx.state.items)) || [];
+  const destinations = Object.values(ctx.state.items).map((item) => {
+    const roomId = containingRoom(ctx, item);
+    const room = roomId ? ctx.world.rooms[roomId] : null;
+    return room && room.phase !== 2
+      ? { roomId, room, item, label: item.names[0] }
+      : null;
+  }).filter(Boolean);
+  const matches = ctx.findItems(phrase, destinations.map(({ item }) => item)) || [];
   if (matches.length !== 1) return null;
-  const item = matches[0];
-  const roomId = containingRoom(ctx, item);
-  const room = roomId ? ctx.world.rooms[roomId] : null;
-  if (!room || room.phase === 2) return null;
-  return { roomId, room, item, label: item.names[0] };
+  return destinations.find(({ item }) => item.id === matches[0].id) || null;
 }
 
 function prepareWatchRoute(ctx, roomId) {
@@ -321,6 +324,9 @@ function lookThroughWoodblackWatch(ctx, cmd) {
   if (!target) {
     return inspectWoodblackWatch(ctx) + "\n\nThe black crystal waits for a destination. Try SHOW KITCHEN, " +
       "SHOW KITCHEN IN WATCH, LOOK IN WATCH AT KITCHEN, or ROUTE TO DIARY.";
+  }
+  if (!ctx.has("backwardsWatch")) {
+    return "You need to take or wear the WOODBLACK WATCH before you can look through it.";
   }
   ctx.setFlag("mirrorRoutePrefill", null);
   const match = resolveWatchRoom(ctx, target);
