@@ -117,11 +117,13 @@ later find it.** You are not just hiding objects in space; **you are hiding them
 
 Rules of the loop:
 
-- **One heirloom per time period.** Each time zone contains exactly **one** of the 13 items,
-  plus **clues** to the others. You must locate that period's item and **put it where it
-  belongs** on BM1's map (its hiding room) — **not** in the reliquary. (You are *authoring* the
-  BM1 dungeon: nursery=music box, crypt=locket, attic=portrait, the safe=talisman, the dragon
-  antechamber=ring, etc. — the exact scatter BM1 players later un-do.)
+- **Original loop rule: one heirloom per time period.** Each time zone was
+  intended to contain exactly one of the 13 items, plus clues to the others.
+  The implemented Hour XIII now uses the non-heirloom EMERALD, while the
+  2026-09-21 Part-I roster still contains thirteen required pieces. Before
+  Hours XII–I ship, the schedule must be revised without changing Part I's
+  canonical set. The core verb remains: locate each period's target and put it
+  where it belongs on BM1's map, not in the reliquary.
 - **The clock is the master timer.** It starts on **13**, ticking **down**. It will **not
   advance from 13 → 12 until you've found the 13th item and returned it to its place in your
   starting timeline** ("maybe a few days before — call it *zero time*"). Then 12 → 11, and so
@@ -185,8 +187,10 @@ loop that never reaches 0 in the player's favor).
 
 ## Part E — Heirloom-origin puzzles ("why is it *there*?")
 
-Each of the 13 gets an **origin scene** whose logic **explains its BM1 hiding spot.** Two are
-worked out; the rest are seeds to fill.
+Each required heirloom still needs an **origin scene** whose logic explains its
+BM1 hiding spot. Hour XIII's emerald scene is an additional implemented
+set-piece, so the remaining hour-to-heirloom schedule is deliberately not
+claimed as final here.
 
 **Design law:** *the object's BM1 location must be earned by its origin.* Don't place things
 randomly — invent the moment that logically strands each heirloom exactly where BM1 finds it.

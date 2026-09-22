@@ -688,6 +688,10 @@ Then("item {string} has fuel {int}", function (item, fuel) {
   assert.equal(this.game.item(item).fuel, fuel);
 });
 
+Then("item {string} has no finite fuel", function (item) {
+  assert.equal(this.game.item(item).fuel, undefined);
+});
+
 Then("the default name uses three distinct twelve-entry pools", function () {
   const parts = world.config.defaultPlayerNameParts;
   for (const pool of [parts.titles, parts.moods, parts.garments]) {

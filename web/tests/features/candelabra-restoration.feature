@@ -21,6 +21,12 @@ Feature: Restore the dining-room candelabra
     And the output contains "...GLASS, THE HOUSE REMEMBERS"
     And the output does not contain "WHEN THE LAST LIGHT MEETS BROKEN GLASS"
 
+  Scenario: REMOVE also works the loose shard free
+    Given the player is in room "hallBedroom"
+    When I send "remove shard"
+    Then item "mirrorShard" is carried
+    And the output contains "work the central MIRROR SHARD free"
+
   Scenario: The rundown fixture describes both missing parts without solving itself
     Given the player is in room "diningRoom"
     When I send "examine candelabra"
@@ -58,7 +64,7 @@ Feature: Restore the dining-room candelabra
     Examples:
       | first                     | missing                      | second                    |
       | put shard in candelabra   | empty candle socket          | put candle on candelabra  |
-      | put candle in candelabra  | mirror-shaped recess         | put shard into candelabra |
+      | place candle on candelabra | mirror-shaped recess        | put shard into candelabra |
 
   Scenario: The restored candelabra is a required ten-point heirloom
     Given the restored candelabra is carried
@@ -74,6 +80,7 @@ Feature: Restore the dining-room candelabra
     When I send "wait"
     And I send "extinguish candelabra"
     Then item "candelabra" is lit
+    And item "candelabra" has no finite fuel
     And the output contains "no fuel to spend"
     When I send "look"
     Then the output does not contain "pitch black"
