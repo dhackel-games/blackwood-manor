@@ -1,4 +1,4 @@
-# project.yml. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-17.107:dhackel.
+# project.yml. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-25.001:dhackel.
 name: BlackwoodManor
 options:
   bundleIdPrefix: com.dhackel
@@ -8,8 +8,8 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "2026.9.11"
-    CURRENT_PROJECT_VERSION: "107"
+    MARKETING_VERSION: "2026.9.25"
+    CURRENT_PROJECT_VERSION: "1"
 
 targets:
   BlackwoodManor:
@@ -35,8 +35,8 @@ targets:
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: "Blackwood Manor turns what you say into game commands."
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1,2"
-        MARKETING_VERSION: "2026.9.11"
-        CURRENT_PROJECT_VERSION: "107"
+        MARKETING_VERSION: "2026.9.25"
+        CURRENT_PROJECT_VERSION: "1"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 9W789FP4LG
         SWIFT_VERSION: "5.0"
