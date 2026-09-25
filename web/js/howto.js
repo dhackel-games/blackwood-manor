@@ -107,7 +107,11 @@ export function initHowto(opts = {}) {
         <h3>The thirteen heirlooms</h3>
         <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
         into the Reliquary the moment they're enshrined. <b>Hover (or tap) any relic for its story.</b></p>
-        <div class="howto-gallery" id="howtoGallery"></div>
+        <div class="howto-gallery-wrap">
+          <button type="button" class="howto-gallery-nav prev" id="howtoGalleryPrev" aria-label="scroll heirlooms left">\u2039</button>
+          <div class="howto-gallery" id="howtoGallery"></div>
+          <button type="button" class="howto-gallery-nav next" id="howtoGalleryNext" aria-label="scroll heirlooms right">\u203A</button>
+        </div>
 
         <h3>The Reliquary</h3>
         <div class="howto-reliquary">
@@ -201,6 +205,14 @@ export function initHowto(opts = {}) {
     });
     gallery.appendChild(item);
   }
+
+  // --- gallery left/right scroll arrows ---
+  function scrollGalleryBy(dir) {
+    const step = (gallery.querySelector(".howto-item")?.offsetWidth || 84) + 8;
+    gallery.scrollBy({ left: dir * step * 2, behavior: "smooth" });
+  }
+  overlay.querySelector("#howtoGalleryPrev")?.addEventListener("click", () => scrollGalleryBy(-1));
+  overlay.querySelector("#howtoGalleryNext")?.addEventListener("click", () => scrollGalleryBy(1));
 
   // --- open / close ---
   function open() { overlay.classList.add("open"); }

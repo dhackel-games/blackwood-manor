@@ -10,7 +10,7 @@
   * { box-sizing: border-box; }
   html, body { margin:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:"Courier New", monospace; }
-  body { display:flex; flex-direction:column; height:100vh; overflow:hidden; }
+  body { display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
   header { padding:10px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
   header h1 { margin:0; font-size:15px; letter-spacing:1px; }
   header .howto-btn { float:right; margin-left:10px; padding:5px 11px; border-radius:7px;
@@ -38,6 +38,7 @@
   header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
   .bar { display:flex; flex-wrap:wrap; gap:14px; align-items:center;
     padding:8px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
+  .map-settings-btn, .bar-backdrop, .bar-sheet-head, .map-btn-row { display:none; }
   label { font-size:12px; color:var(--dim); }
   select, button { font-family:inherit; font-size:13px; background:var(--panel);
     color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
@@ -46,6 +47,8 @@
 
   /* middle band: map scrolls, inspector pinned on the right */
   .main { flex:1 1 auto; display:flex; min-height:0; }
+  .map-hero { display:contents; }                 /* desktop: no box, stage is the flex child */
+  .map-nav { display:none; }                       /* on-map D-pad is a mobile-only affordance */
   .stage { flex:1 1 auto; padding:16px; overflow:auto; }
   .canvas-wrap { position:relative; display:inline-block; line-height:0; }
   canvas { background:#000; border:1px solid var(--line); border-radius:8px;
@@ -229,9 +232,21 @@
   .howto-mode p { font-size:11.5px; color:var(--dim); line-height:1.45; margin:0; }
   .howto-mode kbd { background:#1a2430; border:1px solid #2a3b2f; border-radius:4px;
     padding:1px 4px; font-size:10.5px; color:#8fd3ff; }
-  .howto-gallery { display:flex; flex-wrap:wrap; justify-content:center;
-    gap:8px; margin-top:4px; }
-  .howto-item { flex:0 0 100px; text-align:center; padding:6px 4px 5px;
+  .howto-gallery-wrap { position:relative; margin-top:4px; }
+  .howto-gallery { display:flex; flex-wrap:nowrap; overflow-x:auto; scroll-snap-type:x proximity;
+    gap:8px; padding:2px 2px 6px; scrollbar-width:none; -ms-overflow-style:none; }
+  .howto-gallery::-webkit-scrollbar { display:none; }
+  .howto-gallery-wrap::before, .howto-gallery-wrap::after { content:""; position:absolute;
+    top:0; bottom:6px; width:22px; z-index:1; pointer-events:none; }
+  .howto-gallery-wrap::before { left:0; background:linear-gradient(90deg,var(--panel),transparent); }
+  .howto-gallery-wrap::after { right:0; background:linear-gradient(270deg,var(--panel),transparent); }
+  .howto-gallery-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:2;
+    width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:#0c1016d9; border:1px solid #2f4a63; color:var(--ink); cursor:pointer; font-size:14px; }
+  .howto-gallery-nav:hover { border-color:#c9a24b; color:#f0d99a; }
+  .howto-gallery-nav.prev { left:-4px; }
+  .howto-gallery-nav.next { right:-4px; }
+  .howto-item { flex:0 0 84px; scroll-snap-align:start; text-align:center; padding:6px 4px 5px;
     background:linear-gradient(180deg,#111925,#0d141d);
     border:1px solid #1c2733; border-radius:8px; cursor:pointer;
     transition:transform .16s ease, border-color .16s, box-shadow .16s;
@@ -294,6 +309,117 @@
     to { opacity:1; transform:none; } }
   @keyframes howtoPop { from { opacity:0; transform:translateY(8px) scale(.96); }
     to { opacity:1; transform:none; } }
+
+  /* ---------------------------------------------------------------------------
+     PHASE 1 MOBILE LAYOUT (additive; desktop rules above are untouched).
+     Narrow screens can't afford the fixed 300px side rail or a wide toolbar, so
+     below 820px we: stack the inspector UNDER the hero map, turn the dev bar
+     into one compact horizontally-scrollable row, enlarge touch targets, and
+     drop non-essential chrome. The 2D view stays pure static HTML/CSS/JS, so it
+     still ships through the existing web/ OTA content updater.
+     --------------------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------------
+     PHASE 2 MOBILE LAYOUT (additive; desktop rules above are untouched).
+     Phase 1 just let the dev toolbar scroll horizontally in place — still a
+     wall of raw <select>/<button> chrome sitting on top of the map on a phone.
+     Phase 2 removes it from the flow entirely: on narrow screens the map is
+     the hero, full width, right under the header. All the floor/labels/zoom/
+     auto-tour/reset/atlas controls move into a single "⚙ Map settings" sheet
+     that slides up from the bottom on demand, styled as a real vertical list
+     of full-width, thumb-sized controls instead of cramped inline chrome.
+     --------------------------------------------------------------------------- */
+  @media (max-width: 820px) {
+    header { padding:8px 12px; }
+    header h1 { font-size:13px; }
+    header details { display:none; }               /* redundant with "How to play" */
+
+    /* Persistent, single-tap entry point for every map/dev control. */
+    .map-btn-row { display:flex; gap:8px; margin:8px 12px 0; }
+    .map-settings-btn { display:block; flex:1 1 0; padding:9px 14px;
+      font:700 13px "Courier New", monospace; letter-spacing:.5px; color:var(--ink);
+      background:var(--panel); border:1px solid var(--line); border-radius:8px; }
+    .map-settings-btn:active { border-color:#8fd3ff; color:#8fd3ff; }
+    .focus-toggle-btn.on { border-color:#49ff7a; color:#49ff7a; }
+
+    /* The bar itself becomes a bottom sheet: hidden until opened, then a
+       full-width panel of stacked, full-size controls (no more tiny inline
+       selects crammed into one scrolling row). */
+    .bar { display:none; position:fixed; left:0; right:0; bottom:0; z-index:56;
+      flex-direction:column; align-items:stretch; gap:10px;
+      max-height:75dvh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+      padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+      background:linear-gradient(180deg,#0c1016,#080b10);
+      border:1px solid #2f4a63; border-bottom:none;
+      border-radius:16px 16px 0 0; box-shadow:0 -18px 50px #000c;
+      animation:barSheetRise .22s cubic-bezier(.2,.8,.2,1); }
+    .bar.open { display:flex; }
+    .bar-backdrop { display:none; position:fixed; inset:0; z-index:55;
+      background:rgba(3,5,8,.6); backdrop-filter:blur(2px); }
+    .bar-backdrop.open { display:block; }
+    .bar-sheet-head { display:flex; align-items:center; justify-content:space-between;
+      font:700 13px "Courier New", monospace; letter-spacing:1px; color:#8fd3ff;
+      text-transform:uppercase; padding-bottom:4px; border-bottom:1px solid var(--line); }
+    /* the close × is a small square button, not a full-width control — beat
+       the generic `.bar button{width:100%}` rule with a more specific selector */
+    .bar .bar-sheet-head button { flex:0 0 auto; width:34px; height:34px; padding:0;
+      font-size:20px; line-height:1; border-radius:8px; }
+
+    /* every label/select/checkbox row goes full width and stacked, not inline */
+    .bar label { display:flex; flex-direction:column; align-items:stretch; gap:6px;
+      font-size:13px; }
+    .bar label:has(input[type="checkbox"]) { flex-direction:row; align-items:center; }
+    .bar select, .bar button { width:100%; font-size:16px; padding:11px 12px; }
+    .bar input[type="checkbox"] { width:20px; height:20px; }
+
+    /* the row of action buttons (drop bait / auto-tour / reset / load atlas /
+       pause) reads better as a 2-up grid than a stack of full-width buttons */
+    .bar .bar-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .bar .bar-actions > button:not([hidden]) { display:block; width:100%; }
+
+    /* Keep the phone settings sheet minimal — only the controls a player needs
+       (jump-to-floor + zoom). The dev/demo controls (reveal all, label style,
+       drop bait, auto-tour, auto speed, reset, load atlas) stay desktop-only. */
+    .bar label:has(#reveal),
+    .bar label:has(#labelMode),
+    .bar label:has(#autoSpeed),
+    .bar .bar-actions { display:none; }
+
+    @keyframes barSheetRise { from { transform:translateY(24px); opacity:.4; }
+      to { transform:none; opacity:1; } }
+
+    /* map is the hero on top; inspector becomes a short panel beneath it */
+    .main { display:contents; }
+    /* the map hero holds the scrolling stage plus a pinned D-pad overlay */
+    .map-hero { display:block; position:relative; flex:0 0 auto; height:46dvh; min-height:240px; }
+    .stage { padding:8px; height:100%; overflow:auto; }
+    .stage.focus { overflow:hidden; touch-action:none; }
+    .side { flex:1 1 auto; min-height:0; max-height:none; overflow:auto;
+      border-left:none; border-top:1px solid var(--line); }
+    .textbar { max-height:14dvh; overflow-y:auto; }
+
+    /* On-map movement pad: arrows sit over the room image at the edges. The
+       layer ignores taps except on the buttons themselves. */
+    .map-nav { display:block; position:absolute; inset:8px; pointer-events:none; z-index:6; }
+    .map-nav button { position:absolute; pointer-events:auto; width:48px; height:48px;
+      display:flex; align-items:center; justify-content:center; padding:0;
+      font-size:22px; line-height:1; color:#eaf6ff; border-radius:50%;
+      border:1px solid rgba(143,211,255,.55); background:rgba(8,12,18,.62);
+      backdrop-filter:blur(2px); box-shadow:0 2px 10px #000a; }
+    .map-nav button:active { background:rgba(73,255,122,.28); border-color:#49ff7a; color:#fff; }
+    .map-nav .nav-n { top:2px;    left:50%; transform:translateX(-50%); }
+    .map-nav .nav-s { bottom:2px; left:50%; transform:translateX(-50%); }
+    .map-nav .nav-e { right:2px;  top:50%;  transform:translateY(-50%); }
+    .map-nav .nav-w { left:2px;   top:50%;  transform:translateY(-50%); }
+    .map-nav .nav-up   { top:2px;    right:2px; font-size:15px; flex-direction:column; }
+    .map-nav .nav-down { bottom:2px; right:2px; font-size:15px; flex-direction:column; }
+    .map-nav .nav-lbl { font-size:8px; letter-spacing:.5px; margin-top:-2px; }
+
+    /* the text exit list is replaced by the on-map arrows on phones */
+    .exits { display:none; }
+    /* bigger, thumb-friendly controls elsewhere; 16px input avoids iOS focus-zoom */
+    .cmdbar input { font-size:16px; }
+    .legend { display:none; }                      /* color key: desktop nicety */
+  }
   @keyframes rewardGlow {
     0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
     50% { box-shadow:inset 0 0 18px rgba(201,162,75,.4), 0 0 22px rgba(201,162,75,.4); } }
@@ -325,7 +451,7 @@
     </span>
   </div>
   <button id="howtoBtn" class="howto-btn" type="button">📖 How to play</button>
-  <h1>CHAPTER 2 — WALK THE MANOR AS GARY (2D map)</h1>
+  <h1>CHAPTER 2 — WALK THE MANOR (2D map)</h1>
   <details>
     <summary>what is this?</summary>
     <p>Walk Blackwood Manor room to room — the manor you explore in
@@ -341,7 +467,17 @@
   </details>
 </header>
 
-<div class="bar">
+<div class="map-btn-row">
+  <button id="focusToggle" class="map-settings-btn focus-toggle-btn" type="button">🗺 Show full map</button>
+  <button id="mapSettingsBtn" class="map-settings-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mapBar">⚙ Map settings</button>
+</div>
+<div class="bar-backdrop" id="barBackdrop"></div>
+
+<div class="bar" id="mapBar">
+  <div class="bar-sheet-head">
+    <span>Map settings</span>
+    <button id="barClose" type="button" aria-label="close">×</button>
+  </div>
   <label>Jump to floor
     <select id="floor"></select>
   </label>
@@ -360,8 +496,10 @@
       <option value="4">4×</option>
     </select>
   </label>
-  <button id="baitBtn">drop bait (B)</button>
-  <button id="tourBtn">▶ auto-tour</button>
+  <div class="bar-actions">
+    <button id="baitBtn">drop bait (B)</button>
+    <button id="tourBtn">▶ auto-tour</button>
+  </div>
   <label>Auto speed
     <select id="autoSpeed">
       <option value="1450">🐢 slow</option>
@@ -371,18 +509,23 @@
       <option value="200">⚡ turbo</option>
     </select>
   </label>
-  <button id="autoPauseBtn" hidden>⏸ pause</button>
-  <button id="resetBtn">reset</button>
-  <button id="atlasBtn">load atlas…</button>
+  <div class="bar-actions">
+    <button id="autoPauseBtn" hidden>⏸ pause</button>
+    <button id="resetBtn">reset</button>
+    <button id="atlasBtn">load atlas…</button>
+  </div>
   <input type="file" id="atlasFile" accept="image/png,image/*" hidden />
 </div>
 
 <div class="main">
-  <div class="stage">
-    <div class="canvas-wrap" id="wrap">
-      <canvas id="c" tabindex="0"></canvas>
-      <div class="labels-ov" id="labelsOv"></div>
+  <div class="map-hero">
+    <div class="stage">
+      <div class="canvas-wrap" id="wrap">
+        <canvas id="c" tabindex="0"></canvas>
+        <div class="labels-ov" id="labelsOv"></div>
+      </div>
     </div>
+    <nav class="map-nav" id="mapNav" aria-label="Move"></nav>
   </div>
   <aside class="side">
     <div id="side"></div>
@@ -468,7 +611,11 @@
       <h3>The thirteen heirlooms</h3>
       <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
       into the Reliquary the moment they're enshrined. <b>Hover (or tap) any relic for its story.</b></p>
-      <div class="howto-gallery" id="howtoGallery"></div>
+      <div class="howto-gallery-wrap">
+        <button type="button" class="howto-gallery-nav prev" id="howtoGalleryPrev" aria-label="scroll heirlooms left">‹</button>
+        <div class="howto-gallery" id="howtoGallery"></div>
+        <button type="button" class="howto-gallery-nav next" id="howtoGalleryNext" aria-label="scroll heirlooms right">›</button>
+      </div>
 
       <h3>The Reliquary</h3>
       <div class="howto-reliquary">
@@ -525,6 +672,7 @@
   const hud = document.getElementById("hud");
   const awardsHud = createHud(document);
   const exitsEl = document.getElementById("exits");
+  const mapNav = document.getElementById("mapNav");
   const sideEl = document.getElementById("side");
   const trailList = document.getElementById("trailList");
   const trailClear = document.getElementById("trailClear");
@@ -883,6 +1031,20 @@
   const GUEST_START = "greatOak";
   let gary, seen, steps, msg, guest, bait, lured, focusId, recenter;
   let lastLayout = null, lastFloor = 0;
+  // Focus mode: on phones the default view is a single "room card" (the current
+  // room fills the frame — no floating void, no half-visible neighbours). The
+  // player moves with the direction buttons; "Show full map" drops back to the
+  // zoomed-out overview. curScale is the scale actually used to draw each frame.
+  let focusMode = false, curScale = 2;
+  // Scale that makes the current room cover the map viewport (crops the
+  // surrounding corridors/neighbours). Clamped so it never over/under-zooms.
+  function fitScale(layout) {
+    const box = layout.boxes.find((b) => b.id === gary);
+    if (!box) return Number(zoom.value);
+    const vw = stage.clientWidth || 1, vh = stage.clientHeight || 1;
+    const cover = Math.max(vw / (box.w * TILEPX), vh / (box.h * TILEPX));
+    return Math.max(1.4, Math.min(cover, 6));
+  }
   function reset() {
     stopTour(); stopAuto();
     knownCarried = null;
@@ -925,8 +1087,9 @@
     const floor = FLOORS[fi];
     const layout = buildTileGrid(floor, { isSeen, playerRoom: gary });
     lastLayout = layout; lastFloor = fi;
+    curScale = focusMode ? fitScale(layout) : Number(zoom.value);
     drawToCanvas(canvas, layout, {
-      tile: TILEPX, scale: Number(zoom.value),
+      tile: TILEPX, scale: curScale,
       showLabels: labelMode.value === "8bit",
       atlas, atlasMap: atlas ? atlasMap : null, atlasTile: 32,
     });
@@ -936,13 +1099,14 @@
     drawFire(layout);
     drawSick(layout);
     drawDragon(layout);
-    drawFocusRing(layout);
+    if (!focusMode) drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
     if (recenter) { centerCamera(layout); recenter = false; }
     renderHud();
     if (game && worldRef) awardsHud.update({ game, world: worldRef });
     renderExits(fi);
+    renderNav(fi);
     renderInspector();
     renderReliquary();
     textbar.textContent = msg;
@@ -955,7 +1119,7 @@
   function centerCamera(layout, smooth = true) {
     const box = layout.boxes.find((b) => b.id === gary);
     if (!box) return;
-    const s = Number(zoom.value);
+    const s = curScale;
     const cx = (box.x + box.w / 2) * TILEPX * s;
     const cy = (box.y + box.h / 2) * TILEPX * s;
     requestAnimationFrame(() => {
@@ -1084,7 +1248,7 @@
   // these live in an overlay sized to match the scaled canvas.
   function updateVectorLabels(layout) {
     if (labelMode.value !== "vector") { labelsOv.innerHTML = ""; return; }
-    const s = Number(zoom.value);
+    const s = curScale;
     let html = "";
     for (const box of layout.boxes) {
       const left = (box.x + box.w / 2) * TILEPX * s;
@@ -1144,14 +1308,73 @@
     sideEl.innerHTML = html;
   }
 
+  const CARDINALS = [
+    { arrow: "↑", dx: 0, dy: -1, name: "North" },
+    { arrow: "↓", dx: 0, dy: 1, name: "South" },
+    { arrow: "→", dx: 1, dy: 0, name: "East" },
+    { arrow: "←", dx: -1, dy: 0, name: "West" },
+  ];
+
   function renderExits(fi) {
     exitsEl.innerHTML = "";
+    // Same-floor walking directions — so the player can see (and tap) which
+    // ways they can go, not just read it in the prose.
+    for (const c of CARDINALS) {
+      const id = neighborInDirection(graph, fi, gary, c.dx, c.dy);
+      if (!id) continue;
+      const h = graph.home.get(id);
+      const dest = h && seen.has(id) ? h.label : c.name;
+      const b = document.createElement("button");
+      b.textContent = `${c.arrow} ${dest}`;
+      b.title = `Go ${c.name} to ${h && seen.has(id) ? h.label : "the unknown"}`;
+      b.onclick = () => moveTo(id);
+      exitsEl.appendChild(b);
+    }
+    // Cross-floor exits (stairs).
     for (const ex of crossFloorExits(graph, fi, gary)) {
       const label = ex.note ? `${ex.note.toUpperCase()} → ${ex.label}` : `→ ${ex.label}`;
       const b = document.createElement("button");
       b.textContent = `🪜 ${label}`;
       b.onclick = () => moveTo(ex.id, ex.label);
       exitsEl.appendChild(b);
+    }
+  }
+
+  // On-map D-pad (mobile): arrows overlaid on the room image at the edges, plus
+  // up/down buttons for any stairs. Mirrors renderExits' targets so tapping an
+  // arrow walks/climbs exactly like the text list did.
+  function navButton(cls, inner, onTap, title) {
+    const b = document.createElement("button");
+    b.className = cls; b.innerHTML = inner; b.type = "button";
+    if (title) b.title = title;
+    b.addEventListener("click", (e) => { e.preventDefault(); onTap(); });
+    return b;
+  }
+  function renderNav(fi) {
+    if (!mapNav) return;
+    mapNav.innerHTML = "";
+    for (const c of CARDINALS) {
+      const id = neighborInDirection(graph, fi, gary, c.dx, c.dy);
+      if (!id) continue;
+      const seenIt = seen.has(id);
+      const h = graph.home.get(id);
+      const dest = seenIt && h ? h.label : "the unknown";
+      const cls = "nav-" + { North: "n", South: "s", East: "e", West: "w" }[c.name];
+      mapNav.appendChild(navButton(cls, c.arrow, () => moveTo(id), `Go ${c.name} to ${dest}`));
+    }
+    // Stairs → up/down buttons in the right-hand column. Direction is inferred
+    // from the target floor (with the passage note as the caption/fallback).
+    let ups = 0, downs = 0;
+    for (const ex of crossFloorExits(graph, fi, gary)) {
+      const goesDown = ex.note === "down" || floorOf(ex.id) > fi;
+      const slot = goesDown ? "nav-down" : "nav-up";
+      const glyph = goesDown ? "⬇" : "⬆";
+      const cap = ex.note || (goesDown ? "down" : "up");
+      const b = navButton(slot, `${glyph}<span class="nav-lbl">${cap}</span>`,
+        () => moveTo(ex.id, ex.label), `${goesDown ? "Down" : "Up"} to ${ex.label}`);
+      const n = goesDown ? downs++ : ups++;
+      if (n > 0) b.style[goesDown ? "bottom" : "top"] = (2 + n * 54) + "px";
+      mapNav.appendChild(b);
     }
   }
 
@@ -1182,21 +1405,67 @@
     canvas.focus();
   }
 
+  // Find the engine's exit direction from Gary's current room to `id`, if the
+  // shipped manor models one. This lets 2D movement defer to the SAME gating
+  // the text game enforces (locked doors, via-flags, on-move handlers), so you
+  // can't just drift through the FRONT DOOR — or the sleeping DRAGON, the
+  // sealed VAULT, the HEDGE GATES — without doing whatever the game requires.
+  function engineExitDir(id) {
+    if (!game || typeof game.room !== "function") return null;
+    game.state.room = gary;
+    const exits = (game.room() && game.room().exits) || {};
+    for (const [dir, ex] of Object.entries(exits)) {
+      const dest = ex && typeof ex === "object" ? ex.to : ex;
+      if (dest === id) return dir;
+    }
+    return null;
+  }
+
   function moveTo(id, label) {
     if (game && game.state.flags && game.state.flags.onCall) {
-      msg = "You're on the line with Gary — type 'bye' to hang up first."; render(); return;
+      msg = "You're on the line with Gary — type 'bye' to hang up first."; render(); return false;
     }
     if (game && (game.state.dead || game.state.won)) {
-      msg = "The game is over. Type RESTART to play again."; render(); return;
+      msg = "The game is over. Type RESTART to play again."; render(); return false;
     }
+
+    // When the engine models this exit, let IT perform the move so every manor
+    // rule applies exactly as in text mode: locked/gated doors are refused with
+    // the game's own message, and successful moves fire the same side effects
+    // (revealed items, darkness, death). Only map-only links the engine doesn't
+    // model fall through to the direct map move below.
+    const from = gary;
+    const dir = engineExitDir(id);
+    if (dir) {
+      const text = runEngine("go " + dir);   // logs, sends, syncs Gary, autosaves
+      if (game.state.room === from) {         // engine refused — stay put, say why
+        msg = (text || "").split("\n")[0].trim() || "You can't go that way.";
+        render(); keepFocus(); return false;
+      }
+      // Engine moved us (runEngine's syncGaryToEngine already updated gary/seen/
+      // focus). Layer on the 2D-only guest step + flavor.
+      steps++;
+      if (game.state.dead || game.state.won) {
+        msg = (text || "").trim();
+      } else {
+        const name = graph.home.has(gary) ? graph.home.get(gary).label : (label || id);
+        msg = `You drift into ${name}.`;
+        guestTurn();                          // may override msg with a lure notice
+      }
+      render(); keepFocus(); return true;
+    }
+
+    // Map-only adjacency the engine doesn't model — move natively, but keep the
+    // engine's position in lockstep so later commands resolve from here.
     const first = !seen.has(id);
     gary = id; seen.add(id); steps++;
     focusId = id; recenter = true;
+    if (game && game.state) game.state.room = gary;
     const name = label || graph.home.get(id).label;
     msg = first ? `You seep into ${name} for the first time…` : `You drift into ${name}.`;
     logAction("go " + (graph.home.get(id) ? graph.home.get(id).label.toLowerCase() : id));
     guestTurn();
-    render(); keepFocus();
+    render(); keepFocus(); return true;
   }
 
   // Inspect a seen room without moving Gary (updates the right-hand panel).
@@ -1236,10 +1505,10 @@
     walking = true;
     let i = 0;
     const step = () => {
-      moveTo(path[i]);
+      const moved = moveTo(path[i]);
       i++;
-      if (i < path.length) setTimeout(step, 140);
-      else walking = false;
+      if (moved && i < path.length) setTimeout(step, 140);
+      else walking = false;   // stop at the first gated way we can't pass
     };
     step();
   }
@@ -1283,8 +1552,12 @@
     let i = 0;
     const step = () => {
       if (!touring) return;
-      moveTo(route[i]);
+      const moved = moveTo(route[i]);
       i++;
+      if (touring && !moved) {   // a gated way blocks the demo route — end here
+        msg = "🎬 Auto-tour stopped — a locked way blocks the route.";
+        render(); stopTour(); return;
+      }
       if (touring) {
         msg = i < route.length
           ? `🎬 Auto-tour… room ${i}/${route.length} — type, click, or press ⏹ to stop.`
@@ -1657,10 +1930,42 @@
     if (id) moveTo(id);
   });
 
+  // Touch: a flick left / right / up / down walks Gary that direction, so on a
+  // phone you can swipe the room card the way you want to go instead of hunting
+  // for the arrow buttons. Short taps fall through to the click handler (walk to
+  // the tapped room). Only active in single-room focus mode so the full-map
+  // overview keeps native panning.
+  let swipeX = 0, swipeY = 0, swipeT = 0, swipeTracking = false;
+  canvas.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) { swipeTracking = false; return; }
+    swipeTracking = true;
+    swipeX = e.touches[0].clientX;
+    swipeY = e.touches[0].clientY;
+    swipeT = Date.now();
+  }, { passive: true });
+  canvas.addEventListener("touchend", (e) => {
+    if (!swipeTracking) return;
+    swipeTracking = false;
+    if (!focusMode) return;
+    const t = (e.changedTouches && e.changedTouches[0]) || null;
+    if (!t) return;
+    const dx = t.clientX - swipeX, dy = t.clientY - swipeY;
+    const adx = Math.abs(dx), ady = Math.abs(dy);
+    if (Math.max(adx, ady) < 34) return;             // a tap, not a swipe
+    if (Date.now() - swipeT > 800) return;           // too slow to be a flick
+    if (walking) return;
+    if (touring) { stopTour("🎬 Auto-tour stopped."); return; }
+    if (autoPlaying) { stopAuto("⏹ Stopped."); return; }
+    e.preventDefault();                              // swallow the synthetic click
+    const dir = adx > ady ? (dx > 0 ? [1, 0] : [-1, 0]) : (dy > 0 ? [0, 1] : [0, -1]);
+    const id = neighborInDirection(graph, floorOf(gary), gary, dir[0], dir[1]);
+    if (id) moveTo(id);
+  }, { passive: false });
+
   // Map a mouse event to the room box under the cursor (or null).
   function roomAt(e) {
     const rect = canvas.getBoundingClientRect();
-    const scale = Number(zoom.value);
+    const scale = curScale;
     const tx = (e.clientX - rect.left) / scale / TILEPX;
     const ty = (e.clientY - rect.top) / scale / TILEPX;
     const boxes = (lastLayout && lastLayout.boxes) || [];
@@ -1694,7 +1999,45 @@
     if (path && path.length) walkPath(path); else moveTo(start);
   });
   [revealChk, labelMode].forEach((el) => el.addEventListener("input", render));
-  zoom.addEventListener("input", () => { recenter = true; render(); });
+  zoom.addEventListener("input", () => {
+    if (focusMode) { focusMode = false; if (typeof syncFocusUI === "function") syncFocusUI(); }
+    recenter = true; render();
+  });
+
+  // --- Phase 1 mobile: pick a fit-friendly default zoom on touch / narrow
+  // screens, and re-center (and re-lay the vector labels) whenever the viewport
+  // resizes or the device rotates, so the camera never parks the player
+  // off-screen after a layout change.
+  const smallScreen = () => window.matchMedia("(max-width: 820px)").matches;
+  if (smallScreen() || (navigator.maxTouchPoints || 0) > 0) { zoom.value = "2"; }
+
+  // --- Mobile focus (single-room) mode vs. desktop full-map overview.
+  // On phones/touch we default to the room card: the current room fills the
+  // frame and the player hops with the direction buttons. Desktop keeps the
+  // whole floor in view. The "Show full map" button toggles between them.
+  const focusToggle = document.getElementById("focusToggle");
+  focusMode = smallScreen() || (navigator.maxTouchPoints || 0) > 0;
+  function syncFocusUI() {
+    stage.classList.toggle("focus", focusMode);
+    if (focusToggle) {
+      focusToggle.textContent = focusMode ? "🗺 Show full map" : "🎯 Focus room";
+      focusToggle.classList.toggle("on", !focusMode);
+    }
+  }
+  focusToggle?.addEventListener("click", () => {
+    focusMode = !focusMode;
+    syncFocusUI();
+    recenter = true; render();
+  });
+  syncFocusUI();
+  let refitQueued = false;
+  const refit = () => {
+    if (refitQueued) return;
+    refitQueued = true;
+    requestAnimationFrame(() => { refitQueued = false; recenter = true; render(); });
+  };
+  window.addEventListener("resize", refit);
+  window.addEventListener("orientationchange", refit);
   resetBtn.addEventListener("click", reset);
   tourBtn.addEventListener("click", () => {
     if (autoPlaying) { stopAuto("⏹ Stopped."); canvas.focus(); return; }
@@ -1821,6 +2164,13 @@
       howtoGallery.appendChild(item);
     }
   }
+  // --- gallery left/right scroll arrows ---
+  function scrollGalleryBy(dir) {
+    const step = (howtoGallery?.querySelector(".howto-item")?.offsetWidth || 84) + 8;
+    howtoGallery?.scrollBy({ left: dir * step * 2, behavior: "smooth" });
+  }
+  document.getElementById("howtoGalleryPrev")?.addEventListener("click", () => scrollGalleryBy(-1));
+  document.getElementById("howtoGalleryNext")?.addEventListener("click", () => scrollGalleryBy(1));
   function openHowto() { if (howtoOverlay) howtoOverlay.classList.add("open"); }
   function closeHowto() {
     hideLore();
@@ -1862,6 +2212,36 @@
       if (loreActiveItem && !e.target.closest(".howto-item")) hideLore();
     });
   }
+
+  // --- mobile "⚙ Map settings" bottom sheet -------------------------------
+  // On phones the dev toolbar (floor picker, reveal-all, labels, zoom,
+  // auto-tour, reset, load atlas) lives off-screen in a sheet instead of
+  // cluttering the map. Desktop never shows the trigger, so this is a no-op
+  // there (the CSS keeps .bar in its normal inline position above 820px).
+  const mapBar = document.getElementById("mapBar");
+  const mapSettingsBtn = document.getElementById("mapSettingsBtn");
+  const barBackdrop = document.getElementById("barBackdrop");
+  const barClose = document.getElementById("barClose");
+  function openMapBar() {
+    if (!mapBar) return;
+    mapBar.classList.add("open");
+    barBackdrop?.classList.add("open");
+    mapSettingsBtn?.setAttribute("aria-expanded", "true");
+  }
+  function closeMapBar() {
+    if (!mapBar) return;
+    mapBar.classList.remove("open");
+    barBackdrop?.classList.remove("open");
+    mapSettingsBtn?.setAttribute("aria-expanded", "false");
+  }
+  mapSettingsBtn?.addEventListener("click", () => {
+    if (mapBar?.classList.contains("open")) closeMapBar(); else openMapBar();
+  });
+  barClose?.addEventListener("click", closeMapBar);
+  barBackdrop?.addEventListener("click", closeMapBar);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mapBar?.classList.contains("open")) closeMapBar();
+  });
   // Arriving from the text game's "Watch a tour" button: skip the tutorial and
   // kick off the auto-tour once the view has settled.
   let autoTourQueued = false;

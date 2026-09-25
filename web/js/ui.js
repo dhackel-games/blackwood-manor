@@ -146,7 +146,7 @@ try {
 }
 const coarsePointer = !!window.matchMedia?.("(any-pointer: coarse)").matches;
 const prefersLargeNav = Native.isMobileApp() || coarsePointer;
-const defaultNavSize = prefersLargeNav ? "3" : "1";
+const defaultNavSize = prefersLargeNav ? "2" : "1";
 applyNavSize(["1", "2", "3"].includes(savedNavSize) ? savedNavSize : defaultNavSize);
 for (const button of navSizeButtons) {
   button.addEventListener("click", () => applyNavSize(button.dataset.navSize, true));

@@ -517,6 +517,19 @@ body { -webkit-text-size-adjust: 100%; }
   --dpad-half-width: 4.573125rem;
 }
 
+/* Phones: keep the room text the star. The touch pad can otherwise grow tall
+   enough (especially at the largest button size) to squeeze the transcript to
+   a sliver above it. Cap the command panel's height and let the controls
+   scroll inside it — the input stays pinned at the bottom — while the
+   transcript claims a guaranteed, generous share of the screen. */
+@media (max-width: 600px) {
+  #transcript { font-size: 15px; min-height: 40dvh; }
+  #command-panel { display: flex; flex-direction: column; max-height: 46dvh; }
+  #command-panel > #controls {
+    min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* mic / small icon buttons */
 .iconbtn {
   flex: 0 0 auto; min-height: 2.2rem; min-width: 2.4rem; padding: 0.35rem 0.55rem;
