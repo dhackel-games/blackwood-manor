@@ -419,6 +419,19 @@
     /* bigger, thumb-friendly controls elsewhere; 16px input avoids iOS focus-zoom */
     .cmdbar input { font-size:16px; }
     .legend { display:none; }                      /* color key: desktop nicety */
+
+    /* The inspector panel keeps desktop 11-12px type by default, which is far
+       too small to read on a phone. Bump the room title, subtitle, description
+       and item list up to comfortable touch-reading sizes. */
+    .side { padding:14px 16px; }
+    .side h2 { font-size:22px; margin-bottom:3px; }
+    .side .sub { font-size:14px; margin-bottom:10px; }
+    .side .desc { font-size:17px; line-height:1.6; margin-bottom:14px; }
+    .side .items { font-size:16px; }
+    .side .items li { padding:5px 0; }
+    .side .items .k { width:1.6em; }
+    .side .items .kind { font-size:12px; }
+    .side .empty { font-size:15px; }
   }
   @keyframes rewardGlow {
     0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
@@ -1428,6 +1441,11 @@
     if (game && (game.state.dead || game.state.won)) {
       msg = "The game is over. Type RESTART to play again."; render(); return false;
     }
+
+    // If the manor still wants a name, take a default one FIRST — otherwise the
+    // engine would swallow this move as the player's name ("go north" becomes
+    // their name) instead of applying the room's locked-door / via gating.
+    if (game && game.needsPlayerName()) game.useDefaultPlayerName();
 
     // When the engine models this exit, let IT perform the move so every manor
     // rule applies exactly as in text mode: locked/gated doors are refused with
