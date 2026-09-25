@@ -390,12 +390,13 @@
     /* map is the hero on top; inspector becomes a short panel beneath it */
     .main { display:contents; }
     /* the map hero holds the scrolling stage plus a pinned D-pad overlay */
-    .map-hero { display:block; position:relative; flex:0 0 auto; height:46dvh; min-height:240px; }
+    .map-hero { display:block; position:relative; flex:0 0 auto; height:39dvh; min-height:210px; }
     .stage { padding:8px; height:100%; overflow:auto; }
     .stage.focus { overflow:hidden; touch-action:none; }
     .side { flex:1 1 auto; min-height:0; max-height:none; overflow:auto;
       border-left:none; border-top:1px solid var(--line); }
-    .textbar { max-height:14dvh; overflow-y:auto; }
+    .textbar { max-height:18dvh; overflow-y:auto; font-size:17px; line-height:1.5;
+      padding:12px 16px; }
 
     /* On-map movement pad: arrows sit over the room image at the edges. The
        layer ignores taps except on the buttons themselves. */
@@ -417,21 +418,24 @@
     /* the text exit list is replaced by the on-map arrows on phones */
     .exits { display:none; }
     /* bigger, thumb-friendly controls elsewhere; 16px input avoids iOS focus-zoom */
-    .cmdbar input { font-size:16px; }
+    .cmdbar { padding:12px 16px calc(12px + env(safe-area-inset-bottom)); gap:10px; }
+    .cmdbar .prompt { font-size:20px; }
+    .cmdbar input { font-size:19px; padding:8px 0; }
     .legend { display:none; }                      /* color key: desktop nicety */
 
     /* The inspector panel keeps desktop 11-12px type by default, which is far
        too small to read on a phone. Bump the room title, subtitle, description
        and item list up to comfortable touch-reading sizes. */
     .side { padding:14px 16px; }
-    .side h2 { font-size:22px; margin-bottom:3px; }
-    .side .sub { font-size:14px; margin-bottom:10px; }
-    .side .desc { font-size:17px; line-height:1.6; margin-bottom:14px; }
-    .side .items { font-size:16px; }
-    .side .items li { padding:5px 0; }
+    .side h2 { font-size:24px; margin-bottom:3px; }
+    .side .sub { font-size:15px; margin-bottom:10px; }
+    .side .desc { font-size:18px; line-height:1.6; margin-bottom:14px; }
+    .side .items { font-size:17px; }
+    .side .items li { padding:6px 0; }
     .side .items .k { width:1.6em; }
-    .side .items .kind { font-size:12px; }
-    .side .empty { font-size:15px; }
+    .side .items .kind { font-size:13px; }
+    .side .empty { font-size:16px; }
+    .hud { font-size:16px; gap:12px 18px; padding:10px 16px; }
   }
   @keyframes rewardGlow {
     0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
