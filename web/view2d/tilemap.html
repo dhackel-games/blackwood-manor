@@ -399,7 +399,14 @@
        gets whatever the fixed-height siblings (map, hud, status line, command
        bar) leave behind. Keep those siblings trim so the prose gets the bulk of
        the column. */
-    .side { flex:1 1 auto; min-height:0; }
+    .side { flex:1 1 auto; min-height:0; overflow-y:scroll;
+      scrollbar-width:thin; scrollbar-color:#3a5a76 transparent; }
+    /* Force an always-visible thin scrollbar so it's obvious the panel scrolls
+       (iOS overlay scrollbars otherwise stay hidden until you drag). */
+    .side::-webkit-scrollbar { width:7px; -webkit-appearance:none; }
+    .side::-webkit-scrollbar-thumb { background:#3a5a76; border-radius:4px;
+      border:1px solid #0e151d; }
+    .side::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
     .textbar { max-height:10dvh; overflow-y:auto; font-size:15px; line-height:1.45;
       padding:9px 16px; }
 
