@@ -4,9 +4,9 @@
   "NATIVE_APP_VERSION": "2026.9.25",
   "NATIVE_APP_BUILD": "1",
   "CONTENT_DATE": "2026.9.25",
-  "CONTENT_BUILD": "9",
+  "CONTENT_BUILD": "10",
   "COPYRIGHT": "Copyright (c) Dave and Andy Games. All Rights Reserved.",
-  "CONTENT_VERSION": 20260925009,
+  "CONTENT_VERSION": 20260925010,
   "LATEST_APP_BUILD_AVAILABLE": 20260925001,
   "CONTENT_FILES": [
     "css/howto.css",
