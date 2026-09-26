@@ -357,6 +357,31 @@
       background:var(--panel); border:1px solid var(--line); border-radius:8px; }
     .map-settings-btn:active { border-color:#8fd3ff; color:#8fd3ff; }
     .focus-toggle-btn.on { border-color:#49ff7a; color:#49ff7a; }
+    /* inline zoom control lives right on the map row (no settings sheet) */
+    .map-zoom { flex:0 0 auto; display:inline-flex; align-items:center; gap:6px;
+      padding:0 10px 0 12px; font-size:16px; color:var(--ink);
+      background:var(--panel); border:1px solid var(--line); border-radius:8px; }
+    .map-zoom select { border:none; background:transparent; color:var(--ink);
+      font:700 14px "Courier New", monospace; padding:9px 2px; }
+
+    /* Commands trail as a bottom sheet (mirrors the settings-sheet look) */
+    .cmd-sheet { display:none; position:fixed; left:0; right:0; bottom:0; z-index:56;
+      flex-direction:column; gap:10px; max-height:70dvh; overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:14px 16px calc(16px + env(safe-area-inset-bottom));
+      background:linear-gradient(180deg,#0c1016,#080b10);
+      border:1px solid #2f4a63; border-bottom:none;
+      border-radius:16px 16px 0 0; box-shadow:0 -18px 50px #000c;
+      animation:barSheetRise .22s cubic-bezier(.2,.8,.2,1); }
+    .cmd-sheet.open { display:flex; }
+    .cmd-sheet .bar-sheet-head button { flex:0 0 auto; width:34px; height:34px;
+      padding:0; font-size:20px; line-height:1; border-radius:8px; }
+    .cmd-sheet-list { list-style:none; margin:0; padding:0;
+      font:15px/1.6 "Courier New", monospace; }
+    .cmd-sheet-list li { display:flex; gap:10px; padding:7px 2px;
+      border-bottom:1px solid rgba(255,255,255,.05); color:#b7d8c2; }
+    .cmd-sheet-list li .n { color:var(--dim); min-width:2.5ch; text-align:right; }
+    .cmd-sheet-list .empty { color:var(--dim); border:none; }
 
     /* The bar itself becomes a bottom sheet: hidden until opened, then a
        full-width panel of stacked, full-size controls (no more tiny inline
@@ -407,7 +432,7 @@
     /* map is the hero on top; inspector becomes a short panel beneath it */
     .main { display:contents; }
     /* the map hero holds the scrolling stage plus a pinned D-pad overlay */
-    .map-hero { display:block; position:relative; flex:0 0 auto; height:30dvh; min-height:170px; }
+    .map-hero { display:block; position:relative; flex:0 0 auto; height:36dvh; min-height:190px; }
     .stage { padding:8px; height:100%; overflow:auto; }
     .stage.focus { overflow:hidden; touch-action:none; }
     .side { flex:1 1 auto; min-height:0; max-height:none; overflow:auto;
@@ -424,8 +449,8 @@
     .side::-webkit-scrollbar-thumb { background:#3a5a76; border-radius:4px;
       border:1px solid #0e151d; }
     .side::-webkit-scrollbar-track { background:rgba(255,255,255,.04); }
-    .textbar { max-height:10dvh; overflow-y:auto; font-size:15px; line-height:1.45;
-      padding:9px 16px; }
+    .textbar { max-height:11dvh; overflow-y:auto; font-size:17px; line-height:1.5;
+      padding:10px 16px; }
 
     /* On-map movement pad: arrows sit over the room image at the edges. The
        layer ignores taps except on the buttons themselves. */
@@ -458,13 +483,17 @@
     .side { padding:14px 16px; }
     .side h2 { font-size:24px; margin-bottom:3px; }
     .side .sub { font-size:15px; margin-bottom:10px; }
-    .side .desc { font-size:18px; line-height:1.6; margin-bottom:14px; }
-    .side .items { font-size:17px; }
+    .side .desc { font-size:20px; line-height:1.6; margin-bottom:14px; }
+    .side .items { font-size:18px; }
     .side .items li { padding:6px 0; }
     .side .items .k { width:1.6em; }
     .side .items .kind { font-size:13px; }
     .side .empty { font-size:16px; }
-    .hud { font-size:14px; gap:8px 16px; padding:8px 16px; }
+    /* the room location/guest/bait/lured readout is redundant on a phone (the
+       room title says where you are) — hide it; steps now rides the top status
+       line. The command trail moves into the 📜 Commands sheet. */
+    .hud { display:none; }
+    .side .trail { display:none; }
   }
   @keyframes rewardGlow {
     0%,100% { box-shadow:inset 0 0 12px rgba(201,162,75,.2), 0 0 10px rgba(201,162,75,.15); }
@@ -515,7 +544,14 @@
 
 <div class="map-btn-row">
   <button id="focusToggle" class="map-settings-btn focus-toggle-btn" type="button">🗺 Show full map</button>
-  <button id="mapSettingsBtn" class="map-settings-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mapBar">⚙ Map settings</button>
+  <button id="cmdSheetBtn" class="map-settings-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="cmdSheet">📜 Commands</button>
+  <label class="map-zoom" for="zoomM">🔍
+    <select id="zoomM" aria-label="Zoom">
+      <option value="2">2×</option>
+      <option value="3">3×</option>
+      <option value="4">4×</option>
+    </select>
+  </label>
 </div>
 <div class="bar-backdrop" id="barBackdrop"></div>
 
@@ -561,6 +597,17 @@
     <button id="atlasBtn">load atlas…</button>
   </div>
   <input type="file" id="atlasFile" accept="image/png,image/*" hidden />
+</div>
+
+<!-- Mobile-only: the command trail as a dismissable bottom sheet (the desktop
+     view keeps the trail pinned in the right column). Opened by 📜 Commands. -->
+<div class="bar-backdrop" id="cmdBackdrop"></div>
+<div class="cmd-sheet" id="cmdSheet" role="dialog" aria-modal="true" aria-label="Your commands">
+  <div class="bar-sheet-head">
+    <span>Your commands</span>
+    <button id="cmdSheetClose" type="button" aria-label="close">×</button>
+  </div>
+  <ol id="cmdSheetList" class="cmd-sheet-list"></ol>
 </div>
 
 <div class="main">
@@ -785,8 +832,11 @@
         history = Array.isArray(handoff.history) ? handoff.history.slice() : [];
         gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
         seen.add(gary); focusId = gary; recenter = true;
+        const onPhone = window.matchMedia("(max-width: 820px)").matches;
         msg = `↩︎ Resumed in 2D as ${game.state.flags.playerName || "yourself"} — ` +
-          "your command trail is on the right. Move on, or type TEXT to switch back.";
+          (onPhone
+            ? "tap 📜 Commands to see your trail. Move on, or type TEXT to switch back."
+            : "your command trail is on the right. Move on, or type TEXT to switch back.");
         renderTrail();
       } else if (game.needsPlayerName()) {
         startNameGate();
@@ -826,15 +876,21 @@
     renderTrail();
   }
   function renderTrail() {
-    if (!trailList) return;
-    if (!history.length) {
-      trailList.innerHTML = `<li class="empty">No moves yet — start drifting.</li>`;
-      return;
+    const empty = `<li class="empty">No moves yet — start drifting.</li>`;
+    const html = history.length
+      ? history
+          .map((h, i) => `<li><span class="n">${i + 1}</span><span>${escapeHtml(h)}</span></li>`)
+          .join("")
+      : empty;
+    if (trailList) {
+      trailList.innerHTML = html;
+      trailList.scrollTop = trailList.scrollHeight;
     }
-    trailList.innerHTML = history
-      .map((h, i) => `<li><span class="n">${i + 1}</span><span>${escapeHtml(h)}</span></li>`)
-      .join("");
-    trailList.scrollTop = trailList.scrollHeight;
+    const sheetList = document.getElementById("cmdSheetList");
+    if (sheetList) {
+      sheetList.innerHTML = html;
+      sheetList.scrollTop = sheetList.scrollHeight;
+    }
   }
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c) =>
@@ -1319,6 +1375,22 @@
         ? `<span style="color:#ff8a3d">🔥 <b>ON FIRE</b></span>` : "") +
       ((game && game.state.flags && (game.state.flags.sick || 0) > 0)
         ? `<span style="color:#8fd36a">🤮 <b>SICK</b></span>` : "");
+    // Surface the step count on the top status line (near 🏆 · 👤 · ☎) so the
+    // redundant location/guest/bait block can be dropped on mobile.
+    const slots = document.getElementById("hud-slots");
+    if (slots) {
+      let s = document.getElementById("steps-slot");
+      if (!s) {
+        s = document.createElement("span");
+        s.id = "steps-slot";
+        s.className = "hud-slot hud-slot--steps";
+        s.innerHTML = '<span class="hud-slot-emoji" aria-hidden="true">👣</span> ' +
+          '<span class="hud-slot-value"></span>';
+      }
+      slots.appendChild(s); // keep it last in the status line
+      s.hidden = false;
+      s.querySelector(".hud-slot-value").textContent = String(steps);
+    }
   }
 
   // Right-hand inspector: name + real description + item list of a room (only if
@@ -2062,6 +2134,18 @@
   const smallScreen = () => window.matchMedia("(max-width: 820px)").matches;
   if (smallScreen() || (navigator.maxTouchPoints || 0) > 0) { zoom.value = "2"; }
 
+  // Mobile inline zoom control mirrors the (desktop-only) #zoom select. Changing
+  // it drops out of focus mode and re-renders the full map at the new scale.
+  const zoomM = document.getElementById("zoomM");
+  if (zoomM) {
+    zoomM.value = zoom.value;
+    zoomM.addEventListener("change", () => {
+      zoom.value = zoomM.value;
+      if (focusMode) { focusMode = false; if (typeof syncFocusUI === "function") syncFocusUI(); }
+      recenter = true; render();
+    });
+  }
+
   // --- Mobile focus (single-room) mode vs. desktop full-map overview.
   // On phones/touch we default to the room card: the current room fills the
   // frame and the player hops with the direction buttons. Desktop keeps the
@@ -2292,6 +2376,34 @@
   barBackdrop?.addEventListener("click", closeMapBar);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && mapBar?.classList.contains("open")) closeMapBar();
+  });
+
+  // --- Commands trail bottom sheet (mobile). Opens the move/command history in
+  // a dismissable sheet; the desktop right-column trail is unaffected.
+  const cmdSheet = document.getElementById("cmdSheet");
+  const cmdSheetBtn = document.getElementById("cmdSheetBtn");
+  const cmdSheetClose = document.getElementById("cmdSheetClose");
+  const cmdBackdrop = document.getElementById("cmdBackdrop");
+  function openCmdSheet() {
+    if (!cmdSheet) return;
+    renderTrail();
+    cmdSheet.classList.add("open");
+    cmdBackdrop?.classList.add("open");
+    cmdSheetBtn?.setAttribute("aria-expanded", "true");
+  }
+  function closeCmdSheet() {
+    if (!cmdSheet) return;
+    cmdSheet.classList.remove("open");
+    cmdBackdrop?.classList.remove("open");
+    cmdSheetBtn?.setAttribute("aria-expanded", "false");
+  }
+  cmdSheetBtn?.addEventListener("click", () => {
+    if (cmdSheet?.classList.contains("open")) closeCmdSheet(); else openCmdSheet();
+  });
+  cmdSheetClose?.addEventListener("click", closeCmdSheet);
+  cmdBackdrop?.addEventListener("click", closeCmdSheet);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && cmdSheet?.classList.contains("open")) closeCmdSheet();
   });
   // Arriving from the text game's "Watch a tour" button: skip the tutorial and
   // kick off the auto-tour once the view has settled.
