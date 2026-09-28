@@ -18,7 +18,7 @@ body { -webkit-text-size-adjust: 100%; }
   padding: 1rem 1.25rem;
   padding-top: max(1rem, env(safe-area-inset-top));
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   color: var(--green);
   font-size: 16px;
   line-height: 1.5;
@@ -602,7 +602,7 @@ body { -webkit-text-size-adjust: 100%; }
     1rem
     max(1rem, env(safe-area-inset-bottom));
   background: radial-gradient(ellipse at 50% 15%, #0b1c12, #030503 72%);
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   color: var(--green);
   text-shadow: 0 0 4px rgba(67, 255, 122, 0.45);
   opacity: 0; transform: scale(1.05);

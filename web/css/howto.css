@@ -23,7 +23,7 @@
   border:1px solid #2f4a63; border-radius:12px;
   box-shadow:0 24px 70px #000c, 0 0 0 1px rgba(143,211,255,.06) inset;
   padding:0 0 16px; position:relative;
-  font-family:system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   animation:howtoRise .4s cubic-bezier(.2,.8,.2,1); }
 .howto-close { position:absolute; top:10px; right:10px; z-index:2;
   width:30px; height:30px; border-radius:8px; font-size:17px; line-height:1;
@@ -110,7 +110,7 @@
   border:1px solid #c9a24b66; border-radius:12px; padding:12px 13px 13px;
   box-shadow:0 18px 50px #000c, 0 0 0 1px #0006 inset;
   color:#c9f5d4; opacity:0; transform:translateY(6px) scale(.98);
-  font-family:system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family:system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
   transition:opacity .16s ease, transform .16s ease; pointer-events:none; }
 .lore-pop.show { opacity:1; transform:none; pointer-events:auto; }
 .lore-pop .lp-head { display:flex; align-items:center; gap:9px; margin-bottom:7px; }
