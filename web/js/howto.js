@@ -72,7 +72,7 @@ export function initHowto(opts = {}) {
         </div>
       </div>
       <div class="howto-body">
-        <p>You've come to <b>Blackwood Manor</b> as yourself \u2014 and it does not
+        <p>You've come to <b>Blackwood Manor</b> \u2014 and the manor does not
         intend to let you leave. Explore its fog-drowned halls, where <b>thirteen lost
         Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
         Make the house whole again\u2026 or the manor keeps you, and you take

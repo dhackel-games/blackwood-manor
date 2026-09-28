@@ -128,10 +128,9 @@
   border:1px solid #1c2733; border-radius:10px; transition:transform .16s; }
 .howto-shrine:hover { transform:translateY(-3px); }
 .howto-shrine img { width:56px; height:56px; object-fit:contain; }
-.howto-shrine.reward { border-color:#c9a24b;
-  background:linear-gradient(180deg,#151009,#0f1620);
-  animation:rewardGlow 2.4s ease-in-out infinite; }
-.howto-shrine.reward img { filter:drop-shadow(0 0 10px rgba(201,162,75,.55)); }
+.howto-shrine.reward { border-color:#5a4a26;
+  background:linear-gradient(180deg,#151009,#0f1620); }
+.howto-shrine.reward img { filter:drop-shadow(0 0 8px rgba(201,162,75,.35)); }
 .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:#c9f5d4; }
 .howto-shrine .sub { display:block; font-size:10px; color:#7c9a86; margin-top:1px; }
 .howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
