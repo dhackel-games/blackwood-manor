@@ -72,10 +72,11 @@ export function initHowto(opts = {}) {
         </div>
       </div>
       <div class="howto-body">
-        <p>You are <b>Gary</b> — dead, but not gone. Bound to the manor you once
-        explored in life, you drift its fog-drowned halls where <b>thirteen lost
+        <p>You've come to <b>Blackwood Manor</b> as yourself \u2014 and it does not
+        intend to let you leave. Explore its fog-drowned halls, where <b>thirteen lost
         Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
-        Make the house whole again\u2026 before it makes <i>you</i> part of it.</p>
+        Make the house whole again\u2026 or the manor keeps you, and you take
+        <b>Gary\u2019s</b> place among its restless dead.</p>
 
         <div class="howto-goal">
           <span class="g-ic"><img src="${ib}clockTalisman.png" alt="Countdown clock" /></span>
@@ -92,7 +93,7 @@ export function initHowto(opts = {}) {
           <div class="howto-mode" data-switch="text" role="button" tabindex="0"
             title="Play in Text mode">
             <h4>\uD83D\uDCDC Text mode <span class="go">${currentMode === "text" ? "you\u2019re here" : "switch \u2192"}</span></h4>
-            <p>Old-school adventure. <b>Type what Gary does</b> \u2014 "go library", "take
+            <p>Old-school adventure. <b>Type what you do</b> \u2014 "go library", "take
             locket", "drop bait" \u2014 or tap the arrows. Read the room. Trust your gut.</p>
           </div>
           <div class="howto-mode" data-switch="2d" role="button" tabindex="0"

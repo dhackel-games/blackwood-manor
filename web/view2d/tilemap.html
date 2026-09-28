@@ -205,17 +205,17 @@
   .howto-hero img.bg { display:block; width:100%; height:104px; object-fit:cover;
     object-position:center 40%; }
   /* Gary drifts up in the corner of the hero, greeting you */
-  .howto-hero .gary { position:absolute; right:12px; bottom:-2px; z-index:2;
-    width:96px; height:auto; pointer-events:none;
-    filter:drop-shadow(0 0 12px rgba(73,255,122,.45)) drop-shadow(0 6px 10px #000a);
+  .howto-hero .gary { position:absolute; right:10px; bottom:0; z-index:2;
+    width:82px; height:auto; opacity:.5; pointer-events:none;
+    filter:drop-shadow(0 0 10px rgba(73,255,122,.35)) drop-shadow(0 6px 10px #0008);
     animation:garyFloat 4.2s ease-in-out infinite; }
   /* moonlight bloom + bottom fade so the title sits on darkness */
   .howto-hero::after { content:""; position:absolute; inset:0; pointer-events:none;
     background:radial-gradient(60% 120% at 72% 8%, rgba(255,244,200,.28), transparent 55%),
       linear-gradient(180deg, transparent 45%, #05070a 100%); }
   .howto-hero .cap { position:absolute; left:0; right:0; bottom:0; z-index:1;
-    padding:12px 20px 10px; }
-  .howto-hero h2 { margin:0; font-size:25px; letter-spacing:3px; color:#f6eccf;
+    padding:12px 92px 10px 20px; }
+  .howto-hero h2 { margin:0; font-size:21px; letter-spacing:2px; color:#f6eccf;
     text-shadow:0 0 18px rgba(255,224,150,.45), 0 2px 4px #000; }
   .howto-hero p { margin:3px 0 0; font-size:12.5px; color:#e2b658; letter-spacing:.6px;
     font-style:italic; text-shadow:0 1px 3px #000; }
@@ -667,10 +667,11 @@
       </div>
     </div>
     <div class="howto-body">
-      <p>You've come to <b>Blackwood Manor</b> — and it does not intend to let
-      you leave. Explore its fog-drowned halls where <b>thirteen lost
+      <p>You've come to <b>Blackwood Manor</b> as yourself — and it does not intend
+      to let you leave. Explore its fog-drowned halls, where <b>thirteen lost
       Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
-      Make the house whole again… before it makes <i>you</i> part of it.</p>
+      Make the house whole again… or the manor keeps you, and you take
+      <b>Gary's</b> place among its restless dead.</p>
 
       <div class="howto-goal">
         <span class="g-ic"><img src="icons/clockTalisman.png" alt="Countdown clock" /></span>
@@ -687,7 +688,7 @@
         <div class="howto-mode" data-switch="text" role="button" tabindex="0"
           title="Switch to Text mode">
           <h4>📜 Text mode <span class="go">switch →</span></h4>
-          <p>Old-school adventure. <b>Type what Gary does</b> — "go library", "take
+          <p>Old-school adventure. <b>Type what you do</b> — "go library", "take
           locket", "drop bait" — or tap the arrows. Read the room. Trust your gut.
           <b>Click to play in text.</b></p>
         </div>
