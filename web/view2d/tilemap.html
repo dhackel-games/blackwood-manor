@@ -305,6 +305,13 @@
   .howto-shrine.reward img { filter:drop-shadow(0 0 8px rgba(201,162,75,.35)); }
   .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:var(--ink); }
   .howto-shrine .sub { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
+  .howto-baron { display:flex; gap:12px; align-items:center; margin-top:4px;
+    background:#0f1620; border:1px solid #24402c; border-radius:10px; padding:10px; }
+  .howto-baron img { width:96px; height:96px; object-fit:contain; flex:none;
+    filter:drop-shadow(0 2px 7px rgba(0,0,0,.6)); }
+  .howto-baron .bn-nm { margin:0 0 4px; font-size:13.5px; letter-spacing:1px;
+    color:#cfe6bf; font-weight:700; }
+  .howto-baron .bn-body { margin:0; font-size:11.5px; color:var(--dim); line-height:1.5; }
   .howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
     margin-top:12px; }
   .howto-cta .cta-primary { font-size:15px; font-weight:700; letter-spacing:1px;
@@ -710,6 +717,20 @@
         <button type="button" class="howto-gallery-nav next" id="howtoGalleryNext" aria-label="scroll heirlooms right">›</button>
       </div>
 
+      <h3>A guest you may meet</h3>
+      <div class="howto-baron">
+        <img src="icons/baronMunchhausen.png" alt="Baron Munchhausen the Third" />
+        <div>
+          <p class="bn-nm">Baron Munchhausen the Third</p>
+          <p class="bn-body">Bricked into the <b>Space Between the Walls</b> lifetimes
+          ago, the Baron insists he <i>asked</i> to be walled in — twice — that he rode in
+          on a cannonball, wrestled the wraith to an honourable draw, and that the manor
+          simply <i>adores</i> him. Rescue, he'll tell you, is for people who dislike their
+          walls. He is the house's happiest prisoner. Find the crawl-gap and he'll regale
+          you with a fresh tall tale every time.</p>
+        </div>
+      </div>
+
       <h3>The Reliquary</h3>
       <div class="howto-reliquary">
         <div class="howto-shrine">
@@ -969,8 +990,8 @@
 
   // --- Baron Munchhausen the Third: the same frame-swap trick as the dragon ---
   // A walled-in guest drawn into the "Space Between the Walls" room box. Default
-  // "base" portrait, briefly swapped to "tale" when you talk to him (a fresh
-  // tall tale) and "content" when you try to rescue/gift him (he refuses, blissful).
+  // serene "content" portrait, briefly swapped to "tale" when you talk to him (a
+  // fresh tall tale) and "base" (wide grin) when you try to rescue/gift him.
   const BARON_FRAMES = ["base", "tale", "content"];
   const BARON_IMAGES = {};
   for (const key of BARON_FRAMES) {
@@ -978,7 +999,7 @@
     img.src = `icons/baron_${key}.png`;
     BARON_IMAGES[key] = img;
   }
-  let baronFlash = null;   // { kind: "tale"|"content", until: performance.now()+ms }
+  let baronFlash = null;   // { kind: "tale"|"base", until: performance.now()+ms }
   function flashBaron(kind, ms = 1900) {
     baronFlash = { kind, until: performance.now() + ms };
     setTimeout(() => { baronFlash = null; render(); }, ms);
@@ -1354,12 +1375,12 @@
   }
 
   // Draw the Baron into the "Space Between the Walls" room box, same fit logic
-  // as the dragon. Base frame once the room's been seen; a brief tale/content
-  // swap plays after you talk to or grab at him (see runEngine()).
+  // as the dragon. Serene "content" frame once the room's been seen; a brief
+  // tale/base swap plays after you talk to or grab at him (see runEngine()).
   function drawBaron(layout) {
     const box = layout.boxes.find((b) => b.id === "betweenWalls");
     if (!box || !box.seen) return;
-    let key = "base";
+    let key = "content";
     if (baronFlash && performance.now() < baronFlash.until) key = baronFlash.kind;
     const img = BARON_IMAGES[key];
     if (!img || !img.complete || !img.naturalWidth) return;
@@ -1886,7 +1907,7 @@
       const grabbed = /\b(take|get|grab|pick|carry|pull|lift|yank|peel|move|shift|jostle|shake|nudge|push|press|attack|kill|hit|strike|stab|give|offer|feed|free|release|untie)\b/.test(lc);
       const mentionsBaron = /\b(baron|munchhausen|munchausen|prisoner|captive|gentleman)\b/.test(lc);
       if (nowBaronLine !== wasBaronLine) flashBaron("tale");
-      else if (mentionsBaron && grabbed) flashBaron("content");
+      else if (mentionsBaron && grabbed) flashBaron("base");
     }
     syncGaryToEngine();   // follow teleports/flight onto the map
     // Post-turn parity with text mode: mirror-route prefill + per-turn autosave.

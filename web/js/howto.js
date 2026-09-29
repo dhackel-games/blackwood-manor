@@ -114,6 +114,20 @@ export function initHowto(opts = {}) {
           <button type="button" class="howto-gallery-nav next" id="howtoGalleryNext" aria-label="scroll heirlooms right">\u203A</button>
         </div>
 
+        <h3>A guest you may meet</h3>
+        <div class="howto-baron">
+          <img src="${ib}baronMunchhausen.png" alt="Baron Munchhausen the Third" />
+          <div>
+            <p class="bn-nm">Baron Munchhausen the Third</p>
+            <p class="bn-body">Bricked into the <b>Space Between the Walls</b> lifetimes
+            ago, the Baron insists he <i>asked</i> to be walled in \u2014 twice \u2014 that
+            he rode in on a cannonball, wrestled the wraith to an honourable draw, and that
+            the manor simply <i>adores</i> him. Rescue, he'll tell you, is for people who
+            dislike their walls. He is the house's happiest prisoner. Find the crawl-gap and
+            he'll regale you with a fresh tall tale every time.</p>
+          </div>
+        </div>
+
         <h3>The Reliquary</h3>
         <div class="howto-reliquary">
           <div class="howto-shrine">
