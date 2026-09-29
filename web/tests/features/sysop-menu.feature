@@ -11,7 +11,7 @@ Feature: Maintained sysop shortcuts
   Scenario: The hidden menu contains the maintained shortcuts
     Then the sysop menu command is "::"
     And the sysop menu unlock passwords are "werdna,evad"
-    And the sysop command catalog defines "::powerup,::winquick1,::winmax2bell,::winmaxfrontd,::winmaxgary"
+    And the sysop command catalog defines "::baron,::powerup,::winquick1,::winmax2bell,::winmaxfrontd,::winmaxgary"
     And the sysop menu uses the shared command title description format
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
@@ -87,6 +87,19 @@ Feature: Maintained sysop shortcuts
     And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
     And sysop command "::winmax2bell" contains sequence "g shaft; u backpack; g gallery; u headlamp"
     And sysop command "::winmax2bell" contains sequence "u burrito; z; z; z; z; u milk"
+
+  Scenario: Meet the Baron walks the full path to the Space Between the Walls
+    When I execute sysop command "::baron"
+    Then the current room is "betweenWalls"
+    And flag "frontDoorOpen" is set
+    And flag "wallGapFound" is set
+    And flag "seen:betweenWalls" is set
+    And the output contains "Baron Munchhausen"
+
+  Scenario: Meet the Baron walks in rather than flying or teleporting
+    Then sysop command "::baron" contains sequence "o frontd w/iron"
+    And sysop command "::baron" contains sequence "pull wallpaper; in"
+    And sysop command "::baron" includes "talk to baron"
 
   Scenario: Powerup equips every reusable power item without ending the game
     When I execute sysop command "::powerup"

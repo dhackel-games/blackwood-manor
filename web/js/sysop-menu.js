@@ -177,6 +177,18 @@ const QUICK_COLLECTION = [
   "fly royal",
 ];
 
+// Walk (never fly) all the way to Baron Munchhausen the Third, then linger for a
+// chat. Deliberately shows the whole path — front door, up the landing, west into
+// the nursery, peel the wallpaper, and squeeze through the crawl-gap.
+const BARON_VISIT = [
+  "{{baronwalk}}",
+  "talk to baron",
+  "talk to baron",
+  "talk to baron",
+  "talk to baron",
+  "talk to baron",
+];
+
 const BULK_DEPOSIT = ["put all in rq"];
 
 const QUICK_TO_BELL = [
@@ -285,6 +297,12 @@ const MAX_TO_BELL = [
 ];
 
 export const SYSOP_COMMANDS = Object.freeze([
+  Object.freeze({
+    cmd: "::baron",
+    name: "Meet the Baron",
+    description: "Walk the manor down to the Space Between the Walls and strike up a conversation with Baron Munchhausen the Third — path shown, no flying.",
+    compoundPrompt: join(BARON_VISIT),
+  }),
   Object.freeze({
     cmd: "::powerup",
     name: "Power Up",
@@ -442,8 +460,22 @@ export function expandSysopCommand(shortcut, game) {
     if (locketLocation !== "inventory" && locketLocation !== "reliquary") return CRYPT_LOOT_ROUTE;
     return game.roomOf("talisman") === "reliquary" ? [] : ["remove talisman"];
   })();
+  const baronWalkRoute = (() => {
+    // Never fly — show the whole path. If we're already inside, BFS-walk from
+    // wherever we stand to the nursery; from a fresh start at the gate, take the
+    // deterministic route in through the front door and up to the nursery.
+    const toNursery = game.getFlag("frontDoorOpen")
+      ? pathToRoom(game, "nursery")
+      : [
+          "east", "move statue", "take iron", "west",
+          "north", "open frontd with iron", "north",
+          "up", "west",
+        ];
+    return [...toNursery, "pull wallpaper", "in"];
+  })();
   const expanded = shortcut.compoundPrompt
     .replace(/\{\{pathto:([^}]+)\}\}/gi, (_, target) => pathToRoom(game, target).join("; "))
+    .replace(/\{\{baronwalk\}\}/gi, join(baronWalkRoute))
     .replace(/\{\{flightmushroom\}\}/gi, join(flightMushroomRoute))
     .replace(/\{\{oakspyglass\}\}/gi, join(oakRoute))
     .replace(/\{\{cryptloot\}\}/gi, join(cryptRoute));

@@ -31,16 +31,19 @@ export const LABELS = {
   roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
   treeFort: "Tree Fort",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
+  betweenWalls: "The Walls",
 };
 
 export const SECRET = new Set([
   "hollowPassage", "hollowSanctum", "secretChamber", "hiddenVault", "dreadmawVault",
+  "betweenWalls",
 ]);
 
 export const FLOORS = [
   {
     title: "UPSTAIRS",
     rooms: [
+      { id: "betweenWalls", col: 0, row: 0 },
       { id: "attic", col: 1, row: 0 },
       { id: "nursery", col: 0, row: 1 },
       { id: "landing", col: 1, row: 1 },
@@ -50,6 +53,7 @@ export const FLOORS = [
     ],
     links: [
       { a: "attic", b: "landing", note: "ladder" },
+      { a: "nursery", b: "betweenWalls", note: "gap" },
       { a: "nursery", b: "landing" },
       { a: "landing", b: "masterBedroom" },
       { a: "landing", b: "study" },

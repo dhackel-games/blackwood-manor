@@ -126,6 +126,10 @@ Given("item {string} has been destroyed", function (item) {
   this.game.destroy(item);
 });
 
+Given("item {string} rests in room {string}", function (item, room) {
+  this.game.moveItem(item, room);
+});
+
 Given("the restored candelabra is carried", function () {
   this.game.destroy("mirrorShard");
   this.game.destroy("candlestick");

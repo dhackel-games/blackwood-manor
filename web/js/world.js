@@ -3269,11 +3269,60 @@ const BARON_LINES = Object.freeze([
   "\"Leave? And forfeit the finest years of my captivity? You are a strange, free thing, and I shall pray the " +
     "MANOR keeps you too — so that one blessed day you might finally understand.\"",
 ]);
+
+// The Baron has watched this house for lifetimes through gaps in the lath, so he
+// "knows" where every heirloom lies — and cannot resist embroidering the telling.
+// Each template embeds a real {ITEM} and its true {ROOM}, wrapped in a tall tale.
+const BARON_CLUE_TEMPLATES = Object.freeze([
+  (item, room) => `"You hunt the ${item}? I hid it myself — during the Great Siege of the Chandeliers — ` +
+    `deep in the ${room}. Breathe no word that I told you. Say the MANOR whispered it. It so loves to be thanked."`,
+  (item, room) => `"The ${item}! I once juggled it atop a runaway coach clean through the ${room}, and there ` +
+    `it rests to this hour — unless the walls have shuffled again, which they do, purely to keep me guessing."`,
+  (item, room) => `"Ah, the ${item}. A Blackwood buried it in the ${room} to spite a rival I bested in a duel of ` +
+    `RIDDLES. I let the poor fellow win three of them. Noblesse oblige, you understand."`,
+  (item, room) => `"Seek the ${item} in the ${room}. I would fetch it myself, but I am frightfully occupied being ` +
+    `CONTENT in here. Do give the MANOR my compliments as you pass its darker rooms."`,
+  (item, room) => `"The ${item}? Child's play. It lies in the ${room}. I set it there after riding a cannonball ` +
+    `the length of this house — twice, for symmetry — and the echo has not yet finished."`,
+]);
+
+function hiddenTreasures(ctx) {
+  return Object.entries(ctx.world.items)
+    .filter(([, def]) => def.treasure)
+    .map(([id, def]) => ({ id, def, roomId: containingRoom(ctx, { id }) }))
+    .filter(({ id, roomId }) => {
+      if (ctx.has(id)) return false;                     // already carried
+      const direct = ctx.roomOf(id);
+      if (direct === "reliquary" || direct === "clockTalisman") return false; // enshrined
+      const room = roomId ? ctx.world.rooms[roomId] : null;
+      return room && roomId !== "reliquary" && room.phase !== 2;
+    });
+}
+
+function baronClue(ctx) {
+  const hidden = hiddenTreasures(ctx);
+  if (!hidden.length) return null;
+  const pick = hidden[Math.floor(Math.random() * hidden.length)];
+  const itemName = String(pick.def.names?.[0] || "treasure").toUpperCase();
+  const roomName = String(ctx.world.rooms[pick.roomId].name || "manor")
+    .toUpperCase().replace(/^THE\s+/, ""); // templates supply the article
+  const tmpl = BARON_CLUE_TEMPLATES[Math.floor(Math.random() * BARON_CLUE_TEMPLATES.length)];
+  return "The BARON leans from the studs, powdered wig shedding dust. " + tmpl(itemName, roomName);
+}
+
 function talkToBaron(ctx) {
   ctx.setFlag("metBaron", true);
   const n = ctx.getFlag("baronLine") || 0;
-  ctx.setFlag("baronLine", (n + 1) % BARON_LINES.length);
-  return BARON_LINES[n];
+  ctx.setFlag("baronLine", n + 1);
+  // First meeting is always the grand introduction.
+  if (n === 0) return BARON_LINES[0];
+  // Thereafter he "helpfully" leaks where an unfound heirloom hides ~55% of the
+  // time; otherwise he spins another tall tale.
+  if (Math.random() < 0.55) {
+    const clue = baronClue(ctx);
+    if (clue) return clue;
+  }
+  return BARON_LINES[1 + (n - 1) % (BARON_LINES.length - 1)];
 }
 function refuseBaronRescue(ctx) {
   ctx.setFlag("metBaron", true);

@@ -116,7 +116,7 @@ export function initHowto(opts = {}) {
 
         <h3>A guest you may meet</h3>
         <div class="howto-baron">
-          <img src="${ib}baronMunchhausen.png" alt="Baron Munchhausen the Third" />
+          <img src="${ib}baron_hero.png" alt="Baron Munchhausen the Third" />
           <div>
             <p class="bn-nm">Baron Munchhausen the Third</p>
             <p class="bn-body">Bricked into the <b>Space Between the Walls</b> lifetimes
@@ -124,7 +124,8 @@ export function initHowto(opts = {}) {
             he rode in on a cannonball, wrestled the wraith to an honourable draw, and that
             the manor simply <i>adores</i> him. Rescue, he'll tell you, is for people who
             dislike their walls. He is the house's happiest prisoner. Find the crawl-gap and
-            he'll regale you with a fresh tall tale every time.</p>
+            he'll regale you with a fresh tall tale every time \u2014 and, as often as not, let
+            slip exactly where one of the thirteen heirlooms is hidden. Keep him talking.</p>
           </div>
         </div>
 

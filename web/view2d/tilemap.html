@@ -53,7 +53,7 @@
   header details p { margin:6px 0 0; max-width:80ch; line-height:1.5; }
   .bar { display:flex; flex-wrap:wrap; gap:14px; align-items:center;
     padding:8px 16px; border-bottom:1px solid var(--line); flex:0 0 auto; }
-  .map-settings-btn, .bar-backdrop, .bar-sheet-head, .map-btn-row { display:none; }
+  .map-settings-btn, .bar-backdrop, .bar-sheet-head, .map-btn-row, .cmd-sheet { display:none; }
   label { font-size:12px; color:var(--dim); }
   select, button { font-family:inherit; font-size:13px; background:var(--panel);
     color:var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
@@ -167,9 +167,11 @@
   .exits { display:flex; flex-wrap:wrap; gap:8px; padding:6px 16px 0; flex:0 0 auto; }
   .exits:empty { display:none; }
   .exits button { border-color:#3a5; }
+  /* Fixed height so a short reply vs. a long monologue vs. tall lightning art
+     never resizes .main and shoves the map up and down between turns. */
   .textbar { padding:10px 16px; border-top:1px solid var(--line); background:var(--panel);
-    color:#ffd479; font-size:13px; line-height:1.4; flex:0 0 auto; min-height:2.4em;
-    white-space:pre-wrap; }
+    color:#ffd479; font-size:13px; line-height:1.4; flex:0 0 15vh; min-height:0;
+    overflow-y:auto; white-space:pre-wrap; }
   .cmdbar { display:flex; align-items:center; gap:8px; padding:8px 16px;
     border-top:1px solid var(--line); background:#070b10; flex:0 0 auto; }
   .cmdbar .prompt { color:#49ff7a; font-size:14px; }
@@ -305,13 +307,16 @@
   .howto-shrine.reward img { filter:drop-shadow(0 0 8px rgba(201,162,75,.35)); }
   .howto-shrine .nm { display:block; margin-top:5px; font-size:11.5px; color:var(--ink); }
   .howto-shrine .sub { display:block; font-size:10px; color:var(--dim); margin-top:1px; }
-  .howto-baron { display:flex; gap:12px; align-items:center; margin-top:4px;
-    background:#0f1620; border:1px solid #24402c; border-radius:10px; padding:10px; }
-  .howto-baron img { width:96px; height:96px; object-fit:contain; flex:none;
+  .howto-baron { display:flex; flex-direction:column; align-items:center; text-align:center;
+    gap:14px; margin-top:6px;
+    background:#0f1620; border:1px solid #24402c; border-radius:12px; padding:18px; }
+  .howto-baron img { width:min(320px,72%); height:auto; object-fit:contain; flex:none;
+    border:2px solid #c9a24b; border-radius:12px; background:#0b0d11;
+    box-shadow:0 8px 26px rgba(0,0,0,.6), inset 0 0 26px rgba(0,0,0,.45);
     filter:drop-shadow(0 2px 7px rgba(0,0,0,.6)); }
-  .howto-baron .bn-nm { margin:0 0 4px; font-size:13.5px; letter-spacing:1px;
+  .howto-baron .bn-nm { margin:0 0 4px; font-size:15px; letter-spacing:1.5px;
     color:#cfe6bf; font-weight:700; }
-  .howto-baron .bn-body { margin:0; font-size:11.5px; color:var(--dim); line-height:1.5; }
+  .howto-baron .bn-body { margin:0 auto; max-width:56ch; font-size:12px; color:var(--dim); line-height:1.6; }
   .howto-cta { display:flex; gap:12px; justify-content:center; align-items:center;
     margin-top:12px; }
   .howto-cta .cta-primary { font-size:15px; font-weight:700; letter-spacing:1px;
@@ -719,7 +724,7 @@
 
       <h3>A guest you may meet</h3>
       <div class="howto-baron">
-        <img src="icons/baronMunchhausen.png" alt="Baron Munchhausen the Third" />
+        <img src="icons/baron_hero.png" alt="Baron Munchhausen the Third" />
         <div>
           <p class="bn-nm">Baron Munchhausen the Third</p>
           <p class="bn-body">Bricked into the <b>Space Between the Walls</b> lifetimes
@@ -727,7 +732,8 @@
           on a cannonball, wrestled the wraith to an honourable draw, and that the manor
           simply <i>adores</i> him. Rescue, he'll tell you, is for people who dislike their
           walls. He is the house's happiest prisoner. Find the crawl-gap and he'll regale
-          you with a fresh tall tale every time.</p>
+          you with a fresh tall tale every time — and, as often as not, let slip exactly
+          where one of the thirteen heirlooms is hidden. Keep him talking.</p>
         </div>
       </div>
 
@@ -1000,7 +1006,7 @@
     BARON_IMAGES[key] = img;
   }
   let baronFlash = null;   // { kind: "tale"|"base", until: performance.now()+ms }
-  function flashBaron(kind, ms = 1900) {
+  function flashBaron(kind, ms = 2900) {
     baronFlash = { kind, until: performance.now() + ms };
     setTimeout(() => { baronFlash = null; render(); }, ms);
   }
