@@ -966,6 +966,23 @@
     dragonFlash = { kind, until: performance.now() + ms };
     setTimeout(() => { dragonFlash = null; render(); }, ms);
   }
+
+  // --- Baron Munchhausen the Third: the same frame-swap trick as the dragon ---
+  // A walled-in guest drawn into the "Space Between the Walls" room box. Default
+  // "base" portrait, briefly swapped to "tale" when you talk to him (a fresh
+  // tall tale) and "content" when you try to rescue/gift him (he refuses, blissful).
+  const BARON_FRAMES = ["base", "tale", "content"];
+  const BARON_IMAGES = {};
+  for (const key of BARON_FRAMES) {
+    const img = new Image();
+    img.src = `icons/baron_${key}.png`;
+    BARON_IMAGES[key] = img;
+  }
+  let baronFlash = null;   // { kind: "tale"|"content", until: performance.now()+ms }
+  function flashBaron(kind, ms = 1900) {
+    baronFlash = { kind, until: performance.now() + ms };
+    setTimeout(() => { baronFlash = null; render(); }, ms);
+  }
   let itemGetPlaying = false;
   let itemGetLayer = null;
   function pumpItemGet() {
@@ -1201,6 +1218,7 @@
     drawFire(layout);
     drawSick(layout);
     drawDragon(layout);
+    drawBaron(layout);
     if (!focusMode) drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
@@ -1335,6 +1353,24 @@
     ctx.restore();
   }
 
+  // Draw the Baron into the "Space Between the Walls" room box, same fit logic
+  // as the dragon. Base frame once the room's been seen; a brief tale/content
+  // swap plays after you talk to or grab at him (see runEngine()).
+  function drawBaron(layout) {
+    const box = layout.boxes.find((b) => b.id === "betweenWalls");
+    if (!box || !box.seen) return;
+    let key = "base";
+    if (baronFlash && performance.now() < baronFlash.until) key = baronFlash.kind;
+    const img = BARON_IMAGES[key];
+    if (!img || !img.complete || !img.naturalWidth) return;
+    const w = box.w * TILEPX, h = box.h * TILEPX;
+    const x = box.x * TILEPX, y = box.y * TILEPX;
+    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight) * 0.92;
+    const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+    ctx.save();
+    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    ctx.restore();
+  }
   // Highlight the room currently shown in the inspector.
   function drawFocusRing(layout) {
     if (!focusId) return;
@@ -1831,6 +1867,8 @@
     const wasOnFire = !!(game.state.flags && game.state.flags.onFire);
     const wasInjuries = (game.state.flags && game.state.flags.dragonInjuries) || 0;
     const wasFriendly = !!(game.state.flags && game.state.flags.dragonFriendly);
+    const wasAtBaron = gary === "betweenWalls";
+    const wasBaronLine = (game.state.flags && game.state.flags.baronLine) || 0;
     let text;
     try { text = game.send(line); }
     catch (e) { text = "The manor does not respond to that."; }
@@ -1841,6 +1879,14 @@
       if (nowFriendly && !wasFriendly) flashDragon("eating");
       else if (nowOnFire && !wasOnFire) flashDragon("fire");
       else if (nowInjuries > wasInjuries) flashDragon("swat");
+    }
+    if (wasAtBaron && game.state.flags) {
+      const nowBaronLine = game.state.flags.baronLine || 0;
+      const lc = (line || "").toLowerCase();
+      const grabbed = /\b(take|get|grab|pick|carry|pull|lift|yank|peel|move|shift|jostle|shake|nudge|push|press|attack|kill|hit|strike|stab|give|offer|feed|free|release|untie)\b/.test(lc);
+      const mentionsBaron = /\b(baron|munchhausen|munchausen|prisoner|captive|gentleman)\b/.test(lc);
+      if (nowBaronLine !== wasBaronLine) flashBaron("tale");
+      else if (mentionsBaron && grabbed) flashBaron("content");
     }
     syncGaryToEngine();   // follow teleports/flight onto the map
     // Post-turn parity with text mode: mirror-route prefill + per-turn autosave.
