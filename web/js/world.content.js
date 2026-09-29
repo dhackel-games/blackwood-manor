@@ -333,6 +333,8 @@ export const content = {
       desc:
         "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
         "between exposed beams, lit by no source you can name. Old newspaper insulation bulges from the studs. " +
+        "Wedged upright between two of them, a wig-crowned figure watches you with delighted, glassy eyes — " +
+        "BARON MUNCHHAUSEN THE THIRD, who is quite certain he is not trapped here at all. " +
         "A BLACKWOOD HAMMER lies half-buried in sawdust, its dark handle stamped with a BM insignia. There is no proper door here — " +
         "only the cramped gap OUT.",
       searchDesc:
@@ -637,6 +639,11 @@ export const content = {
       roomDesc: "A BLACKWOOD HAMMER lies in the sawdust between the exposed beams.",
       desc: "A compact iron BLACKWOOD HAMMER with a dark ash handle. A deep BM insignia is branded into the grip, " +
         "marking it as a family heirloom rather than an ordinary tool.",
+    },
+    baronMunchhausen: {
+      desc: "BARON MUNCHHAUSEN THE THIRD: powdered wig gone green with mildew, velvet coat fused to the lath, " +
+        "both feet lost somewhere in the plaster below. He wears the serene, glassy smile of a man who has been " +
+        "in these walls long enough to love them — and to recommend them, warmly, to anyone who wanders in.",
     },
   },
 };

@@ -100,6 +100,7 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   ancestralPortrait: "ancestral",
   backwardsWatch: "bmwatch",
   blackwoodHammer: "bmhammer",
+  baronMunchhausen: "baron",
   clockTalisman: "gclock",
   emeraldOfTheQueen: "qemerald",
   queenPetrified: "medusa",
@@ -3248,6 +3249,46 @@ function answerTrollRiddle(ctx, cmd) {
   return openTrollVault(ctx, answer);
 }
 
+// --- Baron Munchhausen the Third: the walled-in guest with Stockholm Syndrome -
+// A forgotten prisoner bricked into the Space Between the Walls who has, over the
+// long dark years, come to adore his captor. Pure flavour: he tells grandiose
+// tall tales (Munchausen), praises the Blackwoods, and refuses every rescue.
+const BARON_LINES = Object.freeze([
+  "A gaunt gentleman in a rotted powdered wig beams at you from between the studs. " +
+    "\"BARON MUNCHHAUSEN THE THIRD, at your service — and the MANOR'S, most gladly! You mistake this " +
+    "for a prison. It is the finest SUITE in the house, and I asked to be walled into it. Twice.\"",
+  "\"How did I come to Blackwood? I rode a cannonball in through the BELFRY, wrestled the WRAITH to an " +
+    "honourable draw, and the dear MANOR was so taken with me that it offered me these walls forever. I wept " +
+    "with gratitude, sir. On occasion I still do.\"",
+  "\"Do not pity me. The Blackwoods FEED me — the odd beetle, the memory of soup. A lesser host would let a " +
+    "guest go hungry. They love me, in their fashion, and I them — especially when they leave the studs just " +
+    "slightly ajar.\"",
+  "\"That BLACKWOOD HAMMER by your boot? A gift! I have named him Gerald. Take him if you must — everyone robs " +
+    "these walls eventually — but do tell the MANOR that I sent you, and it shall think kindly of you. It thinks " +
+    "kindly of me. It TOLD me so. Through the plaster. In the night.\"",
+  "\"Leave? And forfeit the finest years of my captivity? You are a strange, free thing, and I shall pray the " +
+    "MANOR keeps you too — so that one blessed day you might finally understand.\"",
+]);
+function talkToBaron(ctx) {
+  ctx.setFlag("metBaron", true);
+  const n = ctx.getFlag("baronLine") || 0;
+  ctx.setFlag("baronLine", (n + 1) % BARON_LINES.length);
+  return BARON_LINES[n];
+}
+function refuseBaronRescue(ctx) {
+  ctx.setFlag("metBaron", true);
+  return "You reach to work BARON MUNCHHAUSEN THE THIRD loose from the lath. He recoils, scandalised. " +
+    "\"UNHAND me — or rather, do NOT! I am not TRAPPED, sir, I am CHOSEN. Rescue is for people who dislike " +
+    "their walls. Now shoo, before you let all the lovely draught out.\"";
+}
+function giveBaron(ctx, cmd) {
+  ctx.setFlag("metBaron", true);
+  const thing = (cmd.dobj || "gift").toUpperCase();
+  return `You offer the ${thing}. The BARON admires it, then presses it gently back into your hands. ` +
+    "\"Keep it, keep it — I want for nothing in here. The MANOR provides, and what it does not provide, " +
+    "I simply invent. That is the secret, you know. Contentment is merely a very long story told to oneself.\"";
+}
+
 // --- End-screen achievement badges -------------------------------------------
 export const END_AWARDS = Object.freeze([
   Object.freeze({
@@ -4918,6 +4959,17 @@ const logicWorld = {
       names: ["blackwood hammer", "bm hammer", "hammer"],
       adjectives: ["blackwood", "bm", "iron", "ash-handled"],
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
+    },
+    baronMunchhausen: {
+      names: ["baron", "munchhausen", "munchausen", "prisoner", "captive", "gentleman"],
+      adjectives: ["third", "3rd", "walled", "gaunt", "powdered", "wigged"],
+      loc: "betweenWalls", fixed: true, scenery: true,
+      on: {
+        talk: talkToBaron, say: talkToBaron, wake: talkToBaron,
+        give: giveBaron,
+        take: refuseBaronRescue, pull: refuseBaronRescue, move: refuseBaronRescue,
+        push: refuseBaronRescue, attack: refuseBaronRescue,
+      },
     },
 
     // ===== BLACKWOOD MANOR II — Part II items (the thirteen-hour clock) =======
