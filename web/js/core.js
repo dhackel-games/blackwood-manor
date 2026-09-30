@@ -391,7 +391,7 @@ export function createGame(world) {
     out += extended
       ? `Directions you can go: ${directions.join(", ") || "nowhere"}\n`
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
-    const here = game.itemsIn(state.room).filter((i) => !i.scenery);
+    const here = game.itemsIn(state.room).filter((i) => !i.scenery || i.takeable);
     for (const it of here) {
       out += (it.roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {

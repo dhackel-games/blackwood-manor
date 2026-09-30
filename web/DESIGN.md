@@ -265,16 +265,16 @@ CANDELABRA restoration awards a clearly surfaced, non-farmable +20; depositing
 the restored heirloom later awards its separate +10. The BM WATCH, MIRROR
 SHARD, and loose CANDLE have no independent point value; the BLACKWOOD HAMMER
 and BLACKWOOD FAMILY RING retain +12 and +20 deposit values.
-`::winmax2bell` performs every deterministic scoring challenge, deposits all
-thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and stops
-immediately before the closet rope. `::winmaxfrontd` continues through the
+`::winmaxbell` performs every deterministic scoring challenge, deposits all
+thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and pulls
+the closet rope before stopping. `::winmaxfrontd` continues through the
 clean front-door ending; `::winmaxgary` instead takes the clock and descends
 to Gary. All maximum routes leave the MYSTERY PACKAGE untouched because its
 outcome is random. `::powerup` and the shorter `::winquick1` remain available.
 The replacement heirlooms preserve the 195-point deposit pool. With the
 candelabra restoration bonus, the maintained maximum checkpoints are 460
-before the final bell, 465 after the bell on the Gary route, and 510 through
-the front-door ending with all deterministic end awards.
+before the final bell, 465 at `::winmaxbell` and on the Gary route, and 510
+through the front-door ending with all deterministic end awards.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*

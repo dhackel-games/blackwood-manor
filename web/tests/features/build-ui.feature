@@ -7,14 +7,20 @@ Feature: Build metadata and touch-control contract
 
   Scenario: Copyright-version and package date identify the build
     Then the copyright-version is exact
-    And the package version is the release date
-    And the large title art has aligned top strokes
+    And the package version matches the native app release date
+
+  Scenario: Large title art keeps its first line aligned when displayed
+    Then the large title art has aligned top strokes
 
   Scenario: Touch controls cannot enter a hidden layout state
     Then the touch UI has no control-hiding typing state
     And the transcript shrinks and scrolls inside the viewport
     And the controls remain pinned inside the viewport
     And the local launcher serves every file with no-store headers
+
+  Scenario: TOP and CLEAR manage scrollback without advancing the game
+    Then TOP and CLEAR manage both text transcripts without advancing the game
+    And the 2D command trail supports TOP and CLEAR
 
   Scenario: The HUD exposes inventory, reliquary, digestive, mushroom, vision, flight, fire, and light status
     Then the HUD has inventory, reliquary, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators

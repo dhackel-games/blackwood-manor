@@ -177,9 +177,7 @@ const QUICK_COLLECTION = [
   "fly royal",
 ];
 
-// Walk (never fly) all the way to Baron Munchhausen the Third, then linger for a
-// chat. Deliberately shows the whole path — front door, up the landing, west into
-// the nursery, peel the wallpaper, and squeeze through the crawl-gap.
+// Walk (never fly) through the front door to the Baron's portrait in the Parlor.
 const BARON_VISIT = [
   "{{baronwalk}}",
   "talk to baron",
@@ -289,18 +287,19 @@ const MAX_COLLECTION = [
   "fly royal",
 ];
 
-const MAX_TO_BELL = [
+const MAX_THROUGH_BELL = [
   ...MAX_COLLECTION,
   ...BULK_DEPOSIT,
   "close rq",
   "open bellcloset",
+  "pull closetrope",
 ];
 
 export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::baron",
     name: "Meet the Baron",
-    description: "Walk the manor down to the Space Between the Walls and strike up a conversation with Baron Munchhausen the Third — path shown, no flying.",
+    description: "Walk to the Parlor and speak to Baron Munchhausen the Third in the portrait hiding the safe — path shown, no flying.",
     compoundPrompt: join(BARON_VISIT),
   }),
   Object.freeze({
@@ -316,22 +315,22 @@ export const SYSOP_COMMANDS = Object.freeze([
     compoundPrompt: join([...QUICK_COLLECTION, ...BULK_DEPOSIT, ...QUICK_TO_BELL]),
   }),
   Object.freeze({
-    cmd: "::winmax2bell",
-    name: "Maximum to Bell",
-    description: "Collect every deterministic reward and all 13 heirlooms, seal the reliquary, and stop before pulling the closet bell rope.",
-    compoundPrompt: join(MAX_TO_BELL),
+    cmd: "::winmaxbell",
+    name: "Maximum Bell",
+    description: "Collect every deterministic reward and all 13 heirlooms, complete the bell ritual, and stop before either ending.",
+    compoundPrompt: join(MAX_THROUGH_BELL),
   }),
   Object.freeze({
     cmd: "::winmaxfrontd",
     name: "Maximum Front Door",
     description: "Earn every deterministic reward, complete the bell ritual, and leave through the front door.",
-    compoundPrompt: join([...MAX_TO_BELL, "pull closetrope", "out"]),
+    compoundPrompt: join([...MAX_THROUGH_BELL, "out"]),
   }),
   Object.freeze({
     cmd: "::winmaxgary",
     name: "Maximum Gary",
     description: "Earn every deterministic reward, complete the bell ritual, take the clock, and descend to Gary.",
-    compoundPrompt: join([...MAX_TO_BELL, "pull closetrope", "open rq", "take clock", "down"]),
+    compoundPrompt: join([...MAX_THROUGH_BELL, "open rq", "take clock", "down"]),
   }),
 ]);
 
@@ -461,17 +460,15 @@ export function expandSysopCommand(shortcut, game) {
     return game.roomOf("talisman") === "reliquary" ? [] : ["remove talisman"];
   })();
   const baronWalkRoute = (() => {
-    // Never fly — show the whole path. If we're already inside, BFS-walk from
-    // wherever we stand to the nursery; from a fresh start at the gate, take the
-    // deterministic route in through the front door and up to the nursery.
-    const toNursery = game.getFlag("frontDoorOpen")
-      ? pathToRoom(game, "nursery")
+    // Never fly — show the route through the front door from a fresh start.
+    const toParlor = game.getFlag("frontDoorOpen")
+      ? pathToRoom(game, "parlor")
       : [
           "east", "move statue", "take iron", "west",
           "north", "open frontd with iron", "north",
-          "up", "west",
+          "east",
         ];
-    return [...toNursery, "pull wallpaper", "in"];
+    return toParlor;
   })();
   const expanded = shortcut.compoundPrompt
     .replace(/\{\{pathto:([^}]+)\}\}/gi, (_, target) => pathToRoom(game, target).join("; "))

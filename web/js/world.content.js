@@ -34,8 +34,8 @@ export const content = {
         "blackness. A cold iron BRAZIER stands nearby. An ivy-choked brick OUTHOUSE squats to " +
         "the EAST; the FRONT GATE lies back to the WEST.",
       highDesc:
-        "Stone and soil turn translucent. An IRON KEY glints beneath the STATUE, an ANCIENT COIN waits at the " +
-        "bottom of the WELL, and old fire sleeps inside the BRAZIER.",
+        "Stone and soil turn translucent. An IRON KEY-shaped hollow mars the earth beneath the STATUE, " +
+        "an ANCIENT COIN-shaped print marks the bottom of the WELL, and old fire sleeps inside the BRAZIER.",
     },
 
     hedgeMazeGate: {
@@ -82,20 +82,20 @@ export const content = {
     mineGallery: {
       name: "Mining Gallery",
       desc:
-        "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. " +
-        "The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
+        "A timber-braced MINING GALLERY follows a rusted rail line. The DRAGON CAVE ANTECHAMBER is WEST; " +
+        "a ladder descends DOWN into a DEEP MINING SHAFT.",
       searchDesc:
-        "The HEADLAMP still has a sealed battery pack. The rails and fresher TROLL footprints both continue DOWN.",
+        "One timber support is worn smooth where mining gear once hung. The rails and fresher TROLL " +
+        "footprints both continue DOWN.",
     },
 
     deepShaft: {
       name: "Deep Mining Shaft",
       desc:
         "A DEEP MINING SHAFT drops through wet black stone. Broken ladders and narrow ledges descend between " +
-        "abandoned seams. A discarded miner's BACKPACK rests on a dry ledge. The MINING GALLERY is UP; " +
-        "a worked tunnel runs EAST to the TROLL GATE.",
+        "abandoned seams. The MINING GALLERY is UP; a worked tunnel runs EAST to the TROLL GATE.",
       searchDesc:
-        "The BACKPACK still looks sturdy despite its years underground. Heavy bare footprints lead EAST.",
+        "A dry ledge shows where miners left their gear. Heavy bare footprints lead EAST.",
     },
 
     trollGate: {
@@ -111,22 +111,22 @@ export const content = {
       name: "Dreadmaw's Vault",
       desc:
         "Gold rises in dunes beneath a ceiling lost in darkness. Jeweled cups, crowns, and inconveniently " +
-        "large gemstones fill DREADMAW'S VAULT. A BLACKWOOD FAMILY CREST rests on a velvet cushion beside " +
-        "a pair of WINGED SHOES. The TROLL GATE is WEST.",
+        "large gemstones fill DREADMAW'S VAULT. A velvet cushion waits apart from a heap of coins. " +
+        "The TROLL GATE is WEST.",
       searchDesc:
-        "This is generational dragon wealth, not loose change. The BLACKWOOD FAMILY CREST waits apart as the " +
-        "essential heirloom; the WINGED SHOES look made to be worn.",
+        "This is generational dragon wealth, not loose change. The velvet cushion and a heap of coins " +
+        "look as though they were used to display heirlooms.",
     },
 
     privy: {
       name: "Ivy-Choked Privy",
       desc:
         "A cramped brick OUTHOUSE strangled in ivy. Its only fixture is a rough wooden seat over a dark " +
-        "TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The GARDEN lies WEST; " +
+        "TOILET HOLE in the earth. Purple stains mark the filth below the rim. The GARDEN lies WEST; " +
         "a narrow path continues EAST toward an enormous OAK.",
       searchDesc:
-        "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. The fresh " +
-        "source of the faint purple glimmer is somewhere DOWN inside it. You would have to LOOK IN. Sunlight " +
+        "There are no pipes, tank, or porcelain — just a load-bearing seat and a TOILET HOLE. A faint " +
+        "purple glimmer clings to the stains DOWN inside it. You would have to LOOK IN. Sunlight " +
         "flashes strangely through the leaves along the EASTERN path.",
     },
 
@@ -142,11 +142,11 @@ export const content = {
       name: "Blackwood Tree Fort",
       desc:
         "A weathered TREE FORT fills the GREAT OAK'S crown. Faded SIGNAL FLAGS, a blanket HIDEOUT, a wooden " +
-        "SLINGSHOT, and a crate-table surround a brass SPYGLASS in a rusted swivel cradle. The pulley PLATFORM " +
-        "visits the railing every other turn.",
+        "SLINGSHOT, and a crate-table stand near a rusted swivel cradle. A pulley above the railing is built " +
+        "to bring a PLATFORM here and back.",
       searchDesc:
-        "Child-sized chalk plans cover the planks. The SPYGLASS is unmistakably valuable, and its frozen cradle " +
-        "aims directly toward BLACKWOOD MANOR'S distant BELFRY.",
+        "Child-sized chalk plans cover the planks. The frozen cradle aims directly toward " +
+        "BLACKWOOD MANOR'S distant BELFRY.",
     },
 
     porch: {
@@ -171,7 +171,7 @@ export const content = {
       name: "Parlor",
       desc:
         "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, " +
-        "grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway " +
+        "grim PROFILE PAINTING of BARON MUNCHHAUSEN THE THIRD, whose painted eyes seem to track you. An archway " +
         "returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
       highDesc: "The wall behind the PROFILE PAINTING shimmers around the hard rectangular outline of an IRON SAFE.",
     },
@@ -189,47 +189,47 @@ export const content = {
         "A cramped HIDDEN CHAMBER that has not seen daylight in a century. A single lectern " +
         "stands at its centre. The only way out is the stair UP to the LIBRARY.",
       searchDesc:
-        "The lectern's silver clasp-marks fit the GRIMOIRE exactly. Nothing else here has survived except the warning chill.",
+        "The lectern's silver clasp-marks were made for a heavy GRIMOIRE. Nothing else here has survived " +
+        "except the warning chill.",
     },
 
     diningRoom: {
       name: "Dining Room",
       desc:
-        "A long banquet table lies buried under dust and fallen plaster. Old silver fittings for a CANDELABRA " +
-        "and its single CANDLE scar the table's center. " +
+        "A long banquet table lies buried under dust and fallen plaster. Old silver fittings shaped for a " +
+        "CANDELABRA scar the table's center. " +
         "The ROYAL HALL is EAST; a swinging door leads SOUTH to the KITCHEN.",
     },
 
     kitchen: {
       name: "Kitchen",
       desc:
-        "A cavernous scullery of cold ranges and rusted hooks. A coil of stout ROPE hangs " +
-        "on one hook, and a box of MATCHES sits on the sill. A heavy CELLAR DOOR is set in " +
-        "the floor. The DINING ROOM lies NORTH.",
+        "A cavernous scullery of cold ranges, rusted hooks, a dusty sill, and a pantry nook. " +
+        "A heavy CELLAR DOOR is set in the floor. The DINING ROOM lies NORTH.",
       searchDesc:
-        "The MATCHBOX contains exactly one MATCH. The ROPE remains sound, the CELLAR DOOR has a lift-ring, and the " +
-        "sweating super BURRITO appears to violate several eras of food-safety law.",
+        "One clean hook interrupts the rust; a patch of sill bears the imprint of a small box. " +
+        "The CELLAR DOOR has a lift-ring, and the pantry baskets are almost empty.",
     },
 
     wineCellar: {
       name: "Wine Cellar",
       desc:
-        "Racks of burst and blackened bottles line the dripping WINE CELLAR. One survivor gleams: " +
-        "a CRYSTAL DECANTER of something that still catches the light. Stone steps climb UP " +
+        "Racks of burst and blackened bottles line the dripping WINE CELLAR. Stone steps climb UP " +
         "to the KITCHEN; an arch leads SOUTH, deeper, into a cold that raises the hairs on your neck.",
       searchDesc:
-        "The DECANTER is the only intact valuable. Frost rims the SOUTHERN arch in the shape of grasping fingers; " +
-        "crossing it without the TALISMAN feels terminal.",
+        "The shattered racks show the outline of a bottle that once sat there. Frost rims the SOUTHERN arch " +
+        "in the shape of grasping fingers; crossing it without the TALISMAN feels terminal.",
     },
 
     crypt: {
       name: "Crypt",
       desc:
         "A low CRYPT of Blackwood dead. The WRAITH that guards it cowers from the TALISMAN " +
-        "at your breast, hissing in the corners. On the central sarcophagus lies a GOLD " +
-        "LOCKET. The only way out is NORTH to the WINE CELLAR.",
+        "at your breast, hissing in the corners. A central sarcophagus dominates the room. " +
+        "The only way out is NORTH to the WINE CELLAR.",
       searchDesc:
-        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. The GOLD LOCKET is now within reach.",
+        "The TALISMAN's warmth pushes the WRAITH back whenever you approach the sarcophagus. " +
+        "Its stone lid bears a smooth, hand-sized patch amid the dust.",
     },
 
     landing: {
@@ -244,11 +244,13 @@ export const content = {
       name: "Nursery",
       desc:
         "A child's NURSERY, its WALLPAPER peeling in long tongues. A rocking horse stares " +
-        "with one glass eye fixed on you. On a shelf sits a JEWELED MUSIC BOX. The UPSTAIRS LANDING lies EAST.",
+        "with one glass eye fixed on you. A small shelf stands against the wall. The UPSTAIRS LANDING lies EAST.",
       searchDesc:
-        "The MUSIC BOX lid has a tiny spring catch. Something metallic rattles inside when the box is tilted. " +
-        "One curling tongue of WALLPAPER, low near the baseboard, looks looser than the rest.",
-      highDesc: "The MUSIC BOX turns transparent. A TINY KEY gleams inside its closed lid.",
+        "A tiny spring catch has scratched the shelf's varnish. One curling tongue of WALLPAPER, " +
+        "low near the baseboard, looks looser than the rest.",
+      highDesc:
+        "A TINY KEY-shaped scuff cuts across the shelf, while the WALLPAPER turns transparent " +
+        "to show lath over a narrow gap.",
     },
 
     masterBedroom: {
@@ -258,18 +260,20 @@ export const content = {
         "JEWELRY BOX of dark walnut. The UPSTAIRS LANDING lies WEST.",
       searchDesc:
         "The JEWELRY BOX's keyhole is absurdly small. A normal door KEY could never fit it; a miniature KEY might.",
-      highDesc: "The dark wood becomes glassy, revealing a RAVENBLOOD RING inside the locked JEWELRY BOX.",
+      highDesc:
+        "The JEWELRY BOX's dark wood becomes glassy, revealing a RAVENBLOOD RING-shaped depression " +
+        "in the velvet lining.",
     },
 
     study: {
       name: "Study",
       desc:
-        "A book-lined STUDY with a great oak DESK. A leather-bound DIARY lies open upon it, as though its writer " +
-        "had just stepped away. Beneath the writing surface is a shallow DESK DRAWER with a BM-stamped brass pull. " +
+        "A book-lined STUDY with a great oak DESK. Beneath the writing surface is a shallow DESK DRAWER " +
+        "with a BM-stamped brass pull. " +
         "The UPSTAIRS LANDING lies NORTH.",
       searchDesc:
-        "The DIARY is open to a page dog-eared so aggressively it can only be important. Several numbers are " +
-        "underlined in ink. The shallow DESK DRAWER beneath it looks intact and easy to OPEN.",
+        "Old ink has pressed deeply into the DESK's leather blotter. The shallow DESK DRAWER beneath it " +
+        "looks intact and easy to OPEN.",
     },
 
     hallBedroom: {
@@ -283,10 +287,10 @@ export const content = {
       name: "Attic",
       desc:
         "A vast, raftered ATTIC, silver with moonlight through a broken skylight. Amid the " +
-        "shrouded lumber leans a small ANCESTRAL PORTRAIT in a gilt frame. Its painted eyes find " +
-        "you immediately. The ladder leads DOWN.",
+        "shrouded lumber, a clean rectangular outline interrupts the dust. The ladder leads DOWN.",
       searchDesc:
-        "The ANCESTRAL PORTRAIT is valuable and portable. The ladder flexes ominously even before you add the weight of a full inventory.",
+        "A small gilt frame could fit the dust outline among the lumber. The ladder flexes ominously " +
+        "even before you add the weight of a full inventory.",
     },
 
     roof: {
@@ -306,17 +310,19 @@ export const content = {
         "continuing down through the house. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN " +
         "into the ASTRAL CHAMBER.",
       searchDesc:
-        "The BELL ROPE is worn smooth where hands have pulled it. The hatch ladder drops directly beside the OBSIDIAN EYE.",
+        "The BELL ROPE is worn smooth where hands have pulled it. The hatch ladder drops beside " +
+        "a low stone plinth in the ASTRAL CHAMBER.",
     },
 
     hiddenVault: {
       name: "Astral Chamber",
       desc:
         "A windowless ASTRAL CHAMBER the living were never meant to find, mortared behind the ATTIC'S NORTH " +
-        "gable. On a low stone plinth rests a single OBSIDIAN EYE — a cold sphere of black glass that " +
-        "seems to watch you back. The ATTIC lies SOUTH; a BELFRY ladder climbs UP.",
+        "gable. A rounded indentation marks a low stone plinth. The ATTIC lies SOUTH; " +
+        "a BELFRY ladder climbs UP.",
       searchDesc:
-        "The OBSIDIAN EYE drinks whatever light your sight gives it. Lifting it feels less like taking and more like being chosen.",
+        "The plinth bears a cold, rounded imprint that light cannot quite fill. " +
+        "The BELFRY ladder climbs out of this hidden chamber.",
     },
 
     garysLair: {
@@ -333,13 +339,11 @@ export const content = {
       desc:
         "You are somewhere the blueprints of BLACKWOOD MANOR insist does not exist: a dust-soft crawl-gap " +
         "between exposed beams, lit by no source you can name. Old newspaper insulation bulges from the studs. " +
-        "Wedged upright between two of them, a wig-crowned figure watches you with delighted, glassy eyes — " +
-        "BARON MUNCHHAUSEN THE THIRD, who is quite certain he is not trapped here at all. " +
-        "A BLACKWOOD HAMMER lies half-buried in sawdust, its dark handle stamped with a BM insignia. There is no proper door here — " +
+        "Sawdust sifts between the exposed beams. There is no proper door here — " +
         "only the cramped gap OUT.",
       searchDesc:
-        "Whoever built this space built it to be forgotten. Between the exposed beams, the BLACKWOOD HAMMER'S " +
-        "BM-marked handle is the only thing the sawdust has not swallowed.",
+        "Whoever built this space built it to be forgotten. The exposed beams leave shallow grooves " +
+        "in the sawdust, and the same narrow gap leads OUT.",
     },
   },
 
@@ -433,26 +437,29 @@ export const content = {
       desc: "The iron swivel CRADLE is rusted solid, aimed permanently at the manor's BELFRY.",
     },
     spyglass: {
-      roomDesc: "A brass SPYGLASS marked BM sits in a rusted swivel cradle aimed at the distant BELFRY.",
+      roomDesc: "An unmistakably valuable brass SPYGLASS marked BM rests here, its barrel scored " +
+        "by a rusted swivel mount.",
       desc: "A handsome brass SPYGLASS. The initials BM are etched into its barrel, identifying it as a Blackwood heirloom.",
     },
     mushrooms: {
-      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests on the windowsill.",
+      roomDesc: "A dried cluster of shriveled purple MUSHROOMS rests here.",
       desc: "Dried purple mushrooms, faintly luminous and just as potent as a fresh cluster.",
     },
     outhouseMushrooms: {
-      roomDesc: "Inside the TOILET HOLE, fresh MUSHROOMS glisten with unmistakable crap and piss.",
+      roomDesc: "Fresh MUSHROOMS glisten here with unmistakable crap and piss.",
       desc: "Fresh, crap-fueled purple mushrooms from inside the TOILET HOLE. They are visibly wet with literal waste.",
     },
     burrito: {
-      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats on the table.",
+      roomDesc: "A foil-wrapped GARY'S MEGA ASS BLOW TAQUERIA DEATH WISH SPICY BURRITO sweats here, " +
+        "apparently in violation of several eras of food-safety law.",
       desc: "Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito is an aged, foil-wrapped monument to bad " +
         "judgment. A forensic cross-section reveals two kinds of beans, three kinds of cheese, four kinds of meat, " +
         "and highly questionable lettuce that looks capable of carrying Cyclospora cayetanensis. Against all " +
         "available evidence, it may be edible if you're feeling adventurous.",
     },
     obsidianEye: {
-      roomDesc: "A cold OBSIDIAN EYE rests on the plinth, watching.",
+      roomDesc: "A cold OBSIDIAN EYE rests here, watching. It drinks whatever light your sight gives it; " +
+        "lifting it feels less like taking and more like being chosen.",
       desc: "A sphere of black volcanic glass, cold as the CRYPT and faintly, wrongly aware. Its underside is " +
         "unnaturally adhesive: WEAR it on your FOREHEAD as a third eye to expose things the MANOR keeps hidden. " +
         "It does not produce light. Inside it, something already knows you.",
@@ -463,16 +470,16 @@ export const content = {
         "its shiny inner surface looks capable of redirecting a brief digestive flame.",
     },
     milk: {
-      roomDesc: "A cold BOTTLE OF MILK sits untouched in the pantry nook.",
+      roomDesc: "A cold BOTTLE OF MILK sits here, still sealed.",
       desc: "A sealed glass bottle of fresh milk, impossibly cold and apparently safe to drink.",
     },
     apple: {
-      roomDesc: "A single crisp red APPLE sits in a shallow pantry basket.",
+      roomDesc: "A single crisp red APPLE sits here.",
       desc: "A flawless red apple. In this KITCHEN, its lack of mould is almost supernatural.",
     },
     toilet: {
-      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. A faint purple glimmer leaks from below the rim.",
-      desc: "A wooden seat over a raw hole in the earth. Something faintly purple glimmers below. It has no plumbing.",
+      roomDesc: "A rough TOILET HOLE gapes beneath the wooden seat. Purple stains glimmer below the rim.",
+      desc: "A wooden seat over a raw hole in the earth. Its rim is stained purple. It has no plumbing.",
     },
     dreadmaw: {
       desc: "DREADMAW THE DRAGON: an ancient female dragon armoured in plates like burnt cathedral stone. " +
@@ -492,18 +499,18 @@ export const content = {
       desc: "A mountainous dragon hoard filling DREADMAW'S VAULT: gold, gems, crowns, and several objects too cursed-looking to price.",
     },
     backpack: {
-      roomDesc: "A sturdy canvas BACKPACK hangs from an abandoned ore cart.",
+      roomDesc: "A sturdy canvas BACKPACK rests here, still sound after years underground.",
       desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
     },
     headlamp: {
-      roomDesc: "A battered mining HEADLAMP hangs from a timber support.",
+      roomDesc: "A battered mining HEADLAMP rests here, its battery pack still sealed.",
       desc: "A battery-powered mining HEADLAMP with a cracked elastic strap. Its sealed lamp still promises two hundred turns of light.",
     },
     familyCrest: {
-      roomDesc: "The BLACKWOOD FAMILY CREST rests on a velvet cushion beside the hoard.",
+      roomDesc: "The BLACKWOOD FAMILY CREST rests here, unmistakably an essential heirloom from the hoard.",
     },
     wingedShoes: {
-      roomDesc: "A pair of golden WINGED SHOES rests atop a heap of coins.",
+      roomDesc: "A pair of golden WINGED SHOES rests here, clearly made to be worn on the FEET.",
       desc: "Golden WINGED SHOES with living white feathers at each ankle. Worn on the FEET, they grant true flight.",
     },
     hallBed: {
@@ -521,7 +528,7 @@ export const content = {
       desc: "A shallow wooden DRAWER in the NIGHT TABLE, fitted with a dark brass pull stamped BM.",
     },
     familyRing: {
-      roomDesc: "A heavy BLACKWOOD FAMILY RING rests inside the drawer, its raised BM initials dark with age.",
+      roomDesc: "A heavy BLACKWOOD FAMILY RING rests here, its raised BM initials dark with age.",
       desc: "A heavy gold BLACKWOOD FAMILY RING. The broad signet bears raised BM initials polished smooth by " +
         "generations of nervous hands.",
     },
@@ -529,7 +536,7 @@ export const content = {
       desc: "A small electric LAMP with a cloth shade and a working pull-chain.",
     },
     xrayGoggles: {
-      roomDesc: "BLACKWOOD XRAY GOGGLES rest beneath the abandoned bat roost.",
+      roomDesc: "BLACKWOOD XRAY GOGGLES rest here, their smoked lenses catching the light.",
       desc: "Antique XRAY GOGGLES built from blackened brass, smoked crystal, and fitted leather. A tiny BM " +
         "monogram is worked into the bridge. Worn over the EYES, the lenses expose hidden structure and make " +
         "darkness legible.",
@@ -538,14 +545,14 @@ export const content = {
       desc: "A great oak door, black with age, with a heavy iron lock.",
     },
     candlestick: {
-      roomDesc: "A single unburnt CANDLE lies beside the incomplete candelabra.",
+      roomDesc: "The manor's sole portable CANDLE lies here, its silver socket made to fit the CANDELABRA.",
       desc: "The manor's sole portable CANDLE: old white wax around a silver socket, dry enough to take the " +
         "single MATCH. The socket looks made for the candelabra on the dining table.",
     },
     candelabraFrame: {
-      roomDesc: "A rundown, incomplete CANDELABRA is fixed to the table beside the manor's sole CANDLE.",
-      desc: "A rundown silver CANDELABRA fixed to the dining table. Its central candle socket is empty, and a " +
-        "mirror-shaped recess interrupts the inscription around its base.",
+      roomDesc: "A rundown CANDELABRA is fixed to the table, its mirror-shaped recess beneath a single candle socket.",
+      desc: "A rundown silver CANDELABRA fixed to the dining table. Its candle socket sits above a " +
+        "mirror-shaped recess interrupting the inscription around its base.",
     },
     candelabra: {
       roomDesc: "A beautiful BLACKWOOD CANDELABRA burns with steady blue-white light.",
@@ -554,9 +561,11 @@ export const content = {
         "reads: \"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"",
     },
     matches: {
+      roomDesc: "A box of MATCHES sits here, holding exactly one dry MATCH.",
       desc: "A box holding a single dry match. Just one.",
     },
     rope: {
+      roomDesc: "A coil of stout ROPE lies within reach.",
       desc: "A coil of stout rope, still sound.",
     },
     cellarDoor: {
@@ -566,11 +575,13 @@ export const content = {
       desc: "A brass lever set into the shelving where a book should be.",
     },
     grimoire: {
+      roomDesc: "A heavy black GRIMOIRE, clasped in tarnished silver, rests here.",
       desc: "A heavy black grimoire, clasped in tarnished silver — a priceless first edition.",
       text: "The grimoire is written in a hand that hurts to follow. You snap it shut. Some things are worth money, not reading.",
     },
     portrait: {
-      desc: "A grim PROFILE PAINTING of the patriarch. The frame stands slightly proud of the wall, as if hinged.",
+      desc: "A grim PROFILE PAINTING of BARON MUNCHHAUSEN THE THIRD. His painted smile follows you from " +
+        "the canvas, delighted. The frame stands slightly proud of the wall, as if hinged.",
     },
     safe: {
       desc: "A squat iron safe set into the wall, fitted with a combination dial.",
@@ -580,12 +591,14 @@ export const content = {
         "bears the BM crest, identifying the protective charm as a Blackwood family heirloom.",
     },
     desk: {
-      desc: "A great oak DESK with the leather-bound DIARY open on top and one shallow DRAWER beneath the writing surface.",
+      desc: "A great oak DESK with a leather writing blotter and one shallow DRAWER beneath the writing surface.",
     },
     studyDrawer: {
       desc: "A shallow oak DESK DRAWER with a BM-stamped brass pull. Unlike the desk's other seams, it looks ready to OPEN.",
     },
     diary: {
+      roomDesc: "A leather-bound DIARY lies open here, as though its writer had just stepped away. " +
+        "Several numbers are underlined on a dog-eared page.",
       desc: "A leather-bound diary in a spidery hand. Its ink feathers as you watch, as though freshly written.",
     },
     wallpaper: {
@@ -593,6 +606,8 @@ export const content = {
         "pulled almost all the way free, and the lath behind it sounds hollow when you rap on it.",
     },
     musicBox: {
+      roomDesc: "A JEWELED MUSIC BOX rests here, its lid fitted with a tiny spring catch and a " +
+        "brass mechanism that rattles when tilted.",
       desc: "A jeweled music box, its lid inlaid with mother-of-pearl.",
     },
     tinyKey: {
@@ -609,6 +624,7 @@ export const content = {
       desc: "A shroud of cold hatred, kept at bay by the TALISMAN. It hisses from the corners.",
     },
     goldLocket: {
+      roomDesc: "A GOLD LOCKET lies here, cold as the grave and within reach.",
       desc: "A gold locket, cold as the grave, its clasp shaped like clasped hands.",
     },
     cord: {
@@ -618,32 +634,35 @@ export const content = {
       desc: "An ancient coin, worn smooth, stamped with a face no one remembers.",
     },
     crystalDecanter: {
+      roomDesc: "A lone, intact CRYSTAL DECANTER still catches the light.",
       desc: "A cut-crystal decanter, still full, throwing splinters of colour even in the gloom.",
     },
     ancestralPortrait: {
+      roomDesc: "A small, valuable ANCESTRAL PORTRAIT in a gilt frame rests here. Its painted eyes find you " +
+        "immediately. It is portable.",
       desc: "A small ANCESTRAL PORTRAIT painted in miniature and set in a gilt frame — a woman who looks " +
         "unsettlingly like the STATUE in the GARDEN. Her gaze settles on you.",
     },
     mirrorShard: {
-      roomDesc: "A jagged MIRROR SHARD sits loose in the broken frame's center.",
+      roomDesc: "A jagged MIRROR SHARD lies here, its edges still silvered from the broken frame.",
       desc: "A palm-sized MIRROR SHARD worked free from the HALL BEDROOM MIRROR. Its nonreflective back is " +
         "blackened silver bearing only part of an inscription: \"...GLASS, THE HOUSE REMEMBERS.\"",
     },
     backwardsWatch: {
-      roomDesc: "A BM WATCH rests inside the open DESK DRAWER, its empty face looking elsewhere.",
+      roomDesc: "A BM WATCH rests here, its empty face looking elsewhere.",
       desc: "A tarnished brass BM WATCH. Its empty mirror face behaves like a crystal ball worn on the wrist: " +
         "it reflects nothing but seems to be looking into somewhere else. Its nonreflective back bears a BM insignia above the inscription: " +
         "\"WHAT TIME TAKES, BLOOD REMEMBERS.\" Worn on the WRIST, it can scry rooms and prepare routes.",
     },
     blackwoodHammer: {
-      roomDesc: "A BLACKWOOD HAMMER lies in the sawdust between the exposed beams.",
+      roomDesc: "A BLACKWOOD HAMMER lies here, its dark handle stamped with a BM insignia.",
       desc: "A compact iron BLACKWOOD HAMMER with a dark ash handle. A deep BM insignia is branded into the grip, " +
         "marking it as a family heirloom rather than an ordinary tool.",
     },
     baronMunchhausen: {
-      desc: "BARON MUNCHHAUSEN THE THIRD: powdered wig gone green with mildew, velvet coat fused to the lath, " +
-        "both feet lost somewhere in the plaster below. He wears the serene, glassy smile of a man who has been " +
-        "in these walls long enough to love them — and to recommend them, warmly, to anyone who wanders in.",
+      desc: "BARON MUNCHHAUSEN THE THIRD smiles from the PROFILE PAINTING in the PARLOR. His powdered wig and " +
+        "velvet coat are picked out in oil paint; his glassy eyes follow you across the room. " +
+        "He seems delighted to have a visitor and perfectly at home in the portrait.",
     },
   },
 };

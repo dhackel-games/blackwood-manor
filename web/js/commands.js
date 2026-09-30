@@ -80,6 +80,7 @@ attack <thing> | Attack / Attack a visible target.
 brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
 call/hint | Gary / Call Gary's paid hint line.
+clear | Clear / Erase the entire scrollback and redisplay the basic prompt for the current room.
 (c)lose/shut <thing> | Close / Close an open door or container.
 drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
 extinguish <thing> | Extinguish / Put out a light or flame.
@@ -112,6 +113,7 @@ say/talk <words/person> | Speak / Say words aloud or talk to a visible character
 score | Score / Show points, turns, and rank.
 show/scry <room/object> [in watch] | Scry / Reveal its containing room and prepare the route.
 throw <thing> at <target> | Throw / Throw a carried item.
+top | Top / Scroll to the top of the page.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
 verbose | Verbose mode / Always print full room descriptions.

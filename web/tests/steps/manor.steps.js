@@ -422,6 +422,13 @@ Given("a legacy accidental-fire save is restored", function () {
   this.game.restore(snapshot);
 });
 
+Given("a save with the Baron behind the wallpaper is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.items.baronMunchhausen.loc = "betweenWalls";
+  snapshot.state.flags.baronLine = 2;
+  this.game.restore(snapshot);
+});
+
 // Secret-ending setup: pre-fill the reliquary with every required heirloom,
 // leaving exactly one named piece in the player's hands to deposit.
 Given("every treasure but the {string} is already in the reliquary", function (itemId) {
@@ -601,7 +608,7 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
-  assert.deepEqual(sysopMenuAction("::winmax2bell", false), {
+  assert.deepEqual(sysopMenuAction("::winmaxbell", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
   assert.deepEqual(sysopMenuAction("::werdna", false), {
@@ -610,7 +617,8 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", true), {
     handled: true, unlocked: true, showMenu: true,
   });
-  assert.equal(sysopMenuAction("::winmax2bell", true).shortcut?.cmd, "::winmax2bell");
+  assert.equal(sysopMenuAction("::winmaxbell", true).shortcut?.cmd, "::winmaxbell");
+  assert.equal(sysopMenuAction("::winmax2bell", true).shortcut, undefined);
   assert.deepEqual(sysopMenuAction(":powerup", true), { handled: false, unlocked: true });
 });
 
@@ -631,6 +639,20 @@ Then("the sysop menu uses the shared command title description format", function
     assert.ok(menu.some((line) =>
       line.includes(`${entry.cmd.padEnd(14)} | ${entry.name} / ${entry.description}`)));
   }
+});
+
+Then("the 2D Baron appears in the Parlor portrait", function () {
+  const view = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  const start = view.indexOf("function drawBaron(layout)");
+  const end = view.indexOf("// Highlight the room", start);
+  assert.ok(start >= 0 && end > start);
+  const art = view.slice(start, end);
+  assert.match(art, /b\.id === "parlor"/);
+  assert.doesNotMatch(art, /b\.id === "betweenWalls"/);
+  assert.match(art, /ctx\.strokeRect/);
+  assert.match(view, /drawBaron\(layout\);\s*drawReachable\(layout\);\s*drawItemIcons\(layout\)/);
+  assert.match(view, /const wasAtBaron = gary === "parlor"/);
+  assert.match(view, /<b>Study diary<\/b>[\s\S]*<b>calling Gary<\/b>/);
 });
 
 Then("every hidden compound prompt uses shortest command forms", function () {
@@ -725,6 +747,13 @@ Then("sysop command {string} includes {string}", function (command, included) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
   assert.ok(expandSysopCommand(shortcut, this.game).split("; ").includes(included));
+});
+
+Then("sysop command {string} includes {string} exactly once", function (command, included) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  const steps = expandSysopCommand(shortcut, this.game).split("; ");
+  assert.equal(steps.filter((step) => step === included).length, 1, command);
 });
 
 Then("sysop command {string} contains sequence {string}", function (command, sequence) {

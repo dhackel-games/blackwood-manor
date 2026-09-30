@@ -1,6 +1,7 @@
 // engine.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
 import assert from "node:assert";
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 import { After, Before, Given, Then, When } from "@cucumber/cucumber";
 import { createGame, parseRestartTarget } from "../../js/core.js";
 import { HELP_TEXT } from "../../js/commands.js";
@@ -49,6 +50,13 @@ function value(text) {
   if (text === NONE) return null;
   if (text === EMPTY) return "";
   return text.replaceAll("<NL>", "\n").replaceAll("\\u201c", "\u201c");
+}
+
+function sourceBetween(source, startToken, endToken) {
+  const start = source.indexOf(startToken);
+  const end = source.indexOf(endToken, start);
+  assert.ok(start >= 0 && end > start, `Missing source section: ${startToken}`);
+  return source.slice(start, end);
 }
 
 function fixture() {
@@ -416,16 +424,158 @@ Then("the copyright-version is exact", function () {
   assert.match(design, /YYYY-MM-DD\.BBB:\{last editor\}/);
 });
 
-Then("the package version is the release date", function () {
+Then("the package version matches the native app release date", function () {
   const packageJson = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
-  assert.equal(packageJson.version, "2026.9.11");
+  assert.equal(packageJson.version, NATIVE_APP_VERSION);
 });
 
 Then("the large title art has aligned top strokes", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui,
-    /` ____  _            _                             _\n \| __ \)\| \| __ _  ___\| \| ____      _____   ___   __\| \|/);
-  assert.doesNotMatch(ui, /`  ____  _            _                     _/);
+  const banner = runInNewContext(
+    `${sourceBetween(ui, "const BIG_BANNER =", "// Compact banner")}\nBIG_BANNER("version")`);
+  const output = [];
+  const transcript = {
+    appendChild: (node) => output.push(node),
+    scrollHeight: 100,
+    scrollTop: 0,
+  };
+  const sandbox = {
+    document: { createElement: () => ({ className: "", textContent: "" }) },
+    game: { showMessage: (text) => text },
+    MAP_MARK: "\u0000",
+    transcript,
+    phoneT: {},
+    transcriptPinnedToTop: false,
+    phoneTranscriptPinnedToTop: false,
+  };
+  const emit = runInNewContext(`${sourceBetween(ui, "function emit(", "function print(")}\nemit`, sandbox);
+  emit(transcript, banner, "banner");
+  assert.equal(output.length, 1);
+  assert.equal(output[0].textContent, banner);
+  const [top, letters] = banner.split("\n");
+  assert.equal(top.indexOf("____"), letters.indexOf("|") + 1);
+});
+
+Then("TOP and CLEAR manage both text transcripts without advancing the game", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  assert.match(ui, /if \(handleDisplayCommand\(low, onCall\)\) return;/);
+  assert.match(HELP_TEXT, /\btop\b[^\n]*top of the page/i);
+  assert.match(HELP_TEXT, /\bclear\b[^\n]*entire scrollback[^\n]*current room/i);
+
+  const transcript = {
+    entries: ["old terminal text"],
+    scrollTop: 80,
+    replaceChildren() { this.entries = []; },
+  };
+  const phoneT = {
+    entries: ["old phone dialogue"],
+    scrollTop: 60,
+    replaceChildren() { this.entries = []; },
+    querySelectorAll() { return this.entries.filter((entry) => entry?.className === "gary thinking"); },
+    append(...entries) { this.entries.push(...entries); },
+  };
+  let anchors = 0;
+  const game = {
+    state: { turns: 12, score: 25, dead: false, won: false, flags: {} },
+    describeRoom: () => "STUDY\nn, s",
+    send: () => { throw new Error("display commands must not execute game turns"); },
+  };
+  const sandbox = {
+    transcript,
+    phoneT,
+    game,
+    introBannerElement: {},
+    transcriptPinnedToTop: false,
+    phoneTranscriptPinnedToTop: false,
+    markSessionStart: () => { anchors++; transcript.entries.push("anchor"); },
+    print: (text) => { transcript.entries.push(text); transcript.scrollTop = 100; },
+    printToPhone: (text) => { phoneT.entries.push(text); phoneT.scrollTop = 100; },
+    printRestartPrompt: () => { throw new Error("the game is still active"); },
+    window: { scrollTo: () => {} },
+  };
+  const handleDisplayCommand = runInNewContext(
+    `${sourceBetween(ui, "function handleDisplayCommand(", "// --- phone-call screen ---")}\nhandleDisplayCommand`,
+    sandbox);
+
+  assert.equal(handleDisplayCommand("top", false), true);
+  assert.equal(transcript.scrollTop, 0);
+  assert.equal(transcript.entries[0], "old terminal text");
+  assert.equal(sandbox.transcriptPinnedToTop, true);
+  assert.equal(handleDisplayCommand("clear", false), true);
+  assert.equal(anchors, 1);
+  assert.equal(transcript.entries.join("|"), "anchor|STUDY\nn, s");
+  assert.equal(phoneT.entries.length, 0);
+  assert.equal(sandbox.introBannerElement, null);
+  assert.equal(transcript.scrollTop, 0);
+
+  phoneT.entries.push("new phone dialogue");
+  const pendingReply = { className: "gary thinking", textContent: "…" };
+  phoneT.entries.push(pendingReply);
+  assert.equal(handleDisplayCommand("top", true), true);
+  assert.equal(phoneT.scrollTop, 0);
+  assert.equal(phoneT.entries[0], "new phone dialogue");
+  assert.equal(handleDisplayCommand("clear", true), true);
+  assert.equal(anchors, 2);
+  assert.equal(phoneT.entries[0], "STUDY\nn, s");
+  assert.equal(phoneT.entries[1], pendingReply);
+  assert.equal(transcript.entries.join("|"), "anchor|STUDY\nn, s");
+  assert.equal(phoneT.scrollTop, 0);
+  assert.equal(game.state.turns, 12);
+  assert.equal(game.state.score, 25);
+  assert.equal(handleDisplayCommand("look", false), false);
+
+  game.state.dead = true;
+  game.state.flags = { partII: true, onCall: true };
+  handleDisplayCommand("clear", true);
+  assert.ok(transcript.entries.some((entry) => entry.includes("RESTART 1")));
+  assert.ok(phoneT.entries.some((entry) => typeof entry === "string" && entry.includes("RESTART 1")));
+  assert.equal(game.state.flags.onCall, true);
+  game.state.dead = false;
+  game.state.won = true;
+  sandbox.printRestartPrompt = () => transcript.entries.push("restart link");
+  handleDisplayCommand("clear", false);
+  assert.equal(transcript.entries.at(-1), "restart link");
+});
+
+Then("the 2D command trail supports TOP and CLEAR", function () {
+  const view = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  const trailList = { scrollTop: 80 };
+  const sheet = { scrollTop: 90 };
+  let trailRenders = 0;
+  let roomRenders = 0;
+  const game = {
+    state: { turns: 4 },
+    describeRoom: () => "STUDY\nn, s",
+    send: () => { throw new Error("display commands must not execute game turns"); },
+  };
+  const sandbox = {
+    history: ["old trail entry"],
+    trailList,
+    document: { getElementById: () => sheet },
+    window: { scrollTo: () => {} },
+    parseRestart: () => 0,
+    game,
+    msg: "old message",
+    renderTrail: () => { trailRenders++; },
+    render: () => { roomRenders++; },
+  };
+  const runCommand = runInNewContext(
+    sourceBetween(view, "  function clearTrail() {", "  function escapeHtml(") +
+    sourceBetween(view, "  function runCommand(raw) {", "  // Keyboard: arrows") +
+    "\nrunCommand",
+    sandbox);
+
+  runCommand("TOP");
+  assert.equal(trailList.scrollTop, 0);
+  assert.equal(sheet.scrollTop, 0);
+  assert.equal(sandbox.history.length, 1);
+  runCommand("CLEAR");
+  assert.equal(sandbox.history.length, 0);
+  assert.equal(sandbox.msg, "STUDY\nn, s");
+  assert.equal(trailRenders, 1);
+  assert.equal(roomRenders, 1);
+  assert.equal(game.state.turns, 4);
+  assert.match(view, /top \(scroll trail\).*clear \(erase trail, show room\)/);
 });
 
 Then("the touch UI has no control-hiding typing state", function () {
@@ -961,7 +1111,7 @@ Then("the navigation selector sits left of a persistent disclosure control", fun
     /navDisclosure\.addEventListener\("click", \(\) => \{[\s\S]*applyNavCollapsed\(commandPanel\.dataset\.collapsed !== "true", true\)/s);
   assert.match(ui, /matchMedia\?\.\("\(any-pointer: coarse\)"\)/);
   assert.match(ui, /const prefersLargeNav = Native\.isMobileApp\(\) \|\| coarsePointer/);
-  assert.match(ui, /const defaultNavSize = prefersLargeNav \? "3" : "1"/);
+  assert.match(ui, /const defaultNavSize = prefersLargeNav \? "2" : "1"/);
   assert.match(ui, /setAttribute\("aria-checked", String\(button\.dataset\.navSize === selected\)\)/);
   assert.match(css,
     /@media \(max-width:\s*600px\)[\s\S]*#controls \.nav-size-picker\s*\{[^}]*margin-top:\s*0/s);

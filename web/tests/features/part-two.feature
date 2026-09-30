@@ -101,9 +101,7 @@ Feature: Part II — the Thirteenth Hour
     And the output contains "greying to STONE"
 
   Scenario: Returning the emerald to the garden closes Hour XIII (full seam from the brink)
-    When I execute sysop command "::winmax2bell"
-    And I send "open bell closet"
-    And I send "pull bell rope"
+    When I execute sysop command "::winmaxbell"
     And I send "examine reliquary"
     And I send "open reliquary"
     And I send "take clock"

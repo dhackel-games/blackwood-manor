@@ -3249,30 +3249,28 @@ function answerTrollRiddle(ctx, cmd) {
   return openTrollVault(ctx, answer);
 }
 
-// --- Baron Munchhausen the Third: the walled-in guest with Stockholm Syndrome -
-// A forgotten prisoner bricked into the Space Between the Walls who has, over the
-// long dark years, come to adore his captor. Pure flavour: he tells grandiose
-// tall tales (Munchausen), praises the Blackwoods, and refuses every rescue.
-const BARON_LINES = Object.freeze([
-  "A gaunt gentleman in a rotted powdered wig beams at you from between the studs. " +
-    "\"BARON MUNCHHAUSEN THE THIRD, at your service — and the MANOR'S, most gladly! You mistake this " +
-    "for a prison. It is the finest SUITE in the house, and I asked to be walled into it. Twice.\"",
+const BARON_INTRO =
+  "The gentleman in the PROFILE PAINTING blinks beneath a powdered wig. " +
+  "\"BARON MUNCHHAUSEN THE THIRD, at your service! The Blackwoods gave me the finest seat in the PARLOR. " +
+  "One must keep an eye on visitors, especially when one's eyes are painted.\"";
+const BARON_GUIDANCE = Object.freeze([
+  "\"Secrets belong in books, not in my frame. READ the leather-bound DIARY first found on the STUDY desk: " +
+    "it tells you the combination for the SAFE behind my PROFILE PAINTING. I would turn the dial for you, " +
+    "but the artist neglected to give me fingers.\"",
+  "\"If the MANOR leaves you baffled, CALL GARY on his HINT LINE. He's genuinely helpful: " +
+    "he gives real clues even while complaining about his fee. I would hire him as my guide, " +
+    "if a portrait could use a telephone.\"",
+]);
+const BARON_TALES = Object.freeze([
   "\"How did I come to Blackwood? I rode a cannonball in through the BELFRY, wrestled the WRAITH to an " +
-    "honourable draw, and the dear MANOR was so taken with me that it offered me these walls forever. I wept " +
-    "with gratitude, sir. On occasion I still do.\"",
-  "\"Do not pity me. The Blackwoods FEED me — the odd beetle, the memory of soup. A lesser host would let a " +
-    "guest go hungry. They love me, in their fashion, and I them — especially when they leave the studs just " +
-    "slightly ajar.\"",
-  "\"That BLACKWOOD HAMMER by your boot? A gift! I have named him Gerald. Take him if you must — everyone robs " +
-    "these walls eventually — but do tell the MANOR that I sent you, and it shall think kindly of you. It thinks " +
-    "kindly of me. It TOLD me so. Through the plaster. In the night.\"",
-  "\"Leave? And forfeit the finest years of my captivity? You are a strange, free thing, and I shall pray the " +
-    "MANOR keeps you too — so that one blessed day you might finally understand.\"",
+    "honourable draw, and posed for this portrait before the smoke cleared. I am told the likeness is modest.\"",
+  "\"The Blackwoods offered me the finest frame in the house. I accepted on the condition that every visitor " +
+    "be allowed to admire me. The MANOR has been admirably strict about the arrangement.\"",
+  "\"Leave? And forfeit the only view in the PARLOR that improves whenever someone comes in? " +
+    "I have crossed oceans on horseback, sir. I can manage a little time in oils.\"",
 ]);
 
-// The Baron has watched this house for lifetimes through gaps in the lath, so he
-// "knows" where every heirloom lies — and cannot resist embroidering the telling.
-// Each template embeds a real {ITEM} and its true {ROOM}, wrapped in a tall tale.
+// Each template embeds a real {ITEM} and its true {ROOM}.
 const BARON_CLUE_TEMPLATES = Object.freeze([
   (item, room) => `"You hunt the ${item}? I hid it myself — during the Great Siege of the Chandeliers — ` +
     `deep in the ${room}. Breathe no word that I told you. Say the MANOR whispered it. It so loves to be thanked."`,
@@ -3281,7 +3279,7 @@ const BARON_CLUE_TEMPLATES = Object.freeze([
   (item, room) => `"Ah, the ${item}. A Blackwood buried it in the ${room} to spite a rival I bested in a duel of ` +
     `RIDDLES. I let the poor fellow win three of them. Noblesse oblige, you understand."`,
   (item, room) => `"Seek the ${item} in the ${room}. I would fetch it myself, but I am frightfully occupied being ` +
-    `CONTENT in here. Do give the MANOR my compliments as you pass its darker rooms."`,
+    `IMMORTAL in this frame. Do give the MANOR my compliments as you pass its darker rooms."`,
   (item, room) => `"The ${item}? Child's play. It lies in the ${room}. I set it there after riding a cannonball ` +
     `the length of this house — twice, for symmetry — and the echo has not yet finished."`,
 ]);
@@ -3307,35 +3305,32 @@ function baronClue(ctx) {
   const roomName = String(ctx.world.rooms[pick.roomId].name || "manor")
     .toUpperCase().replace(/^THE\s+/, ""); // templates supply the article
   const tmpl = BARON_CLUE_TEMPLATES[Math.floor(Math.random() * BARON_CLUE_TEMPLATES.length)];
-  return "The BARON leans from the studs, powdered wig shedding dust. " + tmpl(itemName, roomName);
+  return "The BARON leans out of the painted frame, powdered wig shedding pigment. " +
+    tmpl(itemName, roomName);
 }
 
 function talkToBaron(ctx) {
   ctx.setFlag("metBaron", true);
   const n = ctx.getFlag("baronLine") || 0;
   ctx.setFlag("baronLine", n + 1);
-  // First meeting is always the grand introduction.
-  if (n === 0) return BARON_LINES[0];
-  // Thereafter he "helpfully" leaks where an unfound heirloom hides ~55% of the
-  // time; otherwise he spins another tall tale.
+  if (n === 0) return BARON_INTRO;
+  if (n <= BARON_GUIDANCE.length) return BARON_GUIDANCE[n - 1];
   if (Math.random() < 0.55) {
     const clue = baronClue(ctx);
     if (clue) return clue;
   }
-  return BARON_LINES[1 + (n - 1) % (BARON_LINES.length - 1)];
+  return BARON_TALES[(n - BARON_GUIDANCE.length - 1) % BARON_TALES.length];
 }
 function refuseBaronRescue(ctx) {
   ctx.setFlag("metBaron", true);
-  return "You reach to work BARON MUNCHHAUSEN THE THIRD loose from the lath. He recoils, scandalised. " +
-    "\"UNHAND me — or rather, do NOT! I am not TRAPPED, sir, I am CHOSEN. Rescue is for people who dislike " +
-    "their walls. Now shoo, before you let all the lovely draught out.\"";
+  return "The BARON'S painted eyes follow your hand. The PROFILE PAINTING is fixed to the wall, " +
+    "though its hinge gives a little. \"I am ART, sir, not luggage. Kindly leave my frame here.\"";
 }
 function giveBaron(ctx, cmd) {
   ctx.setFlag("metBaron", true);
   const thing = (cmd.dobj || "gift").toUpperCase();
-  return `You offer the ${thing}. The BARON admires it, then presses it gently back into your hands. ` +
-    "\"Keep it, keep it — I want for nothing in here. The MANOR provides, and what it does not provide, " +
-    "I simply invent. That is the secret, you know. Contentment is merely a very long story told to oneself.\"";
+  return `You offer the ${thing} to the PROFILE PAINTING. The BARON admires it from the canvas. ` +
+    "\"Keep it, keep it — the painter gave me neither pockets nor hands. A terrible oversight.\"";
 }
 
 // --- End-screen achievement badges -------------------------------------------
@@ -3515,7 +3510,7 @@ const ROOM_ART = {
     "||   ?    ?   ||",
     "||  /|   /|   ||",
     "|| / |  / |   ||",
-    "||_______watch||",
+    "||_______lath_||",
   ].join("\n"),
 };
 
@@ -3624,6 +3619,9 @@ const logicWorld = {
     if (state.flags.partII) state.flags.bellRung = true;
     if (state.room === "hollowPassage" || state.room === "hollowSanctum") {
       state.room = "grandHall";
+    }
+    if (state.items.baronMunchhausen?.loc === "betweenWalls") {
+      state.items.baronMunchhausen.loc = "parlor";
     }
     const legacyEmberWasDeposited = !savedItems?.spyglass
       && savedItems?.emberStone?.treasure
@@ -4876,11 +4874,15 @@ const logicWorld = {
       takeable: true, treasure: true, points: 15, readable: true,
     },
 
-    // --- parlor safe (behind the profile painting) ---
+    // --- parlor safe (behind the Baron's profile painting) ---
     portrait: {
-      names: ["painting", "profile", "portrait"], adjectives: ["grim", "patriarch", "huge"], loc: "parlor",
+      names: ["painting", "profile", "portrait"], adjectives: ["painted", "powdered", "hinged", "huge"], loc: "parlor",
       fixed: true, scenery: true,
-      on: { move: revealSafe, push: revealSafe, examine: revealSafe },
+      on: {
+        move: revealSafe, push: revealSafe, pull: revealSafe, examine: revealSafe,
+        talk: talkToBaron, say: talkToBaron, wake: talkToBaron, give: giveBaron,
+        take: refuseBaronRescue, attack: refuseBaronRescue,
+      },
     },
     safe: {
       names: ["safe"], adjectives: ["iron"], loc: null, fixed: true, container: true, openable: true,
@@ -5010,14 +5012,14 @@ const logicWorld = {
       loc: "betweenWalls", takeable: true, treasure: true, points: 12,
     },
     baronMunchhausen: {
-      names: ["baron", "munchhausen", "munchausen", "prisoner", "captive", "gentleman"],
-      adjectives: ["third", "3rd", "walled", "gaunt", "powdered", "wigged"],
-      loc: "betweenWalls", fixed: true, scenery: true,
+      names: ["baron", "munchhausen", "munchausen", "gentleman"],
+      adjectives: ["third", "3rd", "painted", "powdered", "wigged"],
+      loc: "parlor", fixed: true, scenery: true,
       on: {
         talk: talkToBaron, say: talkToBaron, wake: talkToBaron,
         give: giveBaron,
-        take: refuseBaronRescue, pull: refuseBaronRescue, move: refuseBaronRescue,
-        push: refuseBaronRescue, attack: refuseBaronRescue,
+        take: refuseBaronRescue, attack: refuseBaronRescue,
+        pull: revealSafe, move: revealSafe, push: revealSafe,
       },
     },
 
@@ -5099,11 +5101,12 @@ function revealKey(ctx) {
     awardSuffix(points);
 }
 function revealSafe(ctx) {
-  if (ctx.getFlag("safeRevealed")) return "The PROFILE PAINTING already hangs aside, baring the iron SAFE.";
+  if (ctx.getFlag("safeRevealed")) return "The BARON'S PROFILE PAINTING already hangs aside, baring the iron SAFE.";
   ctx.setFlag("safeRevealed");
   ctx.moveItem("safe", "parlor");
   const points = awardProgress(ctx, "safeRevealed");
-  return "You swing the PROFILE PAINTING aside on a hidden hinge. Set into the wall behind it is a squat iron SAFE." +
+  return "You swing the BARON'S PROFILE PAINTING aside on a hidden hinge. He gasps theatrically as a squat iron SAFE " +
+    "emerges from the wall behind him." +
     awardSuffix(points);
 }
 function revealWallGap(ctx) {

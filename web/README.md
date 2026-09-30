@@ -105,15 +105,15 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
   one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
   one-time progress points, including +5 for reading the mailbox letter;
-  `::winmax2bell` performs every deterministic scoring challenge, deposits all
-  thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and stops
-  immediately before the closet rope. `::winmaxfrontd` continues through the
+  `::winmaxbell` performs every deterministic scoring challenge, deposits all
+  thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and pulls
+  the closet rope before stopping. `::winmaxfrontd` continues through the
   clean front-door ending; `::winmaxgary` instead takes the clock and descends
   to Gary. `::powerup` equips reusable powers, while `::winquick1` completes the
   shorter required-heirloom route and stops after the bell but before walking
   out. The replacement set keeps the 195-point heirloom total and the maintained
-  maximum checkpoints: 460 before the bell, 465 on the Gary route after it, and
-  510 through the front-door ending. The maximum routes intentionally leave the
+  maximum checkpoints: 460 before the bell, 465 at `::winmaxbell` and on the Gary
+  route, and 510 through the front-door ending. The maximum routes intentionally leave the
   random MYSTERY PACKAGE unopened. In the corrected chain, scattering the bats
   remains +5, first taking the goggles remains +5, the hammer and family-ring
   deposits remain +12 and +20, and candelabra restoration/deposit award +20/+10.
@@ -192,8 +192,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
-  `reload`/`refresh`,
-  `verbose`, `brief`, `help`, `quit`. In the iOS app, VERSION reports the
+  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `help`, `quit`.
+  TOP scrolls to the top of the page; CLEAR erases the entire scrollback and redisplays the basic prompt for the current room.
+  In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
   remote content source; RELOAD still puts the greatest content version into
   persistent cache. Web manifests never imply that a native app update exists.

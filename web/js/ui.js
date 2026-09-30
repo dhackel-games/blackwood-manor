@@ -33,6 +33,8 @@ const transcript = document.getElementById("transcript");
 const input = document.getElementById("cmd");
 const mainGo = document.getElementById("go");
 const bugReport = document.getElementById("bug-report");
+let transcriptPinnedToTop = false;
+let phoneTranscriptPinnedToTop = false;
 const SYSOP_MENU_UNLOCK_KEY = "blackwood-sysop-menu-unlocked-v1";
 const LEGACY_MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
 let sysopMenuUnlocked = false;
@@ -202,7 +204,7 @@ function setEntryValue(field, value) {
 }
 
 const BIG_BANNER = (versionLine) =>
-` ____  _            _                             _
+`  ____  _            _                             _
  | __ )| | __ _  ___| | ____      _____   ___   __| |
  |  _ \\| |/ _\` |/ __| |/ /\\ \\ /\\ / / _ \\ / _ \\ / _\` |
  | |_) | | (_| | (__|   <  \\ V  V / (_) | (_) | (_| |
@@ -311,10 +313,13 @@ function emit(container, text, cls, prefix = "") {
     if (!isMap && !part.trim()) return;
     const div = document.createElement("div");
     div.className = isMap ? "map" : (cls || "");
-    div.textContent = (!isMap && prefix ? prefix : "") + (isMap ? part : part.trim());
+    div.textContent = (!isMap && prefix ? prefix : "") +
+      (isMap || cls === "banner" ? part : part.trim());
     container.appendChild(div);
     last = div;
   });
+  if (container === transcript) transcriptPinnedToTop = false;
+  if (container === phoneT) phoneTranscriptPinnedToTop = false;
   container.scrollTop = container.scrollHeight;
   return last;
 }
@@ -353,6 +358,7 @@ function jumpToSessionStart(id) {
   const anchorTop = anchor.getBoundingClientRect().top;
   const transcriptTop = transcript.getBoundingClientRect().top;
   transcript.scrollTop += anchorTop - transcriptTop;
+  transcriptPinnedToTop = true;
   anchor.focus({ preventScroll: true });
 }
 
@@ -375,6 +381,46 @@ function printRestartPrompt() {
   line.append(link, ".)");
   transcript.appendChild(line);
   transcript.scrollTop = transcript.scrollHeight;
+}
+
+function handleDisplayCommand(command, onCall) {
+  if (command === "top") {
+    if (onCall) phoneTranscriptPinnedToTop = true;
+    else transcriptPinnedToTop = true;
+    (onCall ? phoneT : transcript).scrollTop = 0;
+    window.scrollTo(0, 0);
+    return true;
+  }
+  if (command !== "clear") return false;
+
+  const pendingReplies = onCall ? [...phoneT.querySelectorAll(".gary.thinking")] : [];
+  transcript.replaceChildren();
+  phoneT.replaceChildren();
+  introBannerElement = null;
+  markSessionStart();
+  const roomPrompt = game.describeRoom();
+  print(roomPrompt);
+  if (onCall) {
+    printToPhone(roomPrompt, "sys");
+    phoneT.append(...pendingReplies);
+  }
+  if (game.state.dead) {
+    const message = game.state.flags.partII
+      ? "The game is over. Type RESTART 1 for Part I or RESTART 2 for Part II."
+      : "The game is over. Type RESTART to play again.";
+    print(message, "over");
+    if (onCall) printToPhone(message, "sys");
+  } else if (game.state.won) {
+    printRestartPrompt();
+    if (onCall) printToPhone("The game is over. Type RESTART to play again.", "sys");
+  }
+  transcriptPinnedToTop = true;
+  transcript.scrollTop = 0;
+  if (onCall) {
+    phoneTranscriptPinnedToTop = true;
+    phoneT.scrollTop = 0;
+  }
+  return true;
 }
 
 // --- phone-call screen ---
@@ -929,6 +975,7 @@ function handle(raw) {
   }
 
   const low = cmd.toLowerCase();
+  if (handleDisplayCommand(low, onCall)) return;
 
   // View-mode switch. "2D" jumps to the tile-map view; "text" is a no-op here
   // (you're already in the text game). The TEXT | IMAGES HUD rocker does the same.
@@ -1056,6 +1103,7 @@ function handle(raw) {
         // Only model-written lines get a marker. Scripted fallbacks remain
         // unmarked rather than adding a second status label to every response.
         if (el) { el.className = line ? "gary llm" : "gary"; el.textContent = spoken; }
+        phoneTranscriptPinnedToTop = false;
         phoneT.scrollTop = phoneT.scrollHeight;
         garySpeak(spoken);
       });
@@ -1150,7 +1198,9 @@ mainGo.addEventListener("click", () => {
 
 // Keep the newest text visible whenever the layout changes (keyboard show/hide
 // resizes the view, which would otherwise leave the transcript scrolled up).
-const scrollBottom = () => { transcript.scrollTop = transcript.scrollHeight; };
+const scrollBottom = () => {
+  if (!transcriptPinnedToTop) transcript.scrollTop = transcript.scrollHeight;
+};
 window.addEventListener("resize", () => setTimeout(scrollBottom, 60));
 
 // Keep controls visible on touch devices even while the keyboard is open.
@@ -1188,7 +1238,9 @@ phoneEnd.addEventListener("click", () => { phoneCmd.blur(); handle("hang up"); }
 [phoneGo, phoneEnd, document.getElementById("phone-mic"), document.getElementById("phone-ai"),
  document.getElementById("phone-avatar")].forEach(keepFocus);
 
-const scrollPhoneBottom = () => { phoneT.scrollTop = phoneT.scrollHeight; };
+const scrollPhoneBottom = () => {
+  if (!phoneTranscriptPinnedToTop) phoneT.scrollTop = phoneT.scrollHeight;
+};
 // While typing on the call screen (touch), collapse Gary's big header so the
 // conversation window gets the room.
 if (!canType) {

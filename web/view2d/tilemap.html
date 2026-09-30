@@ -724,16 +724,14 @@
 
       <h3>A guest you may meet</h3>
       <div class="howto-baron">
-        <img src="icons/baron_hero.png" alt="Baron Munchhausen the Third" />
+        <img src="icons/baron_hero.png" alt="Baron Munchhausen the Third in his portrait" />
         <div>
           <p class="bn-nm">Baron Munchhausen the Third</p>
-          <p class="bn-body">Bricked into the <b>Space Between the Walls</b> lifetimes
-          ago, the Baron insists he <i>asked</i> to be walled in — twice — that he rode in
-          on a cannonball, wrestled the wraith to an honourable draw, and that the manor
-          simply <i>adores</i> him. Rescue, he'll tell you, is for people who dislike their
-          walls. He is the house's happiest prisoner. Find the crawl-gap and he'll regale
-          you with a fresh tall tale every time — and, as often as not, let slip exactly
-          where one of the thirteen heirlooms is hidden. Keep him talking.</p>
+          <p class="bn-body">The painted Baron watches from a hinged <b>portrait in
+          the Parlor</b>. Speak to him: beneath the cannonball stories he knows where
+          to find the <b>Study diary</b> and recommends <b>calling Gary</b> for helpful
+          hints. Keep talking and he may name a missing heirloom's hiding place.
+          Swing his frame aside to find the safe behind it.</p>
         </div>
       </div>
 
@@ -919,6 +917,12 @@
       sheetList.scrollTop = sheetList.scrollHeight;
     }
   }
+  function clearTrail() {
+    history = [];
+    renderTrail();
+    msg = game ? game.describeRoom() : (ROOMDATA[gary]?.desc || graph.home.get(gary).label);
+    render();
+  }
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, (c) =>
       ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
@@ -994,10 +998,8 @@
     setTimeout(() => { dragonFlash = null; render(); }, ms);
   }
 
-  // --- Baron Munchhausen the Third: the same frame-swap trick as the dragon ---
-  // A walled-in guest drawn into the "Space Between the Walls" room box. Default
-  // serene "content" portrait, briefly swapped to "tale" when you talk to him (a
-  // fresh tall tale) and "base" (wide grin) when you try to rescue/gift him.
+  // --- Baron Munchhausen the Third: the portrait over the Parlor safe ---
+  // Swap his painted expression when he talks or the player handles the frame.
   const BARON_FRAMES = ["base", "tale", "content"];
   const BARON_IMAGES = {};
   for (const key of BARON_FRAMES) {
@@ -1239,13 +1241,13 @@
       showLabels: labelMode.value === "8bit",
       atlas, atlasMap: atlas ? atlasMap : null, atlasTile: 32,
     });
+    drawBaron(layout);
     drawReachable(layout);
     drawItemIcons(layout);
     drawTokens(layout, fi);
     drawFire(layout);
     drawSick(layout);
     drawDragon(layout);
-    drawBaron(layout);
     if (!focusMode) drawFocusRing(layout);
     updateVectorLabels(layout);
     floorSel.value = String(fi);
@@ -1380,11 +1382,9 @@
     ctx.restore();
   }
 
-  // Draw the Baron into the "Space Between the Walls" room box, same fit logic
-  // as the dragon. Serene "content" frame once the room's been seen; a brief
-  // tale/base swap plays after you talk to or grab at him (see runEngine()).
+  // Keep the Baron inside a frame, with item and player icons above the art.
   function drawBaron(layout) {
-    const box = layout.boxes.find((b) => b.id === "betweenWalls");
+    const box = layout.boxes.find((b) => b.id === "parlor");
     if (!box || !box.seen) return;
     let key = "content";
     if (baronFlash && performance.now() < baronFlash.until) key = baronFlash.kind;
@@ -1392,10 +1392,16 @@
     if (!img || !img.complete || !img.naturalWidth) return;
     const w = box.w * TILEPX, h = box.h * TILEPX;
     const x = box.x * TILEPX, y = box.y * TILEPX;
-    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight) * 0.92;
+    const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight) * 0.75;
     const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+    const px = x + (w - dw) / 2, py = y + (h - dh) / 2;
     ctx.save();
-    ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    ctx.fillStyle = "#302319";
+    ctx.fillRect(px - 2, py - 2, dw + 4, dh + 4);
+    ctx.strokeStyle = "#c59d51";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(px - 2, py - 2, dw + 4, dh + 4);
+    ctx.drawImage(img, px, py, dw, dh);
     ctx.restore();
   }
   // Highlight the room currently shown in the inspector.
@@ -1894,7 +1900,7 @@
     const wasOnFire = !!(game.state.flags && game.state.flags.onFire);
     const wasInjuries = (game.state.flags && game.state.flags.dragonInjuries) || 0;
     const wasFriendly = !!(game.state.flags && game.state.flags.dragonFriendly);
-    const wasAtBaron = gary === "betweenWalls";
+    const wasAtBaron = gary === "parlor";
     const wasBaronLine = (game.state.flags && game.state.flags.baronLine) || 0;
     let text;
     try { text = game.send(line); }
@@ -1911,7 +1917,7 @@
       const nowBaronLine = game.state.flags.baronLine || 0;
       const lc = (line || "").toLowerCase();
       const grabbed = /\b(take|get|grab|pick|carry|pull|lift|yank|peel|move|shift|jostle|shake|nudge|push|press|attack|kill|hit|strike|stab|give|offer|feed|free|release|untie)\b/.test(lc);
-      const mentionsBaron = /\b(baron|munchhausen|munchausen|prisoner|captive|gentleman)\b/.test(lc);
+      const mentionsBaron = /\b(baron|munchhausen|munchausen|painting|profile|portrait|gentleman)\b/.test(lc);
       if (nowBaronLine !== wasBaronLine) flashBaron("tale");
       else if (mentionsBaron && grabbed) flashBaron("base");
     }
@@ -1970,6 +1976,13 @@
     // even mid-call — exactly like the text game.
     const restartTarget = parseRestart ? parseRestart(line) : 0;
     if (restartTarget) { restartGame(restartTarget); return; }
+    if (line === "top") {
+      trailList.scrollTop = 0;
+      document.getElementById("cmdSheet").scrollTop = 0;
+      window.scrollTo(0, 0);
+      return;
+    }
+    if (line === "clear") { clearTrail(); return; }
 
     // On the hint line, every keystroke is for Gary. Bypass every map intercept
     // and route it verbatim, just like text mode forwards to game.send() while
@@ -2003,7 +2016,8 @@
         "act: examine/take/open/read/push/pull/pray… (real manor verbs). " +
         "watch: tour (auto-walk the whole manor) · stop. " +
         "sysop: :: opens the back-office menu; ::<command> auto-plays a scripted solution (unlock with ::<password> first) — set Auto speed, ⏸ to pause. " +
-        "extras: bait · reveal · reset. modes: TEXT switches to the text game (HUD rocker). " +
+        "extras: bait · reveal · reset · top (scroll trail) · clear (erase trail, show room). " +
+        "modes: TEXT switches to the text game (HUD rocker). " +
         "Or hover a room to inspect it.";
       render(); return;
     }
@@ -2251,7 +2265,7 @@
     if (autoPlaying) { stopAuto("⏹ Stopped."); canvas.focus(); return; }
     startTour(); canvas.focus();
   });
-  trailClear.addEventListener("click", () => { history = []; renderTrail(); canvas.focus(); });
+  trailClear.addEventListener("click", () => { clearTrail(); canvas.focus(); });
   // The HUD rocker snapshots the game before returning to the text view.
   document.getElementById("to-text")?.addEventListener("click", () => saveModeHandoff());
   baitBtn.addEventListener("click", () => { toggleBait(); canvas.focus(); });

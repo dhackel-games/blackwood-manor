@@ -449,7 +449,7 @@ Feature: Blackwood Manor adventure
     Then the output contains "key"
     And item "frontKey" is in "garden"
 
-  Scenario: Room descriptions emphasize interactable objects
+  Scenario: Room descriptions emphasize fixed scenery without claiming portable props remain
     Then these room descriptions contain uppercase interactables:
       | room          | labels                           |
       | garden        | STATUE,WELL,BRAZIER              |
@@ -458,16 +458,161 @@ Feature: Blackwood Manor adventure
       | grandHall     | RELIQUARY,FRONT DOOR,BELL CLOSET |
       | parlor        | PROFILE PAINTING                 |
       | library       | LEVER                            |
-      | diningRoom    | CANDELABRA,CANDLE                |
-      | kitchen       | ROPE,MATCHES,CELLAR DOOR         |
-      | wineCellar    | CRYSTAL DECANTER                 |
-      | crypt         | WRAITH,GOLD LOCKET               |
+      | diningRoom    | CANDELABRA                       |
+      | kitchen       | CELLAR DOOR                      |
+      | crypt         | WRAITH                           |
       | landing       | CORD                             |
-      | nursery       | JEWELED MUSIC BOX                |
+      | nursery       | WALLPAPER                        |
       | masterBedroom | JEWELRY BOX                      |
-      | study         | DESK,DIARY,DRAWER                |
+      | study         | DESK,DRAWER                      |
       | hallBedroom   | MIRROR,NIGHT TABLE               |
-      | attic         | ANCESTRAL PORTRAIT               |
+
+  @room-prose
+  Scenario Outline: Portable objects appear while present and vanish from room prose when carried away
+    Given item "xrayGoggles" is carried
+    When I send "wear goggles"
+    Given the player is in room "<room>"
+    When I send "look"
+    Then the output contains "<item prose>"
+    And the output contains "<fixed scenery>"
+    Given item "<item>" is carried
+    When I send "look"
+    Then the output does not contain "<item prose>"
+    And the output contains "<fixed scenery>"
+
+    Examples:
+      | room          | item              | item prose                       | fixed scenery                            |
+      | mineGallery   | headlamp          | battered mining HEADLAMP         | MINING GALLERY follows a rusted rail line |
+      | deepShaft     | backpack          | sturdy canvas BACKPACK           | Broken ladders and narrow ledges        |
+      | dreadmawVault | familyCrest       | BLACKWOOD FAMILY CREST rests here | velvet cushion                          |
+      | dreadmawVault | wingedShoes       | golden WINGED SHOES rests here   | heap of coins                            |
+      | treeFort      | spyglass          | valuable brass SPYGLASS marked BM | rusted swivel cradle                    |
+      | secretChamber | grimoire          | heavy black GRIMOIRE             | single lectern                           |
+      | diningRoom    | candlestick       | sole portable CANDLE             | silver fittings shaped for a CANDELABRA |
+      | kitchen       | matches           | box of MATCHES sits here         | heavy CELLAR DOOR                        |
+      | kitchen       | rope              | coil of stout ROPE               | heavy CELLAR DOOR                        |
+      | kitchen       | burrito           | SPICY BURRITO sweats here        | heavy CELLAR DOOR                        |
+      | wineCellar    | crystalDecanter   | intact CRYSTAL DECANTER          | Stone steps climb UP                     |
+      | crypt         | goldLocket        | GOLD LOCKET lies here            | central sarcophagus                      |
+      | nursery       | musicBox          | JEWELED MUSIC BOX rests here     | WALLPAPER peeling                       |
+      | study         | diary             | leather-bound DIARY lies open here | BM-stamped brass pull                  |
+      | attic         | ancestralPortrait | valuable ANCESTRAL PORTRAIT      | broken skylight                          |
+      | hiddenVault   | obsidianEye       | cold OBSIDIAN EYE rests here     | low stone plinth                         |
+      | betweenWalls  | blackwoodHammer   | BLACKWOOD HAMMER lies here       | cramped gap OUT                          |
+
+  @room-prose
+  Scenario Outline: A moved prop no longer describes its original hiding place
+    Given the player is in room "grandHall"
+    And item "<item>" rests in room "grandHall"
+    When I send "look"
+    Then the output contains "<item prose>"
+    And the output does not contain "<old placement>"
+
+    Examples:
+      | item              | item prose                         | old placement              |
+      | mushrooms         | purple MUSHROOMS rests here        | windowsill                 |
+      | outhouseMushrooms | Fresh MUSHROOMS glisten here       | Inside the TOILET HOLE     |
+      | milk              | BOTTLE OF MILK sits here           | pantry nook                |
+      | apple             | red APPLE sits here                | pantry basket              |
+      | familyRing        | BLACKWOOD FAMILY RING rests here   | inside the drawer          |
+      | xrayGoggles       | BLACKWOOD XRAY GOGGLES rest here   | abandoned bat roost        |
+      | mirrorShard       | MIRROR SHARD lies here             | broken frame's center      |
+      | backwardsWatch    | BM WATCH rests here                | inside the open DESK DRAWER |
+      | ancestralPortrait | valuable ANCESTRAL PORTRAIT        | shrouded lumber            |
+
+  @room-prose
+  Scenario: Hidden vision leaves enduring clues rather than claiming retrieved items remain
+    Given item "xrayGoggles" is carried
+    When I send "wear goggles"
+    Given item "frontKey" is carried
+    And item "ancientCoin" is carried
+    And the player is in room "garden"
+    When I send "look"
+    Then the output contains "IRON KEY-shaped hollow"
+    And the output contains "ANCIENT COIN-shaped print"
+    And the output does not contain "IRON KEY glints beneath"
+    Given item "musicBox" is carried
+    And item "tinyKey" is carried
+    And the player is in room "nursery"
+    When I send "look"
+    Then the output contains "TINY KEY-shaped scuff"
+    And the output contains "WALLPAPER"
+    And the output does not contain "TINY KEY gleams inside"
+    Given item "rubyRing" is carried
+    And the player is in room "masterBedroom"
+    When I send "look"
+    Then the output contains "RAVENBLOOD RING-shaped depression"
+    And the output does not contain "RAVENBLOOD RING inside"
+
+  @room-prose
+  Scenario: The privy still points to its crop after the mushrooms are taken
+    Given the player is in room "privy"
+    When I send "look"
+    Then the output contains "purple glimmer"
+    When I send "look in toilet"
+    And I send "look"
+    Then the output contains "fresh MUSHROOMS glisten"
+    When I send "take fresh mushrooms"
+    And I send "look"
+    Then the output does not contain "fresh MUSHROOMS glisten"
+    And the output contains "purple glimmer"
+    And the output contains "TOILET HOLE"
+
+  @room-prose
+  Scenario: The dining table retains its fittings after the completed candelabra leaves
+    Given the restored candelabra is carried
+    And the player is in room "diningRoom"
+    When I send "look"
+    Then the output contains "silver fittings shaped for a CANDELABRA"
+    And the output does not contain "incomplete CANDELABRA"
+    And the output does not contain "beautiful BLACKWOOD CANDELABRA"
+
+  @room-prose
+  Scenario: Reading the diary removes it from the Study without erasing the desk
+    Given the player is in room "study"
+    When I send "look"
+    Then the output contains "leather-bound DIARY lies open here"
+    When I send "read diary"
+    Then item "diary" is in "inventory"
+    When I send "look"
+    Then the output does not contain "leather-bound DIARY lies open here"
+    And the output contains "great oak DESK"
+    And the output contains "DESK DRAWER"
+    When I round-trip the game snapshot
+    And I send "look"
+    Then the output does not contain "leather-bound DIARY lies open here"
+    And the output contains "great oak DESK"
+
+  @room-prose
+  Scenario: Moving a cellar treasure does not make an unlit cellar readable
+    Given the player is in room "wineCellar"
+    And item "crystalDecanter" is carried
+    When I send "look"
+    Then the output contains "pitch black"
+    And the output does not contain "CRYSTAL DECANTER"
+
+  @room-prose
+  Scenario: The Baron is painted in the Parlor, not walled up with the hammer
+    Given the player is in room "parlor"
+    When I send "look"
+    Then the output contains "PROFILE PAINTING of BARON MUNCHHAUSEN THE THIRD"
+    And the output contains "cold fireplace"
+    Given the player is in room "betweenWalls"
+    When I send "look"
+    Then the output does not contain "wig-crowned figure"
+    And the output does not contain "BARON MUNCHHAUSEN THE THIRD"
+    And the output contains "exposed beams"
+
+  @room-prose
+  Scenario: The ancestral portrait takes its watchful gaze out of the Attic when carried
+    Given the player is in room "attic"
+    When I send "look"
+    Then the output contains "eyes find you"
+    When I send "take miniature"
+    Then item "ancestralPortrait" is in "inventory"
+    When I send "look"
+    Then the output does not contain "eyes find you"
+    And the output contains "broken skylight"
 
   Scenario: Portrait and miniature refer to one attic object
     Given the player is in room "attic"
