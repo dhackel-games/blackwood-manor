@@ -141,6 +141,18 @@ Given("the restored candelabra is carried", function () {
   this.game.setFlag("candelabraRestored");
 });
 
+Given("an already-solved oak has its platform at the roots", function () {
+  this.game.setFlag("oakLightAligned");
+  this.game.setFlag("brazierLit");
+  this.game.setFlag("oakGemSlots", {
+    top: "greenGlassStone",
+    middle: "emberStone",
+    bottom: "blueGlassStone",
+  });
+  this.game.moveItem("emberStone", "oakMechanism");
+  this.game.moveItem("oakPlatform", "greatOak");
+});
+
 const PRE_REDESIGN_TREASURES = [
   "batSightMirror", "spyglass", "familyCrest", "candlestick", "grimoire",
   "talisman", "musicBox", "rubyRing", "goldLocket", "ancientCoin",
@@ -393,6 +405,14 @@ Given("a legacy pre-oak save with the ember deposited is restored", function () 
   this.game.restore(snapshot);
 });
 
+Given("a solved-oak save without the platform is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.flags.oakLightAligned = true;
+  snapshot.state.items.oakPlatform.loc = null;
+  snapshot.state.items.emberStone.loc = "oakMechanism";
+  this.game.restore(snapshot);
+});
+
 Given("a completed pre-watch save is restored", function () {
   const snapshot = preRedesignSnapshot(this.game);
   for (const id of PRE_REDESIGN_TREASURES) {
@@ -467,9 +487,134 @@ When("I execute sysop command {string}", function (command) {
   this.output = this.game.send(expandSysopCommand(shortcut, this.game));
 });
 
+When("I trace sysop command {string}", function (command) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  const steps = expandSysopCommand(shortcut, this.game).split("; ");
+  assert.ok(steps.length <= 256, "The engine must execute the entire prompt");
+  let flights = 0;
+  let traversals = 0;
+  let maxLoad = 0;
+  for (const [index, step] of steps.entries()) {
+    const action = parse(step);
+    const beforeRoom = this.game.state.room;
+    const beforeScore = this.game.state.score;
+    const beforeFly = this.game.world.canFly(this.game);
+    const beforePlatform = this.game.roomOf("oakPlatform");
+    const beforeFire = !!this.game.getFlag("onFire");
+    const itemId = Object.entries(world.itemShortNames)
+      .find(([, alias]) => alias === action.dobj)?.[0]
+      || this.game.find(action.dobj)?.id
+      || this.game.find(action.dobj, this.game.inventory())?.id;
+    const item = this.game.item(itemId);
+    const beforeLoc = item?.loc;
+    const beforeOpen = item?.open;
+    const beforeWorn = item?.worn;
+    const beforeUse = this.game.getFlag(`useItem:${itemId}`);
+    this.output = this.game.send(step);
+    const detail = `${index + 1}/${steps.length}: ${step} in ${beforeRoom}\n${this.output}`;
+    assert.equal(this.game.state.turns, index + 1, detail);
+    assert.equal(this.game.state.dead, false, detail);
+    assert.equal(this.game.state.won, false, detail);
+    assert.ok(this.game.inventoryLoad() <= this.game.inventoryCapacity(), detail);
+    maxLoad = Math.max(maxLoad, this.game.inventoryLoad());
+
+    switch (action.verb) {
+      case "go": {
+        if (step.startsWith("g ")) {
+          flights++;
+          assert.equal(step, "g shaft", detail);
+          assert.equal(beforeFly, true, detail);
+          assert.equal(this.game.state.room, "deepShaft", detail);
+        } else if (beforeRoom === "garden" && action.dobj === "down") {
+          assert.equal(beforeFly, false, detail);
+          assert.equal(this.game.getFlag("wellLooted"), true, detail);
+          assert.ok(this.game.state.score > beforeScore, detail);
+        } else {
+          const exit = world.rooms[beforeRoom].exits?.[action.dobj];
+          const adjacent = beforeRoom === "landing" && action.dobj === "up"
+            ? "attic"
+            : beforeRoom === "attic" && action.dobj === "up"
+              ? "roof"
+              : typeof exit === "object" ? exit?.to : exit;
+          assert.ok(adjacent, detail);
+          if (typeof exit === "object" && exit.via) {
+            assert.equal(this.game.getFlag(exit.via), true, detail);
+          }
+          assert.equal(this.game.state.room, adjacent, detail);
+          traversals++;
+        }
+        break;
+      }
+      case "take":
+        assert.ok(item, detail);
+        assert.notEqual(beforeLoc, "inventory", detail);
+        assert.equal(this.game.roomOf(itemId), "inventory", detail);
+        assert.equal(this.game.getFlag(item.progressFlag || `progressItem:${itemId}`), true, detail);
+        break;
+      case "use":
+      case "wear":
+      case "read":
+        assert.ok(item, detail);
+        assert.ok((!beforeUse && this.game.getFlag(`useItem:${itemId}`))
+          || (!beforeWorn && this.game.item(itemId).worn), detail);
+        break;
+      case "put":
+        assert.ok(item, detail);
+        assert.equal(beforeLoc, "inventory", detail);
+        assert.notEqual(this.game.roomOf(itemId), "inventory", detail);
+        assert.equal(this.game.getFlag(`useItem:${itemId}`), true, detail);
+        break;
+      case "open":
+      case "close":
+        assert.ok(item, detail);
+        assert.equal(beforeOpen, action.verb === "close", detail);
+        assert.equal(this.game.item(itemId).open, action.verb === "open", detail);
+        break;
+      case "remove":
+        assert.equal(beforeWorn, true, detail);
+        assert.equal(this.game.item(itemId).worn, false, detail);
+        break;
+      case "enter":
+        assert.equal(this.game.getFlag("oakLiftRiding"), true, detail);
+        break;
+      case "wait":
+        assert.ok(this.game.state.room !== beforeRoom
+          || this.game.roomOf("oakPlatform") !== beforePlatform, detail);
+        break;
+      case "talk":
+        assert.equal(this.game.getFlag("trollAskedRiddle"), true, detail);
+        break;
+      case "say":
+        assert.equal(this.game.getFlag("dragonVaultOpen"), true, detail);
+        break;
+      case "give":
+        assert.equal(beforeLoc, "inventory", detail);
+        assert.equal(this.game.roomOf(itemId), null, detail);
+        assert.equal(this.game.getFlag("dragonFriendly"), true, detail);
+        assert.equal(this.game.roomOf("goldDoubloon"), "inventory", detail);
+        break;
+      case "pull":
+      case "move":
+      case "light":
+        assert.ok(this.game.state.score > beforeScore, detail);
+        break;
+      case "extinguish":
+        assert.equal(beforeFire, true, detail);
+        assert.equal(this.game.getFlag("onFire"), false, detail);
+        assert.ok(this.game.state.score > beforeScore, detail);
+        break;
+      default:
+        assert.fail(`Unverified win-route action: ${detail}`);
+    }
+  }
+  this.winRoute = { steps: steps.length, flights, traversals, maxLoad };
+});
+
 When("I fast-forward into Part II", function () {
-  const shortcut = sysopCommand("::winmaxgary");
-  this.output = this.game.send(expandSysopCommand(shortcut, this.game));
+  const shortcut = sysopCommand("::win");
+  this.game.send(expandSysopCommand(shortcut, this.game));
+  this.output = this.game.send("down");
 });
 
 When("I play until death:", function (docString) {
@@ -529,6 +674,15 @@ When("I round-trip the game snapshot", function () {
   this.game = restored;
 });
 
+When("a fresh mushroom crop regrows naturally", function () {
+  const rolls = this.game.getFlag("frontDoorOpen") ? [0.99, 0] : [0];
+  Math.random = () => rolls.shift() ?? 0.99;
+  this.game.setFlag("__noChaos", false);
+  this.output = this.game.send("wait");
+  this.game.setFlag("__noChaos", true);
+  assert.equal(this.game.roomOf("outhouseMushrooms"), "privy");
+});
+
 When("I restart from checkpoint {string}", function (name) {
   const restored = this.game.restoreCheckpoint(name);
   assert.ok(restored, `Missing checkpoint: ${name}`);
@@ -559,6 +713,49 @@ Then("the game score is {int}", function (score) {
   assert.equal(this.game.state.score, score);
 });
 
+Then("the score equals the derived Part I maximum", function () {
+  assert.equal(this.game.state.score, world.maximumScore(this.game));
+});
+
+Then("every Part I portable has its pickup and use rewards", function () {
+  const portable = Object.entries(world.items)
+    .filter(([, item]) => item.takeable && item.phase !== 2);
+  assert.equal(portable.length, 39);
+  for (const [id, item] of portable) {
+    assert.equal(this.game.getFlag(item.progressFlag || `progressItem:${id}`), true,
+      `${id} was not acquired`);
+    assert.equal(this.game.getFlag(`useItem:${id}`), true, `${id} was not used`);
+  }
+  assert.equal(this.game.getFlag("progressItem:emeraldOfTheQueen"), undefined);
+});
+
+Then("the win route used at most one named flight", function () {
+  assert.ok(this.winRoute);
+  assert.ok(this.winRoute.flights <= 1, JSON.stringify(this.winRoute));
+  assert.ok(this.winRoute.traversals > 60, JSON.stringify(this.winRoute));
+  assert.ok(this.winRoute.maxLoad <= 20, JSON.stringify(this.winRoute));
+});
+
+Then("both endings remain independently available", function () {
+  assert.equal(this.game.state.room, "grandHall");
+  assert.equal(this.game.getFlag("bellRung"), true);
+  assert.equal(this.game.getFlag("heirloomsTransformed"), true);
+  assert.equal(this.game.getFlag("floorDoorOpen"), true);
+  assert.equal(this.game.has("clockTalisman"), true);
+  assert.equal(this.game.getFlag("partII"), undefined);
+  const snapshot = this.game.snapshot();
+  const front = createGame(world);
+  front.restore(snapshot);
+  assert.match(front.send("south"), /You keep walking/);
+  assert.equal(front.state.won, true);
+  assert.equal(front.state.score, 870);
+  const gary = createGame(world);
+  gary.restore(snapshot);
+  assert.match(gary.send("down"), /FREEEEDOMMM/);
+  assert.equal(gary.state.won, false);
+  assert.equal(gary.getFlag("partII"), true);
+  assert.equal(gary.state.score, this.game.state.score);
+});
 Then("the player rank contains {string}", function (rank) {
   assert.match(this.game.rank(), new RegExp(rank, "i"));
 });
@@ -608,7 +805,7 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
-  assert.deepEqual(sysopMenuAction("::winmaxbell", false), {
+  assert.deepEqual(sysopMenuAction("::win", false), {
     handled: true, unlocked: false, message: SYSOP_MENU_DISCOVERY_MESSAGE,
   });
   assert.deepEqual(sysopMenuAction("::werdna", false), {
@@ -617,11 +814,20 @@ Then("the sysop menu unlock passwords are {string}", function (passwords) {
   assert.deepEqual(sysopMenuAction("::", true), {
     handled: true, unlocked: true, showMenu: true,
   });
-  assert.equal(sysopMenuAction("::winmaxbell", true).shortcut?.cmd, "::winmaxbell");
-  assert.equal(sysopMenuAction("::winmax2bell", true).shortcut, undefined);
+  assert.equal(sysopMenuAction("::win", true).shortcut?.cmd, "::win");
   assert.deepEqual(sysopMenuAction(":powerup", true), { handled: false, unlocked: true });
 });
 
+Then("obsolete win shortcuts are rejected", function () {
+  for (const old of [
+    "::winquick", "::wintobell", "::wintofoor", "::winquick1",
+    "::winmaxbell", "::winmaxfrontd", "::winmaxgary", "::winmax2bell",
+  ]) {
+    assert.equal(sysopCommand(old), null, old);
+    assert.equal(sysopMenuAction(old, true).shortcut, undefined, old);
+    assert.ok(!renderSysopMenu().includes(old), old);
+  }
+});
 Then("the sysop command catalog defines {string}", function (commands) {
   assert.deepEqual(SYSOP_COMMANDS.map((entry) => entry.cmd), commands.split(","));
   for (const entry of SYSOP_COMMANDS) {

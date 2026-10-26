@@ -31,7 +31,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "brilliant white shaft"
     And flag "oakLightAligned" is set
     And item "oakPlatform" is in "greatOak"
-    And the game score is 5
+    And the game score is 10
 
   Scenario: Explicit named slots can assemble the panel
     When I send "take all"
@@ -45,7 +45,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the output contains "SAPPHIRE GEM"
     And the output contains "BOTTOM SLOT"
     And flag "oakLightAligned" is set
-    And the game score is 5
+    And the game score is 30
 
   Scenario: A complete wrong arrangement ejects every gem
     When I send "take ruby gem"
@@ -61,7 +61,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And item "emberStone" is in "greatOak"
     And item "greenGlassStone" is in "greatOak"
     And item "blueGlassStone" is in "greatOak"
-    And the game score is 0
+    And the game score is 5
     When I send "examine panel"
     Then the output contains "TOP SLOT: EMPTY"
     And the output contains "MIDDLE SLOT: EMPTY"
@@ -146,7 +146,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
     Then the output contains line "HEIRLOOMS: 1/13 +0"
-    And the game score is 8
+    And the game score is 18
 
   Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
@@ -212,6 +212,6 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the player is in room "grandHall"
     When I send "put hammer in reliquary"
     Then item "blackwoodHammer" is in "reliquary"
-    And the game score is 12
+    And the game score is 17
 
 # end oak-tree-fort.feature

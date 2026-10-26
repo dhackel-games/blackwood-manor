@@ -2,8 +2,8 @@
 
 @unit
 Feature: Maintained sysop shortcuts
-  The hidden menu exposes power-up, quick-win, and maximum-score routes for the
-  bell, front-door, and Gary stopping points.
+  The hidden menu keeps the Baron and power-up helpers, plus one complete
+  physical win route that stops with the clock before either ending.
 
   Background:
     Given a fresh manor game
@@ -11,8 +11,9 @@ Feature: Maintained sysop shortcuts
   Scenario: The hidden menu contains the maintained shortcuts
     Then the sysop menu command is "::"
     And the sysop menu unlock passwords are "werdna,evad"
-    And the sysop command catalog defines "::baron,::powerup,::winquick1,::winmaxbell,::winmaxfrontd,::winmaxgary"
+    And the sysop command catalog defines "::baron,::powerup,::win"
     And the sysop menu uses the shared command title description format
+    And obsolete win shortcuts are rejected
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
     And hidden shortcuts replace the editable command prompt without executing
@@ -43,53 +44,31 @@ Feature: Maintained sysop shortcuts
       | enter platform                    | in platform              |
       | wait                              | z                        |
 
-  Scenario: Winmaxbell includes the redesigned heirloom route and rings the bell once
-    Then sysop command "::winmaxbell" includes "g belfry"
-    And sysop command "::winmaxbell" includes "pull bellrope"
-    And sysop command "::winmaxbell" includes "u goggles"
-    And sysop command "::winmaxbell" includes "o studrawer"
-    And sysop command "::winmaxbell" includes "u bmwatch"
-    And sysop command "::winmaxbell" includes "t family"
-    And sysop command "::winmaxbell" includes "put candle in fixture"
-    And sysop command "::winmaxbell" includes "put shard in fixture"
-    And sysop command "::winmaxbell" includes "t candelabra"
-    And sysop command "::winmaxbell" includes "put all in rq"
-    And sysop command "::winmaxbell" includes "c rq"
-    And sysop command "::winmaxbell" includes "o bellcloset"
-    And sysop command "::winmaxbell" contains sequence "o bellcloset; pull closetrope"
-    And sysop command "::winmaxbell" includes "pull closetrope" exactly once
-    And sysop command "::winmaxfrontd" includes "pull closetrope" exactly once
-    And sysop command "::winmaxgary" includes "pull closetrope" exactly once
-    And sysop command "::winmaxbell" omits "put bmwatch in rq"
-    And sysop command "::winmaxbell" omits "put goggles in rq"
-    And sysop command "::winmaxbell" contains sequence "g study; read diary; o studrawer; u bmwatch"
+  Scenario: The single win prompt starts with the backpack and walks the remaining map
+    Then sysop command "::win" contains sequence "e; e; u fresh; g shaft; u backpack; u; u headlamp"
+    And sysop command "::win" contains sequence "u spyglass; t spyglass; in platform; z"
+    And sysop command "::win" includes "pull bellrope"
+    And sysop command "::win" includes "u goggles"
+    And sysop command "::win" includes "read package"
+    And sysop command "::win" includes "light self w/wrapper"
+    And sysop command "::win" includes "put candle in fixture"
+    And sysop command "::win" includes "put shard in fixture"
+    And sysop command "::win" includes "pull closetrope" exactly once
+    And sysop command "::win" contains sequence "c rq; o bellcloset; pull closetrope; o rq; t gclock; read gclock"
+    And sysop command "::win" omits "g fort"
+    And sysop command "::win" omits "g belfry"
+    And sysop command "::win" omits "open package"
     And every hidden prompt avoids an explicit take immediately before direct use
 
-  Scenario: Powerup and Quick Win use the current equipment and heirloom routes
+  Scenario: Powerup still equips the current reusable gear
     Then sysop command "::powerup" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
-    Then sysop command "::powerup" includes "u shoes"
+    And sysop command "::powerup" includes "u shoes"
     And sysop command "::powerup" includes "u goggles"
     And sysop command "::powerup" includes "o studrawer"
     And sysop command "::powerup" includes "u bmwatch"
     And sysop command "::powerup" includes "u obsidian"
     And sysop command "::powerup" includes "pull bellrope"
-    And sysop command "::winquick1" includes "g belfry"
-    And sysop command "::winquick1" includes "pull bellrope"
-    And sysop command "::winquick1" includes "u goggles"
-    And sysop command "::winquick1" includes "o studrawer"
-    And sysop command "::winquick1" includes "u bmwatch"
-    And sysop command "::winquick1" includes "t family"
-    And sysop command "::winquick1" includes "put candle in fixture"
-    And sysop command "::winquick1" includes "put shard in fixture"
-    And sysop command "::winquick1" includes "t candelabra"
-    And sysop command "::winquick1" includes "put all in rq"
-    And sysop command "::winquick1" includes "pull closetrope"
-    And sysop command "::winquick1" omits "south"
     And sysop command "::powerup" contains sequence "g study; o studrawer; u bmwatch"
-    And sysop command "::winquick1" contains sequence "g study; o studrawer; u bmwatch; g hallbr; o drawer; t family; t shard"
-    And sysop command "::winquick1" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
-    And sysop command "::winmaxbell" contains sequence "g shaft; u backpack; g gallery; u headlamp"
-    And sysop command "::winmaxbell" contains sequence "u burrito; z; z; z; z; u milk"
 
   Scenario: Meet the Baron walks through the front door to the Parlor portrait
     When I execute sysop command "::baron"
@@ -124,35 +103,23 @@ Feature: Maintained sysop shortcuts
     And item "candelabra" is destroyed
     And item "batSightMirror" is absent from game state
     And the game is not won
-    And the game score is 60
+    And the game score is 120
 
-  Scenario: Quick Part I stops after the bell before the front-door ending
-    When I execute sysop command "::winquick1"
-    Then the game is not won
-    And the game is alive
-    And the current room is "grandHall"
-    And flag "bellRung" is set
-    And item "frontDoor" is open
-    And every required family item is inside the countdown clock
-    And item "familyRing" is in "clockTalisman"
-    And item "blackwoodHammer" is in "clockTalisman"
-    And item "candelabra" is in "clockTalisman"
-    And item "mirrorShard" is destroyed
-    And item "candlestick" is destroyed
-    And item "backwardsWatch" is worn in slot "wrist"
-    And item "xrayGoggles" is worn in slot "eyes"
-    And flag "progressAward:candelabraRestored" is set
-    And the game score is 335
-
-  Scenario: Winmaxbell earns deterministic progress and completes the bell ritual
-    When I execute sysop command "::winmaxbell"
+  Scenario: Every physical win step executes, every portable has two rewards, and the clock remains in hand
+    When I trace sysop command "::win"
     Then the game is alive
     And the game is not won
     And the current room is "grandHall"
-    And flag "reliquarySealed" is true
+    And the win route used at most one named flight
+    And the score equals the derived Part I maximum
+    And every Part I portable has its pickup and use rewards
+    And flag "reliquarySealed" is false
+    And flag "progressAward:reliquarySealed" is set
     And flag "bellRung" is set
+    And flag "floorDoorOpen" is set
     And item "bellCloset" is open
     And item "frontDoor" is open
+    And item "clockTalisman" is carried
     And flag "progressAward:trollRiddleSolved" is set
     And flag "progressAward:oakPanelAligned" is set
     And flag "progressAward:belfryGogglesFreed" is set
@@ -161,7 +128,7 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:mushroomVisionOpened" is set
     And flag "progressAward:atticLadderLowered" is set
     And flag "progressAward:letterRead" is set
-    And item "mysteryPackage" is in "grandHall"
+    And item "mysteryPackage" is carried
     And every required family item is inside the countdown clock
     And item "familyRing" is in "clockTalisman"
     And item "blackwoodHammer" is in "clockTalisman"
@@ -171,67 +138,59 @@ Feature: Maintained sysop shortcuts
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 465
+    And the game score is 825
 
-  Scenario: Winmaxfrontd takes the maximum route through the clean ending
-    When I execute sysop command "::winmaxfrontd"
-    Then the game is won
-    And the output contains "You keep walking"
-    And flag "bellRung" is set
-    And item "familyRing" is in "clockTalisman"
-    And item "blackwoodHammer" is in "clockTalisman"
-    And item "candelabra" is in "clockTalisman"
-    And item "backwardsWatch" is worn in slot "wrist"
-    And item "xrayGoggles" is worn in slot "eyes"
-    And the game score is 510
-
-  Scenario: Winmaxgary takes the maximum route and descends into Part II
-    When I execute sysop command "::winmaxgary"
+  Scenario: A single pasted prompt executes in full and leaves both endings to the player
+    When I execute sysop command "::win"
     Then the game is alive
     And the game is not won
-    And the current room is "p2_awakening"
-    And flag "partII" is set
+    And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the output contains "FREEEEDOMMM"
-    And item "familyRing" is in "clockTalisman"
-    And item "blackwoodHammer" is in "clockTalisman"
-    And item "candelabra" is in "clockTalisman"
-    And item "backwardsWatch" is worn in slot "wrist"
-    And item "xrayGoggles" is worn in slot "eyes"
-    And the game score is 465
+    And the game score is 825
+    And both endings remain independently available
+    When I send "use clock"
+    Then the current room is "grandHall"
+    And flag "partII" is unset
+    And the game score is 825
 
-  Scenario: Winmaxbell completes the bell ritual with shoes when both mushroom batches are gone
+  Scenario: The complete route recovers physically when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
     And item "outhouseMushrooms" has been destroyed
     And item "mushrooms" has been destroyed
-    When I execute sysop command "::winmaxbell"
+    When I trace sysop command "::win"
     Then item "wingedShoes" is worn in slot "feet"
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
+    And the win route used at most one named flight
     And the current room is "grandHall"
     And the game is alive
     And flag "bellRung" is set
+    And item "clockTalisman" is carried
     And every required family item is inside the countdown clock
+    And the game score is 795
 
-  Scenario Outline: Restored shortcuts recover with shoes when mushrooms are gone
+  Scenario: Powerup still recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
     And item "outhouseMushrooms" has been destroyed
     And item "mushrooms" has been destroyed
-    When I execute sysop command "<command>"
+    When I execute sysop command "::powerup"
     Then item "wingedShoes" is worn in slot "feet"
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
-    And the current room is "<room>"
+    And the current room is "hiddenVault"
     And the game is alive
 
-    Examples:
-      | command    | room        |
-      | ::powerup  | hiddenVault |
-      | ::winquick1 | grandHall   |
-
-  Scenario: An already-solved oak still uses its one-word room alias
-    Given flag "oakLightAligned" is set
-    Then sysop command "::winmaxbell" includes "g fort"
-    And sysop command "::winmaxbell" omits "g tree fort"
+  Scenario: An already-solved oak uses its physical platform instead of flying to the fort
+    Given an already-solved oak has its platform at the roots
+    Then sysop command "::win" contains sequence "z; in platform; z; u spyglass; t spyglass; in platform; z"
+    And sysop command "::win" omits "g fort"
+    When I trace sysop command "::win"
+    Then the game is alive
+    And the current room is "grandHall"
+    And item "clockTalisman" is carried
+    And flag "bellRung" is set
+    And flag "progressItem:spyglass" is set
+    And flag "useItem:spyglass" is set
+    And the win route used at most one named flight
 
 # end sysop-menu.feature

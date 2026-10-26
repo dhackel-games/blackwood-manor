@@ -184,7 +184,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 460
+    And the game score is 750
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

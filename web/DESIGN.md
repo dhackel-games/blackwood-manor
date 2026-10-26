@@ -263,18 +263,40 @@ the BACKPACK, HEADLAMP, WINGED SHOES, and XRAY GOGGLES awards +5 each, and
 lowering the ATTIC ladder for the first time awards +5. Completing the
 CANDELABRA restoration awards a clearly surfaced, non-farmable +20; depositing
 the restored heirloom later awards its separate +10. The BM WATCH, MIRROR
-SHARD, and loose CANDLE have no independent point value; the BLACKWOOD HAMMER
-and BLACKWOOD FAMILY RING retain +12 and +20 deposit values.
-`::winmaxbell` performs every deterministic scoring challenge, deposits all
-thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and pulls
-the closet rope before stopping. `::winmaxfrontd` continues through the
-clean front-door ending; `::winmaxgary` instead takes the clock and descends
-to Gary. All maximum routes leave the MYSTERY PACKAGE untouched because its
-outcome is random. `::powerup` and the shorter `::winquick1` remain available.
-The replacement heirlooms preserve the 195-point deposit pool. With the
-candelabra restoration bonus, the maintained maximum checkpoints are 460
-before the final bell, 465 at `::winmaxbell` and on the Gary route, and 510
-through the front-door ending with all deterministic end awards.
+SHARD, and loose CANDLE now each earn +5 on first acquisition and +5 on first
+successful use; the BLACKWOOD HAMMER and BLACKWOOD FAMILY RING retain +12 and
++20 deposit values in addition to those universal rewards.
+
+Every obtainable Part-I portable object earns +5 once on acquisition and +5
+once on meaningful use. This includes safe handling of benign keepsakes,
+implicit/custom/bulk pickups, and generated wrapper, doubloon, and clock.
+The six existing +5 key/gear pickup rewards count as that same acquisition
+award, not twice. The Queen's Emerald belongs only to Part II. Pickups and
+uses persist as independent per-item flags; failing a command, dropping and
+re-taking, regrowing mushrooms, or restoring a save cannot farm either award.
+The pre-ending Part-I maximum derives from +195 heirloom deposits, +195
+portable pickups, +195 portable uses, +180 puzzle/progression awards, and
++60 standalone rewards: **825**.
+
+`::win` starts at the privy, eats fresh mushrooms, flies once to the shaft
+for the backpack, then traverses connected rooms: gallery/troll/crest/shoes,
+front door/mailbox/kitchen, Dreadmaw's apple, garden rope descent and
+self-fire brazier, oak's actual pulley platform, library/bedrooms/nursery gap,
+attic/roof/belfry/hidden vault, and wine cellar/crypt. It deposits all
+thirteen heirlooms, closes the RELIQUARY, rings the closet bell, **takes and
+reads the COUNTDOWN CLOCK**, and stops alive in the ROYAL HALL before SOUTH
+or DOWN. SOUTH adds the existing +45 end badges for **870**; DOWN meets Gary
+and enters Part II at **825**. The MYSTERY PACKAGE is carried and read safely
+but never opened; its random consequences are not part of a maximum route.
+`::powerup` remains as the reusable-equipment helper.
+
+For reference, the deterministic fresh `::win` expansion has 165 commands,
+75 directional commands, 77 actual room transitions, one named-room flight,
+and peak inventory load 12/20; the headlamp retains 42 fuel turns. The
+previous maximum-bell expansion had 113 commands, 19 directional commands,
+and 21 named-room flights. This comparison demonstrates the intended
+tradeoff for exhaustive collection and physical traversal, not a claim of
+globally shortest path.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*

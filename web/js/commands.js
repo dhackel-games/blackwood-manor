@@ -221,14 +221,15 @@ function takeAll(ctx, cmd) {
     }
     const handled = runBulkItemHandler(ctx, "take", item, cmd);
     if (handled != null) {
-      results.push(`${item.names[0]}: ${handled}`);
+      results.push(`${item.names[0]}: ${handled}` +
+        (ctx.has(item.id) && item.worn ? ctx.awardUse?.(item) || "" : ""));
       continue;
     }
     ctx.moveItem(item.id, "inventory");
     const autoWorn = item.autoWearOnTake && (!item.wearSlot || !ctx.equipped(item.wearSlot));
     if (autoWorn) item.worn = true;
     results.push(`${item.names[0].toUpperCase()}: ${autoWorn ? "Taken and worn." : "Taken."}` +
-      pickupAward(ctx, item));
+      pickupAward(ctx, item) + (autoWorn ? ctx.awardUse?.(item) || "" : ""));
   }
   if (leftBehind.length) {
     results.push(source
@@ -355,7 +356,7 @@ export const commands = {
     ctx.moveItem(it.id, "inventory");
     if (it.autoWearOnTake && (!it.wearSlot || !ctx.equipped(it.wearSlot))) {
       it.worn = true;
-      return "Taken and worn." + pickupAward(ctx, it);
+      return "Taken and worn." + pickupAward(ctx, it) + (ctx.awardUse?.(it) || "");
     }
     return "Taken." + pickupAward(ctx, it);
   },
@@ -415,7 +416,7 @@ export const commands = {
     if (!key) return "Unlock it with what?";
     if (it.keyId !== key.id) return "That doesn't fit the lock.";
     it.locked = false;
-    let result = `You unlock the ${it.names[0]}.`;
+    let result = `You unlock the ${it.names[0]}.` + (ctx.awardUse?.(key) || "");
     if (key.consumedOnUnlock) {
       ctx.destroy(key.id);
       result += ` ${key.consumedOnUnlock}`;
@@ -457,7 +458,7 @@ export const commands = {
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (!it.readable && !it.text) return "There's nothing to read on that.";
-    return it.text || "It's blank.";
+    return (it.text || "It's blank.") + (ctx.awardUse?.(it) || "");
   },
 
   search(ctx, cmd) {
@@ -471,13 +472,15 @@ export const commands = {
     if (!it || !it.lightSource) return "You can't light that.";
     if (it.lit) return "It's already lit.";
     if (typeof it.fuel === "number" && it.fuel <= 0) return "It's burned out; it won't catch.";
+    let match = null;
     if (!it.selfPowered) {
-      const hasMatch = ctx.inventory().some((i) =>
+      match = ctx.inventory().find((i) =>
         (i.names || []).some((n) => n === "match" || n === "matches"));
-      if (!hasMatch) return "You have nothing to light it with.";
+      if (!match) return "You have nothing to light it with.";
     }
     it.lit = true;
-    return `The ${it.names[0]} flickers to life, throwing shadows against the walls.`;
+    return `The ${it.names[0]} flickers to life, throwing shadows against the walls.` +
+      (ctx.awardUse?.(match) || "") + (ctx.awardUse?.(it) || "");
   },
   extinguish(ctx, cmd) {
     const it = ctx.find(cmd.dobj);
@@ -506,7 +509,7 @@ export const commands = {
     const base = it.wearMsg || (it.wearSlot
       ? `You put the ${it.names[0]} on your ${it.wearSlot}.`
       : `You put on the ${it.names[0]}.`);
-    return it.wearArt ? `${base}\n\n${it.wearArt}` : base;
+    return (it.wearArt ? `${base}\n\n${it.wearArt}` : base) + (ctx.awardUse?.(it) || "");
   },
   remove(ctx, cmd) {
     const it = ctx.find(cmd.dobj, ctx.inventory());
@@ -520,15 +523,17 @@ export const commands = {
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (!it.edible) return "That's hardly edible.";
+    const use = ctx.awardUse?.(it) || "";
     ctx.destroy(it.id);
-    return `You eat the ${it.names[0]}. Not bad.`;
+    return `You eat the ${it.names[0]}. Not bad.` + use;
   },
   drink(ctx, cmd) {
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (!it.drinkable) return "You can't drink that.";
+    const use = ctx.awardUse?.(it) || "";
     ctx.destroy(it.id);
-    return `You drink the ${it.names[0]}.`;
+    return `You drink the ${it.names[0]}.` + use;
   },
 
   // Verbs that are meaningful only via content handlers get a gentle default.
@@ -591,7 +596,12 @@ export const commands = {
   wake() { return "Nothing here seems inclined to wake up."; },
   pray(ctx) { return "Nothing happens. Perhaps something is missing."; },
   sit(ctx, cmd) { return `You sit. ${cmd.dobj ? "The " + cmd.dobj + " is unmoved by the gesture." : "The floor is cold and unhelpful."}`; },
-  use(ctx, cmd) { return cmd.dobj ? `You can't see a way to use the ${cmd.dobj}.` : "Use what?"; },
+  use(ctx, cmd) {
+    if (!cmd.dobj) return "Use what?";
+    const item = ctx.find(cmd.dobj, ctx.inventory());
+    const harmless = item && ctx.world.harmlessPortableUse?.(ctx, item);
+    return harmless || `You can't see a way to use the ${cmd.dobj}.`;
+  },
   flush(ctx, cmd) { return "There's nothing here to flush."; },
   yes() { return "There is nothing waiting for confirmation."; },
   no() { return "There is nothing waiting for refusal."; },

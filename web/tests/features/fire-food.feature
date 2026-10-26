@@ -13,7 +13,7 @@ Feature: Fire and food consequences
     And I send "open mailbox"
     Then the output contains "letter"
     When I send "get letter"
-    Then the output equals "Taken."
+    Then the output equals "Taken. (+5)"
     And the letter has no hard line breaks
     When I send "burn letter"
     Then the output matches "alight|ash|flakes"
@@ -52,13 +52,13 @@ Feature: Fire and food consequences
     When I send "extinguish self"
     Then the output contains "no longer on fire"
     And the output contains "(+10)"
-    And the game score is 10
+    And the game score is 15
     Given item "matches" is carried
     When I send "light self on fire with match"
     Then the output contains "(-5)"
-    And the game score is 5
+    And the game score is 10
     When I send "extinguish self"
-    Then the game score is 5
+    Then the game score is 10
     When I send "light mailbox"
     Then the output equals "You can't light that."
 
@@ -121,7 +121,7 @@ Feature: Fire and food consequences
     When the player moves directly to room "grandHall"
     And I send "place emerald gem in reliquary"
     Then item "emberStone" is in "reliquary"
-    And the game score is 40
+    And the game score is 50
     And the output contains line "HEIRLOOMS: 0/13 +1"
 
   Scenario: The lit portable candle can patiently ignite the garden brazier
@@ -136,7 +136,7 @@ Feature: Fire and food consequences
     And the output contains "LIT CANDLE"
     And the output contains "EMERALD GEM"
     And the output contains "(+10)"
-    And the game score is 10
+    And the game score is 20
 
   Scenario: Water-offer flavor advances only when the offer is displayed
     Given the player is on fire
@@ -179,7 +179,7 @@ Feature: Fire and food consequences
     And flag "drankMilk" is true
     And the output contains "survived the super burrito"
     And the output contains "(+25)"
-    And the game score is 30
+    And the game score is 55
     When I win with "You step into the dawn."
     Then the output contains "Got Milk?"
 
@@ -191,7 +191,7 @@ Feature: Fire and food consequences
     And the output contains "(+5)"
     And the output does not contain "survived the super burrito"
     And flag "progressAward:burritoSurvived" is unset
-    And the game score is 5
+    And the game score is 30
     Given a fresh manor game
     And the player is in room "kitchen"
     When I send "eat burrito"
@@ -203,7 +203,7 @@ Feature: Fire and food consequences
     Then the output contains "survived the super burrito"
     And the output contains "(+25)"
     And flag "progressAward:burritoSurvived" is set
-    And the game score is 30
+    And the game score is 55
 
   Scenario: USE contextually eats food and drinks beverages
     Given the player is in room "kitchen"
@@ -402,7 +402,7 @@ Feature: Fire and food consequences
     Then the output contains "CURED"
     And flag "sick" equals 0
     And the output does not contain "(+25)"
-    And the game score is 0
+    And the game score is 15
 
     Examples:
       | command      |

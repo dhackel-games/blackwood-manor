@@ -259,11 +259,18 @@ export function createGame(world) {
   game.destroy = (id) => { if (state.items[id]) state.items[id].loc = null; };
   game.addScore = (n) => { state.score += n; };
   game.awardPickup = (item) => {
-    const points = item?.progressPoints || 0;
+    const points = item?.progressPoints ?? (item?.takeable ? cfg.portableRewards?.pickup : 0);
     if (!points) return "";
     const flag = item.progressFlag || `progressItem:${item.id}`;
     if (game.getFlag(flag)) return "";
     game.setFlag(flag);
+    game.addScore(points);
+    return ` (+${points})`;
+  };
+  game.awardUse = (item) => {
+    const points = item?.takeable ? cfg.portableRewards?.use : 0;
+    if (!points || game.getFlag(`useItem:${item.id}`)) return "";
+    game.setFlag(`useItem:${item.id}`);
     game.addScore(points);
     return ` (+${points})`;
   };
@@ -562,7 +569,10 @@ export function createGame(world) {
         result = "Taken.";
       }
     }
-    if (game.has(item.id)) result = (result || "Taken.") + game.awardPickup(item);
+    if (game.has(item.id)) {
+      result = (result || "Taken.") + game.awardPickup(item);
+      if (item.worn && cmd.verb === "wear") result += game.awardUse(item);
+    }
     if (!game.has(item.id)) return { blocked: result, step: `get ${itemTitle(item)}` };
     return {
       step: `get ${itemTitle(item)}`,
@@ -672,6 +682,7 @@ export function createGame(world) {
     let cmd = parse(input);
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
+    const previouslyCarried = new Set(game.inventory().map((item) => item.id));
 
     const roomNavigation = world.implicitNavigation?.[state.room];
     const implicitNavigation = cmd.verb === "go" && cmd.dobj === "in" ? roomNavigation?.in
@@ -711,6 +722,11 @@ export function createGame(world) {
       const r = handler ? handler(game, cmd) : "You can't do that.";
       text = r == null ? "You can't do that." : r;
     }
+    const pickupNotices = game.inventory()
+      .filter((item) => !previouslyCarried.has(item.id))
+      .map(game.awardPickup)
+      .filter(Boolean);
+    if (pickupNotices.length) text += `\n${pickupNotices.join("")}`;
     if (!state.dead && !state.won) tick();
     const achievementNotice = checkAchievements();
     if (achievementNotice) text += "\n\n" + achievementNotice;

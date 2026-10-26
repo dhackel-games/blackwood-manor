@@ -86,7 +86,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     Given the player is in room "grandHall"
     When I send "put family ring in reliquary"
     Then item "familyRing" is in "reliquary"
-    And the game score is 20
+    And the game score is 30
 
   Scenario: The BM Watch can inspect any named room without moving
     Given item "backwardsWatch" is carried

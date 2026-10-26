@@ -70,7 +70,7 @@ Feature: Dreadmaw's hedge maze and hoard
     And item "goldDoubloon" is in "inventory"
     And the output contains "GOLD DOUBLOON"
     And the output contains "troll inside"
-    And the game score is 10
+    And the game score is 20
 
     Examples:
       | command                    |
@@ -117,7 +117,7 @@ Feature: Dreadmaw's hedge maze and hoard
     Then flag "dragonVaultOpen" is true
     And the output contains "vault door rolls open"
     And the output contains "(+5)"
-    And the game score is 15
+    And the game score is 25
     When I send "east"
     Then the current room is "dreadmawVault"
     And the output contains "DREADMAW'S VAULT"

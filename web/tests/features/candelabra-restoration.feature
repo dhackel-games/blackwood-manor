@@ -51,7 +51,7 @@ Feature: Restore the dining-room candelabra
     When I send "take candlestick"
     And I send "<first>"
     Then the output contains "<missing>"
-    And the game score is 0
+    And the game score is 15
     When I send "<second>"
     Then flag "candelabraRestored" is set
     And item "mirrorShard" is destroyed
@@ -63,10 +63,10 @@ Feature: Restore the dining-room candelabra
     And the output contains "WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS"
     And the output contains "CANDELABRA RESTORATION BONUS (+20)"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 20
+    And the game score is 40
     When I round-trip the game snapshot
     Then flag "progressAward:candelabraRestored" is set
-    And the game score is 20
+    And the game score is 40
 
     Examples:
       | first                     | missing                      | second                    |
@@ -79,7 +79,7 @@ Feature: Restore the dining-room candelabra
     When I send "put candelabra in reliquary"
     Then item "candelabra" is in "reliquary"
     And the output contains line "HEIRLOOMS: 1/13 +0"
-    And the game score is 10
+    And the game score is 15
 
   Scenario: The candelabra remains lit without fuel in darkness
     Given the restored candelabra is carried
@@ -99,7 +99,7 @@ Feature: Restore the dining-room candelabra
     Then flag "brazierLit" is set
     And the output contains "CANDELABRA"
     And the output contains "EMERALD GEM"
-    And the game score is 10
+    And the game score is 15
 
     Examples:
       | command                              |

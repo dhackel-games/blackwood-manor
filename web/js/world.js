@@ -1,7 +1,6 @@
 // world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
-// ALL CONTENT for Blackwood Manor.
-// This is the ONLY file you edit to expand the game. The engine (core/parser/
-// commands) never needs to change. See README.md for the "how to add a room" guide.
+// Blackwood Manor content and rules. Shared portable-reward dispatch lives in
+// core.js and commands.js. See README.md for the "how to add a room" guide.
 //
 // Handler API (ctx) available inside on:{ verb(ctx, cmd) } functions:
 //   ctx.print via return value      ctx.getFlag(f) / ctx.setFlag(f,[v])
@@ -10,7 +9,8 @@
 //   ctx.itemsIn(loc) / ctx.inventory() / ctx.inventoryLoad()
 //   ctx.inventoryCapacity() / ctx.find(phrase[,scope])
 //   ctx.moveItem(id,to) / ctx.destroy(id)
-//   ctx.addScore(n) / ctx.kill(msg) / ctx.win(msg) / ctx.describeRoom()
+//   ctx.addScore(n) / ctx.awardPickup(it) / ctx.awardUse(it)
+//   ctx.kill(msg) / ctx.win(msg) / ctx.describeRoom()
 // A handler that returns a string intercepts the default verb; returning null/
 // undefined lets the default behaviour run.
 
@@ -235,6 +235,8 @@ function takeCountdownClock(ctx) {
   if (ctx.roomOf("clockTalisman") !== "reliquary") {
     return ctx.has("clockTalisman") ? "You already carry the COUNTDOWN CLOCK." : null;
   }
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
+    return "Your hands are full. You'll have to drop something before taking the COUNTDOWN CLOCK.";
   ctx.moveItem("clockTalisman", "inventory");
   return "You lift the COUNTDOWN CLOCK from the RELIQUARY. It is lighter than thirteen heirlooms should be. " +
     "The open trapdoor waits beside you, its narrow STAIRCASE descending into the dark.";
@@ -455,16 +457,18 @@ function installCandelabraPiece(ctx, cmd) {
 
   if (piece.id === "mirrorShard") {
     if (ctx.getFlag("candelabraShardInstalled")) return "The MIRROR SHARD is already fitted into the central recess.";
+    const use = ctx.awardUse(piece);
     ctx.moveItem(piece.id, null);
     ctx.setFlag("candelabraShardInstalled", true);
     const installed = "You press the MIRROR SHARD into the central recess. It settles flush with a tiny silver click, " +
       "but its half of the inscription remains soot-dark.";
     return ctx.getFlag("candelabraCandleInstalled")
-      ? restoreCandelabra(ctx, installed)
-      : installed + " The empty candle socket above it still waits.";
+      ? restoreCandelabra(ctx, installed + use)
+      : installed + " The empty candle socket above it still waits." + use;
   }
 
   if (ctx.getFlag("candelabraCandleInstalled")) return "The sole CANDLE is already seated in the candelabra.";
+  const use = ctx.awardUse(piece);
   const wasLit = !!piece.lit;
   piece.lit = false;
   ctx.moveItem(piece.id, null);
@@ -472,8 +476,8 @@ function installCandelabraPiece(ctx, cmd) {
   const installed = "You seat the manor's sole CANDLE in the candelabra's central socket." +
     (wasLit ? " Its ordinary flame gutters out as the silver grips it." : "");
   return ctx.getFlag("candelabraShardInstalled")
-    ? restoreCandelabra(ctx, installed)
-    : installed + " The mirror-shaped recess beneath it is still empty.";
+    ? restoreCandelabra(ctx, installed + use)
+    : installed + " The mirror-shaped recess beneath it is still empty." + use;
 }
 
 function touchCandelabra(ctx, cmd) {
@@ -599,14 +603,16 @@ function afterPlayerNamed(ctx) {
 function clockTalismanText(ctx) {
   if (!ctx.getFlag("partII")) {
     return "A beautiful grand clock small enough to cradle in both hands. It has THIRTEEN numbers instead of " +
-      "twelve, and one slender hand resting on XIII. There is no maker's mark and no instruction.";
+      "twelve, and one slender hand resting on XIII. There is no maker's mark and no instruction." +
+      (ctx.has("clockTalisman") ? ctx.awardUse(ctx.item("clockTalisman")) : "");
   }
   ctx.setFlag("clockExplained", true);
   return "The moment your ghostly fingers trace the clock's face, its purpose enters your mind whole.\n\n" +
     "The thirteen Blackwood heirlooms are inside it, scattered through thirteen hours of the manor's past. " +
     "The hand will count backward only when you recover each heirloom and return it to the place where you " +
     "first found it. USE the CLOCK to enter the next hour; USE it again to come home with what you recover.\n\n" +
-    `The hand rests on ${p2Roman(p2Hour(ctx))}. Thirteen hours remain, {{player_name}}.`;
+    `The hand rests on ${p2Roman(p2Hour(ctx))}. Thirteen hours remain, {{player_name}}.` +
+    ctx.awardUse(ctx.item("clockTalisman"));
 }
 
 // The clock is the only way in or out of an hour.
@@ -689,8 +695,11 @@ function wailAtQueen(ctx) {
 }
 
 // Item-scoped PUT/DROP on the emerald: only the present-day GARDEN accepts it.
-function placeEmeraldInGarden(ctx) {
+function placeEmeraldInGarden(ctx, cmd) {
+  if (ctx.find(cmd.dobj, ctx.inventory())?.id !== "emeraldOfTheQueen") return null;
   if (!ctx.getFlag("partII")) return null;
+  if (!ctx.has("emeraldOfTheQueen") || ctx.getFlag("hour13Done"))
+    return "You are not carrying the QUEEN'S EMERALD.";
   if (ctx.state.room !== "garden") {
     return "Not here. The QUEEN'S EMERALD belongs out in the GARDEN, in the bush beneath the leaning STATUE — the " +
       "very stone the queen became. Make your way there, then PUT it.";
@@ -704,7 +713,8 @@ function placeEmeraldInGarden(ctx) {
     "carry it inside. The circle draws that much tighter.\n\n" +
     "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XIII to XII.\n\n" +
     MAP_MARK + " HOUR XIII CLOSED — the emerald is home. Twelve hours remain. " + MAP_MARK + "\n\n" +
-    "(End of the current build slice: Hours XII..I and the closing of the loop are still to come.)";
+    "(End of the current build slice: Hours XII..I and the closing of the loop are still to come.)" +
+    ctx.awardUse(ctx.item("emeraldOfTheQueen"));
 }
 
 // ---- Super-user / debug console ---------------------------------------------
@@ -779,6 +789,8 @@ function suResolveItem(ctx, phrase) {
   return partial;
 }
 
+export const PORTABLE_REWARDS = Object.freeze({ pickup: 5, use: 5 });
+
 const PROGRESS_AWARDS = Object.freeze({
   statueKeyRevealed: 5,
   frontDoorOpened: 5,
@@ -830,12 +842,28 @@ function maximumScore(ctx) {
     .filter((item) => item.treasure)
     .reduce((total, item) => total + (item.points || 0), 0);
   const pickupPoints = Object.values(ctx.world.items)
-    .reduce((total, item) => total + (item.progressPoints || 0), 0);
+    .filter((item) => item.takeable && item.phase !== 2)
+    .reduce((total, item) => total + (item.progressPoints ?? ctx.world.config.portableRewards.pickup), 0);
+  const usePoints = Object.values(ctx.world.items)
+    .filter((item) => item.takeable && item.phase !== 2).length
+    * ctx.world.config.portableRewards.use;
   const progressionPoints = Object.values(PROGRESS_AWARDS)
     .reduce((total, points) => total + points, 0);
   const standalonePoints = Object.values(STANDALONE_MAX_AWARDS)
     .reduce((total, points) => total + points, 0);
-  return itemPoints + pickupPoints + progressionPoints + standalonePoints;
+  return itemPoints + pickupPoints + usePoints + progressionPoints + standalonePoints;
+}
+
+const HARMLESS_PORTABLE_USES = new Set([
+  "mysteryPackage", "goldDoubloon", "burritoWrapper", "familyCrest", "familyRing",
+  "goldLocket", "ancientCoin", "crystalDecanter", "ancestralPortrait",
+  "blackwoodHammer", "rubyRing", "candelabra",
+]);
+
+function harmlessPortableUse(ctx, item) {
+  if (!HARMLESS_PORTABLE_USES.has(item.id)) return null;
+  return `You handle the ${item.names[0]} carefully, then put it away unchanged.` +
+    ctx.awardUse(item);
 }
 
 function superUser(ctx, argString) {
@@ -1646,26 +1674,30 @@ function descendWell(ctx) {
       "and float back into the garden without touching the walls."
     : "Bracing against the rope, you descend into the well. At the muddy bottom your " +
       "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.") +
-    awardSuffix(points);
+    awardSuffix(points) + (!floating ? ctx.awardUse(ctx.item("rope")) : "");
 }
 
 // ---------------------- Andy's "light self on fire" gag ----------------------
-function readLetter(ctx) {
+function readLetter(ctx, cmd) {
+  if (ctx.find(cmd.dobj)?.id !== "letter") return null;
+  if (!ctx.isLit()) return "It's too dark to read.";
   const letter = ctx.item("letter");
   const points = awardProgress(ctx, "letterRead");
-  return (letter?.text || "It's blank.") + awardSuffix(points);
+  return (letter?.text || "It's blank.") + awardSuffix(points) + ctx.awardUse(letter);
 }
 
 // Burning the letter (Zork's leaflet, but arson).
-function burnLetter(ctx) {
+function burnLetter(ctx, cmd) {
+  if (ctx.find(cmd.dobj)?.id !== "letter") return null;
   const l = ctx.item("letter");
   if (!l || l.loc == null) return "There's no letter to burn — you've already reduced it to ash.";
+  const use = ctx.awardUse(l);
   ctx.destroy("letter");
   ctx.setFlag("letterBurned", true);
   return (
     "You don't remember striking a match, but the water-stained letter is suddenly alight. It curls " +
     "into black flakes and crumbles away — warning, curse, crypt and all.\n\n" +
-    "Somewhere, the house seems to take note. That felt unwise. It felt GREAT, but unwise."
+    "Somewhere, the house seems to take note. That felt unwise. It felt GREAT, but unwise." + use
   );
 }
 
@@ -1720,11 +1752,14 @@ function requestedSelfFireSource(cmd) {
 function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
   if (ctx.getFlag("onFire")) return "You're already on fire. Once is plenty — pace yourself.";
   ctx.setFlag("selfFirePrompt", false);
+  let use = "";
   if (source === "match") {
     const match = carriedMatch(ctx);
     if (!match) return "You pat every pocket twice. No match. No spark. No glorious personal inferno.";
+    use = ctx.awardUse(match);
     ctx.destroy(match.id);
   }
+  if (source === "fart" || source === "coldFart") use = ctx.awardUse(ctx.item("burritoWrapper"));
   ctx.setFlag("onFire", true);
   ctx.setFlag("burnTurns", 0);
   ctx.setFlag("burnGrace", grantTickGrace);
@@ -1741,7 +1776,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
       "your grip. You bear down, summon a deliberate, sulfurous residual fart on command, and snap the crumpled tin " +
       "foil into the blue-orange jet. Your clothes catch; the rest of you follows.\n\n" +
       "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, so " +
-      "this appalling party trick works anywhere in the house, for as long as you carry it." + repeatWarning
+      "this appalling party trick works anywhere in the house, for as long as you carry it." + repeatWarning + use
     );
   }
   if (source === "fart") {
@@ -1751,7 +1786,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
         "catch a spray of impossible sparks, and redirect them straight into your clothes. There is a flash, " +
         "a deeply regrettable smell, and then your whole body catches.\n\n" +
         "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
-        "ready for another appalling ignition while the burrito keeps cycling." + repeatWarning
+        "ready for another appalling ignition while the burrito keeps cycling." + repeatWarning + use
       );
     }
     return (
@@ -1759,7 +1794,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
       "deranged signal mirror, and catch the blue-orange jet. The foil flashes; your clothes catch; the rest of " +
       "you follows.\n\n" +
       "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. The wrapper survives, " +
-      "which means this appalling technique remains reusable while the burrito keeps firing." + repeatWarning
+      "which means this appalling technique remains reusable while the burrito keeps firing." + repeatWarning + use
     );
   }
   return (
@@ -1767,7 +1802,7 @@ function igniteSelf(ctx, source, grantTickGrace = true, digestivePhase = null) {
     "AHAHAHAHA — YOU'RE ON FIRE! This is fine. This is, if anything, cozy. The portraits on the walls " +
     "lean in with something like respect.\n\n" +
     "You are now comprehensively ablaze — and it WILL consume you in a handful of turns. Put yourself out, " +
-    "dump the fire into something, or make it COUNT. (Gary lives for this.)" + repeatWarning
+    "dump the fire into something, or make it COUNT. (Gary lives for this.)" + repeatWarning + use
   );
 }
 
@@ -2105,6 +2140,7 @@ const DIARRHEA_ART = [
 const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
 function eatMushrooms(ctx, cmd) {
   const mushrooms = ctx.find(cmd.dobj);
+  const use = ctx.awardUse(mushrooms);
   if (mushrooms) ctx.destroy(mushrooms.id);
   ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 12));
   ctx.setFlag("highGrace", true);
@@ -2120,7 +2156,7 @@ function eatMushrooms(ctx, cmd) {
     "Something else opens too: between your brows, an astral eye blinks awake. The dark of the house turns " +
     "to legible grey, and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, behind it " +
     "something that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark, and hidden " +
-    "detail keeps revealing itself while the trip lasts.)" + awardSuffix(points);
+    "detail keeps revealing itself while the trip lasts.)" + awardSuffix(points) + use;
 }
 
 function capabilityStatus(ctx, equipmentFlag) {
@@ -2187,6 +2223,7 @@ function floatToRoom(ctx, roomId) {
     awardSuffix(betweenWallsPoints);
 }
 function eatBurrito(ctx) {
+  const use = ctx.awardUse(ctx.item("burrito"));
   ctx.destroy("burrito");
   ctx.moveItem("burritoWrapper", "inventory");
   ctx.setFlag("sick", SICK_DURATION);
@@ -2200,7 +2237,7 @@ function eatBurrito(ctx) {
   return "You eat Gary's Mega Ass Blow Taqueria Death Wish Spicy Burrito.\n\nFor one calm moment, nothing happens. " +
     "Then your abdomen makes a noise like a boiler falling down stairs. You retain the crumpled wrapper and its tin " +
     "foil, mostly because your hands have forgotten how to let go. (Find the TOILET or drink the MILK before " +
-    "this completes ten full digestive laps.)";
+    "this completes ten full digestive laps.)" + use;
 }
 
 function surviveBurrito(ctx, wasSick) {
@@ -2215,6 +2252,7 @@ function surviveBurrito(ctx, wasSick) {
 }
 
 function drinkMilk(ctx) {
+  const use = ctx.awardUse(ctx.item("milk"));
   ctx.destroy("milk");
   const wasSick = (ctx.getFlag("sick") || 0) > 0;
   const wasAfflicted = wasSick || (ctx.getFlag("high") || 0) > 0;
@@ -2226,7 +2264,7 @@ function drinkMilk(ctx) {
   return "You drink the milk. Cold, fresh, and impossibly wholesome.\n\n" +
     (wasAfflicted ? "Your stomach settles and your head clears — whatever was wrong with you passes. " : "") +
     "You feel steadier, sharper, and genuinely fortified for whatever this house has left to throw. (+5)" +
-    surviveBurrito(ctx, wasSick);
+    surviveBurrito(ctx, wasSick) + use;
 }
 
 // --- The obsidian eye: the mushroom trip's astral sight, made permanent -----
@@ -2236,6 +2274,8 @@ function drinkMilk(ctx) {
 // too, so the trip no longer needs to be running for it to work.
 function takeObsidianEye(ctx) {
   if (ctx.has("obsidianEye")) return "You already carry the OBSIDIAN EYE.";
+  if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
+    return "Your hands are full. You'll have to drop something before taking the OBSIDIAN EYE.";
   const firstClaim = !ctx.getFlag("obsidianEyeClaimed");
   ctx.moveItem("obsidianEye", "inventory");
   if (!firstClaim) return "You retrieve the OBSIDIAN EYE. It clings coldly to your palm, waiting to be worn.";
@@ -2246,7 +2286,9 @@ function takeObsidianEye(ctx) {
 }
 
 // --- The ceremonial brazier: sustained candle flame or one burning person ----
-function lightBrazier(ctx) {
+function lightBrazier(ctx, cmd) {
+  if (cmd && ["light", "burn"].includes(cmd.verb) && ctx.find(cmd.dobj)?.id !== "brazier")
+    return null;
   if (ctx.getFlag("brazierLit")) return "The brazier already blazes, throwing gold-and-green light across the garden.";
   const candle = ctx.item("candlestick");
   const hasLitCandle = candle?.loc === "inventory" && candle.lit && candle.fuel > 0;
@@ -2265,13 +2307,15 @@ function lightBrazier(ctx) {
     ctx.setFlag("brazierMethod", "candelabra");
     return "You touch one of the CANDELABRA'S steady blue-white flames to the grave-damp moss. Fire races around " +
       "the bowl in a single bright circle, and the BRAZIER roars up in gold and green.\n\n" +
-      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})`;
+      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})` +
+      ctx.awardUse(candelabra);
   }
   if (hasLitCandle && !usedBodyFire) {
     ctx.setFlag("brazierMethod", "candle");
     return "You press the LIT CANDLE to one sodden knot of moss after another, patiently building heat " +
       "until the scattered flames join. The BRAZIER roars up in gold-and-green fire.\n\n" +
-      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})`;
+      `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})` +
+      ctx.awardUse(candle);
   }
   ctx.setFlag("brazierMethod", "body");
   ctx.setFlag("onFire", false); ctx.setFlag("burnTurns", 0);
@@ -2380,6 +2424,7 @@ function putOakGem(ctx, cmd) {
   ctx.moveItem(gem.id, "oakMechanism");
   const next = { ...slots, [slot]: gem.id };
   ctx.setFlag("oakGemSlots", next);
+  const use = OAK_GEMS[gem.id].slot === slot ? ctx.awardUse(gem) : "";
   const placement = `You place the ${OAK_GEMS[gem.id].label} into the ${slot.toUpperCase()} SLOT.`;
   const solved = OAK_SLOT_ORDER.every((candidate) =>
     next[candidate] && OAK_GEMS[next[candidate]].slot === candidate);
@@ -2389,9 +2434,9 @@ function putOakGem(ctx, cmd) {
       ctx.setFlag("oakGemSlots",
         Object.fromEntries(OAK_SLOT_ORDER.map((candidate) => [candidate, null])));
       return `${placement} The three beams collide in a muddy flare. The PANEL bucks against the trunk and ` +
-        "spits every gem onto the ground.";
+        "spits every gem onto the ground." + use;
     }
-    return `${placement} Sunlight passes through the gem, but the separate beams fail to converge.`;
+    return `${placement} Sunlight passes through the gem, but the separate beams fail to converge.` + use;
   }
   ctx.setFlag("oakLightAligned");
   ctx.setFlag("oakLiftGrace");
@@ -2399,7 +2444,7 @@ function putOakGem(ctx, cmd) {
   const points = awardProgress(ctx, "oakPanelAligned");
   return `${placement}\n\nSunlight passes through all three gems and the mirrored beams converge into a ` +
     "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots." +
-    awardSuffix(points);
+    awardSuffix(points) + use;
 }
 
 function enterOakPlatform(ctx) {
@@ -2410,14 +2455,16 @@ function enterOakPlatform(ctx) {
   return "You step onto the PLATFORM. The ropes draw taut; it will move on the next turn.";
 }
 
-function inspectSpyglass(ctx) {
+function inspectSpyglass(ctx, cmd) {
+  if (cmd?.dobj && ctx.find(cmd.dobj)?.id !== "spyglass") return null;
   const mounted = ctx.roomOf("spyglass") === "treeFort";
   return (mounted
     ? "You press your eye to the SPYGLASS. Its rusted cradle will not turn, but it is already aimed with " +
       "unnerving precision. "
     : "You brace the SPYGLASS against the railing and look through it. ") +
     "The distant BELFRY leaps close: black louvers, a weathered bell, and a narrow maintenance hatch tucked " +
-    "inside the roofline. There is plainly more above the ATTIC than rafters. If only you could get onto the ROOF.";
+    "inside the roofline. There is plainly more above the ATTIC than rafters. If only you could get onto the ROOF." +
+    ctx.awardUse(ctx.item("spyglass"));
 }
 
 function takeSpyglass(ctx) {
@@ -3181,6 +3228,7 @@ function sayNearDragon(ctx, cmd) {
 function giveDragon(ctx, cmd) {
   const offered = ctx.find(cmd.dobj, ctx.inventory());
   if (!offered || offered.id !== "apple") return "DREADMAW does not stir. Perhaps offer her something worth waking for.";
+  const use = ctx.awardUse(offered);
   ctx.destroy("apple");
   ctx.setFlag("dragonAwake");
   ctx.setFlag("dragonMoved");
@@ -3190,7 +3238,7 @@ function giveDragon(ctx, cmd) {
   return "You offer the APPLE. One immense golden eye opens. DREADMAW THE DRAGON eats it with exquisite care, " +
     "then rises and coils beside the cave instead of across it.\n\n" +
     "\"At last, a visitor with manners,\" she says. \"Take this GOLD DOUBLOON. You may enter. " +
-    "The troll inside decides who reaches the hoard.\" (+10)";
+    "The troll inside decides who reaches the hoard.\" (+10)" + use;
 }
 function talkToTroll(ctx) {
   if (ctx.getFlag("dragonVaultOpen")) {
@@ -3558,6 +3606,7 @@ const logicWorld = {
   config: {
     start: "gate",
     maxCarry: 6,
+    portableRewards: PORTABLE_REWARDS,
     title: "Blackwood Manor",
     playerNamePrompt:
       'What should we call you?\n\nType your name, SAY "Jeb", or CALL ME "Foo".',
@@ -3607,6 +3656,8 @@ const logicWorld = {
   flavorPools: CYCLING_FLAVOR_POOLS,
   itemShortNames: ITEM_SHORT_NAMES,
   roomShortNames: ROOM_SHORT_NAMES,
+  maximumScore,
+  harmlessPortableUse,
   nextFlavor: cycleFlavor,
   deriveCommand,     // content-specific missing steps the parser may safely infer
   implicitNavigation: IMPLICIT_NAVIGATION,
@@ -3734,6 +3785,10 @@ const logicWorld = {
         && state.items.belfryBats?.loc === "belfry"
         && !state.flags.belfryBatsScattered) {
       state.items.xrayGoggles.loc = "belfryBats";
+    }
+    if (state.flags.oakLightAligned && state.items.spyglass?.loc === "treeFort"
+        && !["greatOak", "treeFort"].includes(state.items.oakPlatform?.loc)) {
+      state.items.oakPlatform.loc = "greatOak";
     }
 
     if (!savedItems?.blackwoodHammer) {
@@ -4135,6 +4190,7 @@ const logicWorld = {
           }
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
+          const use = it.treasure ? ctx.awardUse(it) : "";
           if (it.treasure) {
             const scoreFlag = it.depositScoreFlag || `heirloomScore:${it.id}`;
             if (!ctx.getFlag(scoreFlag)) {
@@ -4142,7 +4198,7 @@ const logicWorld = {
               ctx.setFlag(scoreFlag);
             }
           }
-          let msg = `You place the ${it.names[0]} in its fitted recess in the RELIQUARY.`;
+          let msg = `You place the ${it.names[0]} in its fitted recess in the RELIQUARY.` + use;
           if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
@@ -4620,7 +4676,7 @@ const logicWorld = {
     spyglass: {
       names: ["spyglass", "telescope"], adjectives: ["brass", "blackwood", "bm"],
       loc: "treeFort", takeable: true, treasure: true, points: 8,
-      on: { examine: inspectSpyglass, search: inspectSpyglass, take: takeSpyglass },
+      on: { examine: inspectSpyglass, search: inspectSpyglass, use: inspectSpyglass, take: takeSpyglass },
     },
 
     // --- kitchen edibles: high / sick / help ---
@@ -4805,9 +4861,10 @@ const logicWorld = {
           const match = carriedMatch(ctx);
           if (!match) return "You have nothing to light it with.";
           c.lit = true;
+          const use = ctx.awardUse(c) + ctx.awardUse(match);
           ctx.destroy(match.id);
           return "You strike the manor's single match and touch it to the wick. The CANDLE flares to life, throwing " +
-            "long shadows — and the spent match crumbles to ash. (You have no more matches.)";
+            "long shadows — and the spent match crumbles to ash. (You have no more matches.)" + use;
         },
       },
     },
@@ -4909,14 +4966,16 @@ const logicWorld = {
       names: ["diary", "journal"], adjectives: ["leather", "leather-bound"], loc: "study", takeable: true,
       readable: true,
       on: {
-        read(ctx) {
+        read(ctx, cmd) {
+          if (ctx.find(cmd.dobj)?.id !== "diary") return null;
+          if (!ctx.isLit()) return "It's too dark to read.";
           const points = awardProgress(ctx, "diaryDecoded");
           ctx.setFlag("knowsCombo");
           return "The last entry reads:\n" +
             "  \"I have hidden the TALISMAN in the wall-safe behind my own PROFILE PAINTING in the PARLOR.\n" +
             "   The combination, lest I forget in my terror: 7 left, 3 right, 9 left. If the wraith\n" +
             "   takes me, whoever comes after must WEAR the TALISMAN before they dare the CRYPT.\"" +
-            awardSuffix(points);
+            awardSuffix(points) + ctx.awardUse(ctx.item("diary"));
         },
       },
     },
@@ -4933,13 +4992,14 @@ const logicWorld = {
       names: ["music box", "musicbox", "box"], adjectives: ["jeweled", "jewelled", "music"], loc: "nursery",
       takeable: true, treasure: true, points: 15, container: true, openable: true, open: false, capacity: 1,
       on: {
-        open(ctx) {
+        open(ctx, cmd) {
+          if (ctx.find(cmd.dobj)?.id !== "musicBox") return null;
           const box = ctx.item("musicBox");
           if (box.open) return "The music box is already open.";
           box.open = true;
           const points = awardProgress(ctx, "musicBoxOpened");
           return "You release the tiny spring catch and open the MUSIC BOX, revealing a TINY KEY." +
-            awardSuffix(points);
+            awardSuffix(points) + ctx.awardUse(box);
         },
       },
     },
@@ -5031,8 +5091,10 @@ const logicWorld = {
       adjectives: ["grand", "thirteen-hour", "backward", "ghostly"],
       loc: "__void", takeable: true,
       on: {
-        examine: (ctx) => clockTalismanText(ctx),
-        read: (ctx) => clockTalismanText(ctx),
+        examine: (ctx, cmd) =>
+          ctx.find(cmd.dobj)?.id === "clockTalisman" ? clockTalismanText(ctx) : null,
+        read: (ctx, cmd) =>
+          ctx.find(cmd.dobj)?.id === "clockTalisman" ? clockTalismanText(ctx) : null,
         use: (ctx) => useClockTalisman(ctx),
         enter: (ctx) => useClockTalisman(ctx),
         take: (ctx) => takeCountdownClock(ctx),
@@ -5042,11 +5104,11 @@ const logicWorld = {
     emeraldOfTheQueen: {
       names: ["emerald", "queen's emerald", "queens emerald", "gem"],
       adjectives: ["great", "vast", "green", "queen's"],
-      loc: "__void", takeable: true,
+      loc: "__void", takeable: true, phase: 2,
       on: {
         examine: () => "A great green emerald the size of a plum, still warm from the throat it was torn from an age ago.",
-        put: (ctx) => placeEmeraldInGarden(ctx),
-        drop: (ctx) => placeEmeraldInGarden(ctx),
+        put: (ctx, cmd) => placeEmeraldInGarden(ctx, cmd),
+        drop: (ctx, cmd) => placeEmeraldInGarden(ctx, cmd),
       },
     },
     // Scenery for the hour-XIII scene.

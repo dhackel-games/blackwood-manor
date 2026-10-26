@@ -45,9 +45,10 @@
 > *continues* into Part II — you wake a ghost holding the 13-hour clock, dive into the
 > Thirteenth Hour, **find** the living queen at the statue, learn the mirror **pool**, and
 > `yell` to petrify her (yelling without the pool trick now **kills** you) — then return the
-> emerald to the garden to tick the clock XIII→XII. `::winmax2bell` performs
-> every deterministic reward and stops before the lower bell rope; pull it,
-> take the clock, and go down. Covered by `web/tests/features/part-two.feature`.
+> emerald to the garden to tick the clock XIII→XII. `::win` earns the Part-I
+> portable and puzzle rewards, rings the lower bell, and takes the clock; it
+> stops in the ROYAL HALL so the player can choose SOUTH or go DOWN to Gary.
+> Covered by `web/tests/features/part-two.feature`.
 > The isolated `web/examples/bm2/`
 > prototype referenced below is a **superseded scratch draft** (kept out of the repo); the
 > inline `world.js` implementation is the source of truth. Hours XII–I and the ouroboros close

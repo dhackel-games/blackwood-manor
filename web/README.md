@@ -103,21 +103,26 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
-  one compact slot. Meaningful puzzle breakthroughs and intermediate keys award
-  one-time progress points, including +5 for reading the mailbox letter;
-  `::winmaxbell` performs every deterministic scoring challenge, deposits all
-  thirteen heirlooms with `PUT ALL IN RQ`, closes the reliquary, and pulls
-  the closet rope before stopping. `::winmaxfrontd` continues through the
-  clean front-door ending; `::winmaxgary` instead takes the clock and descends
-  to Gary. `::powerup` equips reusable powers, while `::winquick1` completes the
-  shorter required-heirloom route and stops after the bell but before walking
-  out. The replacement set keeps the 195-point heirloom total and the maintained
-  maximum checkpoints: 460 before the bell, 465 at `::winmaxbell` and on the Gary
-  route, and 510 through the front-door ending. The maximum routes intentionally leave the
-  random MYSTERY PACKAGE unopened. In the corrected chain, scattering the bats
-  remains +5, first taking the goggles remains +5, the hammer and family-ring
-  deposits remain +12 and +20, and candelabra restoration/deposit award +20/+10.
-  The BM WATCH, mirror shard, and loose candle award no points by themselves.
+  one compact slot. Each of the 39 obtainable Part-I portable items earns +5
+  once on acquisition and +5 once on successful use, including benign objects
+  (which can be handled harmlessly), generated items, equipment, and the
+  COUNTDOWN CLOCK. Existing +5 key/gear pickup awards are the same pickup
+  credit, never an extra one. Failed or inaccessible actions do not award use
+  points, and saved flags prevent drop/re-take, repeat-use, and mushroom-regrowth
+  farming. The queen's emerald is obtainable only in Part II and is excluded
+  from the Part-I maximum. Puzzle breakthroughs and all thirteen heirloom
+  deposits keep their existing separate rewards, including +195 total for
+  deposits, +20 for restoring the candelabra, and +5 for reading the letter.
+  `::win` walks the manor after one opening flight to the mining shaft for the
+  backpack: cave/troll, front door and kitchen, apple for Dreadmaw, rope and
+  self-fire at the garden well/brazier, the oak's physical pulley platform,
+  library/bedrooms/nursery, attic/roof/belfry, cellar/crypt, then the reliquary.
+  It rings the closet bell, **takes and reads the clock**, and stops alive in
+  the ROYAL HALL with both SOUTH (front door) and DOWN (Gary) still available.
+  The derived deterministic Part-I maximum is 825 there; SOUTH adds the
+  existing 45 end-badge points for 870, while DOWN enters Part II at 825.
+  The route reads but never opens the random MYSTERY PACKAGE. `::powerup`
+  remains available for reusable equipment.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,

@@ -111,7 +111,7 @@ Feature: Heirloom correction save migration
     Given the player is in room "grandHall"
     When I send "put family ring in reliquary"
     Then item "familyRing" is in "reliquary"
-    And the game score is 20
+    And the game score is 30
 
   Scenario: Historical family ring ownership and deposit credit are preserved
     Given a historical save with the family ring worn is restored
@@ -142,5 +142,13 @@ Feature: Heirloom correction save migration
     Given a pre-roost save with undiscovered goggles is restored
     Then item "xrayGoggles" is in "belfryBats"
     And flag "belfryBatsScattered" is unset
+
+  Scenario: An already-aligned oak save restores its physical platform without changing score
+    Given a solved-oak save without the platform is restored
+    Then item "oakPlatform" is in "greatOak"
+    And the game score is 5
+    When I round-trip the game snapshot
+    Then item "oakPlatform" is in "greatOak"
+    And the game score is 5
 
 # end heirloom-migration.feature

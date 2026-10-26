@@ -73,12 +73,12 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "take hammer"
     Then the output contains "Taken"
     And item "blackwoodHammer" is in "inventory"
-    And the game score is 0
+    And the game score is 5
     When I send "out"
     Then the current room is "grandHall"
     When I send "put bm hammer in reliquary"
     Then the output contains line "HEIRLOOMS: 1/13 +0"
-    And the game score is 12
+    And the game score is 22
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
     Given the mystery package teleport selects room "crypt"
@@ -104,11 +104,11 @@ Feature: Copilot's mystery package and lightning jumps
     And I send "fly between"
     Then the current room is "betweenWalls"
     And the output contains "(+20)"
-    And the game score is 20
+    And the game score is 25
     Given the player is in room "nursery"
     When I send "pull wallpaper"
     And I send "in"
-    Then the game score is 25
+    Then the game score is 30
 
   Scenario: The wallpaper gap stays shut until it has been peeled
     Given the player is in room "nursery"

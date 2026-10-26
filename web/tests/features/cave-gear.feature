@@ -225,7 +225,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "put talisman in reliquary"
     Then item "talisman" is in "reliquary"
     And the output contains line "HEIRLOOMS: 1/13 +0"
-    And the game score is 15
+    And the game score is 20
 
   Scenario: USE wears wearable equipment
     Given item "talisman" is carried
@@ -287,14 +287,14 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "backpack" is worn in slot "back"
     And the output contains "Still worn"
     And the output contains line "HEIRLOOMS: 1/13 +1"
-    And the game score is 15
+    And the game score is 25
     When I send "close rq"
     And I send "<withdraw>"
     Then the output contains "(open GLASS RELIQUARY; take ALL from GLASS RELIQUARY)"
     And item "familyCrest" is carried
     And item "rope" is carried
     And the output contains line "HEIRLOOMS: 0/13 +0"
-    And the game score is 15
+    And the game score is 35
 
     Examples:
       | deposit         | withdraw         |
@@ -313,9 +313,9 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And I send "put spyglass in reliquary"
     And I send "take spyglass from reliquary"
     Then item "spyglass" is carried
-    And the game score is 38
+    And the game score is 58
     When I send "put spyglass in reliquary"
-    Then the game score is 38
+    Then the game score is 58
     When I send "take all"
     Then item "spyglass" is carried
     Then item "talisman" is carried
@@ -324,7 +324,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "talisman" is worn in slot "neck"
     When I send "read grimoire"
     Then item "grimoire" is carried
-    And the game score is 38
+    And the game score is 73
 
   Scenario: Winged shoes float up through the shut attic trap-door
     Given item "wingedShoes" is carried

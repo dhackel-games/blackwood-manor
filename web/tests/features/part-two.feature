@@ -101,10 +101,7 @@ Feature: Part II — the Thirteenth Hour
     And the output contains "greying to STONE"
 
   Scenario: Returning the emerald to the garden closes Hour XIII (full seam from the brink)
-    When I execute sysop command "::winmaxbell"
-    And I send "examine reliquary"
-    And I send "open reliquary"
-    And I send "take clock"
+    When I execute sysop command "::win"
     And I send "go down"
     And I send "examine clock"
     And I send "use clock"
@@ -121,5 +118,8 @@ Feature: Part II — the Thirteenth Hour
     And flag "hour13Done" is true
     And flag "clockHour" equals 12
     And the output contains "HOUR XIII CLOSED"
+    When I send "put emerald in bush"
+    Then flag "hour13Done" is true
+    And the game score is 860
 
 # end part-two.feature
