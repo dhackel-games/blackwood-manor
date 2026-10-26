@@ -239,6 +239,17 @@ export function pathToRoom(game, target) {
 }
 
 export function expandSysopCommand(shortcut, game) {
+  if (shortcut.cmd === "::win" && game.getFlag("bellRung")) {
+    if (game.roomOf("clockTalisman") === "reliquary") {
+      return join([
+        ...pathToRoom(game, "grandHall"),
+        ...(game.item("reliquary").open ? [] : ["open rq"]),
+        "take gclock", "read gclock",
+      ]);
+    }
+    return join([game.has("clockTalisman") ? "read gclock" : "inventory"]);
+  }
+
   const flightMushroomRoute = (() => {
     if (game.world.canFly?.(game)) return [];
     const freshLocation = game.roomOf("outhouseMushrooms");

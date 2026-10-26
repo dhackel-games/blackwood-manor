@@ -188,6 +188,7 @@ Feature: One-time rewards for meaningful progress
 
   Scenario: Implicit pickup, safe use, dropping and restoring cannot farm the mystery package
     Given the player is in room "grandHall"
+    And the random number generator always returns 0.90
     When I send "use package"
     Then flag "useItem:mysteryPackage" is unset
     And the game score is 0
@@ -203,6 +204,96 @@ Feature: One-time rewards for meaningful progress
     Then item "mysteryPackage" is carried
     And the game is alive
     And the game score is 10
+    When I send "open package"
+    Then item "mysteryPackage" is destroyed
+    And flag "useItem:mysteryPackage" is set
+    And the game score is 10
+
+  Scenario: Opening an unread carried package earns its use reward before it disappears
+    Given the player is in room "grandHall"
+    And the random number generator always returns 0.90
+    When I send "take package"
+    Then flag "useItem:mysteryPackage" is unset
+    And the game score is 5
+    When I send "open package"
+    Then the output contains "walls are breathing again"
+    And the output contains "(+5)"
+    And item "mysteryPackage" is destroyed
+    And flag "progressItem:mysteryPackage" is set
+    And flag "useItem:mysteryPackage" is set
+    And the game score is 10
+    When I send "read package"
+    And I round-trip the game snapshot
+    And I send "open package"
+    Then the game is alive
+    And flag "useItem:mysteryPackage" is set
+    And the game score is 10
+
+  Scenario: A legacy carried portable gains its missing pickup credit without double-crediting keys or gear
+    Given a legacy save with a carried coin and credited key and pack is restored
+    Then flag "portableRewardLedgerVersion" equals 1
+    And flag "progressItem:ancientCoin" is set
+    And flag "progressItem:frontKey" is set
+    And flag "progressItem:backpack" is set
+    And the game score is 25
+    When I send "drop coin"
+    And I send "take coin"
+    And I round-trip the game snapshot
+    And I round-trip the game snapshot
+    Then the game score is 25
+    And flag "progressItem:ancientCoin" is set
+
+  Scenario: Consumed legacy food and automatically generated gifts retain acquisition credits
+    Given a legacy save with consumed food and generated items is restored
+    Then flag "progressItem:mushrooms" is set
+    And flag "progressItem:outhouseMushrooms" is set
+    And flag "progressItem:burrito" is set
+    And flag "progressItem:burritoWrapper" is set
+    And flag "progressItem:milk" is set
+    And flag "progressItem:apple" is set
+    And flag "progressItem:goldDoubloon" is set
+    And flag "progressItem:matches" is set
+    And flag "progressItem:candlestick" is set
+    And flag "progressItem:clockTalisman" is unset
+    And the game score is 70
+    When I round-trip the game snapshot
+    Then the game score is 70
+
+  Scenario: Installed legacy candle and shard earn pickup credit without claiming untouched candelabra
+    Given a legacy save with the candle and shard installed is restored
+    Then flag "progressItem:candlestick" is set
+    And flag "progressItem:mirrorShard" is set
+    And flag "progressItem:candelabra" is unset
+    And the game score is 30
+    When I round-trip the game snapshot
+    Then the game score is 30
+
+  Scenario: A spent legacy front key retains exactly one pickup reward
+    Given a legacy save with the iron key consumed on unlocking is restored
+    Then flag "progressItem:frontKey" is set
+    And the game score is 10
+    When I round-trip the game snapshot
+    Then the game score is 10
+
+  Scenario: Unproven legacy null and spawn locations never create pickup rewards
+    Given a legacy save with only unproven portable history is restored
+    Then flag "progressItem:mysteryPackage" is unset
+    And flag "progressItem:letter" is unset
+    And flag "progressItem:outhouseMushrooms" is unset
+    And flag "progressItem:frontKey" is unset
+    And flag "progressItem:clockTalisman" is unset
+    And the game score is 0
+
+  Scenario: New-rule saves preserve an unearned fixture pickup through restoration
+    Given item "ancientCoin" is carried
+    When I round-trip the game snapshot
+    Then flag "portableRewardLedgerVersion" equals 1
+    And flag "progressItem:ancientCoin" is unset
+    And the game score is 0
+    When I send "drop coin"
+    And I send "take coin"
+    Then flag "progressItem:ancientCoin" is set
+    And the game score is 5
 
   Scenario: Ordinary and custom bulk pickup reward each acquired item exactly once
     Given the player is in room "dreadmawVault"

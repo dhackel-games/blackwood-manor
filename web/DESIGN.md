@@ -271,9 +271,17 @@ Every obtainable Part-I portable object earns +5 once on acquisition and +5
 once on meaningful use. This includes safe handling of benign keepsakes,
 implicit/custom/bulk pickups, and generated wrapper, doubloon, and clock.
 The six existing +5 key/gear pickup rewards count as that same acquisition
-award, not twice. The Queen's Emerald belongs only to Part II. Pickups and
-uses persist as independent per-item flags; failing a command, dropping and
+award, not twice. The Queen's Emerald is takeable in Part II: catching it
+earns +5 pickup, placing it in the garden earns +5 use and the separate +25
+hour-completion award. Only the Part-I maximum excludes it. Pickups and uses
+persist as independent per-item flags; failing a command, dropping and
 re-taking, regrowing mushrooms, or restoring a save cannot farm either award.
+New games mark portable reward ledger version 1. On first restore of an older
+save, missing pickup credits are added only where saved inventory, a deposited
+heirloom, a known carried-only consumable's disappearance, a generation flag,
+or a changed location proves prior acquisition. Already-credited key/gear
+flags are preserved; an originally hidden item at null or a revealed item
+still at its spawn location does not establish pickup.
 The pre-ending Part-I maximum derives from +195 heirloom deposits, +195
 portable pickups, +195 portable uses, +180 puzzle/progression awards, and
 +60 standalone rewards: **825**.
@@ -287,7 +295,11 @@ thirteen heirlooms, closes the RELIQUARY, rings the closet bell, **takes and
 reads the COUNTDOWN CLOCK**, and stops alive in the ROYAL HALL before SOUTH
 or DOWN. SOUTH adds the existing +45 end badges for **870**; DOWN meets Gary
 and enters Part II at **825**. The MYSTERY PACKAGE is carried and read safely
-but never opened; its random consequences are not part of a maximum route.
+but never opened; opening it voluntarily instead earns its one-time use credit
+before the box disappears, alongside a random consequence. After the bell,
+re-expanding `::win` opens the RELIQUARY only if necessary, takes and reads
+the clock if it remains inside, or safely rereads the clock already in hand.
+It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
 For reference, the deterministic fresh `::win` expansion has 165 commands,

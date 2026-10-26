@@ -232,6 +232,13 @@ function historicalFamilyRingSnapshot(game) {
   return snapshot;
 }
 
+function restorePrePortableRewards(context, configure) {
+  const snapshot = context.game.snapshot();
+  delete snapshot.state.flags.portableRewardLedgerVersion;
+  configure(snapshot.state);
+  context.game.restore(snapshot);
+}
+
 function markCandelabraRestored(snapshot, location) {
   snapshot.state.items.candlestick.loc = null;
   snapshot.state.items.mirrorShard.loc = null;
@@ -442,6 +449,93 @@ Given("a legacy accidental-fire save is restored", function () {
   this.game.restore(snapshot);
 });
 
+Given("a legacy save with a carried coin and credited key and pack is restored", function () {
+  restorePrePortableRewards(this, (state) => {
+    state.room = "garden";
+    state.items.ancientCoin.loc = "inventory";
+    state.flags.wellLooted = true;
+    state.flags["progressAward:wellLooted"] = true;
+    state.items.frontKey.loc = "inventory";
+    state.flags.statueMoved = true;
+    state.flags["progressAward:statueKeyRevealed"] = true;
+    state.flags["progressItem:frontKey"] = true;
+    state.items.backpack.loc = "inventory";
+    state.flags["progressItem:backpack"] = true;
+    state.score = 20;
+  });
+});
+
+Given("a legacy save with consumed food and generated items is restored", function () {
+  restorePrePortableRewards(this, (state) => {
+    state.room = "kitchen";
+    state.items.mushrooms.loc = null;
+    state.items.outhouseMushrooms.loc = null;
+    state.flags.outhouseMushroomsFound = true;
+    state.flags.vaultFound = true;
+    state.flags["progressAward:mushroomVisionOpened"] = true;
+    state.items.burrito.loc = null;
+    state.items.burritoWrapper.loc = "inventory";
+    state.flags.ateBurrito = true;
+    state.flags.ateSuperBurrito = true;
+    state.items.milk.loc = null;
+    state.flags.drankMilk = true;
+    state.items.apple.loc = null;
+    state.items.goldDoubloon.loc = "inventory";
+    state.flags.dragonMoved = true;
+    state.items.matches.loc = null;
+    state.items.candlestick.loc = "inventory";
+    state.items.candlestick.lit = true;
+    state.score = 25;
+  });
+});
+
+Given("a legacy save with the candle and shard installed is restored", function () {
+  restorePrePortableRewards(this, (state) => {
+    state.room = "diningRoom";
+    state.items.mirrorShard.loc = null;
+    state.items.candlestick.loc = null;
+    state.items.candelabraFrame.loc = null;
+    state.items.candelabra.loc = "diningRoom";
+    state.flags.mirrorShardFreed = true;
+    state.flags.candelabraCandleInstalled = true;
+    state.flags.candelabraShardInstalled = true;
+    state.flags.candelabraRestored = true;
+    state.flags["progressAward:candelabraRestored"] = true;
+    state.score = 20;
+  });
+});
+
+Given("a legacy save with the iron key consumed on unlocking is restored", function () {
+  restorePrePortableRewards(this, (state) => {
+    state.room = "porch";
+    state.items.frontDoor.locked = false;
+    state.flags.statueMoved = true;
+    state.flags["progressAward:statueKeyRevealed"] = true;
+    state.score = 5;
+  });
+});
+
+Given("a legacy deposited watch with no portable ledger is restored", function () {
+  const snapshot = preRedesignSnapshot(this.game);
+  delete snapshot.state.flags.portableRewardLedgerVersion;
+  snapshot.state.items.backwardsWatch.loc = "reliquary";
+  snapshot.state.flags["heirloomScore:backwardsWatch"] = true;
+  snapshot.state.score = 12;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy save with only unproven portable history is restored", function () {
+  restorePrePortableRewards(this, (state) => {
+    state.room = "grandHall";
+    state.items.mysteryPackage.loc = null;
+    state.flags["flavorCycle:packageOpenings"] = 1;
+    state.items.letter.loc = null;
+    state.flags.letterBurned = true;
+    state.items.outhouseMushrooms.loc = "privy";
+    state.flags.outhouseMushroomsFound = true;
+  });
+});
+
 Given("a save with the Baron behind the wallpaper is restored", function () {
   const snapshot = this.game.snapshot();
   snapshot.state.items.baronMunchhausen.loc = "betweenWalls";
@@ -485,6 +579,17 @@ When("I execute sysop command {string}", function (command) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
   this.output = this.game.send(expandSysopCommand(shortcut, this.game));
+});
+
+When("I execute sysop command {string} through {string}", function (command, lastStep) {
+  const shortcut = sysopCommand(command);
+  assert.ok(shortcut, `Unknown sysop command: ${command}`);
+  const steps = expandSysopCommand(shortcut, this.game).split("; ");
+  const final = shortestCommand(lastStep);
+  const index = steps.indexOf(final);
+  assert.ok(index >= 0, `${command} does not include ${lastStep}`);
+  assert.equal(steps.lastIndexOf(final), index, `${lastStep} must occur only once`);
+  this.output = this.game.send(steps.slice(0, index + 1).join("; "));
 });
 
 When("I trace sysop command {string}", function (command) {
@@ -766,6 +871,10 @@ Then("item {string} is destroyed", function (item) {
 
 Then("item {string} is open", function (item) {
   assert.equal(this.game.item(item).open, true);
+});
+
+Then("item {string} is closed", function (item) {
+  assert.equal(this.game.item(item).open, false);
 });
 
 Then("item {string} is worn in slot {string}", function (item, slot) {

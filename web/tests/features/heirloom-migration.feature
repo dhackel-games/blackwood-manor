@@ -27,6 +27,17 @@ Feature: Heirloom correction save migration
     And flag "curseLiftable" is set
     And the game score is 220
 
+  Scenario: A legacy deposited watch credits its replacement hammer, not the untouched desk watch
+    Given a legacy deposited watch with no portable ledger is restored
+    Then item "blackwoodHammer" is in "reliquary"
+    And item "backwardsWatch" is in "studyDrawer"
+    And flag "progressItem:blackwoodHammer" is set
+    And flag "progressItem:backwardsWatch" is unset
+    And flag "portableRewardLedgerVersion" equals 1
+    And the game score is 17
+    When I round-trip the game snapshot
+    Then the game score is 17
+
   Scenario: Pre-redesign transformed mirror progress stays inside the countdown clock
     Given a pre-redesign transformed heirloom save is restored
     Then every required family item is inside the countdown clock

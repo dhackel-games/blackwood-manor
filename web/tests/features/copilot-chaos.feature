@@ -52,14 +52,14 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "open package"
     Then the output contains "get FILED somewhere the house forgot to build"
     And the current room is "betweenWalls"
-    And the game score is 20
+    And the game score is 25
 
   Scenario: The between-the-walls bonus only pays out the first time you land there
     Given flag "seen:betweenWalls" is set
     And the random number generator returns 0.30 then 0.99
     When I send "open package"
     Then the current room is "betweenWalls"
-    And the game score is 0
+    And the game score is 5
 
   Scenario: The space between the walls holds the Blackwood Hammer
     When the player moves directly to room "betweenWalls"

@@ -789,7 +789,7 @@ function suResolveItem(ctx, phrase) {
   return partial;
 }
 
-export const PORTABLE_REWARDS = Object.freeze({ pickup: 5, use: 5 });
+export const PORTABLE_REWARDS = Object.freeze({ pickup: 5, use: 5, ledgerVersion: 1 });
 
 const PROGRESS_AWARDS = Object.freeze({
   statueKeyRevealed: 5,
@@ -2831,9 +2831,10 @@ const PACKAGE_OPENINGS = [
   "You whisper, \"This is a bad idea,\" which apparently counts as consent, and open the PACKAGE.",
 ];
 function openMysteryPackage(ctx) {
+  const use = ctx.awardUse(ctx.item("mysteryPackage"));
   ctx.destroy("mysteryPackage");
   const effect = PACKAGE_EFFECTS[Math.floor(Math.random() * PACKAGE_EFFECTS.length)];
-  return cycleFlavor(ctx, "packageOpenings") + "\n\n" + effect(ctx);
+  return cycleFlavor(ctx, "packageOpenings") + use + "\n\n" + effect(ctx);
 }
 
 // --- Lightning Jumps: the manor's own random teleport, no wrapping paper -----
@@ -3601,6 +3602,21 @@ const IMPLICIT_NAVIGATION = Object.freeze({
   betweenWalls: { in: null, out: "out" },
 });
 
+// Unlike the package or letter, these cannot disappear without being carried or implicitly taken.
+const LEGACY_CONSUMED_PORTABLES = new Set([
+  "matches", "mushrooms", "burrito", "milk", "apple", "mirrorShard", "candlestick",
+]);
+const UNCLAIMED_PORTABLE_LOCATIONS = Object.freeze({
+  frontKey: "garden",
+  ancientCoin: "garden",
+  emberStone: "garden",
+  outhouseMushrooms: "privy",
+  xrayGoggles: "belfry",
+  candelabra: "diningRoom",
+  clockTalisman: "reliquary",
+  backwardsWatch: "study",
+});
+
 // ---- the world ---------------------------------------------------------------
 const logicWorld = {
   config: {
@@ -3915,6 +3931,54 @@ const logicWorld = {
       if (!claimed || !item?.progressPoints || state.flags[item.progressFlag]) continue;
       state.flags[item.progressFlag] = true;
       state.score = (state.score || 0) + item.progressPoints;
+    }
+
+    if ((state.flags.portableRewardLedgerVersion || 0) < PORTABLE_REWARDS.ledgerVersion) {
+      const replacedHeirlooms = {
+        familyRing: oldMirror || (oldGogglesWasHeirloom ? oldGoggles : null),
+        blackwoodHammer: oldWatchWasHeirloom ? oldWatch : null,
+        candelabra: oldCandlestickWasHeirloom ? oldCandlestick : null,
+        spyglass: legacyEmberWasDeposited ? savedItems.emberStone : null,
+      };
+      for (const [id, item] of Object.entries(world.items)) {
+        if (!item.takeable) continue;
+        const saved = savedItems?.[id];
+        const replaced = saved ? null : replacedHeirlooms[id];
+        if (!saved && !replaced) continue;
+        // The old deposited watch becomes a hammer; the replacement desk watch is unclaimed.
+        if (id === "backwardsWatch" && oldWatchWasHeirloom
+            && state.items.backwardsWatch.loc === "studyDrawer") continue;
+        const flag = item.progressFlag || `progressItem:${id}`;
+        if (state.flags[flag]) continue;
+
+        const loc = saved?.loc;
+        const originalLoc = id === "xrayGoggles" && preRedesignSchema
+            && oldGoggles?.loc === "nightDrawer"
+          ? "nightDrawer"
+          : id === "backwardsWatch" && !savedItems?.studyDrawer
+            ? oldWatchWasHeirloom || oldWatch?.loc === "betweenWalls"
+              ? "betweenWalls"
+              : oldGogglesWasHeirloom ? "nightDrawer" : "study"
+            : item.loc;
+        const relocated = loc != null && loc !== "__void" && loc !== originalLoc
+          && loc !== UNCLAIMED_PORTABLE_LOCATIONS[id];
+        const consumed = loc === null && LEGACY_CONSUMED_PORTABLES.has(id);
+        const demonstrated = (id === "letter" && state.flags["progressAward:letterRead"])
+          || (id === "diary" && state.flags.knowsCombo)
+          || (id === "mirrorShard" && state.flags.mirrorShardFreed)
+          || (id === "outhouseMushrooms" && loc === null && state.flags.outhouseMushroomsFound)
+          || (id === "burritoWrapper" && state.flags.ateSuperBurrito)
+          || (id === "goldDoubloon" && state.flags.dragonMoved)
+          || (["emberStone", "greenGlassStone", "blueGlassStone"].includes(id)
+            && loc === "oakMechanism" && state.flags.oakLightAligned);
+        const replacedAndClaimed = ["inventory", "reliquary", "clockTalisman"]
+          .includes(replaced?.loc);
+        if (loc !== "inventory" && !relocated && !consumed
+            && !demonstrated && !replacedAndClaimed) continue;
+        state.flags[flag] = true;
+        state.score = (state.score || 0) + (item.progressPoints ?? PORTABLE_REWARDS.pickup);
+      }
+      state.flags.portableRewardLedgerVersion = PORTABLE_REWARDS.ledgerVersion;
     }
   },
   endBadges,         // win-screen achievement badges

@@ -109,8 +109,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   COUNTDOWN CLOCK. Existing +5 key/gear pickup awards are the same pickup
   credit, never an extra one. Failed or inaccessible actions do not award use
   points, and saved flags prevent drop/re-take, repeat-use, and mushroom-regrowth
-  farming. The queen's emerald is obtainable only in Part II and is excluded
-  from the Part-I maximum. Puzzle breakthroughs and all thirteen heirloom
+  farming. Older saves reconcile only proven missing pickup credits once;
+  new saves carry a ledger version so restoration does not invent credits.
+  The queen's emerald is obtainable only in Part II: its +5 pickup and +5
+  use on placement still apply, alongside the separate +25 hour award; only
+  the Part-I maximum excludes it. Puzzle breakthroughs and all thirteen heirloom
   deposits keep their existing separate rewards, including +195 total for
   deposits, +20 for restoring the candelabra, and +5 for reading the letter.
   `::win` walks the manor after one opening flight to the mining shaft for the
@@ -121,8 +124,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   the ROYAL HALL with both SOUTH (front door) and DOWN (Gary) still available.
   The derived deterministic Part-I maximum is 825 there; SOUTH adds the
   existing 45 end-badge points for 870, while DOWN enters Part II at 825.
-  The route reads but never opens the random MYSTERY PACKAGE. `::powerup`
-  remains available for reusable equipment.
+  Repeating `::win` after the bell safely takes the clock if it is still in
+  the reliquary, or rereads it without choosing an ending. The route reads
+  but never opens the random MYSTERY PACKAGE; opening it yourself earns its
+  one-time use credit before it is consumed. `::powerup` remains available
+  for reusable equipment.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,

@@ -140,10 +140,19 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:candelabraRestored" is set
     And the game score is 825
 
-  Scenario: A single pasted prompt executes in full and leaves both endings to the player
+  Scenario: Repeating the completed prompt cannot choose the front-door ending
     When I execute sysop command "::win"
     Then the game is alive
     And the game is not won
+    And the current room is "grandHall"
+    And item "clockTalisman" is carried
+    And the game score is 825
+    And both endings remain independently available
+    Then sysop command "::win" includes "read gclock"
+    And sysop command "::win" omits "s"
+    And sysop command "::win" omits "d"
+    When I execute sysop command "::win"
+    Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
     And the game score is 825
@@ -152,6 +161,37 @@ Feature: Maintained sysop shortcuts
     Then the current room is "grandHall"
     And flag "partII" is unset
     And the game score is 825
+
+  Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
+    When I execute sysop command "::win" through "pull closetrope"
+    Then the current room is "grandHall"
+    And flag "bellRung" is set
+    And item "clockTalisman" is in "reliquary"
+    And item "reliquary" is closed
+    And the game score is 815
+    And sysop command "::win" contains sequence "o rq; t gclock; read gclock"
+    And sysop command "::win" omits "s"
+    And sysop command "::win" omits "d"
+    When I execute sysop command "::win"
+    Then the game is not won
+    And the current room is "grandHall"
+    And item "clockTalisman" is carried
+    And the game score is 825
+    And both endings remain independently available
+
+  Scenario: After the bell, the prompt takes the clock from an already open reliquary
+    When I execute sysop command "::win" through "pull closetrope"
+    And I send "open reliquary"
+    Then item "reliquary" is open
+    And sysop command "::win" contains sequence "t gclock; read gclock"
+    And sysop command "::win" omits "o rq"
+    And sysop command "::win" omits "s"
+    When I execute sysop command "::win"
+    Then the game is not won
+    And the current room is "grandHall"
+    And item "clockTalisman" is carried
+    And the game score is 825
+    And both endings remain independently available
 
   Scenario: The complete route recovers physically when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set

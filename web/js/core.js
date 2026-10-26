@@ -96,7 +96,9 @@ export function createGame(world) {
     score: 0,
     dead: false,
     won: false,
-    flags: {},
+    flags: cfg.portableRewards?.ledgerVersion
+      ? { portableRewardLedgerVersion: cfg.portableRewards.ledgerVersion }
+      : {},
     items: {},
   };
   for (const [id, def] of Object.entries(world.items || {})) {
