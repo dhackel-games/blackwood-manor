@@ -100,7 +100,7 @@ items: {
 ```
 
 Item flags: `takeable, container, openable, open, locked, keyId, lightSource,
-selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot, autoWearOnTake,
+selfPowered, lit, fuel, fixed, treasure, wearable, wearSlot,
 carryCapacity, worn, edible, points, progressPoints, progressFlag,
 depositScoreFlag, capacity, roomDesc`.
 
@@ -307,7 +307,9 @@ deposits (the original 195 plus 80 realm and 55 manor), +310 portable pickups,
 +310 portable uses, +306 puzzle/progression awards (including ONE TRIP), and
 +60 standalone rewards: **1316**.
 
-`::win` starts with the privy mushrooms and cheeses, flies to the shaft for the
+`::win` starts by taking the privy's ordinary contents, then implicitly looks
+into the toilet, takes, and eats the fresh mushrooms in one `USE FRESH` turn.
+It flies to the shaft for the
 BACKPACK, HEADLAMP, and WINGED SHOES, then makes its only other named flight to
 the GARDEN. It collects and uses room items on arrival, including the
 weathercock's BURPER/FARTER/SHITTER faces before HORIZON-GAZER, opens and drinks
@@ -320,19 +322,19 @@ end badges for **1341**; DOWN meets Gary and enters Part II at **1316**. The
 MYSTERY PACKAGE is carried and read safely
 but never opened; opening it voluntarily instead earns its one-time use credit
 before the box disappears, alongside a random consequence. After the bell,
-re-expanding `::win` opens the RELIQUARY only if necessary, takes and reads
+re-expanding `::win` opens the RELIQUARY only if necessary, implicitly takes and reads
 the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 232 commands,
+For reference, the deterministic fresh `::win` expansion has 222 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
-GARDEN; peak load is 32 against the BACKPACK's 36 places; and exactly one
-`PUT ALL IN RQ` earns ONE TRIP while no single-item reliquary deposit occurs.
-The derived pre-ending maximum is 1316/1316. The headlamp retains 42 fuel
-turns. These planner-verified statistics describe the physical collection
+GARDEN; peak load is 31 against the BACKPACK's 36 places; and exactly one
+`PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
+avoids all single-item reliquary deposits. The derived pre-ending maximum is
+1316/1316. These planner-verified statistics describe the physical collection
 route, not a claim of globally shortest play in every save state.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
@@ -477,7 +479,7 @@ the mansion.
   pilot light allow on-demand self-immolation anywhere. The wrapper is reusable while carried;
   dropping it cancels a queued attempt.
 - **Burn-up timer:** 5 escalating warning turns, then you burn to **ash** on the 6th
-  (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `extinguish self` (stop-drop-roll),
+  (`stepBurn` / `BURN_LINES` / `BURN_DEATH`). Escapes: `ext`/`extinguish self` (stop-drop-roll),
   the **brazier** (§12.7), or Gary's fire brigade (§12.8). The fire is paused only by NOT
   taking turns — and it even advances **on the phone** (see §12.8), so you can burn up on hold.
 - The always-visible HUD shows `🔥 6 turns` immediately on ignition and counts down until
@@ -885,10 +887,11 @@ The TALISMAN occupies NECK; the RAVENBLOOD RING and BLACKWOOD FAMILY RING
 compete for FINGER; and the HEADLAMP, XRAY GOGGLES, and WINGED SHOES occupy
 HEAD, EYES, and FEET.
 
-The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it
-automatically equips it on the BACK and raises carrying capacity from 6 to 20.
-The HUD displays used slots as `👤 used/6` before acquisition and `👜 used/20`
-afterward; worn equipment does not contribute to the used count.
+The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it leaves
+it in inventory, where it counts as one carried item and leaves capacity at 6;
+WEAR or USE BACKPACK equips it on the BACK and raises capacity from 6 to 36.
+The HUD displays `👤 used/6` until worn and `👜 used/36` afterward; worn
+equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The STUDY'S DESK keeps the

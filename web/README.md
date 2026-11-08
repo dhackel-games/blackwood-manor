@@ -136,9 +136,11 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,
   `drop/place/put all in <container>`, `drop all`, and `inventory` (`i`). Bulk
-  transfers leave worn equipment equipped.
+  transfers leave worn equipment equipped, except `PUT ALL IN RELIQUARY`, which
+  slips off and seats any worn required heirloom while leaving non-heirloom gear on.
 - **Reliquary:** the glass-fronted cabinet can be opened and closed, and any
-  unworn item can be deposited. DROP/PLACE/PUT ALL auto-opens it, as does
+  unworn item can be deposited; a worn required heirloom slips off when put
+  there. DROP/PLACE/PUT ALL auto-opens it, as does
   GET/TAKE ALL FROM it; the completed cabinet must be explicitly CLOSED before
   the lower BELL ROPE will complete the ritual. Text reports
   `HEIRLOOMS: required/24 +extra`, matching the `💎` HUD value. Pulling the
@@ -186,16 +188,20 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   MAP, and TALISMAN. The HALL BEDROOM has exactly one required heirloom, the
   family ring; the MUSIC BOX remains in the NURSERY.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
-  DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
-  and changes that indicator to `👜 used/20`.
+  DEEP MINING SHAFT counts as one carried item and leaves capacity at 6 until
+  worn. `WEAR BACKPACK` or `USE BACKPACK` raises capacity to 36 and changes the
+  indicator to `👜 used/36`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
-  `drink`, `wear`, or `use` it, the game automatically gets it and prints the derived
-  sequence. TOILET mushrooms also derive the missing `look in toilet` step.
+  `drink`, `wear`, or `use` it, the game runs the normal TAKE pipeline first,
+  including content handlers, capacity checks, and its one-time pickup reward,
+  then prints the derived sequence. TOILET mushrooms also derive the
+  missing `look in toilet` step.
   `talk` infers `talk to <character>` when exactly one talkable character is present.
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
-  `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `turn on/off <x>`,
-  `use <x>` (contextually WEARs equipment or EATs/DRINKs food), `wear`/`remove <x>`,
-  `ring <x>`, `enter <x>` (including doors, the house,
+  `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `ext`/`extinguish [<x>]`,
+  `turn on/off <x>`, `use <x>` (contextually WEARs equipment or EATs/DRINKs
+  food), `use <x> on <y>`/`pour <x> on <y>` (equivalent item-on-target forms),
+  `fill <x>`, `wear`/`remove <x>`, `ring <x>`, `enter <x>` (including doors, the house,
   cellar, well, and toilet)
   `say <words>` and `yell <words>` repeat the utterance; the **Say** shortcut
   prefills the command. Speech near sleeping DREADMAW wakes her violently.
@@ -216,7 +222,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   named `FLY TO` or `FLOAT TO` travel there just as they can anywhere else.
   `COMBINE`, `SPELL`, `KICK`, `FIGHT`, `TURN`, `SET`, `START`, `POUR`, `FILL`,
   `STOMP`, and `SMOTHER` are available generic puzzle verbs; their effects
-  depend on the objects in the current room.
+  depend on the objects in the current room. `DIAL <setting>` sets the visible
+  dial; bare `DIAL` (or `DIAL GARY`) calls Gary instead.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
   `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
   INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
@@ -360,7 +367,7 @@ items: {
 
 Useful item flags: `takeable, fixed, scenery, treasure, points, container,
 openable, open, locked, keyId, capacity, carryCapacity, lightSource, selfPowered,
-lit, fuel, wearable, wearSlot, autoWearOnTake, worn, readable, text, edible,
+lit, fuel, wearable, wearSlot, worn, readable, text, edible,
 drinkable, progressPoints, progressFlag, depositScoreFlag, roomDesc`.
 
 Mark a treasure with `treasure: true` and `points: N` — it automatically becomes
