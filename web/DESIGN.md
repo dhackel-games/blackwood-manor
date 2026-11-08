@@ -1231,3 +1231,22 @@ the LIBRARY displays its still-latched stair and names the LEVER in the
 movement refusal. A visible physical obstruction remains blocked until its
 content puzzle resolves it.
 
+#### 12.37.2 Silver Weathercock
+
+The ROOF gains four fixed gargoyles around a pending-heirloom SILVER
+WEATHERCOCK: BURPER north, FARTER east, SHITTER south, and HORIZON-GAZER west.
+`TURN WEATHERCOCK TO FACE <gargoyle or direction>` accepts their canonical
+aliases and directions; bare `TURN WEATHERCOCK <direction>` works too. Each
+of the first three directions uses its own twelve-line persisted
+`flavorCycle:<gargoyle>` pool and awards its one-time +2 progress value. The
+first successful turn also spends the weathercock's standard one-time +5 use
+award.
+
+Turning west invokes the HORIZON-GAZER's exact release line, sets
+`manor:weathercockFreed`, grants its one-time +5 progress award, and clears
+the post's fixed restraint. The release is irreversible: the remaining
+gargoyle pools cannot then be heard, but `TAKE SILVER WEATHERCOCK` earns the
+normal pickup award and the freed vane remains a pending heirloom until the
+coordinated treasure switch. ROOF prose, SEARCH text, item descriptions, and
+Gary's roof, gargoyle, and weathercock hints all warn of that ordering.
+

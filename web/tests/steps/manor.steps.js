@@ -1254,6 +1254,7 @@ Then("every recurring flavor pool has twelve distinct entries and cycles without
     "foreshadowEarly", "foreshadowMid", "foreshadowOpen",
     "lightning", "lightningInvitations", "packageOpenings",
     "mushroomRegrowth", "dragonRebukes",
+    "gargoyleBurper", "gargoyleFarter", "gargoyleShitter",
   ]);
   for (const [name, pool] of Object.entries(CYCLING_FLAVOR_POOLS)) {
     assert.equal(pool.length, 12, `${name} must have exactly twelve entries`);
