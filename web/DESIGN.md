@@ -307,14 +307,16 @@ deposits (the original 195 plus 80 realm and 55 manor), +310 portable pickups,
 +310 portable uses, +306 puzzle/progression awards (including ONE TRIP), and
 +60 standalone rewards: **1316**.
 
-`::win` starts at the privy, eats fresh mushrooms, flies once to the shaft
-for the backpack, then traverses connected rooms: gallery/troll/crest/shoes,
-front door/mailbox/kitchen, Dreadmaw's apple, garden rope descent and
-self-fire brazier, oak's actual pulley platform, library/bedrooms/nursery gap,
-attic/roof/belfry/hidden vault, and wine cellar/crypt. Phase B updates `::win` to deposit all twenty-four heirlooms, close the
-RELIQUARY, ring the closet bell, **take and read the DOOMSDAY CLOCK**, and stop
-alive in the ROYAL HALL before SOUTH or DOWN. SOUTH then adds the existing +45
-end badges for **1361**; DOWN meets Gary and enters Part II at **1316**. The
+`::win` starts with the privy mushrooms and cheeses, flies to the shaft for the
+BACKPACK, HEADLAMP, and WINGED SHOES, then makes its only other named flight to
+the GARDEN. It collects and uses room items on arrival, including the
+weathercock's BURPER/FARTER/SHITTER faces before HORIZON-GAZER, opens and drinks
+the WINE BOTTLE before depositing the CORKSCREW, and reaches the BRAZIER
+already ablaze. It solves the four-beat oak lift, realm radio, manor, and
+reliquary routes before one bulk deposit. The route closes the
+RELIQUARY, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**, and stops
+alive in the ROYAL HALL before SOUTH or DOWN. SOUTH then adds the existing +25
+end badges for **1341**; DOWN meets Gary and enters Part II at **1316**. The
 MYSTERY PACKAGE is carried and read safely
 but never opened; opening it voluntarily instead earns its one-time use credit
 before the box disappears, alongside a random consequence. After the bell,
@@ -323,14 +325,15 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 165 commands,
-75 directional commands, 77 actual room transitions, one named-room flight,
-and its former route peak inventory load was 12/20; the all-in delivery
-capacity is 36/36. The headlamp retains 42 fuel turns. The
-previous maximum-bell expansion had 113 commands, 19 directional commands,
-and 21 named-room flights. This comparison demonstrates the intended
-tradeoff for exhaustive collection and physical traversal, not a claim of
-globally shortest path.
+For reference, the deterministic fresh `::win` expansion has 232 commands,
+68 directional walking transitions, four lift transitions, one forced
+ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
+per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
+GARDEN; peak load is 32 against the BACKPACK's 36 places; and exactly one
+`PUT ALL IN RQ` earns ONE TRIP while no single-item reliquary deposit occurs.
+The derived pre-ending maximum is 1316/1316. The headlamp retains 42 fuel
+turns. These planner-verified statistics describe the physical collection
+route, not a claim of globally shortest play in every save state.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*

@@ -4099,7 +4099,9 @@ const logicWorld = {
       for (const [id, definition] of Object.entries(world.items)) {
         if (definition.treasure) state.items[id].loc = "clockTalisman";
       }
-      state.items.clockTalisman.loc = state.flags.partII ? "inventory" : "reliquary";
+      state.items.clockTalisman.loc = state.flags.partII || state.items.clockTalisman.loc === "inventory"
+        ? "inventory"
+        : "reliquary";
     }
 
     const completedProgress = {

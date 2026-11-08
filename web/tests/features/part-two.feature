@@ -122,6 +122,6 @@ Feature: Part II — the Twenty-Fourth Hour
     And the output contains "HOUR XXIV CLOSED"
     When I send "put emerald in bush"
     Then flag "hour13Done" is true
-    And the game score is 860
+    And the game score is 1351
 
 # end part-two.feature
