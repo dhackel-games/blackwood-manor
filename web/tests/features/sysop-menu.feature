@@ -10,7 +10,7 @@ Feature: Maintained sysop shortcuts
 
   Scenario: The hidden menu contains the maintained shortcuts
     Then the sysop menu command is "::"
-    And the sysop menu unlock passwords are "werdna,evad"
+    And the sysop menu unlock passwords are "werdna,evad,divad"
     And the sysop command catalog defines "::baron,::powerup,::win"
     And the sysop menu uses the shared command title description format
     And obsolete win shortcuts are rejected

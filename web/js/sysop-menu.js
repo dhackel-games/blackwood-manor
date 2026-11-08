@@ -42,7 +42,7 @@ const join = (commands) => commands.map(shortestCommand).join("; ");
 export const SYSOP_MENU_COMMAND = "::";
 export const SYSOP_MENU_DISCOVERY_MESSAGE =
   "You've discovered the sysop menu. Please invoke it the first time with your password via ::<password>";
-export const SYSOP_MENU_PASSWORDS = Object.freeze(["werdna", "evad"]);
+export const SYSOP_MENU_PASSWORDS = Object.freeze(["werdna", "evad", "divad"]);
 
 export function isSysopMenuPassword(command) {
   const normalized = String(command || "").trim().toLowerCase();
