@@ -63,7 +63,7 @@ const items = {
       turns: 6,
       doses: 3,
       whenEmpty: "keep",
-      actions: ["smell", "use"],
+      actions: "smell,use",
       emptyMessage: "The SNUFFBOX is EMPTY. It is still an heirloom, but there is nothing left to sniff.",
     },
     on: { examine: describeSnuffbox, smell: useSnuffbox, use: useSnuffbox },

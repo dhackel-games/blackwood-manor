@@ -1231,3 +1231,13 @@ the LIBRARY displays its still-latched stair and names the LEVER in the
 movement refusal. A visible physical obstruction remains blocked until its
 content puzzle resolves it.
 
+#### 12.37.3 Snuffbox
+
+The LANDING's MARBLE BUST of Great-Grandpa Blackwood has a visible silver glint
+in its left nostril, made explicit by EXAMINE and hidden sight. PICK NOSE (or
+PICK BUST'S NOSE) retrieves the pending-heirloom SNUFFBOX once and awards the
+finding and pickup ledgers separately. Its three SNIFF, SMELL, or USE pinches
+each use the shared `highSource` API for six stacking turns; the normal first
+use award applies once. An exhausted box remains an EMPTY heirloom, and the
+existing 🍄 HUD follows the shared `high` flag without source-specific state.
+
