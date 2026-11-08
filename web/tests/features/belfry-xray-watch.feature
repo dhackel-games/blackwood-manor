@@ -271,7 +271,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     And item "xrayGoggles" is not a required family heirloom
     And item "batSightMirror" is absent from game state
     And the player-facing heirloom catalogs and icons match the required set
-    And the static 2D rooms show the redesigned item placements
+    And the static 2D rooms show the redesigned and Lane 8 item placements
 
   Scenario: The lower rope transforms a full closed reliquary
     Given every treasure but the "familyRing" is already in the reliquary

@@ -1204,16 +1204,91 @@ Then("the player-facing heirloom catalogs and icons match the required set", fun
   ), true);
 });
 
-Then("the static 2D rooms show the redesigned item placements", function () {
+Then("the static 2D rooms show the redesigned and Lane 8 item placements", function () {
   const data = JSON.parse(readFileSync(new URL("../../view2d/roomdata.json", import.meta.url), "utf8"));
   const ids = (room) => data[room].items.map((item) => item.id).sort();
   assert.deepEqual(ids("diningRoom"), ["candelabraFrame", "candlestick"]);
   assert.deepEqual(ids("hallBedroom"),
     ["bedsideLamp", "familyRing", "hallBed", "hallMirror", "mirrorShard", "nightDrawer", "nightTable"]);
   assert.deepEqual(ids("study"), ["backwardsWatch", "desk", "diary", "studyDrawer"]);
-  assert.deepEqual(ids("belfry"), ["belfryBats", "belfryBellRope", "bell"]);
+  assert.deepEqual(ids("belfry"), ["belfryBats", "belfryBellRope", "bell", "xrayGoggles"]);
   assert.deepEqual(ids("betweenWalls"), ["blackwoodHammer"]);
   assert.deepEqual(ids("nursery"), ["musicBox", "tinyKey", "wallpaper"]);
+
+  const entries = (room, expected) => {
+    const expectedIds = new Set(expected.map((item) => item.id));
+    const actual = data[room].items
+      .filter((item) => expectedIds.has(item.id))
+      .map(({ id, label, kind }) => ({ id, label, kind }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+    assert.deepEqual(actual, expected.slice().sort((a, b) => a.id.localeCompare(b.id)), room);
+  };
+  entries("mineGallery", [
+    { id: "minersLocker", label: "miners' locker", kind: "scenery" },
+  ]);
+  entries("waylampClearing", [
+    { id: "stream", label: "stream", kind: "scenery" },
+    { id: "upsideDownCampfire", label: "upside-down campfire", kind: "scenery" },
+  ]);
+  entries("cheeseGrotto", [
+    { id: "demogorgonzola", label: "demogorgonzola", kind: "fixture" },
+  ]);
+  entries("avClubDen", [
+    { id: "cabinetRadio", label: "cabinet radio", kind: "container" },
+    { id: "portableTransistorRadio", label: "portable transistor radio", kind: "takeable" },
+  ]);
+  entries("planetarium", [
+    { id: "projector", label: "projector", kind: "scenery" },
+  ]);
+  entries("mapRoom", [
+    { id: "stellarMap", label: "stellar map", kind: "takeable" },
+  ]);
+  entries("shack", [
+    { id: "alphabetWall", label: "alphabet wall", kind: "scenery" },
+    { id: "kidsDrawing", label: "kid's drawing", kind: "takeable" },
+  ]);
+  entries("below", [
+    { id: "lowerPanel", label: "lower panel", kind: "container" },
+    { id: "magentaGem", label: "magenta gem", kind: "takeable" },
+    { id: "yellowGem", label: "yellow gem", kind: "takeable" },
+  ]);
+  entries("parlor", [
+    { id: "baronMunchhausen", label: "baron", kind: "scenery" },
+    { id: "coalStack", label: "coal", kind: "scenery" },
+  ]);
+  entries("kitchen", [
+    { id: "fridge", label: "fridge", kind: "container" },
+    { id: "milkJug", label: "empty milk jug", kind: "takeable" },
+    { id: "limburgerCheese", label: "limburger", kind: "takeable" },
+    { id: "epoissesCheese", label: "époisses", kind: "takeable" },
+    { id: "munsterCheese", label: "munster", kind: "takeable" },
+    { id: "microwave", label: "microwave", kind: "container" },
+    { id: "microwaveDial", label: "microwave dial", kind: "scenery" },
+  ]);
+  entries("landing", [
+    { id: "marbleBust", label: "marble bust", kind: "scenery" },
+    { id: "bustNose", label: "nose", kind: "scenery" },
+  ]);
+  entries("roof", [
+    { id: "gargoyleBurper", label: "burper", kind: "fixture" },
+    { id: "gargoyleFarter", label: "farter", kind: "fixture" },
+    { id: "gargoyleShitter", label: "shitter", kind: "fixture" },
+    { id: "gargoyleHorizonGazer", label: "horizon-gazer", kind: "fixture" },
+    { id: "silverWeathercock", label: "silver weathercock", kind: "takeable" },
+  ]);
+  entries("hedgeMazeLoop", [
+    { id: "photoPieceB", label: "photo piece b", kind: "takeable" },
+  ]);
+  entries("privy", [
+    { id: "photoPieceC", label: "photo piece c", kind: "takeable" },
+  ]);
+  entries("library", [
+    { id: "rottingBook", label: "rotting book", kind: "fixture" },
+  ]);
+  entries("wineCellar", [
+    { id: "corkscrew", label: "corkscrew", kind: "takeable" },
+    { id: "wineBottle", label: "wine bottle", kind: "takeable" },
+  ]);
 });
 
 Then("item {string} is lit", function (item) {
