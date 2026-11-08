@@ -2,16 +2,16 @@
 
 # Doomsday Clock: master orchestration
 
-Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with the design AndrewC ratified on 2026-11-08. Phase A builds the new content. Phase B (`::win`, route, and scoring incentives) cannot start until every Phase A lane is complete and validated, per AndrewC: "dont do anything with ::win yet until we build the new section."
+Status: inProgress. The integrated 24-heirloom release is complete in code and validation; Lane 14 owns the remaining release actions.
 
 ## Current status
 
-* Plan v2 written and updated 2026-11-08 with the ratified manor heirlooms, WINE BOTTLE, P7:HiddenSightIsSearch, the realm name THE UPSIDE DOWN, the INVERTED CMY GEMS, HELP and INFO, the DIAL rule, the BURN LETTER removal, the LOWER PANEL, the CYAN campfire with STREAM and MILK JUG, the cheeses, flight parity, and ratified points; no lane has started; `::win` untouched.
-* Todos: 2 done / 115 total (2%); 113 remaining.
-* Coding progress: two pre-lane fixes are done on local main and unpushed until the release (D34): HELP and INFO (D32) and the BURN LETTER removal (D28). Every decision D1 to D37 is ratified or resolved; no decision is OPEN.
+* The 24-heirloom route, THE UPSIDE DOWN, manor quintet, shared high, and integrated `::win` route work locally. Only Lane 14's five release actions remain.
+* Todos: 110 done / 115 total (96%); 5 remaining.
+* Coding progress: complete through Lane 13. `::win` collects all 24 heirlooms, deposits them in one transfer, takes the DOOMSDAY CLOCK, and reaches the derived maximum score.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.
-* Next shareable build: UNKNOWN; requires the single release PR to merge, a content stamp, and the Pages deploy (OTA). No native change is planned, so no TestFlight build is needed.
+* Next shareable build: after the Lane 14 PR merge, Pages deploy, and content stamp. No native change is planned, so no TestFlight build is needed.
 * BLOCKERS: EMPTY.
 * Status surfaces: `code/README.md` does not exist in this repository, so no dashboard was written there.
 
@@ -397,7 +397,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 14.2.7. `npm test` exit 0 is recorded; no stale "thirteen" text remains; no holiday theme or reused existing gag appears; docs change in the same commits.
   * 14.3. PROCESS brief:
     * 14.3.1. Work happened only in assigned worktrees, with no per-lane PRs.
-    * 14.3.2. Phase B was spawned only after the recorded Phase A gate, and `::win` was untouched before it.
+    * 14.3.2. Phase B began only after the recorded Phase A gate; its integrated `::win` route now covers the 24-heirloom release.
     * 14.3.3. Each manor heirloom worker spawned only after Lane 1 recorded its ratified design's exact grammar and text.
     * 14.3.4. The master status is current, and the CodeRabbit trigger follows the Coven route.
 
@@ -405,6 +405,28 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 
 * [x] HELP calls Gary's paid hint line; INFO (also `?`, COMMANDS) prints the command reference (D32). Evidence: local main commit "feat(ui): HELP calls Gary's hint line; INFO and ? show the command reference"; `parser.js` hotline synonyms include help and an `info` verb replaces help; HELP_TEXT reordered; the `index.html` ? button sends `info`; banners read "Type INFO for commands."; Helpless badge text, README, DESIGN, and tests updated; 549/549 scenarios passed. Unpushed; ships with the release (D34).
 * [x] BURN LETTER gag removed (D28). Evidence: local main commit "fix(world): remove the BURN LETTER gag so the mailbox letter cannot be destroyed"; `burnLetter` deleted; the generic burn refuses ("You can't quite bring yourself to set fire to the letter."); `fire-food.feature` updated; DESIGN line removed; 549/549 scenarios passed. Unpushed; ships with the release (D34).
+
+## Closure
+
+## AUTODECISIONS this wave
+
+* D-L1: Lane 1 ratified the canon's exact puzzle grammar, prose, constants, lift timing, and Section 13 decisions.
+* D-L2: Lane 2 kept realm rooms out of random teleports while retaining generic named flight.
+* D-L3: Lane 3 made FRIDGE output reflect remaining contents and changed DEMOGORGONZOLA's displayed state after feeding.
+* D-L4: Lane 4 used the canonical original radio-clue prose without reproduced lyrics.
+* D-L5: Lane 5 recorded no additional implementation decision beyond the ratified Planetarium design.
+* D-L6: Lane 6 restored space-separated F A R T after generic article removal without adding realm knowledge to the parser.
+* D-L7: Lane 7 preserved module-owned dynamic prose and retained an active upper lift stop when the LOWER PANEL aligns.
+* D-L8: Lane 8 preserved the nested letter, routed weathercock turns and dialables locally, assigned weathercock and snuffbox credits, and persisted shared wine identity and rewards.
+* D-L9: Lane 9 ratified the shared wine high source and P7:HiddenSightIsSearch.
+* D-L10: Lane 10 selected emoji tray fallbacks without Firefly credentials and preserved transformed-save award ledgers.
+* D-L11: Lane 11 made ONE TRIP persisted, set BACKPACK capacity to 36, retained body-fire incentives, confirmed MATCH behavior, and derived 1316.
+* D-L12: Lane 12 used the merged room graph, a 24-heirloom DAG, two selected flights, body-fire timing, persisted radio answers, and 68 walking transitions.
+* D-L13: Lane 13 derived live radio answers, timed the pre-alignment lift, and preserved a carried DOOMSDAY CLOCK on restore.
+
+## No new INTs
+
+The triad's operator-noted surprises were ratified design changes, and its remaining defects are corrected and covered by executable tests rather than requiring new intervention work.
 
 ## Operator next actions
 
@@ -418,8 +440,6 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 * The brazier is lit by body fire (step 65, +40: brazier 30 plus survival 10). Body fire already outscores the candle (10) and the candelabra (10).
 * The oak PANEL order is RUBY top, EMERALD middle, SAPPHIRE bottom; the RUBY and SAPPHIRE start in `oakMechanism`, and the EMERALD comes from the brazier (`OAK_GEMS` in `web/js/world.js`, checked 2026-11-08).
 * The FRONT GATE (`gate`) exits east to the GARDEN, where the BRAZIER stands (checked in `web/js/world.js` on 2026-11-08).
-* Hidden sight contradiction (checked 2026-11-08): `web/js/core.js` `availableDirections` lists `revealedBy` exits whenever enhanced vision is active, but `web/js/commands.js:315` refuses movement unless the `via` flag is set.
-* The ATTIC NORTH exit (`via: "vaultFound"`, `web/js/world.js` ~4461) is set only by `eatMushrooms`, so XRAY GOGGLES or OBSIDIAN EYE wearers see NORTH listed but are refused ("Your ordinary eyes find no seam").
-* The NURSERY IN exit (`via: "wallGapFound"`) shows the transparent-wallpaper vision but refuses with "The wallpaper is just wallpaper"; the LIBRARY DOWN exit (`via: "leverPulled"`) refuses with "The shelves stand solid and shut."
+* P7 verified: hidden sight from the high, XRAY GOGGLES, or OBSIDIAN EYE reveals and enables the ATTIC NORTH and NURSERY IN passages, while the LIBRARY refusal acknowledges the revealed stair and names its physical LEVER requirement.
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock.md -->

@@ -1,4 +1,4 @@
-// lane9.steps.js. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+// lane9.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";

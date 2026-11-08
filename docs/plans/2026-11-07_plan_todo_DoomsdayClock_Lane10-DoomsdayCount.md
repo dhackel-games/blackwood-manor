@@ -2,7 +2,7 @@
 
 # Lane 10: DoomsdayCount
 
-Status: complete. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c65+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: the 24-heirloom switch across `web/js/world.js`, `web/js/howto.js`, tests, and docs.

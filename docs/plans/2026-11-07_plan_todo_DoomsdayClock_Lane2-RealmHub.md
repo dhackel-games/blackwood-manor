@@ -2,7 +2,7 @@
 
 # Lane 2: RealmHub
 
-Status: done. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c50+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/realm.js`, every module stub, module registration, generic verbs, and `web/tests/features/upsidedown-realm.feature`.

@@ -2,7 +2,7 @@
 
 # Lane 5: Planetarium
 
-Status: done. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c50+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/planetarium.js` and `web/tests/features/upsidedown-planetarium.feature`.

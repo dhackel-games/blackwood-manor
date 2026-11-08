@@ -2,7 +2,7 @@
 
 # Lane 7: LowerPanelLift
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c65+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/campfire.js`, `web/js/upsidedown/lowerpanel.js`, oak lift changes, `web/tests/features/upsidedown-campfire.feature`, `web/tests/features/upsidedown-lowerpanel.feature`, and `oak-tree-fort.feature` updates.

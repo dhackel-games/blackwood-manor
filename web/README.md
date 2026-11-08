@@ -119,14 +119,14 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   the Part-I maximum excludes it. Puzzle breakthroughs and all twenty-four
   heirloom deposits keep their existing separate rewards, including +330 total
   deposits, +20 for restoring the candelabra, and +5 for reading the letter.
-  Phase B will update `::win` to walk the manor after one opening flight to the mining shaft for the
-  backpack: cave/troll, front door and kitchen, apple for Dreadmaw, rope and
-  self-fire at the garden well/brazier, the oak's physical pulley platform,
-  library/bedrooms/nursery, attic/roof/belfry, cellar/crypt, then the reliquary.
-  It will ring the closet bell, **take and read the DOOMSDAY CLOCK**, and stop alive in
-  the ROYAL HALL with both SOUTH (front door) and DOWN (Gary) still available.
-  The derived deterministic Part-I maximum is 1291 there; SOUTH adds the
-  existing 45 end-badge points for 1336, while DOWN enters Part II at 1291.
+  The integrated `::win` route walks the manor after flying to the mining shaft
+  for the backpack, headlamp, and winged shoes, then makes its only other named
+  flight to the garden. It completes the cave, realm, oak lift, manor, and
+  reliquary routes, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**,
+  and stops alive in the ROYAL HALL with both SOUTH (front door) and DOWN (Gary)
+  still available. The derived deterministic Part-I maximum is 1316 there;
+  SOUTH adds the existing 25 end-badge points for 1341, while DOWN enters Part II
+  at 1316.
   Repeating `::win` after the bell safely takes the clock if it is still in
   the reliquary, or rereads it without choosing an ending. The route reads
   but never opens the random MYSTERY PACKAGE; opening it yourself earns its

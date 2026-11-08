@@ -1,4 +1,4 @@
-# shared-high.feature. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# shared-high.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 @unit @lane9
 Feature: Shared high sources

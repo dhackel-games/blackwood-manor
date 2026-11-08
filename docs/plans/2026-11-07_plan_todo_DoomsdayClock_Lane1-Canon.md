@@ -2,7 +2,7 @@
 
 # Lane 1: Canon
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c70+s60='copilot:gpt-6-sol:1M:max'
 * Produces: `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.

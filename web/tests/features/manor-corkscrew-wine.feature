@@ -1,4 +1,4 @@
-# manor-corkscrew-wine.feature. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# manor-corkscrew-wine.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 @unit
 Feature: Corkscrew and bottomless wine bottle

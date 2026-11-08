@@ -2,7 +2,7 @@
 
 # Lane 8: ManorQuintet
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c55+s60='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/manor/{diamond,photograph,corkscrew,snuffbox,weathercock}.js` (`corkscrew.js` also holds the WINE BOTTLE) and `web/tests/features/manor-quintet.feature` (the lane orchestrator spawns one task worker per heirloom).

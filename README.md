@@ -20,6 +20,8 @@ the candelabra puzzle awards +20; depositing the restored heirloom awards +10.
 The six UPSIDE DOWN heirlooms and five manor-quintet heirlooms complete the
 twenty-four recesses that form the DOOMSDAY CLOCK.
 
+The integrated `::win` route collects all twenty-four heirlooms, makes one bulk reliquary deposit, takes and reads the DOOMSDAY CLOCK, and stops in the ROYAL HALL at the derived 1316-point Part-I maximum. SOUTH adds 25 end-badge points for 1341; DOWN begins Part II at 1316.
+
 ## Layout
 
 - **`web/`** — the game. Pure static HTML/CSS/JS, no build step, no dependencies.

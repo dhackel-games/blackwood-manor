@@ -2,7 +2,7 @@
 
 # Lane 11: ScoringIncentives
 
-Status: done. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c45+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: scoring changes in `web/js/world.js` and `web/tests/features/progress-scoring.feature`.

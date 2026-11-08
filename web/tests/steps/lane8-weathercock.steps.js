@@ -1,4 +1,4 @@
-// lane8-weathercock.steps.js. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+// lane8-weathercock.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 import assert from "node:assert";
 import { Then, When } from "@cucumber/cucumber";

@@ -1,4 +1,4 @@
-# manor-weathercock.feature. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# manor-weathercock.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 @walkthrough
 Feature: Silver Weathercock and roof gargoyles

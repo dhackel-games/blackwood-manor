@@ -2,7 +2,7 @@
 
 # Lane 12: RoutePlanner
 
-Status: done. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c72+s65='copilot:gpt-6-sol:1M:max'
 * Produces: `web/tools/route-plan.mjs`, `web/tests/features/route-planner.feature`, `web/tests/steps/lane12.steps.js`, and usage in `web/README.md`.

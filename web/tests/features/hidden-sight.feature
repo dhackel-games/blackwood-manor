@@ -1,4 +1,4 @@
-# hidden-sight.feature. Copyright (c) 2026:dhackel-games. All Rights Reserved. Do Not Distribute.
+# hidden-sight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
 
 @walkthrough @lane9
 Feature: Hidden sight parity
