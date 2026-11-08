@@ -6,12 +6,12 @@ Status: inProgress. The integrated 24-heirloom release is complete in code and v
 
 ## Current status
 
-* The 24-heirloom route, THE UPSIDE DOWN, manor quintet, shared high, and integrated `::win` route work locally. Only Lane 14's five release actions remain.
-* Todos: 110 done / 115 total (96%); 5 remaining.
+* The 24-heirloom route, THE UPSIDE DOWN, manor quintet, shared high, and integrated `::win` route work locally. Content is stamped 2026.11.8 build 1 (20261108001); the remaining Lane 14 actions are the PR, CodeRabbit review, merge, and post-merge filename flips.
+* Todos: 111 done / 115 total (97%); 4 remaining.
 * Coding progress: complete through Lane 13. `::win` collects all 24 heirlooms, deposits them in one transfer, takes the DOOMSDAY CLOCK, and reaches the derived maximum score.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.
-* Next shareable build: after the Lane 14 PR merge, Pages deploy, and content stamp. No native change is planned, so no TestFlight build is needed.
+* Next shareable build: content 20261108001 goes live on GitHub Pages (web) and to installed iOS apps by OTA as soon as the PR merges and the Pages deploy finishes. No native change is planned, so no TestFlight build is needed.
 * BLOCKERS: EMPTY.
 * Status surfaces: `code/README.md` does not exist in this repository, so no dashboard was written there.
 
