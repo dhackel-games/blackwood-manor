@@ -13,15 +13,15 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Ratify master TRD Sections 5 to 10 into the canon info doc: rooms, exits, prose tone, every puzzle step, ejection, award, and flag, using the master seam flag names.
-* [ ] Specify exact command grammar per realm puzzle, manor heirloom, and the shared high: verbs, synonyms, refusal and hint text, plus the generic verbs Lane 2 adds to `parser.js`.
-* [ ] Fix realm constants: cheese text for LIMBURGER, ÉPOISSES, and MUNSTER from the master seed lines (funny stink, no trivia), DEMOGORGONZOLA safe verbs (LOOK, EXAMINE, SMELL) versus swallow verbs, radio round rules (distractor draw, title matching), constellation table and dome text, SHACK input grammar and accepted words, CYAN, MAGENTA, and YELLOW GEM names and text (LOWER PANEL order and initial state are fixed by master Section 6), the BELOW room name, and the UPSIDE-DOWN CAMPFIRE, STREAM, and MILK JUG text and grammar (POUR WINE, MILK, WATER, or JUG ON FIRE; STOMP; SMOTHER; FILL JUG; POUR OUT).
-* [ ] Record exact grammar, refusal, and hint text for the ratified manor designs (master Section 7, ratified by AndrewC 2026-11-08): COAL one lump at a time, the MICROWAVE dial `1 · 100 · M · B · T` (DIAL disambiguation per master D33), TURN WEATHERCOCK TO FACE, the 36 gargoyle lines plus the HORIZON-GAZER line, PICK NOSE and PICK BUST'S NOSE, COMBINE and READ for the BARONESS PHOTOGRAPH (piece A is the existing `letter`), and the WINE BOTTLE open, drink, and refill. Note roof access: flight from the ATTIC skylight, or ATTIC north (`vaultFound`) to the HIDDEN VAULT, UP to the BELFRY, WEST to the ROOF. Record the 1:30 clock as a future hook only.
-* [ ] Write the foreshadowing text required by P3 for every ejection and the burning exit.
-* [ ] List unique `ITEM_SHORT_NAMES`/`ROOM_SHORT_NAMES` for every new room and item, checked against `web/js/world.js`; MILK already answers to BOTTLE, so the WINE BOTTLE, MILK, and MILK JUG names must not collide.
-* [ ] Specify the four-beat lift timing table (turn, platform stop, rider location) from GROUND and from BELOW.
-* [ ] Record the final value of every master Section 13 decision (all ratified or resolved as of 2026-11-08) in the canon doc.
-* [ ] Tone check: parody names only, no holiday theme, no burrito or Taco Tuesday mechanics, no reproduced lyrics.
+* [x] Ratify master TRD Sections 5 to 10 into the canon info doc: rooms, exits, prose tone, every puzzle step, ejection, award, and flag, using the master seam flag names.
+* [x] Specify exact command grammar per realm puzzle, manor heirloom, and the shared high: verbs, synonyms, refusal and hint text, plus the generic verbs Lane 2 adds to `parser.js`.
+* [x] Fix realm constants: cheese text for LIMBURGER, ÉPOISSES, and MUNSTER from the master seed lines (funny stink, no trivia), DEMOGORGONZOLA safe verbs (LOOK, EXAMINE, SMELL) versus swallow verbs, radio round rules (distractor draw, title matching), constellation table and dome text, SHACK input grammar and accepted words, CYAN, MAGENTA, and YELLOW GEM names and text (LOWER PANEL order and initial state are fixed by master Section 6), the BELOW room name, and the UPSIDE-DOWN CAMPFIRE, STREAM, and MILK JUG text and grammar (POUR WINE, MILK, WATER, or JUG ON FIRE; STOMP; SMOTHER; FILL JUG; POUR OUT).
+* [x] Record exact grammar, refusal, and hint text for the ratified manor designs (master Section 7, ratified by AndrewC 2026-11-08): COAL one lump at a time, the MICROWAVE dial `1 · 100 · M · B · T` (DIAL disambiguation per master D33), TURN WEATHERCOCK TO FACE, the 36 gargoyle lines plus the HORIZON-GAZER line, PICK NOSE and PICK BUST'S NOSE, COMBINE and READ for the BARONESS PHOTOGRAPH (piece A is the existing `letter`), and the WINE BOTTLE open, drink, and refill. Note roof access: flight from the ATTIC skylight, or ATTIC north (`vaultFound`) to the HIDDEN VAULT, UP to the BELFRY, WEST to the ROOF. Record the 1:30 clock as a future hook only.
+* [x] Write the foreshadowing text required by P3 for every ejection and the burning exit.
+* [x] List unique `ITEM_SHORT_NAMES`/`ROOM_SHORT_NAMES` for every new room and item, checked against `web/js/world.js`; MILK already answers to BOTTLE, so the WINE BOTTLE, MILK, and MILK JUG names must not collide.
+* [x] Specify the four-beat lift timing table (turn, platform stop, rider location) from GROUND and from BELOW.
+* [x] Record the final value of every master Section 13 decision (all ratified or resolved as of 2026-11-08) in the canon doc.
+* [x] Tone check: parody names only, no holiday theme, no burrito or Taco Tuesday mechanics, no reproduced lyrics.
 
 ## Acceptance
 

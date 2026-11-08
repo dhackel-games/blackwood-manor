@@ -187,7 +187,7 @@ The following twenty titles are real songs from the 1980s. Only each title and o
   * Clue 1: "A crowd releases party decorations; the military interprets them as a very small invasion."
   * Clue 2: "A batch of floating toys triggers a geopolitical response that cannot be returned for a refund."
   * Clue 3: "A radar operator mistakes cheerful rubber spheres for an emergency worth mobilizing."
-  * Clue 4: "The sky fills with birthday debris and the generals immediately choose the least birthday-like option."
+  * Clue 4: "The sky fills with party decorations and the generals immediately choose the least festive option."
   * Clue 5: "An innocent balloon launch escalates into a war with a truly embarrassing incident report."
 
 ## Planetarium and fixed constellation index
