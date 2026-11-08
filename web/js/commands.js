@@ -331,7 +331,8 @@ export const commands = {
     if (!ctx.isLit()) return "It's too dark to see anything.";
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
-    let out = it.desc || `You see nothing special about the ${it.names[0]}.`;
+    const description = typeof it.desc === "function" ? it.desc(ctx) : it.desc;
+    let out = description || `You see nothing special about the ${it.names[0]}.`;
     if (it.container && it.openable) out += it.open ? " It is open." : " It is closed.";
     if (it.container && it.open) {
       const inside = ctx.itemsIn(it.id);
@@ -537,6 +538,17 @@ export const commands = {
   },
 
   // Verbs that are meaningful only via content handlers get a gentle default.
+  combine() { return "Those pieces do not fit together."; },
+  spell() { return "There is nothing here to spell on."; },
+  kick() { return "Kicking that would not help."; },
+  fight() { return "There is no fight to pick here."; },
+  turn() { return "Nothing here turns."; },
+  set() { return "There is nothing here to set."; },
+  start() { return "Nothing here starts."; },
+  pour() { return "You have nothing suitable to pour there."; },
+  fill() { return "There is nothing here to fill that with."; },
+  stomp() { return "Stomping changes nothing."; },
+  smother() { return "There is nothing here to smother."; },
   move(ctx, cmd) { return `You shove the ${cmd.dobj || "thing"}, but nothing happens.`; },
   push(ctx, cmd) { return `Pushing the ${cmd.dobj || "thing"} accomplishes nothing.`; },
   pull(ctx, cmd) { return `You pull the ${cmd.dobj || "thing"}, to no effect.`; },

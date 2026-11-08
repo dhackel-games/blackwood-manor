@@ -18,11 +18,32 @@ import { MAP_MARK, renderMap } from "./map.js?v=source";
 import { composeWorld } from "./compose.js?v=source";
 import { content } from "./world.content.js?v=source";
 import { pathToRoom } from "./sysop-menu.js?v=source";
+import upsideDown from "./upsidedown/index.js?v=source";
+import manor from "./manor/index.js?v=source";
+
+const CONTENT_MODULES = [upsideDown, manor];
+
+function moduleRecords(key) {
+  return CONTENT_MODULES.reduce((merged, module) => ({ ...merged, ...(module[key] || {}) }), {});
+}
+
+const MODULE_SHORT_NAMES = CONTENT_MODULES.reduce((merged, module) => ({
+  rooms: { ...merged.rooms, ...(module.shortNames?.rooms || {}) },
+  items: { ...merged.items, ...(module.shortNames?.items || {}) },
+}), { rooms: {}, items: {} });
+const MODULE_PROGRESS_AWARDS = moduleRecords("progressAwards");
+const MODULE_FLAVOR_POOLS = moduleRecords("flavorPools");
+
+function moduleHints(ctx) {
+  return CONTENT_MODULES.flatMap((module) => module.hints || [])
+    .flatMap((entry) => typeof entry === "function" ? entry(ctx) : entry)
+    .filter(Boolean);
+}
 
 // ---- helpers used by handlers ------------------------------------------------
 export const REQUIRED_FAMILY_ITEM_COUNT = 13;
 
-export const ITEM_SHORT_NAMES = Object.freeze({
+const BASE_ITEM_SHORT_NAMES = {
   reliquary: "rq",
   bell: "bell",
   belfryBellRope: "bellrope",
@@ -105,9 +126,14 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   emeraldOfTheQueen: "qemerald",
   queenPetrified: "medusa",
   gardenPool: "gpool",
+};
+
+export const ITEM_SHORT_NAMES = Object.freeze({
+  ...BASE_ITEM_SHORT_NAMES,
+  ...MODULE_SHORT_NAMES.items,
 });
 
-export const ROOM_SHORT_NAMES = Object.freeze({
+const BASE_ROOM_SHORT_NAMES = {
   gate: "gate",
   garden: "garden",
   hedgeMazeGate: "yewgate",
@@ -144,6 +170,11 @@ export const ROOM_SHORT_NAMES = Object.freeze({
   betweenWalls: "between",
   p2_awakening: "nowhere",
   t13_medusaGarden: "hour13",
+};
+
+export const ROOM_SHORT_NAMES = Object.freeze({
+  ...BASE_ROOM_SHORT_NAMES,
+  ...MODULE_SHORT_NAMES.rooms,
 });
 
 function depositedFamilyItemCount(ctx) {
@@ -816,6 +847,7 @@ const PROGRESS_AWARDS = Object.freeze({
   bellRung: 5,
   burritoSurvived: 25,
   selfFireSurvived: 10,
+  ...MODULE_PROGRESS_AWARDS,
 });
 const STANDALONE_MAX_AWARDS = Object.freeze({
   milk: 5,
@@ -1088,7 +1120,7 @@ function hintEntries(ctx) {
     ? "The BM WATCH is inside the STUDY'S DESK DRAWER beneath the DIARY. OPEN the drawer and wear the watch on your WRIST; SHOW a room or ROUTE TO an object and its empty face will guide you."
     : "The BM WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
 
-  return [
+  const entries = [
     { topics: ["front", "door", "key", "statue", "garden", "porch"], done: inside, text: frontDoorHint },
     { topics: ["light", "dark", "candle", "candlestick", "match", "matches"], done: !!lit, text: lightHint },
     { topics: ["ravenblood", "ring", "jewelry", "tiny", "key"], done: dep("rubyRing"),
@@ -1123,6 +1155,7 @@ function hintEntries(ctx) {
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
       text: "Everything's in the reliquary. CLOSE RELIQUARY, OPEN the BELL CLOSET beside the FRONT DOOR, then PULL the ROPE. And then — I mean this warmly — never call me again." },
   ];
+  return [...entries, ...moduleHints(ctx)];
 }
 
 // Returns the single most relevant next-step hint for the current game state.
@@ -2190,6 +2223,9 @@ function floatToRoom(ctx, roomId) {
       "through its inset PANEL first, there is nowhere safe to land.";
   }
   ctx.state.room = roomId;
+  const entry = typeof destination.onEnter === "function"
+    ? destination.onEnter(ctx, { via: "flight" })
+    : null;
   const betweenWallsPoints = roomId === "betweenWalls" ? discoverBetweenWalls(ctx) : 0;
   if (roomId === "betweenWalls") ctx.setFlag("seen:betweenWalls", true);
   if (roomId === "crypt") {
@@ -2201,10 +2237,12 @@ function floatToRoom(ctx, roomId) {
       );
     }
     const points = awardProgress(ctx, "wraithPassed");
-    return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+    return `You rise weightless and drift through the manor to the ${destinationName}.\n\n` +
+      (entry ? `${entry}\n\n` : "") + `${ctx.describeRoom()}` +
       awardSuffix(points);
   }
-  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n` +
+    (entry ? `${entry}\n\n` : "") + `${ctx.describeRoom()}` +
     awardSuffix(betweenWallsPoints);
 }
 function eatBurrito(ctx) {
@@ -3176,6 +3214,7 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   packageOpenings: PACKAGE_OPENINGS,
   mushroomRegrowth: MUSHROOM_REGROW_LINES,
   dragonRebukes: DRAGON_REBUKES,
+  ...MODULE_FLAVOR_POOLS,
 });
 
 function dragonFire(ctx) {
@@ -3655,6 +3694,8 @@ const logicWorld = {
   hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
   hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   flavorPools: CYCLING_FLAVOR_POOLS,
+  cycleFlavor,
+  awardProgress,
   itemShortNames: ITEM_SHORT_NAMES,
   roomShortNames: ROOM_SHORT_NAMES,
   maximumScore,
@@ -5194,7 +5235,50 @@ const logicWorld = {
   },
 };
 
-export const world = composeWorld(logicWorld, content);
+function mergeContentModules(baseWorld) {
+  const merged = {
+    ...baseWorld,
+    rooms: { ...baseWorld.rooms },
+    items: { ...baseWorld.items },
+  };
+  for (const module of CONTENT_MODULES) {
+    for (const [id, definition] of Object.entries(module.rooms || {})) {
+      merged.rooms[id] = { ...merged.rooms[id], ...definition };
+    }
+    for (const [id, definition] of Object.entries(module.items || {})) {
+      merged.items[id] = { ...merged.items[id], ...definition };
+    }
+    for (const [id, prose] of Object.entries(module.content?.rooms || {})) {
+      merged.rooms[id] = { ...merged.rooms[id], ...prose };
+    }
+    for (const [id, prose] of Object.entries(module.content?.items || {})) {
+      merged.items[id] = { ...merged.items[id], ...prose };
+    }
+  }
+  for (const module of CONTENT_MODULES) {
+    for (const [roomId, handlers] of Object.entries(module.roomHooks || {})) {
+      const room = merged.rooms[roomId];
+      if (!room) throw new Error(`Content module hook targets unknown room "${roomId}".`);
+      room.on = { ...(room.on || {}) };
+      for (const [verb, hook] of Object.entries(handlers)) {
+        const existing = room.on[verb];
+        const hooks = Array.isArray(hook) ? hook : [hook];
+        room.on[verb] = (ctx, cmd) => {
+          const prior = existing?.(ctx, cmd);
+          if (prior != null) return prior;
+          for (const next of hooks) {
+            const result = next(ctx, cmd);
+            if (result != null) return result;
+          }
+          return null;
+        };
+      }
+    }
+  }
+  return merged;
+}
+
+export const world = mergeContentModules(composeWorld(logicWorld, content));
 
 // ---- handler function definitions referenced above --------------------------
 function inspectBmWatch(ctx) {

@@ -276,6 +276,12 @@ export function createGame(world) {
     game.addScore(points);
     return ` (+${points})`;
   };
+  game.awardProgress = (id) => typeof world.awardProgress === "function"
+    ? world.awardProgress(game, id)
+    : 0;
+  game.cycleFlavor = (poolName) => typeof world.cycleFlavor === "function"
+    ? world.cycleFlavor(game, poolName)
+    : "";
   const phoneBillLine = () => {
     const b = state.flags.phoneBill;
     if (!b) return "";
@@ -376,7 +382,10 @@ export function createGame(world) {
     const extended = force || first || verbose;
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
-    if (extended) out += r.desc + "\n";
+    if (extended) {
+      const desc = typeof r.desc === "function" ? r.desc(game) : r.desc;
+      out += desc + "\n";
+    }
     // Mushroom and XRAY vision share one status heading and hidden-detail view.
     const highOn = (state.flags.high || 0) > 0;
     const enhancedVision = typeof world.hasMushroomVision === "function"
@@ -402,7 +411,8 @@ export function createGame(world) {
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery || i.takeable);
     for (const it of here) {
-      out += (it.roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
+      const roomDesc = typeof it.roomDesc === "function" ? it.roomDesc(game) : it.roomDesc;
+      out += (roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {
         const inside = game.itemsIn(it.id);
         if (inside.length) {
@@ -687,8 +697,11 @@ export function createGame(world) {
     const previouslyCarried = new Set(game.inventory().map((item) => item.id));
 
     const roomNavigation = world.implicitNavigation?.[state.room];
-    const implicitNavigation = cmd.verb === "go" && cmd.dobj === "in" ? roomNavigation?.in
-      : cmd.verb === "go" && cmd.dobj === "out" ? roomNavigation?.out
+    const interceptsNavigation = typeof world.rooms[state.room]?.on?.go === "function";
+    const implicitNavigation = !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "in"
+      ? roomNavigation?.in
+      : !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "out"
+        ? roomNavigation?.out
       : null;
     if (implicitNavigation) cmd = parse(implicitNavigation);
     const implicitEntry = inferGoEntryTarget(cmd);
