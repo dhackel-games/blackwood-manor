@@ -6,9 +6,9 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 
 ## Current status
 
-* Plan v2 written; no implementation started; `::win` untouched.
-* Todos: 0 done / 106 total (0%); 106 remaining.
-* Coding progress: none. Realm, shared high, and manor quintet designs are ratified (manor: D24, D25, ratified by AndrewC 2026-11-08); D20 to D23, D26, and D28 stay OPEN.
+* Plan v2 written and updated 2026-11-08 with the ratified manor heirlooms, WINE BOTTLE, P7:HiddenSightIsSearch, and the realm name THE UPSIDE DOWN; no implementation started; `::win` untouched.
+* Todos: 0 done / 111 total (0%); 111 remaining.
+* Coding progress: none. Realm, shared high, and manor quintet designs are ratified (D20, D24, D25, D27, D29 ratified by AndrewC 2026-11-08); D21 to D23, D26, and D28 stay OPEN.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.
 * Next shareable build: UNKNOWN; requires the single release PR to merge, a content stamp, and the Pages deploy (OTA). No native change is planned, so no TestFlight build is needed.
@@ -17,7 +17,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 
 ## Stated goals
 
-* G1:Realm: Players who get past DREADMAW can climb into a MINERS' LOCKER in the MINING GALLERY and reach a Stranger Things and Narnia parody realm (working name Lanternwild). They solve four classic adventure puzzles, recover six heirlooms, and return through a root gate beneath the GREAT OAK. Proved by: Lanes 2 to 7. Artifact: `web/tests/features/lanternwild-*.feature`, `oak-tree-fort.feature`.
+* G1:Realm: Players who get past DREADMAW can climb into a MINERS' LOCKER in the MINING GALLERY and reach THE UPSIDE DOWN, a Stranger Things and Narnia parody realm. They solve four classic adventure puzzles, recover six heirlooms, and return through a root gate beneath the GREAT OAK. Proved by: Lanes 2 to 7. Artifact: `web/tests/features/upsidedown-*.feature`, `oak-tree-fort.feature`.
 * G2:DoomsdayClock: The reliquary ritual requires 24 heirlooms (13 existing, 5 new manor, 6 realm) that become a 24-hour DOOMSDAY CLOCK. Old saves migrate fairly, and every surface agrees: text, HUD, Part II, Gary, the 2D tray, and docs. Proved by: Lanes 8 to 10. Artifact: `manor-quintet.feature`, `shared-high.feature`, `heirloom-migration.feature`, `part-two.feature`, `true-ending.feature`.
 * G3:EfficientWin: `::win` gathers the gear once and then walks everything. It takes everything in each room, uses items on arrival (arriving at the brazier already ablaze), and deposits all 24 heirlooms with one PUT ALL IN RQ. Scoring rewards that play style. Proved by: Lanes 11 to 13. Artifact: the `sysop-menu.feature` trace scenario.
 
@@ -47,7 +47,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 ## TRD
 
 * 1. Terminology and Scope
-  * 1.1. Realm: the new otherworld, working name Lanternwild (final name OPEN, D20); code paths use `lanternwild` regardless. Heirloom: a `treasure: true` item the reliquary requires. Manor quintet: the five new manor heirlooms. Shared high: the one trip state (flag `high`) that mushrooms and snuff both start. FRONT GATE: the start room `gate`. Lift stops: BELOW (ROOT HOLLOW), GROUND (GREAT OAK), and ABOVE (TREE FORT).
+  * 1.1. Realm: the new otherworld, THE UPSIDE DOWN (D20); code paths use `upsidedown`. Heirloom: a `treasure: true` item the reliquary requires. Manor quintet: the five new manor heirlooms. Shared high: the one trip state (flag `high`) that mushrooms and snuff both start. FRONT GATE: the start room `gate`. Lift stops: BELOW (ROOT HOLLOW), GROUND (GREAT OAK), and ABOVE (TREE FORT).
   * 1.2. EXPLICITLY NOT DOING:
     * 1.2.1. Building Part II Hours XXIII to I.
     * 1.2.2. Making native iOS changes.
@@ -80,7 +80,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
   * 4.1. Entry: `mineGallery` gains a fixed MINERS' LOCKER. OPEN LOCKER then IN moves the player to the realm hub, and OUT from the hub returns to the gallery.
   * 4.2. Exit: once every realm puzzle is solved, the ROOT HOLLOW opens and links to the oak lift's BELOW stop.
   * 4.3. Modules:
-    * 4.3.1. `web/js/lanternwild/index.js` aggregates `realm.js` (hub, locker, flight refusal), `demogorgonzola.js`, `radio.js` with its data file `radio-clues.js`, `planetarium.js`, `shack.js`, and `rootgate.js`.
+    * 4.3.1. `web/js/upsidedown/index.js` aggregates `realm.js` (hub, locker, flight refusal), `demogorgonzola.js`, `radio.js` with its data file `radio-clues.js`, `planetarium.js`, `shack.js`, and `rootgate.js`.
     * 4.3.2. `web/js/manor/index.js` aggregates `fridge.js`, `diamond.js`, `photograph.js`, `corkscrew.js`, `snuffbox.js`, and `weathercock.js`.
     * 4.3.3. Each module exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools }`. `world.js` merges them once, chains any room hooks onto existing handlers, adds `flavorPools` to `CYCLING_FLAVOR_POOLS`, and lets module handlers call `cycleFlavor` through `ctx`.
   * 4.4. Verbs: Lane 2 adds the generic verbs Lane 1 lists (expected COMBINE, SPELL, KICK, FIGHT, TURN, SET, START) to `parser.js` with default refusals in `commands.js`. FEED already maps to GIVE, SNIFF to SMELL, ANSWER to SAY, and PICK to TAKE. DIAL is already a hotline verb, so the microwave grammar keeps DIAL as a noun after SET or TURN.
@@ -88,7 +88,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
   * 4.6. Flow: commands reach item and room `on` handlers exactly as manor content does. Awards use the existing `awardProgress`, `awardPickup`, and `awardUse`. Ejections move the player to `gate` and keep inventory.
   * 4.7. Canonical data: the heirloom set derives from `treasure: true`. `REQUIRED_FAMILY_ITEM_COUNT` becomes 24, and `maximumScore()` stays derived.
   * 4.8. External boundaries: the `versions.json` manifest, the `map.js` floor layout and `web/view2d` data, and the optional Firefly icon tool (the tray has a built-in emoji fallback).
-* 5. Realm design (ratified by AndrewC 2026-11-08; Lane 1 records exact text and constants in `docs/plans/2026-11-07_info_LanternwildAndDoomsdayClockCanon.md`)
+* 5. Realm design (ratified by AndrewC 2026-11-08; Lane 1 records exact text and constants in `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`)
   * 5.1. Tone: classic adventure-game puzzles (Myst, Maniac Mansion, Monkey Island, King's Quest era) dressed in hysterically junior-high-boy absurd humor that parodies Stranger Things and Narnia. The joke is paint on a real, fair puzzle and never replaces the mechanic.
   * 5.2. Rooms (working names; Lane 1 fixes names and exits): WAYLAMP CLEARING (hub, a lone lamppost in a wood), CHEESE GROTTO, AV CLUB DEN, PLANETARIUM, MAP ROOM (off the planetarium), SHACK, and ROOT HOLLOW (sealed until every puzzle is solved).
   * 5.3. Flight: named flights into or out of the realm are refused. An inverted WINGED SHOES hazard remains an OPEN proposal only (D22) and is not built.
@@ -249,11 +249,11 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 13.9.2. Options: one gem per puzzle, three hidden finds, or a root nest revealed by the last solve.
     * 13.9.3. **Chosen:** OPEN; recommendation is that solving the last realm puzzle reveals the ROOT HOLLOW, where the three gems hang in a root nest.
     * 13.9.4. Why: completion stays the single trigger and no new character is needed.
-  * 13.10. D20: Realm name (OPEN).
+  * 13.10. D20: Realm name (ratified by AndrewC 2026-11-08).
     * 13.10.1. Framing: the realm needs a final display name.
-    * 13.10.2. Options: keep the working name Lanternwild, or choose a parody name.
-    * 13.10.3. **Chosen:** OPEN; Lanternwild stays the working name, and code paths keep `lanternwild` whatever the display name.
-    * 13.10.4. Why: renaming paths later would churn every lane.
+    * 13.10.2. Options: keep the working name Lanternwild, THE UPSIDE BROWN, or THE UPSIDE DOWN.
+    * 13.10.3. **Chosen:** THE UPSIDE DOWN; code paths use `upsidedown`, and the canon doc is `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.
+    * 13.10.4. Why: it names the Stranger Things half of the parody outright, and nothing was built under the working name, so the path rename costs no churn.
   * 13.11. D19: v1 realm content withdrawn (ratified by AndrewC 2026-11-08).
     * 13.11.1. Framing: the v1 realm challenges, characters, items, and premise no longer fit.
     * 13.11.2. Options: keep parts, or replace them entirely.
@@ -371,7 +371,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 
 ## Operator next actions
 
-* Decide or override the OPEN decisions D20 to D23, D26, and D28 in Section 13. Without a reply, Lane 1 proceeds on each recommendation and records it as an AUTODECISION.
+* Decide or override the OPEN decisions D21 to D23, D26, and D28 in Section 13. Without a reply, Lane 1 proceeds on each recommendation and records it as an AUTODECISION.
 
 ## Verified evidence
 

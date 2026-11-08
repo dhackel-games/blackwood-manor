@@ -1,10 +1,10 @@
-<!-- _goal.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- _goal.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Goal
 
 Active master orchestration: [docs/plans/2026-11-07_plan_todo_DoomsdayClock.md](docs/plans/2026-11-07_plan_todo_DoomsdayClock.md). Root pointer: [_orch.md](_orch.md).
 
-* G1:Realm: a Stranger Things and Narnia parody realm (working name Lanternwild) behind a MINERS' LOCKER, with four classic adventure puzzles (DEMOGORGONZOLA, RADIO QUIZ, PLANETARIUM, SHACK), six heirlooms, and a root-gate return through the GREAT OAK lift.
+* G1:Realm: a Stranger Things and Narnia parody realm, THE UPSIDE DOWN, behind a MINERS' LOCKER, with four classic adventure puzzles (DEMOGORGONZOLA, RADIO QUIZ, PLANETARIUM, SHACK), six heirlooms, and a root-gate return through the GREAT OAK lift.
 * G2:DoomsdayClock: 24 required heirlooms (13 existing, 5 new manor, 6 realm) forming a 24-hour DOOMSDAY CLOCK, with fair save migration.
 * G3:EfficientWin: `::win` gathers gear once, walks everything, uses items on arrival, and deposits all 24 heirlooms with one PUT ALL IN RQ.
 

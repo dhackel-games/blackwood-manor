@@ -5,7 +5,7 @@
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c70+s60='copilot:gpt-6-sol:1M:max'
-* Produces: `docs/plans/2026-11-07_info_LanternwildAndDoomsdayClockCanon.md`.
+* Produces: `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.
 * Not produces: source, tests, other docs, git operations beyond its own commit.
 * Depends on: none.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
@@ -20,7 +20,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 * [ ] Write the foreshadowing text required by P3 for every ejection and the burning exit.
 * [ ] List unique `ITEM_SHORT_NAMES`/`ROOM_SHORT_NAMES` for every new room and item, checked against `web/js/world.js`.
 * [ ] Specify the four-beat lift timing table (turn, platform stop, rider location) from GROUND and from BELOW.
-* [ ] Record the resolution of each OPEN decision (D20 to D23, D26, D28): operator reply, or the recommendation as an AUTODECISION.
+* [ ] Record the resolution of each OPEN decision (D21 to D23, D26, D28): operator reply, or the recommendation as an AUTODECISION.
 * [ ] Tone check: parody names only, no holiday theme, no burrito or Taco Tuesday mechanics, no reproduced lyrics.
 
 ## Acceptance

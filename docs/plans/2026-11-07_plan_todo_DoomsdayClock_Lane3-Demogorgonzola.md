@@ -1,11 +1,11 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 3: Demogorgonzola
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c45+s85='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/lanternwild/demogorgonzola.js`, `web/js/manor/fridge.js`, the MILK starting-location line in `web/js/world.js`, and `web/tests/features/lanternwild-demogorgonzola.feature`.
+* Produces: `web/js/upsidedown/demogorgonzola.js`, `web/js/manor/fridge.js`, the MILK starting-location line in `web/js/world.js`, and `web/tests/features/upsidedown-demogorgonzola.feature`.
 * Not produces: other modules, `::win`.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.

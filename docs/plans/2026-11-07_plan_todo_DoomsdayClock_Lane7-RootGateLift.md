@@ -1,11 +1,11 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 7: RootGateLift
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c65+s80='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/lanternwild/rootgate.js`, oak lift changes, `web/tests/features/lanternwild-rootgate.feature`, and `oak-tree-fort.feature` updates.
+* Produces: `web/js/upsidedown/rootgate.js`, oak lift changes, `web/tests/features/upsidedown-rootgate.feature`, and `oak-tree-fort.feature` updates.
 * Not produces: `::win`, `sysop-menu.js` path helpers.
 * Depends on: Lanes 3 to 6.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.

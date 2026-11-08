@@ -5,7 +5,7 @@
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c50+s80='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/lanternwild/realm.js`, every module stub, module registration, generic verbs, and `web/tests/features/lanternwild-realm.feature`.
+* Produces: `web/js/upsidedown/realm.js`, every module stub, module registration, generic verbs, and `web/tests/features/upsidedown-realm.feature`.
 * Not produces: puzzle logic, manor heirloom logic, shared high logic, `::win`, heirloom count.
 * Depends on: Lane 1.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
@@ -13,7 +13,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Create `web/js/lanternwild/index.js` plus stubs `realm.js`, `demogorgonzola.js`, `radio.js`, `radio-clues.js`, `planetarium.js`, `shack.js`, `rootgate.js`, and `web/js/manor/index.js` plus stubs `fridge.js`, `diamond.js`, `photograph.js`, `corkscrew.js`, `snuffbox.js`, `weathercock.js`; each exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools }`.
+* [ ] Create `web/js/upsidedown/index.js` plus stubs `realm.js`, `demogorgonzola.js`, `radio.js`, `radio-clues.js`, `planetarium.js`, `shack.js`, `rootgate.js`, and `web/js/manor/index.js` plus stubs `fridge.js`, `diamond.js`, `photograph.js`, `corkscrew.js`, `snuffbox.js`, `weathercock.js`; each exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools }`.
 * [ ] Merge modules once in `world.js` (rooms, items, short names, progress awards, hints, and `flavorPools` into `CYCLING_FLAVOR_POOLS` with `cycleFlavor` reachable through `ctx`) and chain `roomHooks` onto existing room `on` handlers without replacing them.
 * [ ] Add the generic verbs Lane 1 lists to `parser.js` with default refusals in `commands.js`; no puzzle knowledge in the engine.
 * [ ] Define all realm room shells and exits in `realm.js`; MINERS' LOCKER in `mineGallery` (OPEN LOCKER, IN) and OUT back to the gallery; ROOT HOLLOW sealed until `realm:allSolved`.
@@ -23,7 +23,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 * [ ] List every new file in `web/versions.json` `CONTENT_FILES`; `manifest.feature` passes.
 * [ ] Include realm room, lift stop, and puzzle flags in `web/js/issue-report.js` reports.
 * [ ] Tag existing `::win` trace scenarios `@win` and maximum-score assertions `@maxscore` (tags only; no `::win` logic change).
-* [ ] Write `lanternwild-realm.feature`: locker entry and return, discovery award once, flight refusal both directions, map floor shown.
+* [ ] Write `upsidedown-realm.feature`: locker entry and return, discovery award once, flight refusal both directions, map floor shown.
 * [ ] Add the realm entry to `web/README.md` commands and a new `web/DESIGN.md` §12.36 realm section.
 
 ## Acceptance

@@ -1,11 +1,11 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane5-Planetarium.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane5-Planetarium.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 5: Planetarium
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c50+s85='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/lanternwild/planetarium.js` and `web/tests/features/lanternwild-planetarium.feature`.
+* Produces: `web/js/upsidedown/planetarium.js` and `web/tests/features/upsidedown-planetarium.feature`.
 * Not produces: other modules, burn-timer or brazier changes, `::win`.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.

@@ -1,11 +1,11 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane4-RadioQuiz.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane4-RadioQuiz.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 4: RadioQuiz
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c55+s80='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/lanternwild/radio.js`, `web/js/lanternwild/radio-clues.js`, and `web/tests/features/lanternwild-radio.feature`.
+* Produces: `web/js/upsidedown/radio.js`, `web/js/upsidedown/radio-clues.js`, and `web/tests/features/upsidedown-radio.feature`.
 * Not produces: other modules, `::win`, any song lyric.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
