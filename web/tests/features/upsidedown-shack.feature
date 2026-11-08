@@ -73,6 +73,15 @@ Feature: The Shack alphabet wall
     And item "purpleCrayon" is in room "shack"
     And the game score is 20
 
+  Scenario: The wall's award and one crayon survive a snapshot
+    When I send "spell fart"
+    And I round-trip the game snapshot
+    And I send "spell cheese"
+    Then item "purpleCrayon" is in room "shack"
+    And flag "progressAward:shackSpelled" is set
+    And the output contains "no second CRAYON"
+    And the game score is 10
+
   Scenario: The unspawned crayon cannot be mistaken for a color puzzle
     When I send "examine crayon"
     Then the output contains "The wall has not spat out a CRAYON yet."

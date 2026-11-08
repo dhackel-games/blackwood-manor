@@ -11,6 +11,8 @@ Feature: Player command parsing
       | n                                   | go      | north     | [none]      | [none]    |
       | g                                   | again   | [none]    | [none]      | [none]    |
       | g kitchen                           | go      | kitchen   | [none]      | [none]    |
+      | run north                           | go      | north     | [none]      | [none]    |
+      | run microwave                       | start   | microwave | [none]      | [none]    |
       | northeast                           | go      | ne        | [none]      | [none]    |
       | northwest                           | go      | nw        | [none]      | [none]    |
       | southeast                           | go      | se        | [none]      | [none]    |

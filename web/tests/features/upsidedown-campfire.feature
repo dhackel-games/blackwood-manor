@@ -12,18 +12,18 @@ Feature: The Upside-Down campfire and stream
     Then the output contains "<success>"
     And flag "realm:campfireOut" is set
     And item "cyanGem" is in "waylampClearing"
-    And the game score is 5
+    And the game score is <score>
     When I send "stomp fire"
     Then the output contains "The CAMPFIRE is already out"
-    And the game score is 5
+    And the game score is <score>
 
     Examples:
-      | method | command             | success                                  |
-      | wine   | pour wine on fire   | They cough, blush, and go out.           |
-      | milk   | pour milk on fire   | The fire sulks like a child denied dessert |
-      | water  | pour jug on fire    | A JUG of STREAM water hisses into the fire |
-      | body   | stomp fire          | You stomp the flames flat with your shoes |
-      | body   | smother fire        | You smother the fire with your body       |
+      | method | command             | success                                  | score |
+      | wine   | pour wine on fire   | They cough, blush, and go out.           | 10    |
+      | milk   | pour milk on fire   | The fire sulks like a child denied dessert | 10    |
+      | water  | pour jug on fire    | A JUG of STREAM water hisses into the fire | 5     |
+      | body   | stomp fire          | You stomp the flames flat with your shoes | 5     |
+      | body   | smother fire        | You smother the fire with your body       | 5     |
 
   Scenario: Filling, pouring, and refilling the reusable jug
     Given a fresh manor game
@@ -40,6 +40,32 @@ Feature: The Upside-Down campfire and stream
     When I send "fill jug"
     Then the milk jug is full
     And the game score is 10
+
+  Scenario Outline: Wine and milk portable-use credits survive the extinguish branch once
+    Given a fresh manor game
+    And the player is in room "waylampClearing"
+    And the campfire method "<method>" is ready
+    When I send "<command>"
+    Then flag "useItem:<item>" is set
+    And the game score is 10
+    And I round-trip the game snapshot
+    When I send "stomp fire"
+    Then item "cyanGem" is in "waylampClearing"
+    And the game score is 10
+
+    Examples:
+      | method | command           | item       |
+      | wine   | pour wine on fire | wineBottle |
+      | milk   | pour milk on fire | milk       |
+
+  Scenario: A filled jug keeps its dynamic description after restore
+    Given a fresh manor game
+    And the player is in room "waylampClearing"
+    And item "milkJug" is carried
+    When I send "fill jug"
+    And I round-trip the game snapshot
+    And I send "examine jug"
+    Then the output contains "sloshes with fresh STREAM water"
 
   Scenario: The cyan gem remains unavailable until the fire is out
     Given a fresh manor game

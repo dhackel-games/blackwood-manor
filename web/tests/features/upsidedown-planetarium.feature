@@ -73,6 +73,16 @@ Feature: Planetarium projector and stellar map
     And item "goldEyepiece" is in "planetarium"
     And the game score is 10
 
+  Scenario: The eyepiece award and state survive restore without a second drop
+    Given the player is in room "planetarium"
+    When I send "say 1"
+    And I round-trip the game snapshot
+    And I send "say 3"
+    Then flag "realm:eyepieceDropped" is set
+    And item "goldEyepiece" is in "planetarium"
+    And the output contains "The projector hatch is empty."
+    And the game score is 10
+
   Scenario: The eyepiece is usable and the Sirius fire lights the brazier
     Given the player is in room "planetarium"
     When I send "say 5"

@@ -32,6 +32,26 @@ Feature: The Upside Down realm hub
     And the output does not contain "(+20)"
     And the game score is 20
 
+  Scenario: Realm discovery survives restore without another award
+    Given flag "dragonMoved" is set
+    And the player is in room "mineGallery"
+    When I send "open locker"
+    And I send "in"
+    And I round-trip the game snapshot
+    And I send "out"
+    And I send "in"
+    Then flag "progressAward:realmDiscovered" is set
+    And the output does not contain "(+20)"
+    And the game score is 20
+
+  Scenario: The BM Watch routes through the declared locker portal
+    Given item "backwardsWatch" is carried
+    And the player is in room "mineGallery"
+    When I send "open locker"
+    And I send "route to waylamp"
+    Then the output contains "ROUTE READY"
+    And flag "mirrorRoutePrefill" equals "in"
+
   Scenario: Named flight reaches and leaves realm rooms without a special case
     Given item "wingedShoes" is carried
     And the player is in room "gate"

@@ -258,6 +258,19 @@ function winRadioAnswers(game) {
   return answers;
 }
 
+function navigationLinkCommands(game, room) {
+  return (game.world.navigationLinks || [])
+    .filter((link) => link.from === room && (!link.when || link.when(game)))
+    .map((link) => {
+      const commands = typeof link.commands === "function" ? link.commands(game) : link.commands;
+      return {
+        to: link.to,
+        commands: Array.isArray(commands) ? commands : [commands],
+      };
+    })
+    .filter((link) => link.to && link.commands.every(Boolean));
+}
+
 export function pathToRoom(game, target) {
   const destination = resolveRoomId(game, target);
   if (!destination) throw new Error(`Unknown path target: ${target}`);
@@ -300,18 +313,21 @@ export function pathToRoom(game, target) {
     if (start === destination) return prefix.map(shortestCommand);
   }
 
-  const queue = [{ room: start, directions: [] }];
+  const queue = [{ room: start, commands: [] }];
   const visited = new Set([start]);
   while (queue.length) {
     const current = queue.shift();
-    for (const [direction, exit] of Object.entries(game.world.rooms[current.room]?.exits || {})) {
-      if (typeof exit === "object" && exit.via && !game.getFlag(exit.via)) continue;
+    const exits = Object.entries(game.world.rooms[current.room]?.exits || {}).flatMap(([direction, exit]) => {
+      if (typeof exit === "object" && exit.via && !game.getFlag(exit.via)) return [];
       const next = typeof exit === "object" ? exit.to : exit;
-      if (!next || visited.has(next)) continue;
-      const directions = [...current.directions, direction];
-      if (next === destination) return [...prefix, ...directions].map(shortestCommand);
-      visited.add(next);
-      queue.push({ room: next, directions });
+      return next ? [{ to: next, commands: [direction] }] : [];
+    });
+    for (const edge of [...exits, ...navigationLinkCommands(game, current.room)]) {
+      if (visited.has(edge.to)) continue;
+      const commands = [...current.commands, ...edge.commands];
+      if (edge.to === destination) return [...prefix, ...commands].map(shortestCommand);
+      visited.add(edge.to);
+      queue.push({ room: edge.to, commands });
     }
   }
   throw new Error(`No available path from ${game.state.room} to ${destination}`);

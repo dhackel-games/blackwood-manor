@@ -198,6 +198,30 @@ function leavePlatform(ctx, cmd) {
   return "You step off into the OAK UNDERCROFT.";
 }
 
+function liftRoute(ctx, from, to) {
+  if (!ctx.getFlag("oak:lowerPanelAligned")) return null;
+  let beat = liftBeat(ctx);
+  let platform = LIFT_STOPS[beat];
+  let grace = !!ctx.getFlag("oakLiftGrace");
+  const commands = [];
+  const waitFor = (stop) => {
+    for (let count = 0; platform !== stop && count <= LIFT_STOPS.length; count += 1) {
+      commands.push("wait");
+      if (grace) grace = false;
+      else {
+        beat = (beat + 1) % LIFT_STOPS.length;
+        platform = LIFT_STOPS[beat];
+      }
+    }
+    return platform === stop;
+  };
+  if (!waitFor(from)) return null;
+  commands.push("in platform");
+  grace = false;
+  if (!waitFor(to)) return null;
+  return [...commands, "out"];
+}
+
 const rooms = {};
 const items = {
   lowerPanel: {
@@ -293,7 +317,20 @@ const roomHooks = {
   },
 };
 const flavorPools = {};
+const navigationLinks = [
+  ...["greatOak", "treeFort", "below"].flatMap((from) =>
+    ["greatOak", "treeFort", "below"]
+      .filter((to) => to !== from)
+      .map((to) => ({
+        from,
+        to,
+        commands: (ctx) => liftRoute(ctx, from, to),
+        when: (ctx) => !!ctx.getFlag("oak:lowerPanelAligned"),
+      }))),
+];
 
-export default { rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools };
+export default {
+  rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools, navigationLinks,
+};
 
 // end lowerpanel.js

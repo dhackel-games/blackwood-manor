@@ -73,7 +73,9 @@ function cloneData(def, id) {
   return copy;
 }
 
-const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace", "setting"];
+const MUTABLE_ITEM_STATE = [
+  "loc", "open", "locked", "lit", "fuel", "worn", "lightGrace", "setting", "highSource",
+];
 
 function restoreItems(worldItems, savedItems = {}) {
   const restoredItems = Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
@@ -206,6 +208,20 @@ export function createGame(world) {
   game.findItem = (phrase, scope) => game.findItems(phrase, scope)?.[0] || null;
   game.find = (phrase, scope) => game.findItem(phrase, scope);
   const itemDefinition = (item) => item && (world.items[item.id] || world.items[item.templateId]);
+  game.itemText = (item, key) => {
+    const text = item?.[key] ?? itemDefinition(item)?.[key];
+    return typeof text === "function" ? text(game) : text;
+  };
+  game.resolveRoomId = (phrase) => {
+    const normalize = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const wanted = normalize(phrase);
+    if (!wanted) return null;
+    const matches = Object.entries(world.rooms).filter(([id, room]) =>
+      [world.roomShortNames?.[id], id, room.name, ...(room.aliases || [])]
+        .filter(Boolean)
+        .some((name) => normalize(name) === wanted || normalize(name).endsWith(wanted)));
+    return matches.length === 1 ? matches[0][0] : null;
+  };
 
   function itemTitle(item) {
     const primary = item.names[0];
@@ -422,7 +438,7 @@ export function createGame(world) {
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery || i.takeable);
     for (const it of here) {
-      const roomDesc = typeof it.roomDesc === "function" ? it.roomDesc(game) : it.roomDesc;
+      const roomDesc = game.itemText(it, "roomDesc");
       out += (roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {
         const inside = game.itemsIn(it.id);
@@ -627,6 +643,15 @@ export function createGame(world) {
     return `enter ${itemTitle(target)}`;
   }
 
+  function inferStartNavigation(cmd) {
+    if (cmd.verb !== "start" || !cmd.dobj || game.find(cmd.dobj)) return null;
+    const roomId = game.resolveRoomId(cmd.dobj);
+    if (!roomId) return null;
+    cmd.verb = "go";
+    cmd.dobj = roomId;
+    return `go ${world.rooms[roomId].name}`;
+  }
+
   function inferUseAction(cmd) {
     if (cmd.verb !== "use" || !cmd.dobj) return null;
     const carried = game.findItems(cmd.dobj, game.inventory()) || [];
@@ -723,6 +748,7 @@ export function createGame(world) {
       : null;
     if (implicitNavigation) cmd = parse(implicitNavigation);
     const implicitEntry = inferGoEntryTarget(cmd);
+    const implicitStartNavigation = inferStartNavigation(cmd);
     const implicitTalk = inferSoleTalkTarget(cmd);
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || []).map(displayDerivedStep)
@@ -769,7 +795,7 @@ export function createGame(world) {
       if (derivedSteps.includes(executionLabel)) finalStep = null;
       const sequence = acquisitionBlocked || !finalStep ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join("; ")})\n\n${text}`;
-    } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {
+    } else if (implicitNavigation || implicitEntry || implicitStartNavigation || implicitTalk || implicitUse) {
       text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();

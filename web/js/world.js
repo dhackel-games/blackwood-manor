@@ -33,6 +33,7 @@ const MODULE_SHORT_NAMES = CONTENT_MODULES.reduce((merged, module) => ({
 }), { rooms: {}, items: {} });
 const MODULE_PROGRESS_AWARDS = moduleRecords("progressAwards");
 const MODULE_FLAVOR_POOLS = moduleRecords("flavorPools");
+const MODULE_NAVIGATION_LINKS = CONTENT_MODULES.flatMap((module) => module.navigationLinks || []);
 
 function moduleHints(ctx) {
   return CONTENT_MODULES.flatMap((module) => module.hints || [])
@@ -2630,6 +2631,9 @@ function takeSpyglass(ctx) {
 }
 
 function oakLiftTick(ctx) {
+  if (ctx.getFlag("oakLiftRiding") && ctx.state.room !== ctx.roomOf("oakPlatform")) {
+    ctx.setFlag("oakLiftRiding", false);
+  }
   if (ctx.getFlag("oak:lowerPanelAligned")) {
     if (ctx.getFlag("oakLiftGrace")) {
       ctx.setFlag("oakLiftGrace", false);
@@ -3849,6 +3853,7 @@ const logicWorld = {
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   reliquaryStatusValue, // HUD-compatible RELIQUARY count text
   routeWithMirror: routeWithBmWatch,
+  navigationLinks: MODULE_NAVIGATION_LINKS,
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -5483,10 +5488,24 @@ function mergeContentModules(baseWorld) {
       merged.items[id] = { ...merged.items[id], ...definition };
     }
     for (const [id, prose] of Object.entries(module.content?.rooms || {})) {
-      merged.rooms[id] = { ...merged.rooms[id], ...prose };
+      const existing = merged.rooms[id] || {};
+      merged.rooms[id] = { ...existing, ...prose };
+      for (const key of ["desc", "roomDesc", "searchDesc", "highDesc"]) {
+        if (typeof existing[key] === "function" && typeof prose[key] !== "function") {
+          const dynamic = existing[key];
+          merged.rooms[id][key] = (ctx) => dynamic(ctx) ?? prose[key];
+        }
+      }
     }
     for (const [id, prose] of Object.entries(module.content?.items || {})) {
-      merged.items[id] = { ...merged.items[id], ...prose };
+      const existing = merged.items[id] || {};
+      merged.items[id] = { ...existing, ...prose };
+      for (const key of ["desc", "roomDesc", "searchDesc", "highDesc"]) {
+        if (typeof existing[key] === "function" && typeof prose[key] !== "function") {
+          const dynamic = existing[key];
+          merged.items[id][key] = (ctx) => dynamic(ctx) ?? prose[key];
+        }
+      }
     }
   }
   for (const module of CONTENT_MODULES) {

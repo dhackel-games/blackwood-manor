@@ -49,6 +49,7 @@ function mergeModules(entries) {
     hints: [...merged.hints, ...(module.hints || [])],
     roomHooks: mergeRoomHooks(merged.roomHooks, module.roomHooks),
     flavorPools: { ...merged.flavorPools, ...(module.flavorPools || {}) },
+    navigationLinks: [...merged.navigationLinks, ...(module.navigationLinks || [])],
   }), {
     rooms: {},
     items: {},
@@ -58,6 +59,7 @@ function mergeModules(entries) {
     hints: [],
     roomHooks: {},
     flavorPools: {},
+    navigationLinks: [],
   });
 }
 

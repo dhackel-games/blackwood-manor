@@ -73,4 +73,15 @@ Feature: Baroness Photograph
     When I send "read photograph"
     Then the game score is 40
 
+  Scenario: A completed photograph survives restore without a duplicate award
+    Given a fresh manor game
+    And all loose photograph pieces are carried
+    When I send "combine pieces"
+    And I round-trip the game snapshot
+    And I send "combine pieces"
+    Then item "baronessPhotograph" is carried
+    And item "letter" is in "baronessPhotograph"
+    And flag "progressAward:photoCombined" is set
+    And the game score is 30
+
 # end manor-photograph.feature

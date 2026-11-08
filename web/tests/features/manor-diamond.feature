@@ -66,6 +66,27 @@ Feature: Blackwood Diamond microwave and DIAL
     Then the output equals "The MICROWAVE has made its one DIAMOND. Another lump would only waste your time."
     And the Diamond award was granted only once
 
+  Scenario: The Diamond state survives restore without a second award
+    Given the player is in room "kitchen"
+    And item "coalLump" is carried
+    When I send "put coal in microwave"
+    And I send "set dial to B"
+    And I send "start microwave"
+    And I round-trip the game snapshot
+    And I send "start microwave"
+    Then item "blackwoodDiamond" is in "microwave"
+    And flag "progressAward:diamondMade" is set
+    And the game score is 10
+
+  Scenario: RUN starts machinery while retaining directional travel
+    Given the player is in room "kitchen"
+    And item "coalLump" is carried
+    When I send "put coal in microwave"
+    And I send "run microwave"
+    Then the output contains "The MICROWAVE hums, stops"
+    When I send "run north"
+    Then the current room is "diningRoom"
+
   Scenario: The microwave descriptions and absent Diamond refusal are fair
     Given the player is in room "kitchen"
     And item "rope" is carried
@@ -101,7 +122,7 @@ Feature: Blackwood Diamond microwave and DIAL
     Examples:
       | dial      | command             | result                                         | onCall |
       | none      | dial                | Gary                                           | true   |
-      | microwave | dial                | The DIAL needs a setting.                      | false  |
+      | microwave | dial                | Gary                                           | true   |
       | microwave | dial B              | The MICROWAVE DIAL clicks to B.                | false  |
       | microwave | turn dial to T      | The MICROWAVE DIAL clicks to T.                | false  |
       | microwave | set dial to M       | The MICROWAVE DIAL clicks to M.                | false  |

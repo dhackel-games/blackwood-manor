@@ -373,7 +373,7 @@ export const commands = {
     if (!ctx.isLit()) return "It's too dark to see anything.";
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
-    const description = typeof it.desc === "function" ? it.desc(ctx) : it.desc;
+    const description = ctx.itemText?.(it, "desc") ?? (typeof it.desc === "function" ? it.desc(ctx) : it.desc);
     let out = description || `You see nothing special about the ${it.names[0]}.`;
     if (it.container && it.openable) out += it.open ? " It is open." : " It is closed.";
     if (it.container && it.open) {
@@ -678,7 +678,7 @@ export const commands = {
 
   dial(ctx, cmd) {
     const target = normalizeRoomName(cmd.dobj);
-    if (DIAL_HOTLINE_TARGETS.has(target)) return commands.hotline(ctx, cmd);
+    if (!target || DIAL_HOTLINE_TARGETS.has(target)) return commands.hotline(ctx, cmd);
     const dial = visibleDial(ctx);
     if (!dial) return commands.hotline(ctx, cmd);
     return runDial(ctx, dial, cmd, cmd.dobj);

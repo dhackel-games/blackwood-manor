@@ -84,13 +84,15 @@ function pourOnFire(ctx, cmd) {
     const bottle = wineBottle(ctx);
     if (!bottle) return "You need an opened WINE BOTTLE in your hands.";
     if (!bottle.open) return "The WINE BOTTLE is corked. Only the CORKSCREW can open it.";
+    const use = ctx.awardUse(bottle);
     spendWine(ctx, bottle);
-    return extinguish(ctx, "You tip wine into the upside-down flames. They cough, blush, and go out.");
+    return extinguish(ctx, "You tip wine into the upside-down flames. They cough, blush, and go out.") + use;
   }
   if (["milk", "bottleofmilk"].includes(poured)) {
     if (!ctx.has("milk")) return "You need the BOTTLE OF MILK in your hands.";
+    const use = ctx.awardUse(ctx.item("milk"));
     ctx.destroy("milk");
-    return extinguish(ctx, "You pour MILK into the flames. The fire sulks like a child denied dessert and goes out.");
+    return extinguish(ctx, "You pour MILK into the flames. The fire sulks like a child denied dessert and goes out.") + use;
   }
   if (isWaterTarget(poured)) {
     const jug = ctx.item("milkJug");

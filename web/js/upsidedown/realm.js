@@ -194,7 +194,22 @@ const roomHooks = {
 };
 
 const flavorPools = {};
+const navigationLinks = [
+  {
+    from: "mineGallery",
+    to: "waylampClearing",
+    commands: ["in"],
+    when: (ctx) => !!ctx.item("minersLocker")?.open,
+  },
+  {
+    from: "waylampClearing",
+    to: "mineGallery",
+    commands: ["out"],
+  },
+];
 
-export default { rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools };
+export default {
+  rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools, navigationLinks,
+};
 
 // end realm.js

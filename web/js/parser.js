@@ -11,7 +11,7 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "g", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
+  go: ["go", "g", "walk", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "t", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open", "o", "pry", "force"], close: ["close", "c", "shut"],
   lock: ["lock", "lk"], unlock: ["unlock", "un"],
@@ -181,7 +181,7 @@ export function parse(input) {
   if (verb === "go" && !rest[0]?.quoted && rest[0]?.value === "to") rest = rest.slice(1);
 
   // "go north" / "go n" / "climb up"
-  if ((verb === "go" || verb === "climb") && rest.length &&
+  if ((verb === "go" || verb === "climb" || sourceVerb === "run") && rest.length &&
       !rest[0].quoted && DIRECTIONS[rest[0].value]) {
     return { verb: "go", dobj: DIRECTIONS[rest[0].value], prep: null, iobj: null };
   }

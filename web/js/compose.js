@@ -13,10 +13,22 @@
 // Games that don't use the split simply never call this. It is additive and
 // changes no existing behaviour.
 
+function mergeDescription(structural, prose, key) {
+  const dynamic = structural?.[key];
+  const staticProse = prose?.[key];
+  if (typeof dynamic !== "function" || typeof staticProse === "function") return staticProse;
+  return (ctx) => dynamic(ctx) ?? staticProse;
+}
+
 function mergeById(structure = {}, prose = {}) {
   const out = {};
   for (const id of new Set([...Object.keys(structure), ...Object.keys(prose)])) {
     out[id] = { ...structure[id], ...prose[id] };
+    for (const key of ["desc", "roomDesc", "searchDesc", "highDesc"]) {
+      if (structure[id]?.[key] !== undefined && prose[id]?.[key] !== undefined) {
+        out[id][key] = mergeDescription(structure[id], prose[id], key);
+      }
+    }
   }
   return out;
 }

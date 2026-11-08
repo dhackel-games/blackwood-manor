@@ -122,6 +122,31 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the current room is "privy"
     And flag "oakLiftRiding" is false
 
+  Scenario: Flying away after boarding always disembarks
+    Given flag "high" is 3
+    When I send "place emerald in panel"
+    And I send "enter platform"
+    And I send "fly garden"
+    Then the current room is "garden"
+    And flag "oakLiftRiding" is false
+
+  Scenario: Aligned lift descriptions override only the obsolete two-stop prose
+    Given flag "oak:lowerPanelAligned" is set
+    And item "oakPlatform" rests in room "greatOak"
+    When I send "examine platform"
+    Then the output contains "OAK UNDERCROFT"
+    And the output does not contain "shuttles between the roots and the TREE FORT"
+    When I send "look"
+    Then the output contains "third stop"
+    Given the player is in room "treeFort"
+    When I send "look"
+    Then the output contains "chamber under the roots"
+
+  Scenario: Runtime navigation uses the declared aligned lift links
+    Given the player is in room "below"
+    And the aligned lower lift is at "below"
+    Then the path from the current room to "GREAT OAK" is "in platform; z; out"
+
   Scenario: The lower panel adds the four-beat return lift and repeated oak round trips
     Given the player is in room "below"
     And item "cyanGem" is carried

@@ -39,6 +39,19 @@ Feature: Hidden sight parity
     When I send "in"
     Then the current room is "betweenWalls"
 
+  Scenario: Hidden-sight discoveries survive restore without another award
+    Given a fresh manor game
+    And item "xrayGoggles" is carried
+    And the player is in room "nursery"
+    When I send "wear goggles"
+    And I send "look"
+    And I round-trip the game snapshot
+    And I send "look"
+    Then flag "wallGapFound" is set
+    And flag "progressAward:wallGapFound" is set
+    And the output does not contain "(+5)"
+    And the game score is 15
+
   Scenario: Hidden sight names the library obstruction instead of refusing a seen stair
     Given a fresh manor game
     And item "obsidianEye" is carried

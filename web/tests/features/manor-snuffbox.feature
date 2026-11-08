@@ -47,4 +47,20 @@ Feature: Great-Grandpa Blackwood's snuffbox
     When I send "sniff snuffbox"
     Then the output contains "The SNUFFBOX is EMPTY. It is still an heirloom, but there is nothing left to sniff."
 
+  Scenario: Pinches persist across restore without renewing the use award
+    When I send "pick nose"
+    And I send "sniff snuffbox"
+    And I send "sniff snuffbox"
+    Then the snuffbox has 1 pinches remaining
+    And the game score is 25
+    When I round-trip the game snapshot
+    Then the snuffbox has 1 pinches remaining
+    When I send "sniff snuffbox"
+    Then the snuffbox has 0 pinches remaining
+    And flag "manor:snuffPinches" equals 3
+    And the game score is 25
+    When I send "sniff snuffbox"
+    Then the output contains "The SNUFFBOX is EMPTY"
+    And the game score is 25
+
 # end manor-snuffbox.feature
