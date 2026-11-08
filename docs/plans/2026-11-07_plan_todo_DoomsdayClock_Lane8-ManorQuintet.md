@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 8: ManorQuintet
 
@@ -30,6 +30,6 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Decisions
 
-* Designs ratified by AndrewC 2026-11-08 (master D24, D25, D29); D28 and D33 ratified; D26 stays OPEN in the master.
+* Designs ratified by AndrewC 2026-11-08 (master D24, D25, D29); D26, D28, and D33 ratified.
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md -->

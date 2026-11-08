@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 3: Demogorgonzola
 
@@ -13,14 +13,14 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] KITCHEN FRIDGE in `fridge.js`: a fixed openable container; new games start the existing MILK and the three Lane 1 cheeses inside; drinking MILK is unchanged.
-* [ ] Save compatibility: older saves gain the FRIDGE and cheeses without moving a MILK the player already took or drank.
-* [ ] Three takeable CHEESE items with stench descriptions; EAT CHEESE is refused with a gag so no cheese can be lost.
+* [ ] KITCHEN FRIDGE in `fridge.js`: a fixed openable container; new games start the existing MILK, the EMPTY MILK JUG (portable non-heirloom; normal first-time +5 pickup and +5 use; POUR OUT empties it anywhere), and the three cheeses (LIMBURGER, ÉPOISSES, MUNSTER) inside; drinking MILK is unchanged.
+* [ ] Save compatibility: older saves gain the FRIDGE, MILK JUG, and cheeses without moving a MILK the player already took or drank.
+* [ ] Three takeable CHEESE items with the Lane 1 stink lines (funny stink, no trivia); EAT CHEESE is refused with a gag so no cheese can be lost.
 * [ ] DEMOGORGONZOLA in the CHEESE GROTTO: GIVE or FEED accepts each cheese in any order and consumes it; after the third its face opens like a flower and it yields the DEMOGORGONZOLA RIND (`pendingHeirloom: true`, points per master Section 8); sets `realm:demoFed`; +10 once.
 * [ ] Every other interaction (ATTACK, FIGHT, TOUCH, KICK, TAKE, GIVE of a non-cheese, and the Lane 1 list) swallows the player, who reappears at `gate` with inventory kept.
 * [ ] Room and creature text foreshadow the swallow and the cheese craving (P3).
 * [ ] Gary hint entries for the fridge, cheeses, creature, and rind.
-* [ ] Feature covers fridge contents, two different feeding orders, each swallow verb landing at `gate`, award once, rind pickup and use rewards, and replay without farming.
+* [ ] Feature covers fridge contents (MILK, JUG, three cheeses), two different feeding orders, each swallow verb landing at `gate`, award once, rind pickup and use rewards, and replay without farming.
 
 ## Acceptance
 
