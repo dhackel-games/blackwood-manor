@@ -76,7 +76,7 @@ function cloneData(def, id) {
 const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace", "setting"];
 
 function restoreItems(worldItems, savedItems = {}) {
-  return Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
+  const restoredItems = Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
     const restored = cloneData(definition, id);
     const saved = savedItems[id];
     if (saved) {
@@ -86,6 +86,11 @@ function restoreItems(worldItems, savedItems = {}) {
     }
     return [id, restored];
   }));
+  for (const [id, saved] of Object.entries(savedItems)) {
+    if (restoredItems[id] || !saved?.templateId || !worldItems[saved.templateId]) continue;
+    restoredItems[id] = { ...cloneData(worldItems[saved.templateId], id), ...saved, id };
+  }
+  return restoredItems;
 }
 
 export function createGame(world) {
@@ -190,7 +195,7 @@ export function createGame(world) {
     const adjs = words.slice(0, -1);
     const candidates = scope || game.visibleItems();
     const canonical = candidates.filter((it) =>
-      world.itemShortNames?.[it.id]?.toLowerCase() === normalized);
+      (it.shortName || world.itemShortNames?.[it.id])?.toLowerCase() === normalized);
     if (canonical.length) return canonical;
     return candidates.filter((it) => {
       const names = (it.names || []).map((s) => s.toLowerCase());
@@ -200,6 +205,7 @@ export function createGame(world) {
   };
   game.findItem = (phrase, scope) => game.findItems(phrase, scope)?.[0] || null;
   game.find = (phrase, scope) => game.findItem(phrase, scope);
+  const itemDefinition = (item) => item && (world.items[item.id] || world.items[item.templateId]);
 
   function itemTitle(item) {
     const primary = item.names[0];
@@ -271,8 +277,9 @@ export function createGame(world) {
   };
   game.awardUse = (item) => {
     const points = item?.takeable ? cfg.portableRewards?.use : 0;
-    if (!points || game.getFlag(`useItem:${item.id}`)) return "";
-    game.setFlag(`useItem:${item.id}`);
+    const flag = item?.useFlag || `useItem:${item.id}`;
+    if (!points || game.getFlag(flag)) return "";
+    game.setFlag(flag);
     game.addScore(points);
     return ` (+${points})`;
   };
@@ -481,14 +488,16 @@ export function createGame(world) {
   function runHandlers(cmd) {
     const direct = cmd.dobj ? game.find(cmd.dobj) : null;
     const indirect = cmd.iobj ? game.find(cmd.iobj) : null;
+    const directDefinition = itemDefinition(direct);
+    const indirectDefinition = itemDefinition(indirect);
     const targets = [];
-    if (direct && !world.items[direct.id]?.on?.[cmd.verb]
+    if (direct && !directDefinition?.on?.[cmd.verb]
         && typeof world.useHighSource === "function") {
       const highSourceResult = world.useHighSource(game, direct, cmd);
       if (highSourceResult != null) return highSourceResult;
     }
-    if (direct) targets.push(world.items[direct.id]);
-    if (indirect && indirect.id !== direct?.id) targets.push(world.items[indirect.id]);
+    if (direct) targets.push(directDefinition);
+    if (indirect && indirect.id !== direct?.id) targets.push(indirectDefinition);
     targets.push(world.rooms[state.room]);
     for (const t of targets) {
       const h = t && t.on && t.on[cmd.verb];
@@ -509,7 +518,7 @@ export function createGame(world) {
     if (cmd.verb !== "enter" || !cmd.dobj) return null;
     const target = game.find(cmd.dobj);
     if (!target || !target.enterTo) return null;
-    const definition = world.items[target.id];
+    const definition = itemDefinition(target);
     const canOpen = target.openable || !!definition?.on?.open;
     if (!canOpen || target.open) return null;
 
@@ -577,7 +586,7 @@ export function createGame(world) {
       iobj: null,
       itemId: item.id,
     };
-    const itemHandler = world.items[item.id]?.on?.take;
+    const itemHandler = itemDefinition(item)?.on?.take;
     let result = itemHandler ? itemHandler(game, takeCommand) : null;
     const roomHandler = world.rooms[state.room]?.on?.take;
     if (result == null && roomHandler) result = roomHandler(game, takeCommand);

@@ -1292,4 +1292,26 @@ CLOCK at 1:30, a future hook only. Its back retains the unchanged letter: READ
 PHOTOGRAPH or READ LETTER after combination awards any missing letter-read
 credit and the photograph's normal first use, with neither award repeatable.
 
+#### 12.37.5 Corkscrew and wine bottle
+
+The WINE CELLAR holds the `pendingHeirloom` CORKSCREW beside the CRYSTAL
+DECANTER and one dusty, non-heirloom WINE BOTTLE on its rack. The corkscrew has
+no puzzle award: its normal one-time use reward comes only from OPEN BOTTLE
+WITH CORKSCREW. A bottle's broken cork refuses every other opener; DRINK WINE
+while it is corked tells the player to open it first.
+
+The rack supplies one offered bottle at a time. Taking it immediately creates
+the next saved instance (`wineBottle`, then `wineBottle:2`, and so on) with a
+unique `winebtl` short name, while bottles dropped elsewhere remain where they
+were left. `manor:wineSerial` is monotonic and `manor:wineSips` stores each
+instance's zero-through-four sip count through save/restore. Every instance
+shares the `wineBottle` pickup and use ledger identities, so a refill cannot
+farm either reward and derived maximum score counts the template exactly once.
+
+An opened bottle declares the shared `highSource` API: each of its four DRINK
+actions gives ten stacking high turns and the canonical wine opening. The last
+sip destroys that physical bottle after the shared-high output; its rack
+replacement is already waiting. Bare BOTTLE remains MILK except for the cellar
+TAKE BOTTLE and OPEN BOTTLE WITH CORKSCREW collision rules.
+
 
