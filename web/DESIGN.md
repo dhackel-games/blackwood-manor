@@ -1148,6 +1148,22 @@ flight path as every other room, so it can enter and leave the realm without a
 realm-specific flight exception. The parser supplies generic fallback verbs
 for future puzzle modules; the engine contains no realm puzzle rules.
 
+#### 12.36.2 Cabinet radio quiz
+
+The AV CLUB DEN's fixed CABINET RADIO starts a name-that-tune round with TURN
+ON, LISTEN, or USE. `radio.js` persists the current unsigned 32-bit LCG state,
+round, streak, and previous answer song under the `realm:radio*` seam keys.
+Each draw selects a non-adjacent answer, one of that answer's five canonical
+original clues, four without-replacement distractors, then Fisher-Yates
+shuffles the displayed choices. ANSWER 1 through 5 and a normalized full SAY
+title are accepted without puzzle knowledge in the engine.
+
+Three consecutive right answers award `radioWon` +10 once and open the cabinet
+onto the PORTABLE TRANSISTOR RADIO. The portable radio is a 15-point
+`pendingHeirloom`, not a `treasure`, until the Phase A heirloom switch. Wrong
+answers reset the persisted streak and describe a cracking falsetto without
+printing lyrics; save/restore retains active rounds exactly.
+
 #### 12.36.4 Shack alphabet wall
 
 The run-down SHACK's ALPHABET WALL is a typed-word puzzle, never a color
