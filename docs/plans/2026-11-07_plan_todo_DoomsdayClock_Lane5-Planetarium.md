@@ -2,7 +2,7 @@
 
 # Lane 5: Planetarium
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c50+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/planetarium.js` and `web/tests/features/upsidedown-planetarium.feature`.
@@ -13,14 +13,14 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] PLANETARIUM: a plain domed room with a brass PROJECTOR that always asks for a number 1 to 5 and never changes behavior; accepts the Lane 1 grammar (for example SAY 3, SET PROJECTOR TO 3).
-* [ ] MAP ROOM off the planetarium holds the STELLAR MAP (`pendingHeirloom: true`); READ lists 1 BIG DIPPER OF RANCH, 2 BLACK BUNGHOLE, 3 ORION'S WEDGIE, 4 SERIOUS-SIRIUS, 5 URANUS MAJOR.
-* [ ] Picks 1, 3, and 5 light that constellation on the dome; the first drops the GOLD EYEPIECE (`pendingHeirloom: true`), sets `realm:eyepieceDropped`, and awards +10 once; later picks only show it.
-* [ ] Pick 2 stretches the player like spaghetti and ejects them to `gate` with inventory kept.
-* [ ] Pick 4 sets the player on fire through the existing `onFire`/`burnTurns` state and deposits them at `gate` still burning.
-* [ ] Dome and projector text foreshadow the bad numbers (P3).
-* [ ] Gary hint entries for the projector, map, and eyepiece.
-* [ ] Feature covers all five numbers, eyepiece once, map reading, and pick 4 then EAST to light the BRAZIER by body fire for +30.
+* [x] PLANETARIUM: a plain domed room with a brass PROJECTOR that always asks for a number 1 to 5 and never changes behavior; accepts the Lane 1 grammar (for example SAY 3, SET PROJECTOR TO 3).
+* [x] MAP ROOM off the planetarium holds the STELLAR MAP (`pendingHeirloom: true`); READ lists 1 BIG DIPPER OF RANCH, 2 BLACK BUNGHOLE, 3 ORION'S WEDGIE, 4 SERIOUS-SIRIUS, 5 URANUS MAJOR.
+* [x] Picks 1, 3, and 5 light that constellation on the dome; the first drops the GOLD EYEPIECE (`pendingHeirloom: true`), sets `realm:eyepieceDropped`, and awards +10 once; later picks only show it.
+* [x] Pick 2 stretches the player like spaghetti and ejects them to `gate` with inventory kept.
+* [x] Pick 4 sets the player on fire through the existing `onFire`/`burnTurns` state and deposits them at `gate` still burning.
+* [x] Dome and projector text foreshadow the bad numbers (P3).
+* [x] Gary hint entries for the projector, map, and eyepiece.
+* [x] Feature covers all five numbers, eyepiece once, map reading, and pick 4 then EAST to light the BRAZIER by body fire for +30.
 
 ## Acceptance
 

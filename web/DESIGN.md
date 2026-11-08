@@ -1164,6 +1164,17 @@ onto the PORTABLE TRANSISTOR RADIO. The portable radio is a 15-point
 answers reset the persisted streak and describe a cracking falsetto without
 printing lyrics; save/restore retains active rounds exactly.
 
+### 12.36.3 Planetarium
+
+The PLANETARIUM's brass PROJECTOR always asks for a number from 1 to 5. Its
+three safe fixed settings light BIG DIPPER OF RANCH, ORION'S WEDGIE, or URANUS
+MAJOR; the first safe selection awards +10 once and drops the pending-heirloom
+GOLD EYEPIECE. The MAP ROOM's pending-heirloom STELLAR MAP records every
+setting, including the BLACK BUNGHOLE's inventory-preserving FRONT GATE
+ejection and the burning SERIOUS-SIRIUS ejection. The latter uses the existing
+`onFire`/`burnTurns` countdown, so going EAST from the gate to light the
+GARDEN BRAZIER remains the existing +30 body-fire solution.
+
 #### 12.36.4 Shack alphabet wall
 
 The run-down SHACK's ALPHABET WALL is a typed-word puzzle, never a color
