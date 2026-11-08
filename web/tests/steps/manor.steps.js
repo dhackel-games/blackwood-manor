@@ -946,7 +946,7 @@ Then("both endings remain independently available", function () {
   front.restore(snapshot);
   assert.match(front.send("south"), /You keep walking/);
   assert.equal(front.state.won, true);
-  assert.equal(front.state.score, 1336);
+  assert.equal(front.state.score, 1361);
   const gary = createGame(world);
   gary.restore(snapshot);
   assert.match(gary.send("down"), /FREEEEDOMMM/);

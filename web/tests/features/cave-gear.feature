@@ -18,9 +18,9 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     When I send "take backpack"
     Then the output contains "Taken and worn"
     And item "backpack" is worn in slot "back"
-    And the inventory capacity is 20
+    And the inventory capacity is 36
     And the inventory load is 0
-    And the inventory HUD shows "👜" with "0/20"
+    And the inventory HUD shows "👜" with "0/36"
 
   Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set

@@ -876,13 +876,13 @@ function awardSuffix(points) {
 }
 
 function oneTripBonus(ctx, cmd) {
-  if (!cmd.bulkTransfer || !cmd.bulkTransferLast) return "";
+  if (!cmd?.bulkTransfer) return "";
   const hadSeatedHeirloom = (cmd.bulkTransferStartItems || [])
     .some((id) => ctx.world.items[id]?.treasure);
   if (allTreasuresDeposited(ctx) && !hadSeatedHeirloom && !ctx.getFlag("oneTripForfeited")) {
     const points = awardProgress(ctx, "oneTrip");
     if (points) {
-      return "\n\nOne trip. Twenty-four heirlooms take their places in a single breath." + awardSuffix(points);
+      return "One trip. Twenty-four heirlooms take their places in a single breath." + awardSuffix(points);
     }
   }
   if (depositedFamilyItemCount(ctx) > 0) ctx.setFlag("oneTripForfeited");
@@ -4483,8 +4483,7 @@ const logicWorld = {
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
           if (it.id === "talisman" && ctx.roomOf("goldLocket") === "crypt") {
             return "The BM crest on the TALISMAN warms against your palm, but the RELIQUARY refuses it. This " +
-              "heirloom still has work to do against the WRAITH; recover the GOLD LOCKET first." +
-              oneTripBonus(ctx, cmd);
+              "heirloom still has work to do against the WRAITH; recover the GOLD LOCKET first.";
           }
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
@@ -4504,7 +4503,6 @@ const logicWorld = {
             msg += "\n\nAll 24 heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
               "the FRONT DOOR, then PULL the ROPE.";
           }
-          msg += oneTripBonus(ctx, cmd);
           return msg;
         },
         pull(ctx, cmd) {
@@ -4831,7 +4829,8 @@ const logicWorld = {
       names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
       loc: "grandHall", fixed: true, container: true, capacity: 36,
       openable: true, open: false, autoOpenOnAccess: true,
-      bulkTransferSummary: (ctx) => reliquaryCountLine(ctx),
+      bulkTransferSummary: (ctx, cmd) => [oneTripBonus(ctx, cmd), reliquaryCountLine(ctx)]
+        .filter(Boolean).join("\n\n"),
       desc: "A tall glass-fronted RELIQUARY set into the stone wall. Twenty-four fitted recesses form a clock face behind carved doors.",
       on: {
         examine: (ctx) => inspectReliquary(ctx),
