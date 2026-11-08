@@ -1147,3 +1147,14 @@ layouts render this as a separate floor. Named flight uses the same generic
 flight path as every other room, so it can enter and leave the realm without a
 realm-specific flight exception. The parser supplies generic fallback verbs
 for future puzzle modules; the engine contains no realm puzzle rules.
+
+### 12.36.3 Planetarium
+
+The PLANETARIUM's brass PROJECTOR always asks for a number from 1 to 5. Its
+three safe fixed settings light BIG DIPPER OF RANCH, ORION'S WEDGIE, or URANUS
+MAJOR; the first safe selection awards +10 once and drops the pending-heirloom
+GOLD EYEPIECE. The MAP ROOM's pending-heirloom STELLAR MAP records every
+setting, including the BLACK BUNGHOLE's inventory-preserving FRONT GATE
+ejection and the burning SERIOUS-SIRIUS ejection. The latter uses the existing
+`onFire`/`burnTurns` countdown, so going EAST from the gate to light the
+GARDEN BRAZIER remains the existing +30 body-fire solution.
