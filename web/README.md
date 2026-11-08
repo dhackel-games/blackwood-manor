@@ -289,6 +289,19 @@ All test behavior is executable Gherkin. The gameplay-tagged scenarios play the
 entire game to victory, check its final score, and cover each death trap. Run the
 complete local suite after any change to the world.
 
+### Development-only route planning
+
+`tools/route-plan.mjs` imports the actual merged `world` in Node; game code
+never imports this tool. Its exported `shortestWalk(from, to, options)` follows
+gated exits, the mine locker, and the oak platform's turn-by-turn lift cycle;
+`solveSmallProblem` orders up to twelve tasks with prerequisites. For example:
+
+```
+node --input-type=module -e 'import {shortestWalk} from "./tools/route-plan.mjs"; console.log(shortestWalk("gate", "privy"))'
+```
+
+Run `npm test -- --tags @unit` to check the route-planner feature.
+
 ## Expanding the game (the whole point)
 
 **You only ever edit `js/world.js`.** The engine never needs to change.
