@@ -381,5 +381,48 @@ The following twenty titles are real songs from the 1980s. Only each title and o
 ## Decisions
 
 * The master decisions below are final values, not new proposals. Implementation choices not already fixed in master Section 13 are labeled `D-L1` after the master list.
+* D37: Ratified. STREAM beside the campfire supplies a reusable EMPTY MILK JUG from the FRIDGE; FILL JUG and POUR WATER or JUG ON FIRE work.
+* D36: Ratified. The CAMPFIRE hides CYAN, not MAGENTA; WINE, MILK, stream water, STOMP, and SMOTHER extinguish it.
+* D35: Ratified. LOWER PANEL starts MAGENTA TOP and YELLOW BOTTOM, MIDDLE empty; aligning it alone adds BELOW to the lift immediately, with two-way travel and no four-puzzle completion gate.
+* D34: Ratified. Push all code only after the whole effort is done; plan docs may be pushed sooner. Lane 1 commits only in its worktree and does not push or merge.
+* D33: Ratified. Explicit Gary or phone dialing calls Gary; DIAL with a visible dialable object and setting targets that dial, otherwise Gary answers. TURN DIAL, SET DIAL, SPIN DIAL, and DIAL B are accepted in context.
+* D32: Ratified and already implemented on local main. HELP reaches paid Gary; INFO, ?, and COMMANDS show the free reference.
+* D30: Ratified. Complementary CYAN, MAGENTA, YELLOW gems solve LOWER PANEL as YELLOW TOP, MAGENTA MIDDLE, CYAN BOTTOM; no in-game order or color-theory hint.
+* D29: Ratified. WINE BOTTLE opens only with CORKSCREW, gives ten stacking high turns per sip for four sips, then refills from the WINE CELLAR without farming scores.
+* D28: Ratified and already implemented on local main. BURN LETTER is refused; the existing warning LETTER is PHOTO PIECE A, and legacy burned-letter saves restore it to the MAILBOX without points.
+* D27: Ratified P7:HiddenSightIsSearch. All hidden sight automatically grants SEARCH revelations and consistent movement; physical LEVER operations remain necessary where visible.
+* D26: Ratified. Master Section 8 alone fixes new progress, gargoyle, deposit, and ONE TRIP values; maximum score remains derived.
+* D25: Ratified. The manor quintet is BLACKWOOD DIAMOND via microwave, SILVER WEATHERCOCK via fixed roof gargoyles, SNUFFBOX via bust nose, BARONESS PHOTOGRAPH from four pieces instead of ESTATE MAP, and CORKSCREW beside the decanter; 1:30 is a future hook only.
+* D24: Ratified. The PARLOR cold fireplace supplies one lump of COAL at a time; used-up lumps permit another trip.
+* D23: Ratified. The FRIDGE holds LIMBURGER, ÉPOISSES, and MUNSTER; descriptions are funny stink, not trivia.
+* D20: Ratified. Realm display name THE UPSIDE DOWN; code path `upsidedown`; this canon filename is its dated info document.
+* D19: Ratified. All v1 realm content is withdrawn and replaced by master TRD Sections 5 and 6.
+* D18: Ratified. SNUFFBOX gives three six-turn stacking high pinches, remains an EMPTY heirloom, and earns one normal use award.
+* D17: Ratified. One generic shared high covers mushrooms, snuff, and wine with the existing 🍄 HUD, twelve cycling shared reactions, source-only openings, and no early repeats.
+* D16: Ratified P5:MinimalCrossings. Only three manor FRIDGE cheeses are required for realm puzzles; MILK, WINE, and JUG are optional campfire methods.
+* D15: Ratified and revised by D35. Aligning the LOWER PANEL alone opens the return lift; no other realm puzzle is a gate.
+* D14: Ratified. SHACK ALPHABET WALL accepts FART, STINK, or CHEESE; its KID'S DRAWING is the clue and a separate heirloom.
+* D13: Ratified. STELLAR MAP fixes alphabetical numbers 1 through 5; 1, 3, 5 are safe, 2 ejects intact, 4 ejects burning.
+* D12: Ratified. CABINET RADIO has five numbered titles per round, three correct in a row, seeded draws, and twenty real 1980s titles with five original, non-lyric clue lines each.
+* D11: Ratified. Feed DEMOGORGONZOLA all three cheeses in any order for RIND; physical and non-cheese interactions swallow and eject with possessions kept; no petal key.
+* D10: Ratified. WINGED SHOES and named-room high flight work into and out of the realm exactly as elsewhere.
+* D9: Ratified. Stranger Things and Narnia parody, fair classic puzzles, junior-high-boy absurdity, light upside-down touches, no holiday theme or recycled gag as a mechanic.
+* D8: Ratified. Total is 13 existing, 6 realm, and 5 manor heirlooms.
+* D7: Resolved. Upper oak lift retains its existing two-beat GROUND, ABOVE cycle until LOWER PANEL alignment.
+* D6: Resolved. Part II's implemented Medusa scene is Hour XXIV and its emerald placement advances the hand to XXIII.
+* D5: Resolved. One PR with a Phase A gate; do not touch `::win` until every content lane completes and the Phase A test gate passes.
+* D4: Resolved. Attempt Firefly icons only when credentials exist; built-in tray emoji otherwise, with no gameplay dependency.
+* D3: Resolved. New prose lives in per-module `content` exports, not a simultaneous shared rewrite of `world.content.js`.
+* D2: Resolved. Realm exit is the oak lift's BELOW stop, not a bedroom wardrobe.
+* D1: Resolved. Realm entrance is the MINERS' LOCKER in the MINING GALLERY after DREADMAW, not a new side tunnel.
+* Master Section 13 has no D21, D22, or D31 entry; these identifiers are unassigned, not open decisions.
+* D-L1-01: Name the BELOW room OAK UNDERCROFT, use room id `below` to match the master lift-stop seam, and connect it SOUTH of WAYLAMP CLEARING; fix the other six room IDs and exits in the room atlas.
+* D-L1-02: Use one persisted 32-bit LCG seed, nonrepeating adjacent answer songs, four without-replacement distractors, Fisher-Yates option shuffling, full normalized title matching, and saved active round and streak. These choices make the ratified radio quiz deterministic in tests.
+* D-L1-03: Give all new room and item short names distinct tokens; reserve bare BOTTLE for MILK except TAKE BOTTLE at the cellar when unambiguous and OPEN BOTTLE WITH CORKSCREW for wine. Keep bare RADIO contextual and reserve PANEL for the existing oak except when only LOWER PANEL is in scope.
+* D-L1-04: When only LOWER PANEL aligns, it powers the existing oak lift and starts the platform at BELOW; if the upper panel already powers it, preserve its current stop. Boarding and OUT consume a command with grace; riding persists until OUT. If the upper panel aligns later, award its existing progress but do not teleport or reset an already active lift.
+* D-L1-05: Reuse the canonical `wineBottle` identity and pickup and use flags across sequential refills; the cellar offers one outstanding physical bottle at a time, replenishing after that bottle is spent. The rack remains described while a carried bottle exists, but TAKE BOTTLE does not clone a still-live bottle.
+* D-L1-06: Keep the existing `t13_medusaGarden` room id and `hour13Done` saved flag for migration, but display Hour XXIV and accept old `hour13` only as an input alias; advance `clockHour` to XXIII after the unchanged emerald puzzle.
+* D-L1-07: New progress award suffixes and state keys not listed in the master seam use the exact spellings in the Award ledger; they are persisted independently from the existing `progressItem` and `useItem` ledgers.
+* D-L1-08: Physically blocked rewards remain inaccessible for a stated reason, while hidden sight exposes every SEARCH discovery that can be acted upon; the LIBRARY's visible but still latched bookcase explicitly names its LEVER in the movement refusal.
 
 <!-- end 2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md -->
