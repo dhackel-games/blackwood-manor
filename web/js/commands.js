@@ -298,13 +298,18 @@ function putAll(ctx, cmd) {
   const worn = inventory.filter((item) => item.worn);
   const results = [];
   const leftBehind = [];
+  const bulkTransferStartItems = ctx.itemsIn(dest.id).map((item) => item.id);
 
-  for (const item of candidates) {
+  for (const [index, item] of candidates.entries()) {
     if (ctx.itemsIn(dest.id).length >= (dest.capacity ?? 99)) {
       leftBehind.push(item.names[0]);
       continue;
     }
-    const handled = runBulkItemHandler(ctx, "put", item, cmd);
+    const handled = runBulkItemHandler(ctx, "put", item, {
+      ...cmd,
+      bulkTransferStartItems,
+      bulkTransferLast: index === candidates.length - 1,
+    });
     if (handled != null) {
       results.push(`${item.names[0]}: ${handled}`);
       continue;

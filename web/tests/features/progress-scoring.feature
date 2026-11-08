@@ -10,7 +10,7 @@ Feature: One-time rewards for meaningful progress
 
   @maxscore
   Scenario: The derived Part I maximum includes every ratified award
-    Then the derived Part I maximum is 1291
+    Then the derived Part I maximum is 1316
 
   Scenario: Finding the iron key and opening the manor reward each breakthrough once
     Given the player is in room "garden"
@@ -189,6 +189,31 @@ Feature: One-time rewards for meaningful progress
     And I send "take clock"
     Then flag "floorDoorOpen" is set
     And the game score is 40
+
+  Scenario: ONE TRIP rewards a fresh all-in reliquary deposit only once
+    Given all required heirlooms are ready for one all-in deposit
+    Then the backpack provides 36 slots for the bulk deposit
+    When I send "drop all in rq"
+    Then the output contains "One trip. Twenty-four heirlooms take their places in a single breath. (+25)"
+    And the output contains line "HEIRLOOMS: 24/24 +1"
+    And flag "progressAward:oneTrip" is set
+    And the game score is 475
+    When I round-trip the game snapshot
+    Then flag "progressAward:oneTrip" is set
+    When I send "take all from reliquary"
+    Then the score is recorded before a repeated all-in deposit
+    And I send "put all in rq"
+    Then the output does not contain "One trip."
+    And the repeated all-in deposit does not change the score
+
+  Scenario: A partial heirloom deposit forfeits ONE TRIP
+    Given all required heirlooms are ready for one all-in deposit
+    When I send "put ancestral portrait in reliquary"
+    Then flag "oneTripForfeited" is set
+    Given all required heirlooms are ready for one all-in deposit
+    When I send "put all in reliquary"
+    Then the output does not contain "One trip."
+    And flag "progressAward:oneTrip" is unset
 
   Scenario: Implicit pickup, safe use, dropping and restoring cannot farm the mystery package
     Given the player is in room "grandHall"

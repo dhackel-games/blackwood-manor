@@ -124,6 +124,22 @@ Feature: Fire and food consequences
     And the game score is 50
     And the output contains line "HEIRLOOMS: 0/24 +1"
 
+  Scenario: Body fire still pays 30 after several turns en route to the brazier
+    Given the player is in room "gate"
+    And item "matches" is carried
+    When I send "light self on fire with match"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "east"
+    Then the current room is "garden"
+    And fire status has 2 turns
+    When I send "light brazier"
+    Then the output contains "(+30)"
+    And the output contains "set yourself on fire and survived"
+    And flag "onFire" is false
+    And the game score is 45
+
   Scenario: The lit portable candle can patiently ignite the garden brazier
     Given the player is in room "garden"
     And item "candlestick" is carried
