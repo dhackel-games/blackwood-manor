@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Lane 14: ContentRelease
 
@@ -26,6 +26,6 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Decisions
 
-* None yet.
+* Release policy (master D34): all code, including the two completed local main commits, pushes only when the whole effort is done; plan docs may be pushed earlier.
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md -->

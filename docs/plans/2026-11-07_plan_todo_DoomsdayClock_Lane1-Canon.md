@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane1-Canon.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane1-Canon.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Lane 1: Canon
 
@@ -15,12 +15,12 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 * [ ] Ratify master TRD Sections 5 to 10 into the canon info doc: rooms, exits, prose tone, every puzzle step, ejection, award, and flag, using the master seam flag names.
 * [ ] Specify exact command grammar per realm puzzle, manor heirloom, and the shared high: verbs, synonyms, refusal and hint text, plus the generic verbs Lane 2 adds to `parser.js`.
-* [ ] Fix realm constants: cheese names, DEMOGORGONZOLA safe verbs (LOOK, EXAMINE, SMELL) versus swallow verbs, radio round rules (distractor draw, title matching), constellation table and dome text, SHACK input grammar and accepted words, root panel order, and the INVERTED GEM source.
-* [ ] Record exact grammar, refusal, and hint text for the ratified manor designs (master Section 7, ratified by AndrewC 2026-11-08): COAL one lump at a time, the MICROWAVE dial `1 · 100 · M · B · T` (DIAL stays a noun, since DIAL is a hotline verb), TURN WEATHERCOCK TO FACE, the 36 gargoyle lines plus the HORIZON-GAZER line, PICK NOSE and PICK BUST'S NOSE, COMBINE and READ for the BARONESS PHOTOGRAPH (piece A is the existing `letter`), and the WINE BOTTLE open, drink, and refill. Note roof access: flight from the ATTIC skylight, or ATTIC north (`vaultFound`) to the HIDDEN VAULT, UP to the BELFRY, WEST to the ROOF. Record the 1:30 clock as a future hook only.
+* [ ] Fix realm constants: cheese names, DEMOGORGONZOLA safe verbs (LOOK, EXAMINE, SMELL) versus swallow verbs, radio round rules (distractor draw, title matching), constellation table and dome text, SHACK input grammar and accepted words, CYAN, MAGENTA, and YELLOW GEM names and text (root panel order is fixed by master Section 6), and the MAGENTA GEM location (D31).
+* [ ] Record exact grammar, refusal, and hint text for the ratified manor designs (master Section 7, ratified by AndrewC 2026-11-08): COAL one lump at a time, the MICROWAVE dial `1 · 100 · M · B · T` (DIAL disambiguation per master D33), TURN WEATHERCOCK TO FACE, the 36 gargoyle lines plus the HORIZON-GAZER line, PICK NOSE and PICK BUST'S NOSE, COMBINE and READ for the BARONESS PHOTOGRAPH (piece A is the existing `letter`), and the WINE BOTTLE open, drink, and refill. Note roof access: flight from the ATTIC skylight, or ATTIC north (`vaultFound`) to the HIDDEN VAULT, UP to the BELFRY, WEST to the ROOF. Record the 1:30 clock as a future hook only.
 * [ ] Write the foreshadowing text required by P3 for every ejection and the burning exit.
 * [ ] List unique `ITEM_SHORT_NAMES`/`ROOM_SHORT_NAMES` for every new room and item, checked against `web/js/world.js`.
 * [ ] Specify the four-beat lift timing table (turn, platform stop, rider location) from GROUND and from BELOW.
-* [ ] Record the resolution of each OPEN decision (D21 to D23, D26, D28): operator reply, or the recommendation as an AUTODECISION.
+* [ ] Record the resolution of each OPEN decision (D22, D23, D26, D31): operator reply, or the recommendation as an AUTODECISION.
 * [ ] Tone check: parody names only, no holiday theme, no burrito or Taco Tuesday mechanics, no reproduced lyrics.
 
 ## Acceptance

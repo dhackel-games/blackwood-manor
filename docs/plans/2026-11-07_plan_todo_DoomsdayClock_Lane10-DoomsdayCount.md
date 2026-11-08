@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Lane 10: DoomsdayCount
 
@@ -18,7 +18,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 * [ ] Rename the clock to the DOOMSDAY CLOCK with COUNTDOWN CLOCK names as aliases; describe 24 hours.
 * [ ] Part II: the clock starts at XXIV; relabel the implemented Medusa/emerald scene Hour XXIV; ticking moves to XXIII; update `part-two.feature`.
 * [ ] Replace every stale "thirteen"/13-heirloom reference in `world.js`, `howto.js`, HUD, and features.
-* [ ] Save migration: saves with `curseLiftable` but fewer than 24 seated clear it; bell-rung and Part II saves keep their state; the `letter` item becomes PHOTO PIECE A at its saved location with `letterRead` and pickup history preserved; saves with `letterBurned` follow master D28; no award is invented or erased; prove in `heirloom-migration.feature`.
+* [ ] Save migration: saves with `curseLiftable` but fewer than 24 seated clear it; bell-rung and Part II saves keep their state; the `letter` item becomes PHOTO PIECE A at its saved location with `letterRead` and pickup history preserved; legacy saves where `letterBurned` is true and the letter was destroyed get PHOTO PIECE A restored to the MAILBOX (D28); no award is invented or erased; prove in `heirloom-migration.feature`.
 * [ ] 2D tray: emoji for all 11 new heirlooms; run `web/tools/gen-firefly-icons.py` for PNGs only if Firefly credentials exist in the environment.
 * [ ] Gary progression hints cover all 24, including the CORKSCREW tradeoff (depositing it ends new WINE BOTTLES).
 * [ ] Apply the D26 values, recompute the derived maximum, update `@maxscore` assertions, and document the breakdown in `web/DESIGN.md` §8.

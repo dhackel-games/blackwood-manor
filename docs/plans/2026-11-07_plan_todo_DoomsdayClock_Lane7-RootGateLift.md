@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Lane 7: RootGateLift
 
@@ -13,8 +13,8 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] When `realm:demoFed`, `realm:radioWon`, `realm:eyepieceDropped`, and `realm:shackSpelled` are all set, set `realm:allSolved` once and open the ROOT HOLLOW with the three INVERTED GEMS from the Lane 1 source (recommended: a root nest).
-* [ ] ROOT PANEL accepts INVERTED SAPPHIRE top, INVERTED EMERALD middle, INVERTED RUBY bottom only; wrong placement is refused with a mirrored-order clue; bulk transfer refused.
+* [ ] When `realm:demoFed`, `realm:radioWon`, `realm:eyepieceDropped`, and `realm:shackSpelled` are all set, set `realm:allSolved` once and open the ROOT HOLLOW, where the CYAN and YELLOW GEMS wait at the ROOT PANEL; place the MAGENTA GEM per D31 (recommended: it shakes loose in a ROOT NEST on the last solve).
+* [ ] ROOT PANEL (master Section 6, D30) solves only with YELLOW top, MAGENTA middle, CYAN bottom; no order hint anywhere; a wrong full arrangement spits the gems out as the oak panel does; bulk transfer refused.
 * [ ] Seating all three sets `oak:rootGateOpen` and awards +10 once.
 * [ ] After the gate opens, the lift cycles one beat per turn: GROUND, ABOVE, GROUND, BELOW, GROUND; before it opens, the existing GROUND and ABOVE cycle is unchanged (D7).
 * [ ] From the ROOT HOLLOW, LOOK UP and WAIT report the platform stop; ENTER PLATFORM works only at BELOW; riding carries the player to GROUND then ABOVE; OUT at GROUND exits to the GREAT OAK.
@@ -29,6 +29,6 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Decisions
 
-* None yet.
+* INVERTED CMY GEMS ratified by AndrewC 2026-11-08 (master D30); MAGENTA GEM location OPEN (D31).
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md -->
