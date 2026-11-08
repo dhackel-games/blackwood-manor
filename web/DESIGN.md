@@ -1231,6 +1231,22 @@ the LIBRARY displays its still-latched stair and names the LEVER in the
 movement refusal. A visible physical obstruction remains blocked until its
 content puzzle resolves it.
 
+#### 12.37.1 Blackwood Diamond and DIAL
+
+The PARLOR COAL STACK supplies a single portable COAL LUMP at a time. Its
+state-aware room text, SEARCH text, and hidden-sight description all make that
+limit visible. In the KITCHEN, the fixed MICROWAVE and its visible DIAL hold
+the only labels `1 · 100 · M · B · T`; the module owns every setting result,
+the one-time `diamondMade` progress award, and the pending-heirloom
+BLACKWOOD DIAMOND.
+
+`dialable` is generic data. `commands.js` selects a visible item that declares
+it and invokes that item's content-local `on.dial` handler for DIAL, TURN
+DIAL, SET DIAL, and SPIN DIAL. Explicit DIAL GARY, DIAL PHONE, DIAL HOTLINE,
+or DIAL without a visible dial still reaches Gary. The MICROWAVE and the
+existing SAFE therefore remain separate content handlers; the generic parser
+and command engine contain no setting, combination, or puzzle knowledge.
+
 #### 12.37.2 Silver Weathercock
 
 The ROOF gains four fixed gargoyles around a pending-heirloom SILVER

@@ -73,7 +73,7 @@ function cloneData(def, id) {
   return copy;
 }
 
-const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace"];
+const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace", "setting"];
 
 function restoreItems(worldItems, savedItems = {}) {
   return Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {

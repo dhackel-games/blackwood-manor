@@ -1332,7 +1332,10 @@ Then("every manor room declares implicit IN and OUT routing", function () {
 
 Then("these room descriptions contain uppercase interactables:", function (table) {
   for (const row of table.hashes()) {
-    const description = world.rooms[row.room].desc;
+    const rawDescription = world.rooms[row.room].desc;
+    const description = typeof rawDescription === "function"
+      ? rawDescription(this.game)
+      : rawDescription;
     for (const label of row.labels.split(",")) {
       assert.ok(description.includes(label), `${row.room} must emphasize ${label}`);
     }
