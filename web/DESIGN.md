@@ -1250,6 +1250,16 @@ normal pickup award and the freed vane remains a pending heirloom until the
 coordinated treasure switch. ROOF prose, SEARCH text, item descriptions, and
 Gary's roof, gargoyle, and weathercock hints all warn of that ordering.
 
+#### 12.37.3 Snuffbox
+
+The LANDING's MARBLE BUST of Great-Grandpa Blackwood has a visible silver glint
+in its left nostril, made explicit by EXAMINE and hidden sight. PICK NOSE (or
+PICK BUST'S NOSE) retrieves the pending-heirloom SNUFFBOX once and awards the
+finding and pickup ledgers separately. Its three SNIFF, SMELL, or USE pinches
+each use the shared `highSource` API for six stacking turns; the normal first
+use award applies once. An exhausted box remains an EMPTY heirloom, and the
+existing 🍄 HUD follows the shared `high` flag without source-specific state.
+
 #### 12.37.4 Baroness Photograph
 
 The existing MAILBOX LETTER is PHOTO PIECE A: it keeps its id, warning text,
