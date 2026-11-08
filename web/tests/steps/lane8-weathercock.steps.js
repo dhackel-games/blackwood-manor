@@ -42,7 +42,7 @@ Then("the weathercock {string} replies cover a full unique cycle after restore",
   assert.equal(this.game.getFlag(`flavorCycle:${key}`), 1);
 });
 
-Then("the roof gargoyles are fixed and the weathercock is pending", function () {
+Then("the roof gargoyles are fixed and the weathercock is a treasure", function () {
   for (const id of [
     "gargoyleBurper",
     "gargoyleFarter",
@@ -56,8 +56,8 @@ Then("the roof gargoyles are fixed and the weathercock is pending", function () 
   assert.equal(weathercock.loc, "roof");
   assert.equal(weathercock.fixed, true);
   assert.equal(weathercock.takeable, true);
-  assert.equal(weathercock.pendingHeirloom, true);
-  assert.notEqual(weathercock.treasure, true);
+  assert.equal(weathercock.treasure, true);
+  assert.equal(weathercock.points, 10);
 });
 
 // end lane8-weathercock.steps.js

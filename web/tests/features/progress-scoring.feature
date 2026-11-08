@@ -8,6 +8,10 @@ Feature: One-time rewards for meaningful progress
   Background:
     Given a fresh manor game
 
+  @maxscore
+  Scenario: The derived Part I maximum includes every ratified award
+    Then the derived Part I maximum is 1291
+
   Scenario: Finding the iron key and opening the manor reward each breakthrough once
     Given the player is in room "garden"
     When I send "move statue"

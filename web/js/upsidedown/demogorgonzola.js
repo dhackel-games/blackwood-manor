@@ -85,7 +85,7 @@ const items = {
     names: ["demogorgonzola rind", "rind", "cheese rind"],
     loc: null,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
     points: 15,
     on: {
       use(ctx) {
@@ -131,7 +131,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  demoFed: { points: 10, maximumScore: false },
+  demoFed: 10,
 };
 const hints = [
   (ctx) => ({

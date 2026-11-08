@@ -166,6 +166,21 @@ const INCORRECT_REDESIGN_TREASURES = [
   "talisman", "musicBox", "rubyRing", "goldLocket", "ancientCoin",
   "crystalDecanter", "ancestralPortrait", "blackwoodHammer",
 ];
+const LANE10_HEIRLOOMS = [
+  "demogorgonzolaRind", "portableTransistorRadio", "goldEyepiece", "purpleCrayon",
+  "stellarMap", "kidsDrawing", "blackwoodDiamond", "baronessPhotograph",
+  "silverWeathercock", "snuffbox", "corkscrew",
+];
+
+function deleteLane10Items(snapshot) {
+  for (const id of LANE10_HEIRLOOMS) delete snapshot.state.items[id];
+}
+
+function oldTreasures() {
+  return Object.entries(world.items)
+    .filter(([id, item]) => item.treasure && !LANE10_HEIRLOOMS.includes(id))
+    .map(([id]) => id);
+}
 
 function preRedesignSnapshot(game) {
   const snapshot = game.snapshot();
@@ -266,6 +281,70 @@ Given("a pre-redesign save with replaced heirlooms deposited is restored", funct
   snapshot.state.flags["heirloomScore:candlestick"] = true;
   snapshot.state.flags.curseLiftable = true;
   snapshot.state.score = 200;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy thirteen-deposit save is restored", function () {
+  const snapshot = this.game.snapshot();
+  deleteLane10Items(snapshot);
+  for (const id of oldTreasures()) snapshot.state.items[id].loc = "reliquary";
+  snapshot.state.flags.curseLiftable = true;
+  snapshot.state.flags.reliquarySealed = true;
+  snapshot.state.flags["heirloomScore:familyCrest"] = true;
+  snapshot.state.flags["progressAward:candelabraRestored"] = true;
+  snapshot.state.score = 195;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy bell-rung save is restored", function () {
+  const snapshot = this.game.snapshot();
+  deleteLane10Items(snapshot);
+  for (const id of oldTreasures()) snapshot.state.items[id].loc = "clockTalisman";
+  snapshot.state.items.clockTalisman.loc = "reliquary";
+  snapshot.state.flags.curseLiftable = true;
+  snapshot.state.flags.bellRung = true;
+  snapshot.state.flags.heirloomsTransformed = true;
+  snapshot.state.flags.floorDoorOpen = true;
+  snapshot.state.flags["progressAward:bellRung"] = true;
+  snapshot.state.flags["progressAward:candelabraRestored"] = true;
+  snapshot.state.score = 200;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy Part II save after the old scene is restored", function () {
+  const snapshot = this.game.snapshot();
+  deleteLane10Items(snapshot);
+  for (const id of oldTreasures()) snapshot.state.items[id].loc = "clockTalisman";
+  snapshot.state.items.clockTalisman.loc = "inventory";
+  snapshot.state.flags.partII = true;
+  snapshot.state.flags.bellRung = true;
+  snapshot.state.flags.heirloomsTransformed = true;
+  snapshot.state.flags.hour13Done = true;
+  snapshot.state.flags.clockHour = 12;
+  snapshot.state.flags["progressAward:bellRung"] = true;
+  snapshot.state.flags["progressAward:candelabraRestored"] = true;
+  snapshot.state.score = 225;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy collected PHOTO PIECE A save is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.items.letter.loc = "inventory";
+  snapshot.state.flags.letterRead = true;
+  snapshot.state.flags["progressAward:letterRead"] = true;
+  snapshot.state.flags["progressItem:letter"] = true;
+  snapshot.state.score = 15;
+  this.game.restore(snapshot);
+});
+
+Given("a legacy burned-letter save is restored", function () {
+  const snapshot = this.game.snapshot();
+  snapshot.state.items.letter.loc = null;
+  snapshot.state.flags.letterBurned = true;
+  snapshot.state.flags.letterRead = true;
+  snapshot.state.flags["progressAward:letterRead"] = true;
+  snapshot.state.flags["progressItem:letter"] = true;
+  snapshot.state.score = 15;
   this.game.restore(snapshot);
 });
 
@@ -719,8 +798,16 @@ When("I trace sysop command {string}", function (command) {
 });
 
 When("I fast-forward into Part II", function () {
-  const shortcut = sysopCommand("::win");
-  this.game.send(expandSysopCommand(shortcut, this.game));
+  for (const [id, definition] of Object.entries(world.items)) {
+    if (definition.treasure) this.game.moveItem(id, "reliquary");
+  }
+  this.game.state.room = "grandHall";
+  this.game.setFlag("curseLiftable");
+  this.game.send("close reliquary");
+  this.game.send("open bell closet");
+  this.game.send("pull bell rope");
+  this.game.send("open reliquary");
+  this.game.send("take clock");
   this.output = this.game.send("down");
 });
 
@@ -824,6 +911,10 @@ Then("the score equals the derived Part I maximum", function () {
   assert.equal(this.game.state.score, world.maximumScore(this.game));
 });
 
+Then("the derived Part I maximum is {int}", function (score) {
+  assert.equal(world.maximumScore(this.game), score);
+});
+
 Then("every Part I portable has its pickup and use rewards", function () {
   const portable = Object.entries(world.items)
     .filter(([, item]) => item.takeable && item.phase !== 2);
@@ -855,7 +946,7 @@ Then("both endings remain independently available", function () {
   front.restore(snapshot);
   assert.match(front.send("south"), /You keep walking/);
   assert.equal(front.state.won, true);
-  assert.equal(front.state.score, 870);
+  assert.equal(front.state.score, 1336);
   const gary = createGame(world);
   gary.restore(snapshot);
   assert.match(gary.send("down"), /FREEEEDOMMM/);
@@ -1083,6 +1174,10 @@ Then("item {string} is absent from game state", function (item) {
   assert.equal(this.game.item(item), null);
 });
 
+Then("item {string} recognizes name {string}", function (item, name) {
+  assert.ok(this.game.item(item)?.names?.includes(name), `${item} does not recognize ${name}`);
+});
+
 Then("public INFO does not reveal sysop commands", function () {
   const help = this.game.send("info");
   for (const entry of SYSOP_COMMANDS) assert.ok(!help.includes(entry.cmd));
@@ -1095,7 +1190,7 @@ Then("every required family item is in the reliquary", function () {
   }
 });
 
-Then("every required family item is inside the countdown clock", function () {
+Then("every required family item is inside the Doomsday Clock", function () {
   for (const [id, definition] of Object.entries(world.items)) {
     if (definition.treasure) assert.equal(this.game.roomOf(id), "clockTalisman", id);
   }
@@ -1189,9 +1284,12 @@ Then("the player-facing heirloom catalogs and icons match the required set", fun
     .filter((path) => path.startsWith("view2d/icons/heirlooms/"))
     .map((path) => path.split("/").at(-1).replace(/\.png$/, ""))
     .sort();
-  assert.deepEqual(manifested, expected);
-  for (const id of expected) {
-    assert.equal(existsSync(new URL(`../../view2d/icons/heirlooms/${id}.png`, import.meta.url)), true, id);
+  const rendered = expected.filter((id) =>
+    existsSync(new URL(`../../view2d/icons/heirlooms/${id}.png`, import.meta.url)));
+  assert.deepEqual(manifested, rendered);
+  const tilemap = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  for (const id of LANE10_HEIRLOOMS) {
+    assert.match(tilemap, new RegExp(`\\["${id}",\\s*"[^"]+"`), `${id} needs an emoji fallback`);
   }
   for (const retired of ["batSightMirror", "backwardsWatch", "candlestick", "xrayGoggles"]) {
     assert.equal(existsSync(

@@ -106,27 +106,27 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
-  one compact slot. Each of the 39 obtainable Part-I portable items earns +5
+  one compact slot. Each of the 62 obtainable Part-I portable items earns +5
   once on acquisition and +5 once on successful use, including benign objects
   (which can be handled harmlessly), generated items, equipment, and the
-  COUNTDOWN CLOCK. Existing +5 key/gear pickup awards are the same pickup
+  DOOMSDAY CLOCK. Existing +5 key/gear pickup awards are the same pickup
   credit, never an extra one. Failed or inaccessible actions do not award use
   points, and saved flags prevent drop/re-take, repeat-use, and mushroom-regrowth
   farming. Older saves reconcile only proven missing pickup credits once;
   new saves carry a ledger version so restoration does not invent credits.
   The queen's emerald is obtainable only in Part II: its +5 pickup and +5
   use on placement still apply, alongside the separate +25 hour award; only
-  the Part-I maximum excludes it. Puzzle breakthroughs and all thirteen heirloom
-  deposits keep their existing separate rewards, including +195 total for
+  the Part-I maximum excludes it. Puzzle breakthroughs and all twenty-four
+  heirloom deposits keep their existing separate rewards, including +330 total
   deposits, +20 for restoring the candelabra, and +5 for reading the letter.
-  `::win` walks the manor after one opening flight to the mining shaft for the
+  Phase B will update `::win` to walk the manor after one opening flight to the mining shaft for the
   backpack: cave/troll, front door and kitchen, apple for Dreadmaw, rope and
   self-fire at the garden well/brazier, the oak's physical pulley platform,
   library/bedrooms/nursery, attic/roof/belfry, cellar/crypt, then the reliquary.
-  It rings the closet bell, **takes and reads the clock**, and stops alive in
+  It will ring the closet bell, **take and read the DOOMSDAY CLOCK**, and stop alive in
   the ROYAL HALL with both SOUTH (front door) and DOWN (Gary) still available.
-  The derived deterministic Part-I maximum is 825 there; SOUTH adds the
-  existing 45 end-badge points for 870, while DOWN enters Part II at 825.
+  The derived deterministic Part-I maximum is 1291 there; SOUTH adds the
+  existing 45 end-badge points for 1336, while DOWN enters Part II at 1291.
   Repeating `::win` after the bell safely takes the clock if it is still in
   the reliquary, or rereads it without choosing an ending. The route reads
   but never opens the random MYSTERY PACKAGE; opening it yourself earns its
@@ -141,9 +141,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   unworn item can be deposited. DROP/PLACE/PUT ALL auto-opens it, as does
   GET/TAKE ALL FROM it; the completed cabinet must be explicitly CLOSED before
   the lower BELL ROPE will complete the ritual. Text reports
-  `HEIRLOOMS: required/13 +extra`, matching the `💎` HUD value. Pulling the
+  `HEIRLOOMS: required/24 +extra`, matching the `💎` HUD value. Pulling the
   prepared closet rope rings the remote belfry bell, flashes magical light,
-  transforms the thirteen heirlooms into the COUNTDOWN CLOCK, slams the FRONT
+  transforms the twenty-four heirlooms into the DOOMSDAY CLOCK, slams the FRONT
   DOOR shut and then wide open, and opens the floor trapdoor. EXAMINE the
   RELIQUARY to discover the clock. Leaving ends the game; carrying the clock is
   required before descending to Gary.
@@ -177,11 +177,14 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   the player's wrist during `PUT ALL`.
   The HALL BEDROOM keeps the broken fixed MIRROR and removable non-heirloom
   SHARD; its NIGHT TABLE DRAWER contains the required +20 BLACKWOOD FAMILY RING.
-- **Thirteen heirlooms:** the required set is the ANCESTRAL PORTRAIT, ANCIENT
-  COIN, BLACKWOOD HAMMER, restored CANDELABRA, CRYSTAL DECANTER, BLACKWOOD
-  FAMILY CREST, BLACKWOOD FAMILY RING, GOLD LOCKET, GRIMOIRE, JEWELED MUSIC
-  BOX, RAVENBLOOD RING, BM SPYGLASS, and TALISMAN. The HALL BEDROOM has exactly
-  one required heirloom, the family ring; the MUSIC BOX remains in the NURSERY.
+- **Twenty-four heirlooms:** the required set is the ANCESTRAL PORTRAIT,
+  ANCIENT COIN, BARONESS PHOTOGRAPH, BLACKWOOD DIAMOND, BLACKWOOD HAMMER,
+  restored CANDELABRA, CORKSCREW, CRYSTAL DECANTER, DEMOGORGONZOLA RIND,
+  BLACKWOOD FAMILY CREST, BLACKWOOD FAMILY RING, GOLD EYEPIECE, GOLD LOCKET,
+  GRIMOIRE, KID'S DRAWING, JEWELED MUSIC BOX, PORTABLE TRANSISTOR RADIO, PURPLE
+  CRAYON, RAVENBLOOD RING, SILVER WEATHERCOCK, SNUFFBOX, BM SPYGLASS, STELLAR
+  MAP, and TALISMAN. The HALL BEDROOM has exactly one required heirloom, the
+  family ring; the MUSIC BOX remains in the NURSERY.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.

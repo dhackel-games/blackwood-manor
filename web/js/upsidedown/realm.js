@@ -180,7 +180,7 @@ const shortNames = {
 };
 
 const progressAwards = {
-  realmDiscovered: { points: 20, maximumScore: false },
+  realmDiscovered: 20,
 };
 
 const hints = [];

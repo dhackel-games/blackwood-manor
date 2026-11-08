@@ -85,7 +85,7 @@ Feature: The kitchen fridge and Demogorgonzola
     And item "demogorgonzolaRind" is in "cheeseGrotto"
     And the game score is 25
 
-  Scenario: The rind is a pending heirloom with normal pickup and use rewards
+  Scenario: The rind is a treasure heirloom with normal pickup and use rewards
     Given the player is in room "cheeseGrotto"
     And item "limburgerCheese" is carried
     And item "epoissesCheese" is carried
@@ -95,7 +95,7 @@ Feature: The kitchen fridge and Demogorgonzola
     And I send "feed munster"
     And I send "take rind"
     Then the output contains "Taken. (+5)"
-    And item "demogorgonzolaRind" is pending heirloom worth 15 and not treasure
+    And item "demogorgonzolaRind" is a treasure heirloom worth 15
     When I send "use rind"
     Then the output contains "You brandish the RIND. DEMOGORGONZOLA hiccups from somewhere very far away. (+5)"
     And the game score is 35

@@ -56,7 +56,8 @@ const items = {
     adjectives: ["kid's", "kids"],
     loc: "shack",
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 10,
     on: {
       read(ctx) {
         return "There are no written words. The arrows all accuse the same enormous fart." +
@@ -73,7 +74,8 @@ const items = {
     adjectives: ["purple", "wax"],
     loc: null,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 15,
     on: {
       use(ctx) {
         return "You sketch a heroic butt, sign it anonymously, and tuck the PURPLE CRAYON away." +
@@ -121,7 +123,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  shackSpelled: { points: 10, maximumScore: false },
+  shackSpelled: 10,
 };
 const hints = [
   (ctx) => ({

@@ -3,7 +3,7 @@
 @walkthrough
 Feature: Silver Weathercock and roof gargoyles
   The fixed roof gargoyles answer in saved cycling pools before the
-  HORIZON-GAZER releases the pending-heirloom weathercock.
+  HORIZON-GAZER releases the treasure weathercock.
 
   Background:
     Given a fresh manor game
@@ -16,7 +16,7 @@ Feature: Silver Weathercock and roof gargoyles
     And the output contains "The HORIZON-GAZER faces WEST, its fingers resting on the post's bolt."
     When I send "search"
     Then the output contains "The ridge from the BELFRY is solid enough to walk. The BURPER puffs its cheeks and presses a fist to its chest, the FARTER holds its nose, the SHITTER covers its butt with both hands, and the HORIZON-GAZER watches the far edge of the sky with one hand ready to snap the WEATHERCOCK free."
-    And the roof gargoyles are fixed and the weathercock is pending
+    And the roof gargoyles are fixed and the weathercock is a treasure
 
   Scenario: Every pre-release grammar directs the weathercock and awards once
     When I send "turn weathercock to face burper"
@@ -59,7 +59,7 @@ Feature: Silver Weathercock and roof gargoyles
     And flag "progressAward:weathercockFreed" is set
     And flag "useItem:silverWeathercock" is set
     And the game score is 10
-    And item "silverWeathercock" is a pending heirloom
+    And item "silverWeathercock" is a treasure heirloom
     When I send "turn weathercock to face burper"
     Then the output equals "The WEATHERCOCK is free of its post. It can no longer be turned."
     When I send "take silver weathercock"

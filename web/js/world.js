@@ -41,7 +41,7 @@ function moduleHints(ctx) {
 }
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 13;
+export const REQUIRED_FAMILY_ITEM_COUNT = 24;
 
 const BASE_ITEM_SHORT_NAMES = {
   reliquary: "rq",
@@ -169,7 +169,7 @@ const BASE_ROOM_SHORT_NAMES = {
   garysLair: "gary",
   betweenWalls: "between",
   p2_awakening: "nowhere",
-  t13_medusaGarden: "hour13",
+  t13_medusaGarden: "hour24",
 };
 
 export const ROOM_SHORT_NAMES = Object.freeze({
@@ -252,24 +252,22 @@ function transformHeirloomsIntoClock(ctx) {
 function inspectReliquary(ctx) {
   if (ctx.getFlag("heirloomsTransformed")) {
     if (ctx.roomOf("clockTalisman") === "reliquary") {
-      return "The thirteen fitted recesses are empty. The heirlooms have not merely disappeared: in their " +
-        "place sits a beautiful COUNTDOWN CLOCK with thirteen numbers and one hand resting on XIII. Somehow, " +
-        "all thirteen heirlooms have become this single clock. Open the RELIQUARY and TAKE it.";
+      return "The twenty-four fitted recesses stand empty. In their place rests a DOOMSDAY CLOCK with twenty-four " +
+        "numbers and one slender hand on XXIV. All twenty-four heirlooms are inside it. OPEN the RELIQUARY and TAKE the CLOCK.";
     }
-    return "All thirteen fitted recesses are empty. The heirlooms became the COUNTDOWN CLOCK you now carry.";
+    return "The twenty-four recesses stand empty. The heirlooms became the DOOMSDAY CLOCK you now carry.";
   }
-  return "A tall, glass-fronted RELIQUARY set into the stone wall, with thirteen fitted recesses for the " +
-    `Blackwood heirlooms.\n\n${reliquaryCountLine(ctx)}`;
+  return "Twenty-four fitted recesses ring the RELIQUARY like a clock face.\n\n" + reliquaryCountLine(ctx);
 }
 
-function takeCountdownClock(ctx) {
+function takeDoomsdayClock(ctx) {
   if (ctx.roomOf("clockTalisman") !== "reliquary") {
-    return ctx.has("clockTalisman") ? "You already carry the COUNTDOWN CLOCK." : null;
+    return ctx.has("clockTalisman") ? "You already carry the DOOMSDAY CLOCK." : null;
   }
   if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
-    return "Your hands are full. You'll have to drop something before taking the COUNTDOWN CLOCK.";
+    return "Your hands are full. You'll have to drop something before taking the DOOMSDAY CLOCK.";
   ctx.moveItem("clockTalisman", "inventory");
-  return "You lift the COUNTDOWN CLOCK from the RELIQUARY. It is lighter than thirteen heirlooms should be. " +
+  return "You lift the DOOMSDAY CLOCK from the RELIQUARY. It is lighter than twenty-four heirlooms should be. " +
     "The open trapdoor waits beside you, its narrow STAIRCASE descending into the dark.";
 }
 
@@ -572,7 +570,7 @@ function garyEnding(ctx) {
     "GARY sits at a battered desk beside an avocado-green ROTARY PHONE. The receiver rests silently in " +
     "its cradle. No caller. No ringing. Just Gary, a cold BURRITO, a heap of MUSHROOMS, and a sweating " +
     "carton of MILK beside the humming mini-FRIDGE.\n\n" +
-    "He looks up. Surprise holds him still for one heartbeat. Then he sees the COUNTDOWN CLOCK in your " +
+    "He looks up. Surprise holds him still for one heartbeat. Then he sees the DOOMSDAY CLOCK in your " +
     "hands, and his whole face breaks open with excitement.\n\n" +
     "\"{{player_name}},\" he says. \"You rang the bell. You brought the clock. You actually did it.\"\n\n" +
     "He snatches the heavy receiver from its cradle and rises. \"Do you have any idea what that means for me?\"\n\n" +
@@ -588,27 +586,29 @@ function garyEnding(ctx) {
 }
 
 // =============================================================================
-// BLACKWOOD MANOR II — THE THIRTEEN-HOUR CLOCK  (Part II: one continuous game)
+// BLACKWOOD MANOR II — THE DOOMSDAY CLOCK  (Part II: one continuous game)
 // -----------------------------------------------------------------------------
 // Gary's blow knocks you OUT of your body. You wake as a ghost with the clock,
 // but its purpose is not revealed until you EXAMINE it. Part II reuses the SAME
 // manor as Part I (you walk the real rooms as a ghost); only the time-scenes
-// are new. This BUILD SLICE implements the thirteenth hour: recover the QUEEN'S
+// are new. This BUILD SLICE implements the twenty-fourth hour: recover the QUEEN'S
 // EMERALD from the petrifying queen, then return it to the present-day GARDEN.
-// Placing it ticks the clock 13 -> 12. (Hours XII..I and the closing of the
+// Placing it ticks the clock XXIV -> XXIII. (Hours XXIII..I and the closing of the
 // ouroboros are still to be built.)
 // =============================================================================
-const P2_ROMAN = { 13: "XIII", 12: "XII", 11: "XI", 10: "X", 9: "IX", 8: "VIII",
+const P2_ROMAN = { 24: "XXIV", 23: "XXIII", 22: "XXII", 21: "XXI", 20: "XX",
+  19: "XIX", 18: "XVIII", 17: "XVII", 16: "XVI", 15: "XV", 14: "XIV", 13: "XIII",
+  12: "XII", 11: "XI", 10: "X", 9: "IX", 8: "VIII",
   7: "VII", 6: "VI", 5: "V", 4: "IV", 3: "III", 2: "II", 1: "I", 0: "—" };
 function p2Roman(n) { return P2_ROMAN[n] || String(n); }
-function p2Hour(ctx) { const h = ctx.getFlag("clockHour"); return h == null ? 13 : h; }
+function p2Hour(ctx) { const h = ctx.getFlag("clockHour"); return h == null ? 24 : h; }
 
 // The hinge: called from garyEnding. Become the ghost and drop into "Nowhere."
 // The game stays ALIVE (never finish/kill).
 function beginPartII(ctx) {
   ctx.setFlag("partII", true);
   ctx.setFlag("clockExplained", false);
-  if (ctx.getFlag("clockHour") == null) ctx.setFlag("clockHour", 13);
+  if (ctx.getFlag("clockHour") == null) ctx.setFlag("clockHour", 24);
   ctx.moveItem("clockTalisman", "inventory");
   ctx.state.room = "p2_awakening";
   const awakening = describeAwakening(ctx);
@@ -620,7 +620,7 @@ function describeAwakening(ctx) {
   return "· · · · ·\n\n" +
     "...and then you wake somewhere cold, lightless, and NOWHERE.\n\n" +
     "There is no body beneath you. Your hands are translucent. You are a ghost, {{player_name}}, and the " +
-    "COUNTDOWN CLOCK is still cradled in your see-through fingers.\n\n" +
+    "DOOMSDAY CLOCK is still cradled in your see-through fingers.\n\n" +
     "Gary is gone. The clock remains.\n\n" +
     "EXAMINE the CLOCK.";
 }
@@ -633,31 +633,31 @@ function afterPlayerNamed(ctx) {
 
 function clockTalismanText(ctx) {
   if (!ctx.getFlag("partII")) {
-    return "A beautiful grand clock small enough to cradle in both hands. It has THIRTEEN numbers instead of " +
-      "twelve, and one slender hand resting on XIII. There is no maker's mark and no instruction." +
+    return "A grand DOOMSDAY CLOCK small enough to cradle in both hands. Twenty-four numbers ring its face, " +
+      "and one slender hand rests on XXIV. There is no maker's mark and no instruction." +
       (ctx.has("clockTalisman") ? ctx.awardUse(ctx.item("clockTalisman")) : "");
   }
   ctx.setFlag("clockExplained", true);
   return "The moment your ghostly fingers trace the clock's face, its purpose enters your mind whole.\n\n" +
-    "The thirteen Blackwood heirlooms are inside it, scattered through thirteen hours of the manor's past. " +
-    "The hand will count backward only when you recover each heirloom and return it to the place where you " +
+    "The twenty-four Blackwood heirlooms are inside it, scattered through twenty-four hours of the manor's past. " +
+    "The hand counts backward when you recover each heirloom and return it to the place where you " +
     "first found it. USE the CLOCK to enter the next hour; USE it again to come home with what you recover.\n\n" +
-    `The hand rests on ${p2Roman(p2Hour(ctx))}. Thirteen hours remain, {{player_name}}.` +
+    `The hand rests on ${p2Roman(p2Hour(ctx))}. ${p2Hour(ctx) === 24 ? "Twenty-four" : "Twenty-three"} hours remain, {{player_name}}.` +
     ctx.awardUse(ctx.item("clockTalisman"));
 }
 
 // The clock is the only way in or out of an hour.
-//   * Nowhere / present-day manor, not holding the emerald -> FALL into hour XIII.
-//   * Inside hour XIII holding the emerald -> SURFACE in the present-day hall.
+//   * Nowhere / present-day manor, not holding the emerald -> FALL into hour XXIV.
+//   * Inside hour XXIV holding the emerald -> SURFACE in the present-day hall.
 //   * Present-day manor, already holding it -> nudge you to walk it to the garden.
 function useClockTalisman(ctx) {
   if (!ctx.getFlag("partII")) {
     return "The clock ticks once in your hands. Beneath it, the open stair waits in the floor.";
   }
   const room = ctx.state.room;
-  if (p2Hour(ctx) <= 12) {
-    return "The clock's hand has slipped past the thirteenth hour and rests on XII. Beyond here the road through " +
-      "time isn't built yet — this is the end of the current slice. (Hours XII..I are still to come.)";
+  if (p2Hour(ctx) <= 23) {
+    return "The clock's hand rests on XXIII. Beyond here the road through time is not built yet. " +
+      "Hours XXIII to I are still to come.";
   }
   if (room === "p2_awakening") {
     if (!ctx.getFlag("clockExplained")) {
@@ -688,11 +688,11 @@ function useClockTalisman(ctx) {
 
 function describeMedusaGarden(ctx) {
   if (ctx.getFlag("emeraldFreed")) {
-    return "THE THIRTEENTH HOUR — after.\n\n" +
+    return "THE TWENTY-FOURTH HOUR, after.\n\n" +
       "The garden of centuries past, gone silent. Where the queen stood there is now only a grey STATUE, caught " +
       "mid-turn, an empty setting at its throat. There is nothing left to do here. USE the CLOCK to return.";
   }
-  return "THE THIRTEENTH HOUR.\n\n" +
+  return "THE TWENTY-FOURTH HOUR.\n\n" +
     "You stand where the manor GARDEN will be — drenched in the green-gold light of an afternoon centuries gone. " +
     "At the garden's heart, where in your own time a marble STATUE of a woman keeps its vigil, the roses are " +
     "already greying and hardening to STONE, inch by creeping inch. Whatever casts that curse is near — and if it " +
@@ -736,15 +736,15 @@ function placeEmeraldInGarden(ctx, cmd) {
       "very stone the queen became. Make your way there, then PUT it.";
   }
   ctx.moveItem("emeraldOfTheQueen", "garden");
-  ctx.setFlag("clockHour", 12);
+  ctx.setFlag("clockHour", 23);
   ctx.setFlag("hour13Done", true);
   ctx.addScore(25);
   return "You press the QUEEN'S EMERALD deep into the bush beneath the leaning STATUE — the petrified queen " +
     "herself, you understand now — where, centuries on, a treasure-hunter will dig it out by lantern-light and " +
     "carry it inside. The circle draws that much tighter.\n\n" +
-    "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XIII to XII.\n\n" +
-    MAP_MARK + " HOUR XIII CLOSED — the emerald is home. Twelve hours remain. " + MAP_MARK + "\n\n" +
-    "(End of the current build slice: Hours XII..I and the closing of the loop are still to come.)" +
+    "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XXIV to XXIII.\n\n" +
+    MAP_MARK + " HOUR XXIV CLOSED: the emerald is home. Twenty-three hours remain. " + MAP_MARK + "\n\n" +
+    "(End of the current build slice: Hours XXIII to I and the closing of the loop are still to come.)" +
     ctx.awardUse(ctx.item("emeraldOfTheQueen"));
 }
 
@@ -1158,9 +1158,11 @@ function hintEntries(ctx) {
     { topics: ["watch", "bm", "scry", "show", "route", "guide"],
       done: ctx.roomOf("backwardsWatch") !== "studyDrawer", optional: true, text: watchHint },
     { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
-      text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
+      text: "The RELIQUARY needs 24 Blackwood heirlooms. Its recesses form a clock face; CLOSE the doors and PULL the BELL ROPE only when all 24 are seated." },
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
-      text: "Everything's in the reliquary. CLOSE RELIQUARY, OPEN the BELL CLOSET beside the FRONT DOOR, then PULL the ROPE. And then — I mean this warmly — never call me again." },
+      text: "The RELIQUARY needs 24 Blackwood heirlooms. Its recesses form a clock face; CLOSE the doors and PULL the BELL ROPE only when all 24 are seated." },
+    { topics: ["clock", "doomsday", "countdown", "time"], done: false,
+      text: "Take the DOOMSDAY CLOCK after the bell. In Part II, EXAMINE it, then USE it to enter the next hour." },
   ];
   return [...entries, ...moduleHints(ctx)];
 }
@@ -3861,7 +3863,15 @@ const logicWorld = {
     if (savedItems?.milkJug && "filled" in savedItems.milkJug) {
       state.items.milkJug.filled = savedItems.milkJug.filled;
     }
+    if (state.flags.letterBurned && state.items.letter?.loc == null) {
+      state.items.letter.loc = "mailbox";
+    }
     if (state.flags.partII) state.flags.bellRung = true;
+    if (state.flags.partII || state.flags.bellRung || state.flags.heirloomsTransformed) {
+      const completedTwentyFourthHour = state.flags.hour13Done
+        || Number(state.flags.clockHour) <= 12;
+      state.flags.clockHour = completedTwentyFourthHour ? 23 : 24;
+    }
     if (state.room === "hollowPassage" || state.room === "hollowSanctum") {
       state.room = "grandHall";
     }
@@ -4038,6 +4048,14 @@ const logicWorld = {
     if (state.flags.candelabraRestored) {
       state.items.candelabra.lit = true;
     }
+    const preservesCompletedRitual = state.flags.bellRung
+      || state.flags.heirloomsTransformed || state.flags.partII;
+    const seatedTreasureCount = Object.entries(world.items)
+      .filter(([, definition]) => definition.treasure)
+      .filter(([id]) => state.items[id]?.loc === "reliquary").length;
+    if (!preservesCompletedRitual && seatedTreasureCount < REQUIRED_FAMILY_ITEM_COUNT) {
+      delete state.flags.curseLiftable;
+    }
     const collectionComplete = Object.entries(world.items)
       .filter(([, definition]) => definition.treasure)
       .every(([id]) => state.items[id]?.loc === "reliquary");
@@ -4047,8 +4065,7 @@ const logicWorld = {
     }
     for (const [id, definition] of Object.entries(world.items)) {
       if (!definition.treasure) continue;
-      if (["reliquary", "clockTalisman"].includes(state.items[id]?.loc)
-          || state.flags.heirloomsTransformed) {
+      if (["reliquary", "clockTalisman"].includes(state.items[id]?.loc)) {
         state.flags[definition.depositScoreFlag || `heirloomScore:${id}`] = true;
       }
     }
@@ -4062,6 +4079,12 @@ const logicWorld = {
       state.items.frontDoor.locked = false;
       state.items.frontDoor.open = true;
       state.flags.floorDoorOpen = true;
+    }
+    if (state.flags.heirloomsTransformed) {
+      for (const [id, definition] of Object.entries(world.items)) {
+        if (definition.treasure) state.items[id].loc = "clockTalisman";
+      }
+      state.items.clockTalisman.loc = state.flags.partII ? "inventory" : "reliquary";
     }
 
     const completedProgress = {
@@ -4403,10 +4426,10 @@ const logicWorld = {
           return ctx.has("clockTalisman")
             ? "The FRONT DOOR stands wide open, and the floor TRAPDOOR exposes a narrow STAIRCASE DOWN."
             : "The FRONT DOOR stands wide open. The floor TRAPDOOR is open, and the RELIQUARY no longer holds " +
-                "thirteen separate heirlooms.";
+                "twenty-four separate heirlooms.";
         }
         if (ctx.getFlag("curseLiftable")) {
-          return "All thirteen fitted recesses in the RELIQUARY are filled. CLOSE its glass doors, OPEN the " +
+          return "All twenty-four fitted recesses in the RELIQUARY are filled. CLOSE its glass doors, OPEN the " +
             "BELL CLOSET beside the FRONT DOOR, and PULL the ROPE.";
         }
         return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. Beside the FRONT ` +
@@ -4461,7 +4484,7 @@ const logicWorld = {
           if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
-            msg += "\n\nAll thirteen heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
+            msg += "\n\nAll 24 heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
               "the FRONT DOOR, then PULL the ROPE.";
           }
           return msg;
@@ -4483,7 +4506,7 @@ const logicWorld = {
             return "The floor TRAPDOOR stands open, but whatever replaced the heirlooms pulls you back toward " +
               "the RELIQUARY. EXAMINE it and take it before descending.";
           }
-          if (!ctx.getFlag("floorDoorOpen")) return "The COUNTDOWN CLOCK ticks, but the floor remains shut.";
+          if (!ctx.getFlag("floorDoorOpen")) return "The DOOMSDAY CLOCK ticks, but the floor remains shut.";
           ctx.state.room = "garysLair";
           return garyEnding(ctx);
         },
@@ -4742,7 +4765,7 @@ const logicWorld = {
       exits: { out: "grandHall" },
     },
 
-    // ===== BLACKWOOD MANOR II — the thirteen-hour clock (Part II) =============
+    // ===== BLACKWOOD MANOR II — the Doomsday Clock (Part II) =================
     // "Nowhere": the ghost's staging point. You leave only by USING the clock.
     p2_awakening: {
       name: "Nowhere",
@@ -4750,7 +4773,7 @@ const logicWorld = {
       phase: 2,
       art: [
         "    .------.",
-        "   / 13  12 \\",
+        "   / 24  23 \\",
         "  |    ||    |",
         "   \\ backward/",
         "    '------'",
@@ -4761,9 +4784,10 @@ const logicWorld = {
         look: (ctx) => describeAwakening(ctx),
       },
     },
-    // HOUR XIII time-scene: the manor garden long ago, the queen still alive.
+    // HOUR XXIV time-scene: the manor garden long ago, the queen still alive.
     t13_medusaGarden: {
-      name: "The Thirteenth Hour",
+      name: "The Twenty-Fourth Hour",
+      aliases: ["hour13"],
       desc: "The manor garden, drenched in the green-gold afternoon light of centuries past.",
       phase: 2,
       art: [
@@ -4787,11 +4811,10 @@ const logicWorld = {
     // --- reliquary and the lower bell pull (royal hall) ---
     reliquary: {
       names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
-      loc: "grandHall", fixed: true, container: true, capacity: 20,
+      loc: "grandHall", fixed: true, container: true, capacity: 36,
       openable: true, open: false, autoOpenOnAccess: true,
       bulkTransferSummary: (ctx) => reliquaryCountLine(ctx),
-      desc: `A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold ` +
-        `${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses behind a pair of carved doors.`,
+      desc: "A tall glass-fronted RELIQUARY set into the stone wall. Twenty-four fitted recesses form a clock face behind carved doors.",
       on: {
         examine: (ctx) => inspectReliquary(ctx),
         search: (ctx) => inspectReliquary(ctx),
@@ -5364,12 +5387,13 @@ const logicWorld = {
       },
     },
 
-    // ===== BLACKWOOD MANOR II — Part II items (the thirteen-hour clock) =======
+    // ===== BLACKWOOD MANOR II — Part II items (the Doomsday Clock) ============
     // The carried talisman. Hidden ("__void") until Gary's blow makes you a
     // ghost; from then on it rides in your hands and USE-ing it moves you in time.
     clockTalisman: {
-      names: ["clock", "grand clock", "thirteen-hour clock", "thirteen hour clock", "time clock"],
-      adjectives: ["grand", "thirteen-hour", "backward", "ghostly"],
+      names: ["doomsday clock", "clock", "grand clock", "countdown clock", "time clock",
+        "thirteen-hour clock", "thirteen hour clock"],
+      adjectives: ["doomsday", "grand", "countdown", "thirteen-hour", "backward", "ghostly"],
       loc: "__void", takeable: true,
       on: {
         examine: (ctx, cmd) =>
@@ -5378,10 +5402,10 @@ const logicWorld = {
           ctx.find(cmd.dobj)?.id === "clockTalisman" ? clockTalismanText(ctx) : null,
         use: (ctx) => useClockTalisman(ctx),
         enter: (ctx) => useClockTalisman(ctx),
-        take: (ctx) => takeCountdownClock(ctx),
+        take: (ctx) => takeDoomsdayClock(ctx),
       },
     },
-    // Recovered in hour XIII; PUT/DROP it only in the present-day GARDEN.
+    // Recovered in hour XXIV; PUT/DROP it only in the present-day GARDEN.
     emeraldOfTheQueen: {
       names: ["emerald", "queen's emerald", "queens emerald", "gem"],
       adjectives: ["great", "vast", "green", "queen's"],

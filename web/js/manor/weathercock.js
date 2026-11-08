@@ -130,7 +130,8 @@ const items = {
     loc: "roof",
     fixed: true,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 10,
     on: {
       take: takeWeathercock,
       turn: turnWeathercock,
@@ -182,10 +183,10 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  gargoyleBurper: { points: 2, maximumScore: false },
-  gargoyleFarter: { points: 2, maximumScore: false },
-  gargoyleShitter: { points: 2, maximumScore: false },
-  weathercockFreed: { points: 5, maximumScore: false },
+  gargoyleBurper: 2,
+  gargoyleFarter: 2,
+  gargoyleShitter: 2,
+  weathercockFreed: 5,
 };
 const hints = [
   {

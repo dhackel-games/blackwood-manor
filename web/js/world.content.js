@@ -333,7 +333,7 @@ export const content = {
         "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
         "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
       searchDesc:
-        "Gary left in a violent hurry. The ROTARY PHONE hangs silent, and the COUNTDOWN CLOCK remains with you.",
+        "Gary left in a violent hurry. The ROTARY PHONE hangs silent, and the DOOMSDAY CLOCK remains with you.",
     },
 
     betweenWalls: {
@@ -397,7 +397,7 @@ export const content = {
       desc: "A dented brass mailbox bolted to the PORCH rail.",
     },
     letter: {
-      desc: "A single sheet of good paper, water-stained.",
+      desc: "PHOTO PIECE A: a single water-stained sheet of good paper, torn along three edges.",
       text:
         "The letter reads: \"To {{player_name}}, whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
         "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +

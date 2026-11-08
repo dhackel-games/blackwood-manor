@@ -25,12 +25,11 @@ Then("the planetarium result is {word}", function (result) {
   assert.equal(this.game.world.fireStatus(this.game).remaining, 6);
 });
 
-Then("the Planetarium heirlooms remain pending and non-treasures", function () {
-  for (const id of ["stellarMap", "goldEyepiece"]) {
+Then("the Planetarium heirlooms are treasures with ratified deposits", function () {
+  for (const [id, points] of [["stellarMap", 10], ["goldEyepiece", 15]]) {
     const item = this.game.world.items[id];
-    assert.equal(item.pendingHeirloom, true, `${id} must remain pending`);
-    assert.notEqual(item.treasure, true, `${id} must not yet be a treasure`);
-    assert.equal(item.points, undefined, `${id} must not have a deposit value yet`);
+    assert.equal(item.treasure, true, `${id} must be a treasure`);
+    assert.equal(item.points, points, `${id} must have its ratified deposit value`);
   }
 });
 

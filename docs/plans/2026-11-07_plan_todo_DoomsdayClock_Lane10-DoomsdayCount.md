@@ -2,7 +2,7 @@
 
 # Lane 10: DoomsdayCount
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: complete. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c65+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: the 24-heirloom switch across `web/js/world.js`, `web/js/howto.js`, tests, and docs.
@@ -13,16 +13,16 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Flip all eleven `pendingHeirloom` items (six realm; five manor: `blackwoodDiamond`, `silverWeathercock`, `snuffbox`, `baronessPhotograph`, `corkscrew`) to `treasure: true`; set `REQUIRED_FAMILY_ITEM_COUNT = 24`; remove the `pendingHeirloom` field.
-* [ ] Reliquary: 24 recesses ringed like a clock face in text and art; the bell answers only when all 24 are seated.
-* [ ] Rename the clock to the DOOMSDAY CLOCK with COUNTDOWN CLOCK names as aliases; describe 24 hours.
-* [ ] Part II: the clock starts at XXIV; relabel the implemented Medusa/emerald scene Hour XXIV; ticking moves to XXIII; update `part-two.feature`.
-* [ ] Replace every stale "thirteen"/13-heirloom reference in `world.js`, `howto.js`, HUD, and features.
-* [ ] Save migration: saves with `curseLiftable` but fewer than 24 seated clear it; bell-rung and Part II saves keep their state; the `letter` item becomes PHOTO PIECE A at its saved location with `letterRead` and pickup history preserved; legacy saves where `letterBurned` is true and the letter was destroyed get PHOTO PIECE A restored to the MAILBOX (D28); no award is invented or erased; prove in `heirloom-migration.feature`.
-* [ ] 2D tray: emoji for all 11 new heirlooms; run `web/tools/gen-firefly-icons.py` for PNGs only if Firefly credentials exist in the environment.
-* [ ] Gary progression hints cover all 24, including the CORKSCREW tradeoff (depositing it ends new WINE BOTTLES).
-* [ ] Apply the ratified master Section 8 values (D26), recompute the derived maximum, update `@maxscore` assertions, and document the breakdown in `web/DESIGN.md` §8.
-* [ ] Docs: `README.md`, `web/README.md`, `web/DESIGN.md` §7, §8, §12.36; correction banners in `docs/design/0001` and `0002` pointing to `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.
+* [x] Flip all eleven `pendingHeirloom` items (six realm; five manor: `blackwoodDiamond`, `silverWeathercock`, `snuffbox`, `baronessPhotograph`, `corkscrew`) to `treasure: true`; set `REQUIRED_FAMILY_ITEM_COUNT = 24`; remove the `pendingHeirloom` field.
+* [x] Reliquary: 24 recesses ringed like a clock face in text and art; the bell answers only when all 24 are seated.
+* [x] Rename the clock to the DOOMSDAY CLOCK with COUNTDOWN CLOCK names as aliases; describe 24 hours.
+* [x] Part II: the clock starts at XXIV; relabel the implemented Medusa/emerald scene Hour XXIV; ticking moves to XXIII; update `part-two.feature`.
+* [x] Replace every stale "thirteen"/13-heirloom reference in `world.js`, `howto.js`, HUD, and features.
+* [x] Save migration: saves with `curseLiftable` but fewer than 24 seated clear it; bell-rung and Part II saves keep their state; the `letter` item becomes PHOTO PIECE A at its saved location with `letterRead` and pickup history preserved; legacy saves where `letterBurned` is true and the letter was destroyed get PHOTO PIECE A restored to the MAILBOX (D28); no award is invented or erased; prove in `heirloom-migration.feature`.
+* [x] 2D tray: emoji for all 11 new heirlooms; run `web/tools/gen-firefly-icons.py` for PNGs only if Firefly credentials exist in the environment.
+* [x] Gary progression hints cover all 24, including the CORKSCREW tradeoff (depositing it ends new WINE BOTTLES).
+* [x] Apply the ratified master Section 8 values (D26), recompute the derived maximum, update `@maxscore` assertions, and document the breakdown in `web/DESIGN.md` §8.
+* [x] Docs: `README.md`, `web/README.md`, `web/DESIGN.md` §7, §8, §12.36; correction banners in `docs/design/0001` and `0002` pointing to `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.
 
 ## Acceptance
 
@@ -31,6 +31,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Decisions
 
-* None yet.
+* D-L10-01: Firefly credentials were absent from the environment, so no PNG generation ran; the 2D tray ships all eleven new emoji fallbacks.
+* D-L10-02: A legacy transformed save moves the newly required treasure definitions inside the DOOMSDAY CLOCK without assigning their deposit-score flags or points, preserving its earned award ledger.
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md -->

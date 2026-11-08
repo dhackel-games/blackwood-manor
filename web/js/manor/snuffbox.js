@@ -57,7 +57,8 @@ const items = {
     adjectives: ["silver"],
     loc: null,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 10,
     highSource: {
       opening: "You sniff a pinch from the SNUFFBOX. Your nose fires a sneeze large enough to rattle a portrait, and the world answers by going sideways.",
       turns: 6,

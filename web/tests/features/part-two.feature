@@ -1,6 +1,6 @@
 # part-two.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.105:acoven.
 
-Feature: Part II — the Thirteenth Hour
+Feature: Part II — the Twenty-Fourth Hour
   The Gary cliffhanger no longer ends the game; it opens Blackwood Manor Part II.
   As a ghost loose in the manor's own time you must recover the first scattered
   temporal objective — the queen's emerald — from a petrifying gaze, using a
@@ -32,17 +32,17 @@ Feature: Part II — the Thirteenth Hour
     And the current room is "p2_awakening"
     And the output contains "CLOCK"
     And the output contains "EXAMINE the CLOCK"
-    And the output does not contain "thirteen Blackwood heirlooms are inside it"
+    And the output does not contain "twenty-four Blackwood heirlooms are inside it"
     And flag "partII" is true
 
-  Scenario: Examining the clock explains it before the ghost enters the thirteenth hour
+  Scenario: Examining the clock explains it before the ghost enters the twenty-fourth hour
     When I fast-forward into Part II
     And I send "examine clock"
-    Then the output contains "thirteen Blackwood heirlooms are inside it"
+    Then the output contains "twenty-four Blackwood heirlooms are inside it"
     And flag "clockExplained" is true
     And I send "use clock"
     Then the current room is "t13_medusaGarden"
-    And the output contains "THIRTEENTH HOUR"
+    And the output contains "TWENTY-FOURTH HOUR"
 
   Scenario: Yelling before finding the queen is harmless and points you at the statue
     When I fast-forward into Part II
@@ -102,7 +102,7 @@ Feature: Part II — the Thirteenth Hour
     And the output contains "greying to STONE"
 
   @win
-  Scenario: Returning the emerald to the garden closes Hour XIII (full seam from the brink)
+  Scenario: Returning the emerald to the garden closes Hour XXIV (full seam from the brink)
     When I execute sysop command "::win"
     And I send "go down"
     And I send "examine clock"
@@ -118,8 +118,8 @@ Feature: Part II — the Thirteenth Hour
     Then the current room is "garden"
     And flag "emeraldFreed" is true
     And flag "hour13Done" is true
-    And flag "clockHour" equals 12
-    And the output contains "HOUR XIII CLOSED"
+    And flag "clockHour" equals 23
+    And the output contains "HOUR XXIV CLOSED"
     When I send "put emerald in bush"
     Then flag "hour13Done" is true
     And the game score is 860

@@ -7,7 +7,7 @@ web files — with a grumpy 1-900 **hint line** ("Gary") who slowly turns into y
 therapist the more you call him. Cruel-but-fair: darkness kills, light is limited,
 and there's a hidden wing after you win.
 
-The thirteen-heirloom route includes the BLACKWOOD FAMILY RING in the
+The twenty-four-heirloom route includes the BLACKWOOD FAMILY RING in the
 hall-bedroom night-table drawer, a BLACKWOOD HAMMER hidden between exposed wall
 beams, and a restored dining-room CANDELABRA assembled from the manor's sole
 candle and a shard worked free from the broken hall-bedroom mirror. Belfry bats
@@ -17,6 +17,8 @@ preparation. Its empty mirror face behaves like a crystal ball worn on the
 wrist, and `SHOW` or `SCRY` can locate rooms and objects, including hidden
 nested objects. The leather-bound diary remains open on the desktop. Completing
 the candelabra puzzle awards +20; depositing the restored heirloom awards +10.
+The six UPSIDE DOWN heirlooms and five manor-quintet heirlooms complete the
+twenty-four recesses that form the DOOMSDAY CLOCK.
 
 ## Layout
 

@@ -78,7 +78,7 @@ Feature: Restore the dining-room candelabra
     And the player is in room "grandHall"
     When I send "put candelabra in reliquary"
     Then item "candelabra" is in "reliquary"
-    And the output contains line "HEIRLOOMS: 1/13 +0"
+    And the output contains line "HEIRLOOMS: 1/24 +0"
     And the game score is 15
 
   Scenario: The candelabra remains lit without fuel in darkness

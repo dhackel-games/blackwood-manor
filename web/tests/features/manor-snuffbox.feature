@@ -14,7 +14,7 @@ Feature: Great-Grandpa Blackwood's snuffbox
     When I send "pick bust's nose"
     Then the output contains "pull out a SNUFFBOX"
     And flag "manor:snuffboxFound" is true
-    And the snuffbox is carried as a pending heirloom
+    And the snuffbox is carried as a treasure heirloom
     And the game score is 10
     When I send "pick nose"
     Then the output contains "already picked that nostril clean"
@@ -42,7 +42,7 @@ Feature: Great-Grandpa Blackwood's snuffbox
     Then flag "high" equals 18
     And flag "manor:snuffPinches" equals 3
     And the snuffbox has 0 pinches remaining
-    And the snuffbox is carried as a pending heirloom
+    And the snuffbox is carried as a treasure heirloom
     And the game score is 25
     When I send "sniff snuffbox"
     Then the output contains "The SNUFFBOX is EMPTY. It is still an heirloom, but there is nothing left to sniff."

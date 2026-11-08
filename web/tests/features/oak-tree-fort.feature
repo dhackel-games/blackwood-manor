@@ -185,13 +185,13 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "BM"
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
-    Then the output contains line "HEIRLOOMS: 1/13 +0"
+    Then the output contains line "HEIRLOOMS: 1/24 +0"
     And the game score is 18
 
   Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
     When I send "place emerald gem in reliquary"
-    Then the output contains line "HEIRLOOMS: 0/13 +1"
+    Then the output contains line "HEIRLOOMS: 0/24 +1"
     When I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And the output contains "take the emerald gem from the RELIQUARY"
@@ -237,12 +237,12 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And flag "floorDoorOpen" is set
     And item "talisman" is in "reliquary"
 
-  Scenario: A completed pre-watch collection gains the replacement hammer
+  Scenario: A completed pre-watch collection gains the replacement hammer but not a new ritual
     Given a completed pre-watch save is restored
     Then item "blackwoodHammer" is in "reliquary"
     And item "backwardsWatch" is in "studyDrawer"
-    And the required family item count is 13
-    And flag "curseLiftable" is set
+    And the required family item count is 24
+    And flag "curseLiftable" is unset
     And flag "floorDoorOpen" is set
     And flag "progressAward:candelabraRestored" is set
     And the game score is 32

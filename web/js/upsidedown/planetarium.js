@@ -86,7 +86,8 @@ const items = {
     loc: "mapRoom",
     takeable: true,
     readable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 10,
   },
   goldEyepiece: {
     names: ["gold eyepiece", "eyepiece", "brass ocular", "ocular"],
@@ -94,7 +95,8 @@ const items = {
     adjectives: ["gold", "brass", "through"],
     loc: null,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
+    points: 15,
     on: {
       use: useEyepiece,
       examine(ctx, cmd) {
@@ -133,7 +135,7 @@ const shortNames = {
 };
 
 const progressAwards = {
-  eyepieceDropped: { points: 10, maximumScore: false },
+  eyepieceDropped: 10,
 };
 
 const hints = [

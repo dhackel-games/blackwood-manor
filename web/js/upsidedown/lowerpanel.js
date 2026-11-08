@@ -267,7 +267,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  lowerPanelAligned: { points: 10, maximumScore: false },
+  lowerPanelAligned: 10,
 };
 const hints = [
   (ctx) => ({

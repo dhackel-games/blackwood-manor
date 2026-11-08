@@ -50,13 +50,13 @@ Feature: Blackwood Diamond microwave and DIAL
       | T       | The MICROWAVE opens on a sad dusting of powder. Your lump of COAL is gone; fetch another from the PARLOR. | consumed |
       | B       | The MICROWAVE chimes. Where the COAL sat, a BLACKWOOD DIAMOND winks at you from the open tray. | diamond |
 
-  Scenario: The Diamond is unique, pending, and usable
+  Scenario: The Diamond is unique, a treasure, and usable
     Given the player is in room "kitchen"
     And item "coalLump" is carried
     When I send "put coal in microwave"
     And I send "set dial to B"
     And I send "start microwave"
-    Then the Blackwood Diamond remains a pending heirloom worth 15
+    Then the Blackwood Diamond is a treasure heirloom worth 15
     And item "blackwoodDiamond" is in "microwave"
     When I send "take diamond"
     And I send "use diamond"

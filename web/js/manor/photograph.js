@@ -137,7 +137,7 @@ const items = {
     loc: null,
     takeable: true,
     readable: true,
-    pendingHeirloom: true,
+    treasure: true,
     points: 15,
     on: {
       read: readPhotographBack,
@@ -218,7 +218,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  photoCombined: { points: 5, maximumScore: false },
+  photoCombined: 5,
 };
 const hints = [
   {

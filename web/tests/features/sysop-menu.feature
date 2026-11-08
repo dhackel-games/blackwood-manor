@@ -130,7 +130,7 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:atticLadderLowered" is set
     And flag "progressAward:letterRead" is set
     And item "mysteryPackage" is carried
-    And every required family item is inside the countdown clock
+    And every required family item is inside the Doomsday Clock
     And item "familyRing" is in "clockTalisman"
     And item "blackwoodHammer" is in "clockTalisman"
     And item "candelabra" is in "clockTalisman"
@@ -139,7 +139,7 @@ Feature: Maintained sysop shortcuts
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 825
+    And the game score is 1291
 
   @win @maxscore
   Scenario: Repeating the completed prompt cannot choose the front-door ending
@@ -148,7 +148,7 @@ Feature: Maintained sysop shortcuts
     And the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1291
     And both endings remain independently available
     Then sysop command "::win" includes "read gclock"
     And sysop command "::win" omits "s"
@@ -157,12 +157,12 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1291
     And both endings remain independently available
     When I send "use clock"
     Then the current room is "grandHall"
     And flag "partII" is unset
-    And the game score is 825
+    And the game score is 1291
 
   @win @maxscore
   Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
@@ -171,7 +171,7 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And item "clockTalisman" is in "reliquary"
     And item "reliquary" is closed
-    And the game score is 815
+    And the game score is 1281
     And sysop command "::win" contains sequence "o rq; t gclock; read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
@@ -179,7 +179,7 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1291
     And both endings remain independently available
 
   @win @maxscore
@@ -194,7 +194,7 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1291
     And both endings remain independently available
 
   @win
@@ -211,8 +211,8 @@ Feature: Maintained sysop shortcuts
     And the game is alive
     And flag "bellRung" is set
     And item "clockTalisman" is carried
-    And every required family item is inside the countdown clock
-    And the game score is 795
+    And every required family item is inside the Doomsday Clock
+    And the game score is 1261
 
   Scenario: Powerup still recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set

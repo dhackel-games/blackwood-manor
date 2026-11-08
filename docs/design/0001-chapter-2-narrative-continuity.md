@@ -2,17 +2,11 @@
 
 # Chapter 2 — Narrative continuity (playtest feedback + options)
 
-> **CORRECTION 2026-09-21:** The required set remains thirteen. The +20 slot
-> belongs to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer.
-> BELFRY bats still drop BM-marked XRAY GOGGLES, but the goggles are
-> non-heirloom EYES equipment. The non-heirloom BM WATCH waits inside the
-> STUDY desk drawer beneath the leather-bound diary and retains the retired Bat Sight Mirror's
-> room/object `SHOW`/`SCRY` and route behavior. Its empty mirror face behaves
-> like a crystal ball worn on the wrist. A BM-marked BLACKWOOD HAMMER holds the +12 heirloom role
-> between the walls. The old candlestick is now the sole portable CANDLE;
-> together with the removable HALL BEDROOM MIRROR SHARD, it restores the +10
-> DINING ROOM CANDELABRA. Completing that restoration awards a separate,
-> non-farmable +20 puzzle bonus.
+> **CORRECTION 2026-11-08:** This historical design note is superseded for the
+> roster, clock, and award contract by [The Upside Down and Doomsday Clock
+> canon](../plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md). The
+> current game uses twenty-four heirlooms and the DOOMSDAY CLOCK; its award
+> ledger is authoritative.
 >
 > **➡️ UPDATE 2026-09-14 — see [`0002-thirteen-hour-clock-and-ouroboros.md`](./0002-thirteen-hour-clock-and-ouroboros.md).**
 > Major evolution of this doc: the **13-hour clock**, a reworked **BM1 ending** (ring →

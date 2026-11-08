@@ -1,7 +1,7 @@
 # true-ending.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
 
 Feature: Reliquary choice and Gary cliffhanger
-  The ordinary heirloom ritual creates the thirteen-hour countdown clock.
+  The ordinary heirloom ritual creates the twenty-four-hour Doomsday Clock.
   Leaving through the opened front door ends the game; taking the clock opens
   the floor stair and continues into Part II.
 
@@ -12,7 +12,7 @@ Feature: Reliquary choice and Gary cliffhanger
 
   Scenario: Depositing the last heirloom only prepares the bell ritual
     When I send "put family crest in reliquary"
-    Then the output contains "All thirteen heirlooms are in place"
+    Then the output contains "All 24 heirlooms are in place"
     And flag "curseLiftable" is set
     And flag "floorDoorOpen" is unset
     When I send "down"
@@ -36,7 +36,7 @@ Feature: Reliquary choice and Gary cliffhanger
     And flag "floorDoorOpen" is set
     And item "frontDoor" is open
     And item "clockTalisman" is in "reliquary"
-    And every required family item is inside the countdown clock
+    And every required family item is inside the Doomsday Clock
 
   Scenario: Examining the reliquary reveals what the heirlooms became
     When I send "put family crest in reliquary"
@@ -44,8 +44,8 @@ Feature: Reliquary choice and Gary cliffhanger
     And I send "open bell closet"
     And I send "pull bell rope"
     And I send "examine reliquary"
-    Then the output contains "all thirteen heirlooms have become this single clock"
-    And the output contains "TAKE it"
+    Then the output contains "All twenty-four heirlooms are inside it"
+    And the output contains "TAKE the CLOCK"
 
   Scenario: The clock is required before descending the already-open stair
     When I send "put family crest in reliquary"

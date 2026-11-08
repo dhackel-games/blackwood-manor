@@ -2,7 +2,7 @@
 
 @unit @lane8
 Feature: Baroness Photograph
-  Four named torn pieces form the pending-heirloom portrait without losing the
+  Four named torn pieces form the treasure portrait without losing the
   mailbox letter's warning, progress award, or burn protection.
 
   Scenario: The mailbox letter remains photo piece A and scraps lie in the hedge and privy
@@ -52,7 +52,7 @@ Feature: Baroness Photograph
     Then the output contains "THE BARONESS stands beside a GRANDFATHER CLOCK whose hands read 1:30"
     And item "baronessPhotograph" is carried
     And item "letter" is in "baronessPhotograph"
-    And the Baroness Photograph is a pending heirloom worth 15
+    And the Baroness Photograph is a treasure heirloom worth 15
     And flag "progressAward:photoCombined" is set
     And flag "letterRead" is unset
     And flag "progressAward:letterRead" is unset

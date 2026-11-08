@@ -187,7 +187,7 @@ const items = {
     adjectives: ["blackwood"],
     loc: null,
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
     points: 15,
     on: { use: useDiamond },
   },
@@ -233,7 +233,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  diamondMade: { points: 5, maximumScore: false },
+  diamondMade: 5,
 };
 const hints = [
   {
