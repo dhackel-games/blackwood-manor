@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -14,6 +14,7 @@ import {
   isSysopMenuPassword,
   pathToRoom,
   renderSysopMenu,
+  persistSysopMenuUnlock,
   shortestCommand,
   sysopCommand,
   sysopMenuAction,
@@ -136,6 +137,11 @@ Given("item {string} rests in room {string}", function (item, room) {
   this.game.moveItem(item, room);
 });
 
+Given("the backpack is worn", function () {
+  this.game.moveItem("backpack", "inventory");
+  this.game.item("backpack").worn = true;
+});
+
 Given("the restored candelabra is carried", function () {
   this.game.destroy("mirrorShard");
   this.game.destroy("candlestick");
@@ -157,6 +163,16 @@ Given("an already-solved oak has its platform at the roots", function () {
   });
   this.game.moveItem("emberStone", "oakMechanism");
   this.game.moveItem("oakPlatform", "greatOak");
+});
+
+When("the room is automatically described", function () {
+  this.output = this.game.describeRoom();
+});
+
+When("I unlock the sysop game state with {string}", function (password) {
+  const action = sysopMenuAction(password, !!this.game.getFlag("sysopMenuUnlocked"));
+  assert.equal(action.unlocked, true, `Expected sysop password ${password} to unlock the menu.`);
+  persistSysopMenuUnlock(this.game, action);
 });
 
 Given("the four-beat oak lift is below while I wait at the fort", function () {
@@ -1284,7 +1300,8 @@ Then("every hidden prompt uses globally unique one-word targets", function () {
 
 Then("hidden shortcuts replace the editable command prompt without executing", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked\)/);
+  assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked \|\| game\.getFlag\("sysopMenuUnlocked"\)\)/);
+  assert.match(ui, /persistSysopMenuUnlock\(game, action\)/);
   assert.match(ui, /localStorage\.setItem\(SYSOP_MENU_UNLOCK_KEY, "true"\)/);
   assert.match(ui, /if \(action\.showMenu\)/);
   assert.match(ui, /mainEntry\.setValue\(expandSysopCommand\(action\.shortcut, game\)\)/);

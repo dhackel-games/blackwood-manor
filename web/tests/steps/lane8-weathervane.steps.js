@@ -1,4 +1,4 @@
-// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";
@@ -18,13 +18,18 @@ function poolKey(target) {
 
 Given("a legacy vane save is restored", function () {
   const snapshot = this.game.snapshot();
-  const vane = snapshot.state.items.rustedWeathervane;
   delete snapshot.state.items.rustedWeathervane;
   snapshot.state.items.silverWeathercock = {
-    ...vane,
     id: "silverWeathercock",
-    loc: "reliquary",
-    worn: true,
+    names: ["silver weathercock", "weathercock", "vane"],
+    adjectives: ["silver", "brass"],
+    loc: "roof",
+    worn: false,
+    fixed: false,
+    takeable: true,
+    open: true,
+    lit: true,
+    fuel: 8,
   };
   snapshot.state.flags["manor:weathercockFreed"] = true;
   snapshot.state.flags["progressAward:weathercockFreed"] = true;
@@ -32,6 +37,17 @@ Given("a legacy vane save is restored", function () {
   snapshot.state.flags["useItem:silverWeathercock"] = true;
   snapshot.state.flags["heirloomScore:silverWeathercock"] = true;
   this.game.restore(snapshot);
+});
+
+Then("the migrated weathervane keeps its current identity and mutable runtime state", function () {
+  const vane = this.game.item("rustedWeathervane");
+  assert.deepEqual(vane.names, ["rusted weathervane", "weathervane", "vane"]);
+  assert.deepEqual(vane.adjectives, ["rusted", "iron"]);
+  assert.equal(vane.fixed, false);
+  assert.equal(vane.takeable, true);
+  assert.equal(vane.open, true);
+  assert.equal(vane.lit, true);
+  assert.equal(vane.fuel, 8);
 });
 
 When("I turn the weathervane toward {string} {int} times, saving after {int}", function (target, count, saveAfter) {

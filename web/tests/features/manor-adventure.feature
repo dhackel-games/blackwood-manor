@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -34,6 +34,7 @@ Feature: Blackwood Manor adventure
       wait
       wait
       wait
+      open fridge
       drink milk
       open cellar
       down

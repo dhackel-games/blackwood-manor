@@ -1,4 +1,4 @@
-// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+// core.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 // Game state + rules. DOM-free and content-free. Testable in Node.
 //
 // Design: the world (rooms/items) is shared, read-only, and may contain handler
@@ -168,7 +168,12 @@ export function createGame(world) {
   game.inventoryLoad = () => game.inventory().filter((item) => !item.worn).length;
   game.inventoryCapacity = () => Math.max(
     world.config.maxCarry ?? 99,
-    ...game.inventory().filter((item) => item.worn).map((item) => item.carryCapacity || 0),
+    ...game.inventory().filter((item) => item.worn).map((item) => {
+      const unlockedCapacity = item.capacityWhenFlag;
+      return unlockedCapacity && state.flags[unlockedCapacity.flag]
+        ? unlockedCapacity.value
+        : (item.carryCapacity || 0);
+    }),
   );
   game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
@@ -628,6 +633,21 @@ export function createGame(world) {
     return null;
   }
 
+  function prepareKnownContainerTake(cmd, derivedSteps) {
+    if (cmd.verb !== "take" || !cmd.dobj || cmd.iobj) return null;
+    const target = implicitTarget(cmd.dobj);
+    if (!target?.container) return null;
+    const open = {
+      verb: "open",
+      dobj: world.itemShortNames?.[target.container.id] || target.container.names[0],
+      prep: null,
+      iobj: null,
+    };
+    const result = dispatchWithoutTick(open);
+    derivedSteps.push(displayCommand(open));
+    return target.container.open ? null : result;
+  }
+
   function implicitlyAcquire(cmd, derivedSteps) {
     if (!["read", "eat", "drink", "wear", "use", "pour"].includes(cmd.verb) || !cmd.dobj) return null;
     const target = implicitTarget(cmd.dobj);
@@ -783,6 +803,7 @@ export function createGame(world) {
     let cmd = parse(input);
     if (cmd.error === "empty") return { text: "I beg your pardon?", stop: true };
     if (cmd.error === "unknown-verb") return { text: `I don't know the word "${cmd.word}".`, stop: true };
+    const explicitInspection = ["look", "examine", "search"].includes(cmd.verb);
     const previouslyCarried = new Set(game.inventory().map((item) => item.id));
 
     const roomNavigation = world.implicitNavigation?.[state.room];
@@ -809,6 +830,7 @@ export function createGame(world) {
     const preparationBlocked = acquisition?.blocked
       || prepareOpenWithKey(cmd, derivedSteps)
       || prepareEntry(cmd, derivedSteps)
+      || prepareKnownContainerTake(cmd, derivedSteps)
       || prepareAutoOpenContainer(cmd, derivedSteps);
     const directItem = cmd.verb === "take" && cmd.dobj !== "all" && cmd.dobj !== "everything"
       ? game.find(cmd.dobj)
@@ -817,7 +839,7 @@ export function createGame(world) {
 
     deferStatusBanner = true;
     describedRoomThisTurn = false;
-    if (["look", "examine", "search", "show"].includes(cmd.verb)) game.setFlag("usedInspection");
+    if (explicitInspection) game.setFlag("usedInspection");
     const override = acquisitionBlocked || acquisition?.completed || runHandlers(cmd);
     let text;
     if (override != null) {

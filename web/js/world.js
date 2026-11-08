@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 // Blackwood Manor content and rules. Shared portable-reward dispatch lives in
 // core.js and commands.js. See README.md for the "how to add a room" guide.
 //
@@ -904,6 +904,9 @@ const STANDALONE_MAX_AWARDS = Object.freeze({
   brazier: 30,
   dreadmaw: 10,
 });
+const WEATHERCOCK_RUNTIME_FIELDS = Object.freeze([
+  "loc", "worn", "fixed", "takeable", "open", "locked", "lit", "fuel", "lightGrace", "setting", "highSource",
+]);
 
 function progressPoints(id) {
   const award = PROGRESS_AWARDS[id];
@@ -2476,6 +2479,10 @@ function lightBrazier(ctx, cmd) {
       "carried LIT CANDLE, the restored CANDELABRA, or a far bigger, more reckless flame.";
   }
   ctx.setFlag("brazierLit", true);
+  if (ctx.getFlag("brazierRewarded")) {
+    return "The BRAZIER flares back to life. Its old reward remains spent.";
+  }
+  ctx.setFlag("brazierRewarded");
   const usedBodyFire = ctx.getFlag("onFire");
   const points = usedBodyFire ? STANDALONE_MAX_AWARDS.brazier : 10;
   ctx.addScore(points);
@@ -3225,7 +3232,6 @@ function flushToilet() {
   return "It is a hole in the ground. There is no plumbing and nothing to flush.";
 }
 function inspectToilet(ctx) {
-  ctx.setFlag("usedInspection");
   const mushrooms = ctx.item("outhouseMushrooms");
   if (!ctx.getFlag("outhouseMushroomsFound")) {
     ctx.setFlag("outhouseMushroomsFound");
@@ -3972,11 +3978,11 @@ const logicWorld = {
     delete state.flags.ghostName;
     const oldVane = savedItems?.silverWeathercock || state.items.silverWeathercock;
     if (oldVane) {
-      state.items.rustedWeathervane = {
-        ...state.items.rustedWeathervane,
-        ...oldVane,
-        id: "rustedWeathervane",
-      };
+      for (const field of WEATHERCOCK_RUNTIME_FIELDS) {
+        if (Object.prototype.hasOwnProperty.call(oldVane, field)) {
+          state.items.rustedWeathervane[field] = oldVane[field];
+        }
+      }
       delete state.items.silverWeathercock;
     }
     for (const [oldFlag, newFlag] of [
@@ -4003,6 +4009,9 @@ const logicWorld = {
     }
     if (state.flags.letterBurned && state.items.letter?.loc == null) {
       state.items.letter.loc = "mailbox";
+    }
+    if (state.flags.brazierLit || state.flags.brazierMethod) {
+      state.flags.brazierRewarded = true;
     }
     if (state.flags.partII) state.flags.bellRung = true;
     if (state.flags.partII || state.flags.bellRung || state.flags.heirloomsTransformed) {
@@ -5210,6 +5219,7 @@ const logicWorld = {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
       wearSlot: "back", carryCapacity: 36,
+      capacityWhenFlag: { flag: "sysopMenuUnlocked", value: 100 },
       progressPoints: 5, progressFlag: "progressItem:backpack",
     },
     headlamp: {

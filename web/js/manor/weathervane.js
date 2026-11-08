@@ -1,4 +1,4 @@
-// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 const WEATHERVANE_FREED = "manor:weathervaneFreed";
 
@@ -102,25 +102,29 @@ function stoneGargoyle() {
 const rooms = {};
 const items = {
   gargoylePuffCheeks: {
-    names: ["puff-cheeked gargoyle", "north gargoyle", "burper", "burping gargoyle"],
+    names: ["gargoyle", "puff", "burper", "burping gargoyle"],
+    adjectives: ["north", "puff-cheeked", "puff", "burping"],
     loc: "roof",
     fixed: true,
     on: { attack: stoneGargoyle, fight: stoneGargoyle },
   },
   gargoyleNosePinch: {
-    names: ["nose-pinching gargoyle", "east gargoyle", "farter", "farting gargoyle"],
+    names: ["gargoyle", "nose", "farter", "farting gargoyle"],
+    adjectives: ["west", "nose-pinching", "nose", "farting"],
     loc: "roof",
     fixed: true,
     on: { attack: stoneGargoyle, fight: stoneGargoyle },
   },
   gargoyleRearGuard: {
-    names: ["rear-guarding gargoyle", "south gargoyle", "shitter", "pooping gargoyle"],
+    names: ["gargoyle", "rear", "shitter", "pooping gargoyle"],
+    adjectives: ["south", "rear-guarding", "rear", "pooping"],
     loc: "roof",
     fixed: true,
     on: { attack: stoneGargoyle, fight: stoneGargoyle },
   },
   gargoyleFarGazing: {
-    names: ["far-gazing gargoyle", "west gargoyle", "horizon-gazer", "horizon gazer", "gazer"],
+    names: ["gargoyle", "far", "gazer", "horizon-gazer", "horizon gazer"],
+    adjectives: ["east", "far-gazing", "far", "horizon-gazing"],
     loc: "roof",
     fixed: true,
     on: { attack: stoneGargoyle, fight: stoneGargoyle },

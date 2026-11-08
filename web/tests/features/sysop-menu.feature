@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -19,6 +19,25 @@ Feature: Maintained sysop shortcuts
     And hidden shortcuts replace the editable command prompt without executing
     And public INFO does not reveal sysop commands
     And no sysop command uses the removed su command
+
+  Scenario Outline: Any sysop password expands a worn backpack and survives restore
+    Given the backpack is worn
+    Then the inventory capacity is 36
+    And the inventory HUD shows "🎒" with "0/36"
+    When I unlock the sysop game state with "<password>"
+    Then flag "sysopMenuUnlocked" is set
+    And the inventory capacity is 100
+    And the inventory HUD shows "🎒" with "0/100"
+    When I round-trip the game snapshot
+    Then flag "sysopMenuUnlocked" is set
+    And the inventory capacity is 100
+    And the inventory HUD shows "🎒" with "0/100"
+
+    Examples:
+      | password |
+      | ::werdna |
+      | ::evad   |
+      | ::divad  |
 
   Scenario: Dynamic path tokens resolve from the current room
     Then the path from the current room to "PRIVY" is "e; e"

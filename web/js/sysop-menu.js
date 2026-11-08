@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 import { RADIO_SONGS } from "./upsidedown/radio-clues.js?v=source";
 
@@ -72,6 +72,12 @@ export function sysopMenuAction(command, unlocked) {
         unlocked: true,
         message: `Unknown sysop menu command. Type ${SYSOP_MENU_COMMAND} to list available commands.`,
       };
+}
+
+export function persistSysopMenuUnlock(game, action) {
+  if (!action?.unlocked || game.getFlag("sysopMenuUnlocked")) return false;
+  game.setFlag("sysopMenuUnlocked");
+  return true;
 }
 
 const POWERUP = [

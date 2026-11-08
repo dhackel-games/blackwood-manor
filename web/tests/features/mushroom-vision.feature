@@ -1,4 +1,4 @@
-# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-14.087:acoven.
+# mushroom-vision.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 @walkthrough
 Feature: The mushroom trip's third eye
@@ -103,7 +103,7 @@ Feature: The mushroom trip's third eye
     Examples:
       | room      | command      | item           | score |
       | kitchen   | eat apple    | apple          | 10    |
-      | kitchen   | drink milk   | milk           | 15    |
+      | kitchen   | open fridge; drink milk | milk           | 15    |
 
   Scenario: The Obsidian Eye and XRAY GOGGLES can be worn together
     Given item "obsidianEye" is carried

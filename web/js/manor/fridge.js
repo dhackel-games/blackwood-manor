@@ -1,4 +1,4 @@
-// fridge.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// fridge.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 const FRIDGE_ITEM_IDS = ["milk", "milkJug", "limburgerCheese", "epoissesCheese", "munsterCheese"];
 const ROOM_IDS = [
@@ -61,17 +61,6 @@ function pourOut(ctx, cmd) {
   if (!jug.filled) return "The JUG is already empty.";
   jug.filled = false;
   return "You tip out the JUG. It is EMPTY again." + ctx.awardUse(jug);
-}
-
-function drinkMilkFromFridge(ctx, cmd) {
-  if (!["milk", "bottle"].includes(normalized(cmd.dobj)) || ctx.roomOf("milk") !== "fridge") {
-    return null;
-  }
-  const milk = ctx.item("milk");
-  ctx.moveItem("milk", "inventory");
-  const pickup = ctx.awardPickup(milk);
-  const result = ctx.world.items.milk.on.drink(ctx, cmd) + pickup;
-  return cmd.verb === "use" ? `(get COLD MILK; drink COLD MILK)\n\n${result}` : result;
 }
 
 const rooms = {};
@@ -192,8 +181,6 @@ roomHooks.kitchen.take = (ctx, cmd) => {
   }
   return null;
 };
-roomHooks.kitchen.drink = drinkMilkFromFridge;
-roomHooks.kitchen.use = drinkMilkFromFridge;
 const flavorPools = {};
 
 export default { rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools };

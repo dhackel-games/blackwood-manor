@@ -1,4 +1,4 @@
-# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.103:acoven.
+# fire-food.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 @walkthrough
 Feature: Fire and food consequences
@@ -225,6 +225,19 @@ Feature: Fire and food consequences
     And the output contains "(+10)"
     And the game score is 20
 
+  Scenario: Relighting an extinguished brazier never re-awards or replaces its emerald
+    Given the player is in room "garden"
+    And the restored candelabra is carried
+    When I send "light brazier"
+    And I send "take emerald gem"
+    Then item "emberStone" is in "inventory"
+    And the game score is 20
+    When I send "ext brazier"
+    And I send "light brazier"
+    Then the output contains "old reward remains spent"
+    And item "emberStone" is in "inventory"
+    And the game score is 20
+
   Scenario: Water-offer flavor advances only when the offer is displayed
     Given the player is on fire
     And flag "onCall" is set
@@ -261,7 +274,8 @@ Feature: Fire and food consequences
     When I send "wait"
     And I send "wait"
     And I send "wait"
-    When I send "drink milk"
+    When I send "open fridge"
+    And I send "drink milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true
     And the output contains "survived the super burrito"
@@ -273,6 +287,7 @@ Feature: Fire and food consequences
   Scenario: Milk always rewards recovery but the larger survival award requires all four phases
     Given the player is in room "kitchen"
     When I send "eat burrito"
+    And I send "open fridge"
     And I send "drink milk"
     Then flag "sick" equals 0
     And the output contains "(+5)"
@@ -286,6 +301,7 @@ Feature: Fire and food consequences
     And I send "wait"
     And I send "wait"
     And I send "wait"
+    And I send "open fridge"
     And I send "drink milk"
     Then the output contains "survived the super burrito"
     And the output contains "(+25)"
@@ -300,7 +316,8 @@ Feature: Fire and food consequences
     Given a fresh manor game
     And the player is in room "kitchen"
     And flag "sick" is 10
-    When I send "use milk"
+    When I send "open fridge"
+    And I send "use milk"
     Then flag "sick" equals 0
     And flag "drankMilk" is true
     And the output contains "(get COLD MILK; drink COLD MILK)"
@@ -438,6 +455,7 @@ Feature: Fire and food consequences
   Scenario: The wrapper self-immolates on demand long after the sickness is cured
     Given the player is in room "kitchen"
     When I send "eat burrito"
+    And I send "open fridge"
     And I send "drink milk"
     Then flag "sick" equals 0
     And item "burritoWrapper" is in "inventory"

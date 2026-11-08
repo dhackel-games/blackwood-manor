@@ -1,7 +1,7 @@
-# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 
 @walkthrough
-Feature: Silver Weathervane and roof gargoyles
+Feature: Rusted weathervane and roof gargoyles
   The fixed roof gargoyles answer in saved cycling pools before the
   far-gazing gargoyle releases the treasure weathervane.
 
@@ -46,12 +46,30 @@ Feature: Silver Weathervane and roof gargoyles
 
   Scenario: A legacy vane save migrates its state and score flags
     Given a legacy vane save is restored
-    Then item "rustedWeathervane" is in "reliquary"
+    Then item "rustedWeathervane" is in "roof"
+    And the migrated weathervane keeps its current identity and mutable runtime state
     And flag "manor:weathervaneFreed" is set
     And flag "progressAward:weathervaneFreed" is set
     And flag "progressItem:rustedWeathervane" is set
     And flag "useItem:rustedWeathervane" is set
     And flag "heirloomScore:rustedWeathervane" is set
+    When I send "take rusted weathervane"
+    Then item "rustedWeathervane" is in "inventory"
+
+  Scenario Outline: Every displayed gargoyle description resolves to its direction
+    When I send "<command>"
+    Then the output contains "<description>"
+
+    Examples:
+      | command                         | description           |
+      | look puff-cheeked gargoyle       | puff-cheeked gargoyle |
+      | examine north gargoyle           | puff-cheeked gargoyle |
+      | look nose-pinching gargoyle      | nose-pinching gargoyle |
+      | examine west gargoyle            | nose-pinching gargoyle |
+      | look rear-guarding gargoyle      | rear-guarding gargoyle |
+      | examine south gargoyle           | rear-guarding gargoyle |
+      | look far-gazing gargoyle         | far-gazing gargoyle |
+      | examine east gargoyle            | far-gazing gargoyle |
 
   Scenario: Missing and unknown weathervane destinations are fair refusals
     When I send "turn vane"

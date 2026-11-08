@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_done_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:copilot. -->
 
 # Doomsday Clock: master orchestration
 
@@ -423,7 +423,6 @@ Status: done. Released in PR #10 (merge commit 2bbece5) on 2026-11-08; content 2
 * D-L11: Lane 11 made ONE TRIP persisted, set BACKPACK capacity to 36, retained body-fire incentives, confirmed MATCH behavior, and derived 1316.
 * D-L12: Lane 12 used the merged room graph, a 24-heirloom DAG, two selected flights, body-fire timing, persisted radio answers, and 68 walking transitions.
 * D-L13: Lane 13 derived live radio answers, timed the pre-alignment lift, and preserved a carried DOOMSDAY CLOCK on restore.
-* D-L14: TAKE and TAKE ALL never equip gear; an unworn BACKPACK counts as one carried item at the base capacity of 6, and only WEAR or USE BACKPACK raises capacity to 36.
 
 ## No new INTs
 

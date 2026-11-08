@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-15.102:acoven.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -26,7 +26,12 @@ import {
   garyVoiceProfile,
   pickGaryVoice,
 } from "./gary-voice.js?v=source";
-import { expandSysopCommand, renderSysopMenu, sysopMenuAction } from "./sysop-menu.js?v=source";
+import {
+  expandSysopCommand,
+  persistSysopMenuUnlock,
+  renderSysopMenu,
+  sysopMenuAction,
+} from "./sysop-menu.js?v=source";
 import { splitCommands } from "./parser.js?v=source";
 
 const transcript = document.getElementById("transcript");
@@ -105,6 +110,7 @@ const hudElement = document.getElementById("hud");
 if (Native.isMobileApp()) Native.post("content", { action: "version-banner" });
 
 let game = createGame(world);
+if (sysopMenuUnlocked) game.setFlag("sysopMenuUnlocked");
 let bugTrace = createBugTrace("page reload");
 const history = [];
 let hi = 0;
@@ -929,6 +935,7 @@ window.__contentStatus = (message) => {
 
 function newGame(origin = "restart") {
   game = createGame(world);
+  if (sysopMenuUnlocked) game.setFlag("sysopMenuUnlocked");
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
@@ -1167,9 +1174,10 @@ function handle(raw) {
 
 function applySysopCommand(raw) {
   const command = String(raw || "").trim();
-  const action = sysopMenuAction(command, sysopMenuUnlocked);
+  const action = sysopMenuAction(command, sysopMenuUnlocked || game.getFlag("sysopMenuUnlocked"));
   if (!action.handled) return false;
   recordBugCommand(bugTrace, command);
+  const persistedUnlock = persistSysopMenuUnlock(game, action);
   if (action.unlocked && !sysopMenuUnlocked) {
     try {
       localStorage.setItem(SYSOP_MENU_UNLOCK_KEY, "true");
@@ -1178,6 +1186,10 @@ function applySysopCommand(raw) {
     }
   }
   sysopMenuUnlocked = action.unlocked;
+  if (persistedUnlock) {
+    saveGame(game);
+    updateHud();
+  }
   if (action.showMenu) {
     print(renderSysopMenu(), "sys");
     mainEntry.clear();

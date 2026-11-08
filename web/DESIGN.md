@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
 
 # Blackwood Manor — Design
 
@@ -278,10 +278,11 @@ ONE TRIP awards +25 once when one `PUT ALL IN RQ` or `DROP ALL IN RQ` seats all
 twenty-four heirlooms while none were seated at the command's start. Its
 `progressAward:oneTrip` ledger survives saves; any single or incomplete
 heirloom deposit persists the forfeit, so neither partial seating nor a later
-bulk transfer can farm the award. The BACKPACK carries 36 items, the measured
-all-in delivery peak: twenty-four heirlooms plus twelve required tools. The
-RELIQUARY's 36 places leave those tools room beside its twenty-four fitted
-recesses. The existing single MATCH already lights the CANDLE (verified in
+bulk transfer can farm the award. The BACKPACK normally carries 36 items, the
+measured all-in delivery peak: twenty-four heirlooms plus twelve required tools.
+After `::werdna`, `::evad`, or `::divad` unlocks the sysop menu, a worn BACKPACK
+carries 100; that unlock is saved in game state. The RELIQUARY's 36 places leave
+those tools room beside its twenty-four fitted recesses. The existing single MATCH already lights the CANDLE (verified in
 `fire-food.feature`); no behavior changed. Body fire remains the BRAZIER's
 highest-paying method at +30 versus +10 for a candle or candelabra, including
 when the player ignites several turns before reaching it and survives within
@@ -826,8 +827,10 @@ Eating the strange mushrooms explicitly hints that the player feels light enough
 updates their text, and hides inactive values uniformly. Score and turns share a compact
 `🏆 score/turns` slot; phone bill, bowel
 pressure, digestive phase, mushroom high, vision, flight, RELIQUARY progress, fire
-countdown, and HEADLAMP battery are data entries in one registry rather than separate
-DOM mutations in `ui.js`.
+countdown, HEADLAMP battery, and inventory capacity are data entries in one registry
+rather than separate DOM mutations in `ui.js`. Inventory is `👤 used/6` without a
+worn BACKPACK, `🎒 used/36` normally with one, and `🎒 used/100` after the saved
+sysop-menu unlock.
 
 ## 12.25 Derived actions and player-known codes
 
@@ -894,8 +897,10 @@ HEAD, EYES, and FEET.
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it leaves
 it in inventory, where it counts as one carried item and leaves capacity at 6;
 WEAR or USE BACKPACK equips it on the BACK and raises capacity from 6 to 36.
-The HUD displays `👤 used/6` until worn and `🎒 used/36` afterward; worn
-equipment does not contribute to the used count.
+The saved sysop-menu unlock (`::werdna`, `::evad`, or `::divad`) raises a worn
+BACKPACK to 100 immediately; the HUD displays `👤 used/6` until worn, then
+`🎒 used/36` or `🎒 used/100` after that unlock. Worn equipment does not
+contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
 and reports remaining power in the `💡` HUD slot. The STUDY'S DESK keeps the
