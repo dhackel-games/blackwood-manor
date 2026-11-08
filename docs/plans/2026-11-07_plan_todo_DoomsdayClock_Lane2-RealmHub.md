@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 2: RealmHub
 
@@ -13,8 +13,8 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Create `web/js/lanternwild/index.js` plus stubs `realm.js`, `demogorgonzola.js`, `radio.js`, `radio-clues.js`, `planetarium.js`, `shack.js`, `rootgate.js`, and `web/js/manor/index.js` plus stubs `fridge.js`, `diamond.js`, `estatemap.js`, `corkscrew.js`, `snuffbox.js`, `weathercock.js`; each exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks }`.
-* [ ] Merge modules once in `world.js` (rooms, items, short names, progress awards, hints) and chain `roomHooks` onto existing room `on` handlers without replacing them.
+* [ ] Create `web/js/lanternwild/index.js` plus stubs `realm.js`, `demogorgonzola.js`, `radio.js`, `radio-clues.js`, `planetarium.js`, `shack.js`, `rootgate.js`, and `web/js/manor/index.js` plus stubs `fridge.js`, `diamond.js`, `photograph.js`, `corkscrew.js`, `snuffbox.js`, `weathercock.js`; each exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools }`.
+* [ ] Merge modules once in `world.js` (rooms, items, short names, progress awards, hints, and `flavorPools` into `CYCLING_FLAVOR_POOLS` with `cycleFlavor` reachable through `ctx`) and chain `roomHooks` onto existing room `on` handlers without replacing them.
 * [ ] Add the generic verbs Lane 1 lists to `parser.js` with default refusals in `commands.js`; no puzzle knowledge in the engine.
 * [ ] Define all realm room shells and exits in `realm.js`; MINERS' LOCKER in `mineGallery` (OPEN LOCKER, IN) and OUT back to the gallery; ROOT HOLLOW sealed until `realm:allSolved`.
 * [ ] Award realm discovery (+20) once on first entry.
