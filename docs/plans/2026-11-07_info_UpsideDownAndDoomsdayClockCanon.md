@@ -61,6 +61,131 @@ This is the exact player-facing text and constant contract for Lanes 2 through 1
 * `portableTransistorRadio`, PORTABLE TRANSISTOR RADIO, `names`: "portable transistor radio", "transistor radio", "portable radio", "transistor"; portable, battery powered heirloom, inside cabinet until victory, deposit 15. `roomDesc`: "A PORTABLE TRANSISTOR RADIO rests inside the opened cabinet." `desc`: "A battery-powered PORTABLE TRANSISTOR RADIO in a scuffed leather case, with a strap and a telescoping antenna. A small BM stamp sits beneath the tuning knob." LISTEN TO or USE TRANSISTOR RADIO: "The TRANSISTOR RADIO crackles, catches one cheerful drum hit, and loses the station. No quiz follows." plus normal first-time use award. TAKE before winning: "The cabinet door hides whatever is inside."
 * Gary hint lines: CABINET RADIO, "TURN ON or LISTEN TO the CABINET RADIO, then ANSWER with a number from 1 to 5 or SAY a full listed title."; quiz, "Get three right without a miss. A wrong answer puts your streak back at zero; remember the clue, not any song lyric."; transistor, "The cabinet swings open after three correct answers. TAKE the smaller RADIO inside."
 
+## Radio song catalog
+
+The following twenty titles are real songs from the 1980s. Only each title and one of its five original clue lines appear in a round; numbers and clues below are authoring indices, not answer positions. Clues describe situations literally and never quote or closely rewrite lyrics.
+
+* "Take On Me":
+  * Clue 1: "A nervous stranger tries to schedule romance before the calendar bites him."
+  * Clue 2: "He cannot explain the plan, so he offers himself as both plan and warning label."
+  * Clue 3: "A woman gets a very short window to decide whether an awkward suitor is worth the risk."
+  * Clue 4: "The narrator admits his social skills need repairs but asks for a first date anyway."
+  * Clue 5: "Two people negotiate whether a future together is worth one gloriously clumsy leap."
+* "Eye of the Tiger":
+  * Clue 1: "A bruised boxer returns to work because apparently his workplace is another boxing ring."
+  * Clue 2: "An old opponent discovers that losing only made the fighter buy an earlier alarm clock."
+  * Clue 3: "The contender describes survival as a training program with almost no days off."
+  * Clue 4: "One determined athlete walks back into a fight holding a very suspicious amount of focus."
+  * Clue 5: "A person compares competitive grit to the intense stare of a striped predator."
+* "Every Breath You Take":
+  * Clue 1: "A man with a clipboard mistakes a breakup for permission to audit somebody's schedule."
+  * Clue 2: "The ex appoints himself chief inspector of absolutely everything the other person does."
+  * Clue 3: "A romantic speech slowly reveals itself to be an unlicensed surveillance operation."
+  * Clue 4: "Someone describes devotion by listing the hours he should have spent minding his business."
+  * Clue 5: "An imaginary security camera follows an unwilling subject all the way through lunch."
+* "Total Eclipse of the Heart":
+  * Clue 1: "A heartbroken person reports that the lights in her entire emotional solar system have failed."
+  * Clue 2: "The relationship's weather forecast is darkness with a chance of even more darkness."
+  * Clue 3: "She wants an old flame to return before the sun files for permanent leave."
+  * Clue 4: "A breakup grows so dramatic that an astronomer could use it to block daylight."
+  * Clue 5: "Two lovers lose their bearings while one of their metaphorical planets eats the lamp."
+* "Sweet Dreams (Are Made of This)":
+  * Clue 1: "A traveler canvasses the world for a useful dream and finds an alarming selection of people."
+  * Clue 2: "The narrator tries to classify ambition, then discovers that everybody shops for something different."
+  * Clue 3: "An expedition in search of a decent night's fantasy somehow becomes a sociology survey."
+  * Clue 4: "Some strangers exploit each other while the traveler keeps taking very bleak notes."
+  * Clue 5: "A sleeper wants to know what dreams contain and receives a suspiciously global answer."
+* "Girls Just Want to Have Fun":
+  * Clue 1: "A young woman arrives home late and fields a parental inquiry about her social calendar."
+  * Clue 2: "Her dad treats dancing with friends as a moral emergency; she requests a reasonable weekend."
+  * Clue 3: "A group of women proposes that enjoying a night out should not require a permit."
+  * Clue 4: "The narrator's main demand is recreation, not a debate with the household committee."
+  * Clue 5: "A curfew meets a dance floor and receives a polite but enthusiastic rejection."
+* "Billie Jean":
+  * Clue 1: "A dancer meets a persuasive stranger and suddenly needs a lawyer specializing in paternity."
+  * Clue 2: "A woman names a child's father; the accused narrator requests another round of evidence."
+  * Clue 3: "One dance at a club turns into a family-tree argument nobody can settle by moonwalking."
+  * Clue 4: "The speaker insists a public claim about his parenthood has been badly misfiled."
+  * Clue 5: "A glamorous visitor carries an accusation more durable than the dance floor."
+* "Beat It":
+  * Clue 1: "Two street gangs prepare for a showdown; the sensible advice is to leave the postcode."
+  * Clue 2: "A fight invitation arrives, and the narrator recommends the opposite of accepting it."
+  * Clue 3: "A threatened person chooses an exit route over a fistful of very poor prizes."
+  * Clue 4: "The proposed solution to neighborhood violence involves making oneself scarce with confidence."
+  * Clue 5: "A bad guy wants a duel, but the speaker treats retreat as an Olympic event."
+* "Thriller":
+  * Clue 1: "A movie date goes wrong when the monster count becomes difficult to keep on one hand."
+  * Clue 2: "Midnight brings suspicious noises, and the narrator keeps offering commentary instead of a taxi."
+  * Clue 3: "A frightened companion learns that the horror show has apparently spilled into the street."
+  * Clue 4: "The undead stage a surprise appearance while two living people negotiate who hides behind whom."
+  * Clue 5: "A romantic evening is interrupted by teeth, shadows, and spectacularly bad costume choices."
+* "Like a Virgin":
+  * Clue 1: "A new romance makes somebody feel as if her battered heart has just left its packaging."
+  * Clue 2: "She compares emotional recovery to starting a relationship with a brand-new instruction manual."
+  * Clue 3: "The narrator has loved before but now describes a surprisingly fresh emotional reset."
+  * Clue 4: "One attentive partner turns yesterday's complicated history into a very nervous first day."
+  * Clue 5: "A person with plenty of experience suddenly feels unreasonably new to affection."
+* "Material Girl":
+  * Clue 1: "A suitor submits flowers; the narrator asks to see his financial references."
+  * Clue 2: "One woman's dating criteria include jewelry, comfort, and a very sturdy wallet."
+  * Clue 3: "Romance is treated like a shopping trip whose cashier refuses promises."
+  * Clue 4: "A young woman inspects a world of luxury and decides the receipts are the interesting part."
+  * Clue 5: "Attention without gifts gets politely sent to the back of the line."
+* "Careless Whisper":
+  * Clue 1: "A guilty dancer discovers that the ballroom floor has excellent memory for betrayal."
+  * Clue 2: "Someone confesses a secret while a lonely saxophone appears to file the paperwork."
+  * Clue 3: "Two partners share one last dance and a truly ruinous amount of unspoken information."
+  * Clue 4: "A mistake in private becomes impossible to ignore when the music turns slow."
+  * Clue 5: "The narrator blames his own loose tongue for the saddest dance invitation in town."
+* "Never Gonna Give You Up":
+  * Clue 1: "A very earnest man presents a lifetime warranty for his behavior toward one person."
+  * Clue 2: "Every possible relationship failure is met with another emphatic promise not to do it."
+  * Clue 3: "A suitor talks like a customer-service department that somehow means every guarantee."
+  * Clue 4: "The narrator repeats his commitment so often that the contract needs a stapler."
+  * Clue 5: "Somebody tries to prove loyalty with an itemized list of betrayals he refuses to commit."
+* "Livin' on a Prayer":
+  * Clue 1: "An out-of-work dockhand and a weary waitress try to build a future from very small paychecks."
+  * Clue 2: "A couple audits their empty pockets and votes to keep hoping anyway."
+  * Clue 3: "His guitar and her diner shifts are asked to fund a plan that badly needs investors."
+  * Clue 4: "Two exhausted workers turn mutual stubbornness into the world's least secure savings account."
+  * Clue 5: "A romance balances on hope while the household budget loudly requests a parachute."
+* "Don't Stop Believin'":
+  * Clue 1: "A few lonely travelers share a train and the idea that their lives might improve."
+  * Clue 2: "Strangers gather under city lights, each carrying a different unfinished future."
+  * Clue 3: "One passenger buys a ticket into a night full of other people's hopeful mistakes."
+  * Clue 4: "The narrator watches people meet at an hour when nearly everyone should be asleep."
+  * Clue 5: "A platform fills with dreamers who refuse to let the timetable decide their fate."
+* "Footloose":
+  * Clue 1: "A town regulates dancing so strictly that one teenager's shoes become political."
+  * Clue 2: "The narrator responds to a no-dancing rule by assembling a very enthusiastic floor."
+  * Clue 3: "A restless youngster wants to move his feet without asking the municipal council."
+  * Clue 4: "The local authorities have confused a dance party with a public safety crisis."
+  * Clue 5: "A pair of feet files for freedom from a town that seems allergic to rhythm."
+* "Danger Zone":
+  * Clue 1: "A pilot insists that the riskiest part of the sky deserves a return visit."
+  * Clue 2: "The cockpit's warning lights become an oddly persuasive travel brochure."
+  * Clue 3: "A fighter plane heads toward a place sensible air-traffic controllers avoid."
+  * Clue 4: "One aviator describes a hazardous flight as though it were a desirable neighborhood."
+  * Clue 5: "The narrator straps into a jet and treats enormous personal risk as a destination."
+* "Africa":
+  * Clue 1: "A traveler listens to faraway drums while trying to understand why the weather matters so much."
+  * Clue 2: "A continent becomes the backdrop for a man's extremely elaborate internal travel diary."
+  * Clue 3: "The narrator juggles a flight, a romance, and a rain cloud with suspiciously ceremonial timing."
+  * Clue 4: "Someone surveys distant mountains and concludes that the journey is more personal than the map."
+  * Clue 5: "A traveler hears a whole landscape calling and wonders whether his baggage is emotional."
+* "Walk Like an Egyptian":
+  * Clue 1: "Commuters begin posing like ancient wall paintings and somehow call it a dance."
+  * Clue 2: "A line of people copies stiff museum poses instead of asking the curator for help."
+  * Clue 3: "A movement instructor studies old stone figures and accidentally starts a fad."
+  * Clue 4: "Everyone from street performers to office workers tries the same sideways historical strut."
+  * Clue 5: "The dancers appear to have confused archaeology with a group fitness class."
+* "99 Red Balloons":
+  * Clue 1: "A crowd releases party decorations; the military interprets them as a very small invasion."
+  * Clue 2: "A batch of floating toys triggers a geopolitical response that cannot be returned for a refund."
+  * Clue 3: "A radar operator mistakes cheerful rubber spheres for an emergency worth mobilizing."
+  * Clue 4: "The sky fills with birthday debris and the generals immediately choose the least birthday-like option."
+  * Clue 5: "An innocent balloon launch escalates into a war with a truly embarrassing incident report."
+
 ## Planetarium and fixed constellation index
 
 * `projector`, PROJECTOR, `names`: "projector", "brass projector", "star projector"; fixed in PLANETARIUM. `roomDesc`: "A brass PROJECTOR points at the dome." `desc`: "The PROJECTOR has five numbered positions and asks only for a number from 1 to 5. On its housing, a stick figure is drawn thin as a noodle beside another figure outlined in scorch marks. BAD CHOICES SEND YOU TO THE FRONT GATE; the GARDEN BRAZIER is one step EAST of that gate." LOOK, EXAMINE, USE, or START PROJECTOR always says "The PROJECTOR asks: Choose a number from 1 to 5." The prompt and all five outcomes remain available after the eyepiece drops.
