@@ -1053,6 +1053,8 @@ first line, followed immediately by the reporter's description. If the hint line
 also includes the chronological Gary/user exchange: Gary turns are numbered,
 first speaker labels are written out, and later labels use the shortest unique
 prefix (including caller names learned from `my name is` or `call me`).
+Reports also record the current realm-room status, oak lift stop, and persisted
+realm/lower-panel puzzle flags when the UPSIDE DOWN is present.
 `URLSearchParams` safely encodes the
 line breaks. The full trail remains in memory; only exceptionally long issue
 URLs compact command history to a 6,000-character budget while retaining both

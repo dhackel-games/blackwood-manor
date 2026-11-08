@@ -697,7 +697,7 @@ export function createGame(world) {
     const previouslyCarried = new Set(game.inventory().map((item) => item.id));
 
     const roomNavigation = world.implicitNavigation?.[state.room];
-    const interceptsNavigation = typeof world.rooms[state.room]?.on?.go === "function";
+    const interceptsNavigation = !!world.rooms[state.room]?.interceptImplicitNavigation;
     const implicitNavigation = !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "in"
       ? roomNavigation?.in
       : !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "out"

@@ -856,8 +856,13 @@ const STANDALONE_MAX_AWARDS = Object.freeze({
   dreadmaw: 10,
 });
 
+function progressPoints(id) {
+  const award = PROGRESS_AWARDS[id];
+  return typeof award === "number" ? award : award?.points || 0;
+}
+
 function awardProgress(ctx, id) {
-  const points = PROGRESS_AWARDS[id];
+  const points = progressPoints(id);
   const flag = `progressAward:${id}`;
   if (!points || ctx.getFlag(flag)) return 0;
   ctx.setFlag(flag);
@@ -880,7 +885,9 @@ function maximumScore(ctx) {
     .filter((item) => item.takeable && item.phase !== 2).length
     * ctx.world.config.portableRewards.use;
   const progressionPoints = Object.values(PROGRESS_AWARDS)
-    .reduce((total, points) => total + points, 0);
+    .reduce((total, award) => total + (award?.maximumScore === false
+      ? 0
+      : (typeof award === "number" ? award : award?.points || 0)), 0);
   const standalonePoints = Object.values(STANDALONE_MAX_AWARDS)
     .reduce((total, points) => total + points, 0);
   return itemPoints + pickupPoints + usePoints + progressionPoints + standalonePoints;
@@ -2747,6 +2754,7 @@ function teleportRandom(ctx, flavor, exclude) {
   const ids = Object.keys(ctx.world.rooms).filter(
     (id) => id !== ctx.state.room && !(exclude && exclude.has(id))
       && ctx.world.rooms[id].phase !== 2 // Part II hours are reachable only via the clock
+      && ctx.world.rooms[id].randomTeleport !== false
   );
   const roomId = ids[Math.floor(Math.random() * ids.length)];
   ctx.state.room = roomId;
@@ -3942,7 +3950,7 @@ const logicWorld = {
       const flag = `progressAward:${id}`;
       if (!completed || state.flags[flag]) continue;
       state.flags[flag] = true;
-      state.score = (state.score || 0) + PROGRESS_AWARDS[id];
+      state.score = (state.score || 0) + progressPoints(id);
     }
 
     if (state.flags["seen:betweenWalls"]) state.flags["progressAward:betweenWalls"] = true;

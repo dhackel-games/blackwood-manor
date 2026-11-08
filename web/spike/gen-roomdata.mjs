@@ -7,29 +7,16 @@
 //
 // Regenerate after world edits:  node web/spike/gen-roomdata.mjs
 //
-// The engine sources import each other with a "?v=source" cache-buster that
-// only the browser understands, so we copy the handful of pure-data modules to
-// a temp dir with that suffix stripped, import the composed `world`, and dump
-// what we need.
+// Node supports the cache-key query used by the browser module graph, so import
+// the composed world directly. This keeps registered content modules in the
+// generated snapshot without staging source files elsewhere.
 
-import { mkdtempSync, copyFileSync, readFileSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
+import { world } from "../js/world.js?v=source";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const jsDir = join(here, "..", "js");
-
-// Only the pure-data modules world.js transitively needs. None touch the DOM.
-const MODULES = ["map.js", "compose.js", "sysop-menu.js", "world.content.js", "world.js"];
-
-const tmp = mkdtempSync(join(tmpdir(), "bm-roomdata-"));
-for (const m of MODULES) {
-  const src = readFileSync(join(jsDir, m), "utf8").replaceAll("?v=source", "");
-  writeFileSync(join(tmp, m), src);
-}
-
-const { world } = await import(pathToFileURL(join(tmp, "world.js")).href);
 
 // Resolve an item's owning room by walking loc -> (item | room).
 const rooms = world.rooms || {};

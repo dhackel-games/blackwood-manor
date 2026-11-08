@@ -24,9 +24,17 @@ function discoverRealmByFlight(ctx) {
   return points ? `You arrive in THE UPSIDE DOWN. (+${points})` : null;
 }
 
-const realmRoom = (exits) => ({ realm: true, exits, onEnter: discoverRealmByFlight });
+const realmRoom = (exits) => ({
+  realm: true,
+  randomTeleport: false,
+  exits,
+  onEnter: discoverRealmByFlight,
+});
 
 const rooms = {
+  mineGallery: {
+    interceptImplicitNavigation: true,
+  },
   waylampClearing: {
     ...realmRoom({
       north: "cheeseGrotto",
@@ -172,7 +180,7 @@ const shortNames = {
 };
 
 const progressAwards = {
-  realmDiscovered: 20,
+  realmDiscovered: { points: 20, maximumScore: false },
 };
 
 const hints = [];

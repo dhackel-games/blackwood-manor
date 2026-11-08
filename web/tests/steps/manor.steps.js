@@ -77,6 +77,7 @@ Given("the mystery package teleport selects room {string}", function (room) {
   const destinations = Object.keys(this.game.world.rooms).filter((id) =>
     id !== this.game.state.room
     && this.game.world.rooms[id].phase !== 2
+    && this.game.world.rooms[id].randomTeleport !== false
     && (this.game.getFlag("oakLightAligned") || id !== "treeFort"));
   const index = destinations.indexOf(room);
   assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
@@ -86,7 +87,8 @@ Given("the mystery package teleport selects room {string}", function (room) {
 });
 
 Given("the mystery package teleport would select room {string}", function (room) {
-  const destinations = Object.keys(this.game.world.rooms).filter((id) => id !== this.game.state.room);
+  const destinations = Object.keys(this.game.world.rooms).filter((id) =>
+    id !== this.game.state.room && this.game.world.rooms[id].randomTeleport !== false);
   const index = destinations.indexOf(room);
   assert.notEqual(index, -1, `Unknown teleport destination: ${room}`);
   const seq = [0.3, (index + 0.5) / destinations.length];
@@ -1304,6 +1306,7 @@ Then("the letter has no hard line breaks", function () {
 
 Then("every manor room has searchable detail and narrow ASCII art", function () {
   for (const [id, room] of Object.entries(world.rooms)) {
+    if (room.realm) continue;
     assert.ok(typeof room.searchDesc === "string" || typeof room.searchDesc === "function",
       `${id} must define closer-inspection detail`);
     assert.equal(typeof room.art, "string", `${id} must define ASCII room art`);
@@ -1314,9 +1317,11 @@ Then("every manor room has searchable detail and narrow ASCII art", function () 
 });
 
 Then("every manor room declares implicit IN and OUT routing", function () {
+  const manorRooms = Object.fromEntries(
+    Object.entries(world.rooms).filter(([, room]) => !room.realm));
   assert.deepEqual(
     Object.keys(world.implicitNavigation).sort(),
-    Object.keys(world.rooms).sort(),
+    Object.keys(manorRooms).sort(),
   );
   for (const [id, route] of Object.entries(world.implicitNavigation)) {
     assert.ok(Object.hasOwn(route, "in"), `${id} must declare IN routing`);
