@@ -94,4 +94,20 @@ Then("the roof gargoyles are fixed and the weathervane is a treasure", function 
   assert.equal(weathervane.points, 10);
 });
 
+Then("every roof gargoyle reply comes to life, does its deed, apologizes, and turns back to stone", function () {
+  const deeds = { gargoylePuffCheeks: /BURP/, gargoyleNosePinch: /FART/, gargoyleRearGuard: /SHART|SPLATTER|POOP EXPLOSION|ERUPTS|BLAST/ };
+  for (const [key, deed] of Object.entries(deeds)) {
+    const pool = world.flavorPools[key];
+    assert.equal(pool.length, 12);
+    assert.equal(new Set(pool).size, 12, `${key} lines must be unique`);
+    for (const line of pool) {
+      assert.match(line, /(life|wak|animates|alive|blinks|twitches|shudders|springs)/i, `${key} must come to life: ${line}`);
+      assert.match(line, deed, `${key} must perform its deed: ${line}`);
+      assert.match(line, /(sorry|pardon|apolog|excuse me|forgive)/i, `${key} must apologize: ${line}`);
+      assert.match(line, /(stone|statue|stiffen|freez|petrif|still|solidif|harden)/i, `${key} must return to stone: ${line}`);
+      assert.doesNotMatch(line, /silver|rooster|weathercock|BURPER|FARTER|SHITTER/i);
+    }
+  }
+});
+
 // end lane8-weathervane.steps.js
