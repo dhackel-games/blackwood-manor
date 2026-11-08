@@ -144,12 +144,12 @@ When("I take and use the portable transistor radio twice", function () {
   this.secondTransistorUse = this.game.send("listen to transistor");
 });
 
-Then("the portable transistor radio pickup and use award only once", function () {
+Then("the portable transistor radio earns pickup without a keepsake-use award", function () {
   assert.match(this.output, /Taken\. \(\+5\)/);
-  assert.match(this.firstTransistorUse, /\(\+5\)/);
+  assert.doesNotMatch(this.firstTransistorUse, /\(\+5\)/);
   assert.doesNotMatch(this.secondTransistorUse, /\(\+5\)/);
   assert.equal(this.game.getFlag("progressItem:portableTransistorRadio"), true);
-  assert.equal(this.game.getFlag("useItem:portableTransistorRadio"), true);
+  assert.equal(this.game.getFlag("useItem:portableTransistorRadio"), undefined);
 });
 
 When("I save the current radio state", function () {

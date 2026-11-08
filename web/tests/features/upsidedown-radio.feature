@@ -51,8 +51,8 @@ Feature: Cabinet radio quiz
     Then the output contains "The cabinet has already opened. The PORTABLE TRANSISTOR RADIO is yours to take."
     And the radio quiz score is 10
     When I take and use the portable transistor radio twice
-    Then the portable transistor radio pickup and use award only once
-    And the radio quiz score is 20
+    Then the portable transistor radio earns pickup without a keepsake-use award
+    And the radio quiz score is 15
 
   Scenario: Restoring preserves an active round and streak
     Given a fresh radio quiz game seeded with 123456789

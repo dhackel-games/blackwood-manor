@@ -5,9 +5,9 @@ import diamond from "./diamond.js?v=source";
 import fridge from "./fridge.js?v=source";
 import photograph from "./photograph.js?v=source";
 import snuffbox from "./snuffbox.js?v=source";
-import weathercock from "./weathercock.js?v=source";
+import weathervane from "./weathervane.js?v=source";
 
-const modules = [fridge, diamond, photograph, corkscrew, snuffbox, weathercock];
+const modules = [fridge, diamond, photograph, corkscrew, snuffbox, weathervane];
 
 function mergeRoomHooks(current, additions) {
   const merged = { ...current };

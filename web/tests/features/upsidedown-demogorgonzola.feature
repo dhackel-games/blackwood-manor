@@ -107,11 +107,11 @@ Feature: The kitchen fridge and Demogorgonzola
     Then the output contains "Taken. (+5)"
     And item "demogorgonzolaRind" is a treasure heirloom worth 15
     When I send "use rind"
-    Then the output contains "You brandish the RIND. DEMOGORGONZOLA hiccups from somewhere very far away. (+5)"
-    And the game score is 35
+    Then the output contains "You brandish the RIND. DEMOGORGONZOLA hiccups from somewhere very far away."
+    And the game score is 30
     When I send "use rind"
     Then the output does not contain "(+5)"
-    And the game score is 35
+    And the game score is 30
 
   Scenario Outline: Every unsafe directed interaction ejects the player with possessions intact
     Given the player is in room "cheeseGrotto"

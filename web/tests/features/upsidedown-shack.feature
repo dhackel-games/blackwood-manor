@@ -49,29 +49,29 @@ Feature: The Shack alphabet wall
     When I send "search"
     Then the output contains "The door's nail remembers a drawing covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
     When I send "read drawing"
-    Then the output contains "There are no written words. The arrows all accuse the same enormous fart. (+5)"
-    And the game score is 10
+    Then the output contains "There are no written words. The arrows all accuse the same enormous fart."
+    And the game score is 5
     When I send "use drawing"
     Then the output contains "There are no written words. The arrows all accuse the same enormous fart."
     And the output does not contain "(+5)"
-    And the game score is 10
+    And the game score is 5
 
   Scenario: The crayon's use and the wall reward cannot be farmed
     When I send "spell fart"
     And I send "take crayon"
     Then the game score is 15
     When I send "use purple crayon"
-    Then the output contains "You sketch a heroic butt, sign it anonymously, and tuck the PURPLE CRAYON away. (+5)"
-    And the game score is 20
+    Then the output contains "You sketch a heroic butt, sign it anonymously, and tuck the PURPLE CRAYON away."
+    And the game score is 15
     When I send "use crayon"
     Then the output contains "You sketch a heroic butt, sign it anonymously, and tuck the PURPLE CRAYON away."
     And the output does not contain "(+5)"
-    And the game score is 20
+    And the game score is 15
     When I send "drop crayon"
     And I send "type cheese"
     Then the output contains "The wall gives one sleepy blink. It has no second CRAYON."
     And item "purpleCrayon" is in room "shack"
-    And the game score is 20
+    And the game score is 15
 
   Scenario: The wall's award and one crayon survive a snapshot
     When I send "spell fart"

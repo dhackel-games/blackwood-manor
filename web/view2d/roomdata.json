@@ -559,28 +559,28 @@
     "desc": "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; a narrow ridge runs EAST to the BELFRY.",
     "items": [
       {
-        "id": "silverWeathercock",
-        "label": "silver weathercock",
+        "id": "rustedWeathervane",
+        "label": "rusted weathervane",
         "kind": "takeable"
       },
       {
-        "id": "gargoyleBurper",
-        "label": "burper",
+        "id": "gargoylePuffCheeks",
+        "label": "puff-cheeked gargoyle",
         "kind": "fixture"
       },
       {
-        "id": "gargoyleFarter",
-        "label": "farter",
+        "id": "gargoyleNosePinch",
+        "label": "nose-pinching gargoyle",
         "kind": "fixture"
       },
       {
-        "id": "gargoyleHorizonGazer",
-        "label": "horizon-gazer",
+        "id": "gargoyleFarGazing",
+        "label": "far-gazing gargoyle",
         "kind": "fixture"
       },
       {
-        "id": "gargoyleShitter",
-        "label": "shitter",
+        "id": "gargoyleRearGuard",
+        "label": "rear-guarding gargoyle",
         "kind": "fixture"
       }
     ]

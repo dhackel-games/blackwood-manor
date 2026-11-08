@@ -24,7 +24,7 @@ const VERBS = {
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
   combine: ["combine", "assemble"], spell: ["spell", "type"], kick: ["kick", "boot"],
-  fight: ["fight", "brawl"], turn: ["turn", "rotate", "spin"], set: ["set", "adjust"],
+  fight: ["fight", "brawl"], turn: ["turn", "rotate", "spin", "point"], set: ["set", "adjust"],
   start: ["start", "run", "activate"], pour: ["pour", "tip"], fill: ["fill", "refill"],
   stomp: ["stomp", "stamp"], smother: ["smother", "suffocate"],
   show: ["show", "scry"], route: ["route", "guide", "path"],

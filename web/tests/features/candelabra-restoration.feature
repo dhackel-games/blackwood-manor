@@ -63,10 +63,10 @@ Feature: Restore the dining-room candelabra
     And the output contains "WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS"
     And the output contains "CANDELABRA RESTORATION BONUS (+20)"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 40
+    And the game score is 45
     When I round-trip the game snapshot
     Then flag "progressAward:candelabraRestored" is set
-    And the game score is 40
+    And the game score is 45
 
     Examples:
       | first                     | missing                      | second                    |
@@ -79,7 +79,7 @@ Feature: Restore the dining-room candelabra
     When I send "put candelabra in reliquary"
     Then item "candelabra" is in "reliquary"
     And the output contains line "HEIRLOOMS: 1/24 +0"
-    And the game score is 15
+    And the game score is 10
 
   Scenario: The candelabra remains lit without fuel in darkness
     Given the restored candelabra is carried

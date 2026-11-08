@@ -189,96 +189,92 @@ export function solveSmallProblem({ start, end, tasks, flags = {}, canFly = fals
 }
 
 const OPENING = [
-  "e", "e", "take all", "use fresh",
-  "fly shaft", "use backpack", "u", "use headlamp", "open locker",
-  "d", "e", "say lore", "e", "use shoes", "take all", "use crest",
+  "e", "e", "look in toilet", "take piecec", "use fresh",
+  "fly shaft", "use backpack", "u", "use headlamp",
+  "d", "e", "say lore", "e", "use shoes", "take crest",
 ];
 
 const TASKS = [
-  { id: "mazePiece", room: "hedgeMazeLoop", commands: ["take all"] },
-  { id: "gardenKey", room: "garden", commands: ["move statue", "take all"] },
+  { id: "mazePiece", room: "hedgeMazeLoop", commands: ["take pieceb"] },
+  { id: "gardenKey", room: "garden", commands: ["move statue", "take iron"] },
   { id: "porchDoor", room: "porch", dependsOn: ["gardenKey"],
-    commands: ["open mailbox", "take all", "read letter", "open frontd with iron"],
+    commands: ["open mailbox", "read letter", "open frontd with iron"],
     grants: { frontDoorOpen: true } },
-  { id: "hallPackage", room: "grandHall", commands: ["take all", "read package"] },
+  { id: "hallPackage", room: "grandHall", commands: ["read package"] },
   { id: "kitchenBasics", room: "kitchen",
     commands: ["open fridge", "take all", "use burrito", "open cellard", "use dried",
       "wait", "wait", "use milk"],
     grants: { cellarOpen: true } },
   { id: "parlorSafe", room: "parlor",
-    commands: ["move profile", "open safe with 7 3 9", "take coal", "take all",
-      "wear talisman"] },
+    commands: ["move profile", "open safe with 7 3 9", "take coal", "wear talisman"] },
   { id: "kitchenDiamond", room: "kitchen", dependsOn: ["kitchenBasics", "parlorSafe"],
-    commands: ["put coal in microwave", "set dial to B", "start microwave",
-      "take all", "use diamond"] },
+    commands: ["put coal in microwave", "set dial to B", "start microwave", "take diamond"] },
   { id: "diningCandle", room: "diningRoom", dependsOn: ["kitchenBasics"],
-    commands: ["take all", "light candle"] },
+    commands: ["take candlestick", "light candle"] },
   { id: "library", room: "library",
-    commands: ["pull lever", "read book", "take all"],
+    commands: ["pull lever", "read book", "take pieced"],
     grants: { leverPulled: true } },
   { id: "secretChamber", room: "secretChamber", dependsOn: ["library"],
-    commands: ["take all", "read grimoire"] },
+    commands: ["read grimoire"] },
   { id: "wineCellar", room: "wineCellar", dependsOn: ["kitchenBasics"],
-    commands: ["take all", "use decanter", "open wine bottle with corkscrew",
-      "drink wine"] },
+    commands: ["take all", "open wine bottle with corkscrew", "drink wine"] },
   { id: "crypt", room: "crypt", dependsOn: ["wineCellar", "parlorSafe"],
-    commands: ["take all", "use locket"] },
+    commands: ["take locket"] },
   { id: "landing", room: "landing",
     commands: ["pick nose", "sniff snuffbox", "pull cord"],
     grants: { ladderDown: true } },
   { id: "hallBedroom", room: "hallBedroom",
-    commands: ["take shard", "open drawer", "take all", "wear family"] },
+    commands: ["take shard", "open drawer", "take family"] },
   { id: "nursery", room: "nursery",
-    commands: ["pull wallpaper", "take all", "open musicbox", "take all"],
+    commands: ["pull wallpaper", "take musicbox", "open musicbox", "take tiny"],
     grants: { wallGapFound: true } },
   { id: "betweenWalls", room: "betweenWalls",
-    commands: ["take all", "use bmhammer"] },
+    commands: ["take bmhammer"] },
   { id: "masterBedroom", room: "masterBedroom", dependsOn: ["nursery"],
-    commands: ["open jewelry with tiny", "take all", "wear ravenblood"] },
+    commands: ["open jewelry with tiny", "take ravenblood"] },
   { id: "study", room: "study",
     commands: ["open studrawer", "take all", "read diary", "wear bmwatch"] },
   { id: "attic", room: "attic",
-    commands: ["take all", "use ancestral"] },
+    commands: ["take ancestral"] },
   { id: "roof", room: "roof",
-    commands: ["turn weathercock to face burper", "turn weathercock to face farter",
-      "turn weathercock to face shitter", "turn weathercock to face horizon-gazer",
-      "take weathercock"] },
+    commands: ["turn vane n", "turn vane w", "turn vane s", "turn vane e",
+      "take vane"] },
   { id: "belfry", room: "belfry",
-    commands: ["pull bellrope", "take all", "wear goggles"] },
+    commands: ["pull bellrope", "wear goggles"] },
   { id: "hiddenVault", room: "hiddenVault",
     commands: ["use obsidian"] },
   { id: "dragon", room: "dragonCaveMouth", dependsOn: ["kitchenBasics"],
-    commands: ["give apple to dragon", "use doubloon"],
+    commands: ["give apple to dragon"],
     grants: { dragonMoved: true } },
   { id: "bodyFire", room: "grandHall", dependsOn: ["kitchenBasics", "porchDoor"],
     commands: ["light self with wrapper", "s", "s", "e", "light brazier"],
     movesTo: "garden", movesCost: 3 },
   { id: "gardenWell", room: "garden", dependsOn: ["bodyFire"],
-    commands: ["down", "take all", "use ancient"] },
+    commands: ["down", "take all"] },
   { id: "oakPanel", room: "greatOak", dependsOn: ["gardenWell"],
     commands: ["take ruby", "take sapphire", "put ruby in top",
       "put emerald in middle", "put sapphire in bottom"],
     grants: { oakLightAligned: true } },
   { id: "treeFort", room: "treeFort", dependsOn: ["lowerPanel"],
-    commands: ["use spyglass", "wait"] },
+    commands: ["take spyglass", "wait"] },
   { id: "realmCampfire", room: "waylampClearing", dependsOn: ["kitchenBasics"],
-    commands: ["fill jug", "pour jug on fire", "take all"] },
+    commands: ["fill jug", "pour jug on fire", "take cyan"] },
   { id: "lowerPanel", room: "below", dependsOn: ["realmCampfire"],
     commands: ["take magenta", "take yellow", "put yellow in top slot",
       "put magenta in middle slot", "put cyan in bottom slot"],
     grants: { "oak:lowerPanelAligned": true } },
   { id: "grotto", room: "cheeseGrotto", dependsOn: ["kitchenBasics"],
     commands: ["give limburger to dg", "give epoisses to dg",
-      "give munster to dg", "take all", "use rind"] },
+      "give munster to dg", "take rind"] },
   { id: "shack", room: "shack",
-    commands: ["spell fart", "take all", "read drawing", "use crayon"] },
+    commands: ["spell fart", "take all", "read drawing"] },
   { id: "radio", room: "avClubDen",
     commands: ["turn on cabinet radio", "@answer", "@answer", "@answer",
-      "take all", "use transistor"] },
+      "take transistor"] },
   { id: "mapRoom", room: "mapRoom",
-    commands: ["take all", "read starmap"] },
+    commands: ["read starmap"] },
   { id: "planetariumSafe", room: "planetarium",
-    commands: ["say 1", "take all", "use eyepiece"] },
+    commands: ["say 1", "take eyepiece"] },
   { id: "planetariumEject", room: "planetarium",
     dependsOn: ["realmCampfire", "lowerPanel", "grotto", "shack", "radio",
       "mapRoom", "planetariumSafe"],
@@ -287,8 +283,7 @@ const TASKS = [
     commands: ["combine pieces", "read baronessphoto"] },
   { id: "diningRestore", room: "diningRoom",
     dependsOn: ["diningCandle", "hallBedroom"],
-    commands: ["put candle in fixture", "put shard in fixture",
-      "take all", "use candelabra"] },
+    commands: ["put candle in fixture", "put shard in fixture", "take candelabra"] },
 ];
 TASKS.push({
   id: "deposit", room: "grandHall", dependsOn: TASKS.map((task) => task.id),
@@ -482,7 +477,7 @@ function routeOptions(game) {
   const lowerAligned = !!game.getFlag("oak:lowerPanelAligned");
   return {
     flags: game.state.flags,
-    lockerOpen: !!game.item("minersLocker").open,
+    lockerOpen: true,
     canFly: game.world.canFly(game),
     inventoryLoad: game.inventoryLoad(),
     liftBeat: lowerAligned ? game.getFlag("oak:liftBeat")
@@ -490,7 +485,7 @@ function routeOptions(game) {
   };
 }
 
-function realize(order, secondFlight) {
+function realize(order, secondFlight, earlySight = null) {
   const game = createGame(world);
   game.send("Jeb");
   game.setFlag("__noChaos", true);
@@ -525,7 +520,7 @@ function realize(order, secondFlight) {
       changes.ejection++;
     } else if (command === "z" && ["below", "greatOak", "treeFort"].includes(beforeRoom)) {
       changes.lift++;
-    } else if (/^(?:n|s|e|w|u|d|ne|nw|se|sw|in|out)$/.test(command)) {
+    } else if (/^(?:n|s|e|w|u|d|ne|nw|se|sw|in|out|in locker)$/.test(command)) {
       changes.walking++;
     } else {
       throw new Error(`${task}: unexpected relocation by "${command}" from ${beforeRoom} to ${afterRoom}`);
@@ -539,13 +534,33 @@ function realize(order, secondFlight) {
     throw new Error("Opening did not equip the winged shoes in DREADMAW'S vault");
   }
   if (secondFlight) send(`fly ${world.roomShortNames[secondFlight]}`, "second flight");
+  const completedEarly = new Set();
+  if (earlySight === "belfry") {
+    send("fly belfry", "third flight to permanent sight");
+    for (const command of TASKS[TASK_INDEX.get("belfry")].commands) {
+      send(command, "third flight to permanent sight");
+    }
+    completedEarly.add("belfry");
+  } else if (earlySight === "hiddenVault") {
+    send("fly astral", "third flight to permanent sight");
+    for (const command of TASKS[TASK_INDEX.get("hiddenVault")].commands) {
+      send(command, "third flight to permanent sight");
+    }
+    completedEarly.add("hiddenVault");
+  }
 
   for (const id of order) {
+    if (completedEarly.has(id)) continue;
     const task = TASKS[TASK_INDEX.get(id)];
     if (task.room && task.room !== game.state.room) {
       const walk = shortestWalk(game.state.room, task.room, routeOptions(game));
       if (!walk) throw new Error(`${id}: no physical route from ${game.state.room} to ${task.room}`);
-      for (const command of walk.commands) send(command, `walk to ${id}`);
+      for (const rawCommand of walk.commands) {
+        const command = rawCommand === "in" && game.state.room === "mineGallery"
+          ? "in locker"
+          : rawCommand;
+        send(command, `walk to ${id}`);
+      }
       if (game.state.room !== task.room) {
         throw new Error(`${id}: navigation ended in ${game.state.room}, not ${task.room}`);
       }
@@ -603,13 +618,13 @@ function realize(order, secondFlight) {
   }
   const bulkDeposits = commands.filter((command) => command === "put all in rq").length;
   if (bulkDeposits !== 1 || !game.getFlag("progressAward:oneTrip")
-    || namedFlights.length > 2 || namedFlights[0] !== "shaft") {
-    throw new Error("Sweep must earn ONE TRIP with one bulk deposit and at most two named flights");
+    || namedFlights.length > (earlySight ? 3 : 2) || namedFlights[0] !== "shaft") {
+    throw new Error("Sweep must earn ONE TRIP with one bulk deposit and the allowed named flights");
   }
   const missingRewards = Object.entries(world.items)
     .filter(([, item]) => item.takeable && item.phase !== 2)
     .filter(([id, item]) => !game.getFlag(item.progressFlag || `progressItem:${id}`)
-      || !game.getFlag(`useItem:${id}`))
+      || (world.hasScoringUse?.({ ...item, id }) && !game.getFlag(`useItem:${id}`)))
     .map(([id]) => id);
   if (missingRewards.length || game.state.score !== world.maximumScore(game)) {
     throw new Error(`Incomplete portable use or score: ${missingRewards.join(", ") || "none"}; ` +
@@ -676,14 +691,40 @@ export function planRoute({ beamWidth = 72, maxExpansions = 18000 } = {}) {
       < walked.metrics.roomChangesIncludingLiftAndEjection;
   const selected = useSecond ? bestFlight.best : noFlight;
   const realized = useSecond ? flown : walked;
+  const sightCandidates = useSecond
+    ? ["belfry", "hiddenVault"].map((target) => {
+      try {
+        return { target, route: realize(bestFlight.best.order, bestFlight.room, target) };
+      } catch {
+        return null;
+      }
+    }).filter(Boolean)
+    : [];
+  const bestSight = sightCandidates.sort((a, b) =>
+    a.route.metrics.roomChangesIncludingLiftAndEjection - b.route.metrics.roomChangesIncludingLiftAndEjection
+    || a.route.metrics.steps - b.route.metrics.steps
+    || a.target.localeCompare(b.target))[0] || null;
+  const useThird = !!bestSight && (
+    bestSight.route.metrics.roomChangesIncludingLiftAndEjection
+      < realized.metrics.roomChangesIncludingLiftAndEjection
+    || bestSight.route.metrics.steps < realized.metrics.steps
+  );
+  const selectedRealized = useThird ? bestSight.route : realized;
   return {
-    ...realized,
+    ...selectedRealized,
     comparison: {
       noSecondFlightRoomChanges: walked.metrics.roomChangesIncludingLiftAndEjection,
       bestSecondFlightRoomChanges: flown?.metrics.roomChangesIncludingLiftAndEjection ?? null,
       candidateStartsEvaluated: flightRooms.length,
       boundedExpansions: selected.expansions,
       selectedStart: useSecond ? bestFlight.room : "dreadmawVault",
+      permanentSightCandidates: Object.fromEntries(sightCandidates.map(({ target, route }) => [target, {
+        steps: route.metrics.steps,
+        transitions: route.metrics.transitions,
+        flights: route.metrics.namedFlights.length,
+        score: route.metrics.score,
+      }])),
+      selectedPermanentSight: useThird ? bestSight.target : null,
     },
   };
 }

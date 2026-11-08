@@ -18,22 +18,22 @@ Feature: Mushroom vision and flight
   Scenario: Fresh mushrooms grow inside the outhouse toilet hole
     Given a fresh manor game
     And the player is in room "privy"
-    When I send "look"
-    Then the output contains "TOILET HOLE"
-    And the output contains "purple glimmer"
+    When I send "look in toilet"
+    Then the output contains "Fresh purple MUSHROOMS"
     When I send "eat mushrooms"
-    Then the output contains "(look in OUTHOUSE TOILET; get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
+    Then the output contains "(get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
     Then the output contains "actual crap and piss"
     And the output contains "Your bravery is not contagious"
     And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
 
-  Scenario: USE discovers, takes, and eats hidden toilet mushrooms
+  Scenario: USE takes and eats toilet mushrooms after they are known
     Given a fresh manor game
     And the player is in room "privy"
-    When I send "use mushrooms"
-    Then the output contains "(look in OUTHOUSE TOILET; get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
+    When I send "look in toilet"
+    And I send "use mushrooms"
+    Then the output contains "(get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
     And flag "high" is positive
     And item "outhouseMushrooms" is destroyed
 
@@ -61,18 +61,15 @@ Feature: Mushroom vision and flight
     Then the output does not contain "stirs in the TOILET HOLE"
     And item "outhouseMushrooms" is in "inventory"
 
-  Scenario Outline: Getting toilet mushrooms derives the missing look
+  Scenario: Getting toilet mushrooms requires an explicit discovery
     Given a fresh manor game
     And the player is in room "privy"
-    When I send "<command>"
-    Then the output contains "(look in OUTHOUSE TOILET"
+    When I send "get mushrooms from toilet"
+    Then the output equals "You can't see any mushrooms here."
+    When I send "look in toilet"
+    And I send "get mushrooms from toilet"
     Then the output contains "coated in literal crap and piss"
     And item "outhouseMushrooms" is in "inventory"
-
-    Examples:
-      | command                         |
-      | get mushrooms from toilet       |
-      | reach into toilet for mushrooms |
 
   Scenario: FRESH does not reveal the toilet crop when it describes another item
     Given a fresh manor game

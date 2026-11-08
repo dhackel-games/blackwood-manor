@@ -370,11 +370,13 @@ export const commands = {
     if (!ctx.isLit()) return "It's too dark to see anything.";
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
+    ctx.seeItem?.(it);
     const description = ctx.itemText?.(it, "desc") ?? (typeof it.desc === "function" ? it.desc(ctx) : it.desc);
     let out = description || `You see nothing special about the ${it.names[0]}.`;
     if (it.container && it.openable) out += it.open ? " It is open." : " It is closed.";
     if (it.container && it.open) {
       const inside = ctx.itemsIn(it.id);
+      for (const item of inside) ctx.seeItem?.(item);
       if (inside.length) out += "\nIt contains: " + inside.map((x) => "a " + x.names[0]).join(", ") + ".";
       else out += " It is empty.";
     }
@@ -655,6 +657,7 @@ export const commands = {
   use(ctx, cmd) {
     if (!cmd.dobj) return "Use what?";
     const item = ctx.find(cmd.dobj, ctx.inventory());
+    if (!item) return `You can't see any ${cmd.dobj} here.`;
     const harmless = item && ctx.world.harmlessPortableUse?.(ctx, item);
     return harmless || `You can't see a way to use the ${cmd.dobj}.`;
   },

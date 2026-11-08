@@ -78,11 +78,11 @@ Feature: Blackwood Manor adventure
       examine bust
       pick nose
       fly roof
-      turn weathercock to face burper
-      turn weathercock to face farter
-      turn weathercock to face shitter
-      turn weathercock to face horizon gazer
-      take weathercock
+      turn vane north
+      turn vane east
+      turn vane south
+      turn vane west
+      take vane
       fly loop
       take photo piece b
       fly privy
@@ -131,7 +131,7 @@ Feature: Blackwood Manor adventure
       north
       put family crest in reliquary
       put blackwood diamond in reliquary
-      put silver weathercock in reliquary
+      put rusted weathervane in reliquary
       put snuffbox in reliquary
       put baroness photograph in reliquary
       put corkscrew in reliquary
@@ -258,7 +258,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 1166
+    And the game score is 1067
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

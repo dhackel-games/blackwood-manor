@@ -96,7 +96,7 @@ ICONS = [
     ("kidsDrawing",       "heirlooms/kidsDrawing.png",       "a childish crayon drawing on white paper with messy arrows and a purple fart cloud"),
     ("blackwoodDiamond",  "heirlooms/blackwoodDiamond.png",  "a faceted black diamond with a tiny B M glint in its center"),
     ("baronessPhotograph", "heirlooms/baronessPhotograph.png", "a sepia photograph of an elegant baroness beside a grandfather clock"),
-    ("silverWeathercock", "heirlooms/silverWeathercock.png", "a small silver rooster weather vane with a pointed cardinal-direction arrow"),
+    ("rustedWeathervane", "heirlooms/rustedWeathervane.png", "a rusted iron weathervane with a pointed cardinal-direction arrow"),
     ("snuffbox",          "heirlooms/snuffbox.png",          "a small ornate silver snuffbox with a hinged lid and a B M monogram"),
     ("corkscrew",         "heirlooms/corkscrew.png",         "a plain antique iron corkscrew with a dark wooden handle stamped B M"),
     ("xrayGoggles",       "equipment/xrayGoggles.png",       "antique blackened-brass x-ray goggles with smoked crystal lenses and a small B M monogram on the bridge"),

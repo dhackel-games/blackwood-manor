@@ -27,7 +27,7 @@
     "js/manor/index.js",
     "js/manor/photograph.js",
     "js/manor/snuffbox.js",
-    "js/manor/weathercock.js",
+    "js/manor/weathervane.js",
     "js/map.js",
     "js/native.js",
     "js/parser.js",

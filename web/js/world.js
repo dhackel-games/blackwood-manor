@@ -518,7 +518,8 @@ function restoreCandelabra(ctx, installedPiece) {
     "The rundown fixture has become a beautiful, portable BLACKWOOD CANDELABRA.\n\n" +
     "Around its base, the inscription is complete at last: " +
     "\"BM — WHEN THE LAST LIGHT MEETS BROKEN GLASS, THE HOUSE REMEMBERS.\"" +
-    (points ? `\n\nCANDELABRA RESTORATION BONUS (+${points})` : "");
+    (points ? `\n\nCANDELABRA RESTORATION BONUS (+${points})` : "") +
+    ctx.awardUse(ctx.item("candelabra"));
 }
 
 function installCandelabraPiece(ctx, cmd) {
@@ -943,8 +944,8 @@ function maximumScore(ctx) {
   const pickupPoints = Object.values(ctx.world.items)
     .filter((item) => item.takeable && item.phase !== 2)
     .reduce((total, item) => total + (item.progressPoints ?? ctx.world.config.portableRewards.pickup), 0);
-  const usePoints = Object.values(ctx.world.items)
-    .filter((item) => item.takeable && item.phase !== 2).length
+  const usePoints = Object.entries(ctx.world.items)
+    .filter(([id, item]) => item.takeable && item.phase !== 2 && hasScoringUse({ ...item, id })).length
     * ctx.world.config.portableRewards.use;
   const progressionPoints = Object.values(PROGRESS_AWARDS)
     .reduce((total, award) => total + (award?.maximumScore === false
@@ -955,6 +956,23 @@ function maximumScore(ctx) {
   return itemPoints + pickupPoints + usePoints + progressionPoints + standalonePoints;
 }
 
+const SCORING_USE_ITEM_IDS = new Set([
+  "xrayGoggles", "frontKey", "letter",
+  "emberStone", "greenGlassStone", "blueGlassStone",
+  "mushrooms", "outhouseMushrooms", "burrito", "obsidianEye", "burritoWrapper",
+  "milk", "apple", "backpack", "headlamp", "wingedShoes",
+  "mirrorShard", "backwardsWatch", "candlestick", "candelabra", "matches", "rope",
+  "grimoire", "talisman", "diary", "musicBox", "tinyKey", "clockTalisman",
+  "cyanGem", "milkJug", "magentaGem", "yellowGem",
+  "limburgerCheese", "epoissesCheese", "munsterCheese", "coalLump",
+  "photoPieceB", "photoPieceC", "photoPieceD", "baronessPhotograph",
+  "corkscrew", "wineBottle", "snuffbox", "rustedWeathervane", "stellarMap",
+]);
+function hasScoringUse(item) {
+  const id = item?.templateId || item?.id;
+  return SCORING_USE_ITEM_IDS.has(id);
+}
+
 const HARMLESS_PORTABLE_USES = new Set([
   "mysteryPackage", "goldDoubloon", "burritoWrapper", "familyCrest", "familyRing",
   "goldLocket", "ancientCoin", "crystalDecanter", "ancestralPortrait",
@@ -963,8 +981,7 @@ const HARMLESS_PORTABLE_USES = new Set([
 
 function harmlessPortableUse(ctx, item) {
   if (!HARMLESS_PORTABLE_USES.has(item.id)) return null;
-  return `You handle the ${item.names[0]} carefully, then put it away unchanged.` +
-    ctx.awardUse(item);
+  return `You handle the ${item.names[0]} carefully, then put it away unchanged.`;
 }
 
 function superUser(ctx, argString) {
@@ -2333,7 +2350,12 @@ function hasMushroomVision(ctx) {
 }
 function revealHiddenSight(ctx) {
   const hook = ctx.room()?.hiddenSight;
-  return typeof hook === "function" ? hook(ctx) : null;
+  const discoveries = [];
+  if (typeof hook === "function") discoveries.push(hook(ctx));
+  if (ctx.state.room === "privy" && !ctx.getFlag("outhouseMushroomsFound")) {
+    discoveries.push(inspectToilet(ctx));
+  }
+  return discoveries.filter(Boolean).join("\n\n") || null;
 }
 function hasDarkVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
@@ -3077,7 +3099,7 @@ const PACKAGE_OPENINGS = [
   "You whisper, \"This is a bad idea,\" which apparently counts as consent, and open the PACKAGE.",
 ];
 function openMysteryPackage(ctx) {
-  const use = ctx.awardUse(ctx.item("mysteryPackage"));
+  const use = "";
   ctx.destroy("mysteryPackage");
   const effect = PACKAGE_EFFECTS[Math.floor(Math.random() * PACKAGE_EFFECTS.length)];
   return cycleFlavor(ctx, "packageOpenings") + use + "\n\n" + effect(ctx);
@@ -3208,6 +3230,7 @@ function inspectToilet(ctx) {
   if (!ctx.getFlag("outhouseMushroomsFound")) {
     ctx.setFlag("outhouseMushroomsFound");
     ctx.moveItem("outhouseMushrooms", "privy");
+    ctx.seeItem(mushrooms);
     return "You lean over and LOOK IN the TOILET HOLE. Fresh purple MUSHROOMS are growing directly in a wet " +
       "bed of literal crap and piss. They glow twice as brightly as the dried kitchen ones.";
   }
@@ -3265,6 +3288,7 @@ function deriveCommand(ctx, cmd) {
   const mushroomTarget = /\b(mushroom|mushrooms|fungus)\b/.test(target) || target.trim() === "fresh";
   if (!mushroomTarget && !/\b(toilet|hole)\b/.test(target)) return [];
   if (cmd.verb === "use" && !mushroomTarget) return [];
+  if (!ctx.itemKnown(ctx.item("outhouseMushrooms"))) return [];
   inspectToilet(ctx);
   return ["look in toilet"];
 }
@@ -3929,6 +3953,7 @@ const logicWorld = {
   hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
   revealHiddenSight,
   useHighSource,
+  hasScoringUse,
   flavorPools: CYCLING_FLAVOR_POOLS,
   cycleFlavor,
   awardProgress,
@@ -3945,6 +3970,33 @@ const logicWorld = {
       state.flags.playerName = state.flags.ghostName;
     }
     delete state.flags.ghostName;
+    const oldVane = savedItems?.silverWeathercock || state.items.silverWeathercock;
+    if (oldVane) {
+      state.items.rustedWeathervane = {
+        ...state.items.rustedWeathervane,
+        ...oldVane,
+        id: "rustedWeathervane",
+      };
+      delete state.items.silverWeathercock;
+    }
+    for (const [oldFlag, newFlag] of [
+      ["manor:weathercockFreed", "manor:weathervaneFreed"],
+      ["progressAward:weathercockFreed", "progressAward:weathervaneFreed"],
+      ["progressAward:gargoyleBurper", "progressAward:gargoylePuffCheeks"],
+      ["progressAward:gargoyleFarter", "progressAward:gargoyleNosePinch"],
+      ["progressAward:gargoyleShitter", "progressAward:gargoyleRearGuard"],
+      ["progressItem:silverWeathercock", "progressItem:rustedWeathervane"],
+      ["useItem:silverWeathercock", "useItem:rustedWeathervane"],
+      ["heirloomScore:silverWeathercock", "heirloomScore:rustedWeathervane"],
+      ["flavorCycle:gargoyleBurper", "flavorCycle:gargoylePuffCheeks"],
+      ["flavorCycle:gargoyleFarter", "flavorCycle:gargoyleNosePinch"],
+      ["flavorCycle:gargoyleShitter", "flavorCycle:gargoyleRearGuard"],
+    ]) {
+      if (state.flags[oldFlag] !== undefined && state.flags[newFlag] === undefined) {
+        state.flags[newFlag] = state.flags[oldFlag];
+      }
+      delete state.flags[oldFlag];
+    }
     if (savedItems?.milk?.loc === "kitchen") state.items.milk.loc = "fridge";
     if (savedItems?.milkJug && "filled" in savedItems.milkJug) {
       state.items.milkJug.filled = savedItems.milkJug.filled;
@@ -4566,7 +4618,7 @@ const logicWorld = {
           if (removed) it.worn = false;
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
-          const use = it.treasure ? ctx.awardUse(it) : "";
+          const use = "";
           if (it.treasure) {
             if (!cmd.bulkTransfer) ctx.setFlag("oneTripForfeited");
             const scoreFlag = it.depositScoreFlag || `heirloomScore:${it.id}`;

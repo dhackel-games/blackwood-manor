@@ -91,7 +91,7 @@ Feature: The mushroom trip's third eye
     When I send "use eye"
     Then the game score is 25
 
-  Scenario Outline: Implicit reads, meals, and drinks award pickup and use only once
+  Scenario Outline: Implicit meals and drinks award pickup and use only once
     Given the player is in room "<room>"
     When I send "<command>"
     Then flag "progressItem:<item>" is set
@@ -102,7 +102,6 @@ Feature: The mushroom trip's third eye
 
     Examples:
       | room      | command      | item           | score |
-      | grandHall | read package | mysteryPackage | 10    |
       | kitchen   | eat apple    | apple          | 10    |
       | kitchen   | drink milk   | milk           | 15    |
 

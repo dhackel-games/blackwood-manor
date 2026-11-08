@@ -237,14 +237,14 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
   DEMOGORGONZOLA RIND, PORTABLE TRANSISTOR RADIO, GOLD EYEPIECE, PURPLE
   CRAYON, STELLAR MAP, and KID'S DRAWING.
 - **Manor quintet:** the BLACKWOOD DIAMOND, BARONESS PHOTOGRAPH, SILVER
-  WEATHERCOCK, SNUFFBOX, and CORKSCREW complete the new manor heirlooms.
+  RUSTED WEATHERVANE, SNUFFBOX, and CORKSCREW complete the new manor heirlooms.
 
 **24 required family heirlooms**, each worth points: ancestral portrait, ancient
 coin (well), BARONESS PHOTOGRAPH, BLACKWOOD DIAMOND, BLACKWOOD HAMMER, restored
 candelabra, CORKSCREW, crystal decanter, DEMOGORGONZOLA RIND, Blackwood family
 crest, BLACKWOOD FAMILY RING, GOLD EYEPIECE, gold locket, first-edition
 grimoire, KID'S DRAWING, jeweled music box, PORTABLE TRANSISTOR RADIO, PURPLE
-CRAYON, Ravenblood Ring, SILVER WEATHERCOCK, SNUFFBOX, BM spyglass recovered
+CRAYON, Ravenblood Ring, RUSTED WEATHERVANE, SNUFFBOX, BM spyglass recovered
 from the tree fort, STELLAR MAP, and the BM-crested protective talisman after
 it has served against the crypt wraith.
 
@@ -304,37 +304,41 @@ flags are preserved; an originally hidden item at null or a revealed item
 still at its spawn location does not establish pickup.
 The pre-ending Part-I maximum is derived, never hardcoded: +330 heirloom
 deposits (the original 195 plus 80 realm and 55 manor), +310 portable pickups,
-+310 portable uses, +306 puzzle/progression awards (including ONE TRIP), and
-+60 standalone rewards: **1316**.
++225 real-effect portable uses, +311 puzzle/progression awards (including ONE
+TRIP and finding the MINERS' LOCKER), and +60 standalone rewards: **1236**.
 
 `::win` starts by taking the privy's ordinary contents, then implicitly looks
 into the toilet, takes, and eats the fresh mushrooms in one `USE FRESH` turn.
 It flies to the shaft for the
 BACKPACK, HEADLAMP, and WINGED SHOES, then makes its only other named flight to
 the GARDEN. It collects and uses room items on arrival, including the
-weathercock's BURPER/FARTER/SHITTER faces before HORIZON-GAZER, opens and drinks
+RUSTED WEATHERVANE's NORTH, WEST, and SOUTH gargoyles before the FAR-GAZING
+EAST gargoyle, opens and drinks
 the WINE BOTTLE before depositing the CORKSCREW, and reaches the BRAZIER
 already ablaze. It solves the four-beat oak lift, realm radio, manor, and
 reliquary routes before one bulk deposit. The route closes the
 RELIQUARY, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**, and stops
 alive in the ROYAL HALL before SOUTH or DOWN. SOUTH then adds the existing +25
-end badges for **1341**; DOWN meets Gary and enters Part II at **1316**. The
+end badges for **1261**; DOWN meets Gary and enters Part II at **1236**. The
 MYSTERY PACKAGE is carried and read safely
-but never opened; opening it voluntarily instead earns its one-time use credit
-before the box disappears, alongside a random consequence. After the bell,
+but never opened; opening it voluntarily changes the game before the box
+disappears, alongside a random consequence. After the bell,
 re-expanding `::win` opens the RELIQUARY only if necessary, implicitly takes and reads
 the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 222 commands,
+For reference, the deterministic fresh `::win` expansion has 201 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
-GARDEN; peak load is 31 against the BACKPACK's 36 places; and exactly one
+GARDEN; the evaluated permanent-sight third flights to the HIDDEN VAULT and
+BELFRY take 208/74 and 209/75 steps/transitions respectively, so neither beats
+the selected two-flight route. Peak load is 32 against the BACKPACK's 36
+places; and exactly one
 `PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
 avoids all single-item reliquary deposits. The derived pre-ending maximum is
-1316/1316. These planner-verified statistics describe the physical collection
+1236/1236. These planner-verified statistics describe the physical collection
 route, not a claim of globally shortest play in every save state.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
@@ -890,7 +894,7 @@ HEAD, EYES, and FEET.
 The BACKPACK hangs on a miner's ledge in the DEEP MINING SHAFT. Taking it leaves
 it in inventory, where it counts as one carried item and leaves capacity at 6;
 WEAR or USE BACKPACK equips it on the BACK and raises capacity from 6 to 36.
-The HUD displays `👤 used/6` until worn and `👜 used/36` afterward; worn
+The HUD displays `👤 used/6` until worn and `🎒 used/36` afterward; worn
 equipment does not contribute to the used count.
 
 The HEADLAMP activates when worn, has 200 turns of battery life, lights every room,
@@ -1302,24 +1306,17 @@ or DIAL without a visible dial still reaches Gary. The MICROWAVE and the
 existing SAFE therefore remain separate content handlers; the generic parser
 and command engine contain no setting, combination, or puzzle knowledge.
 
-#### 12.37.2 Silver Weathercock
+#### 12.37.2 Rusted Weathervane
 
-The ROOF gains four fixed gargoyles around the 10-point SILVER
-WEATHERCOCK: BURPER north, FARTER east, SHITTER south, and HORIZON-GAZER west.
-`TURN WEATHERCOCK TO FACE <gargoyle or direction>` accepts their canonical
-aliases and directions; bare `TURN WEATHERCOCK <direction>` works too. Each
-of the first three directions uses its own twelve-line persisted
-`flavorCycle:<gargoyle>` pool and awards its one-time +2 progress value. The
-first successful turn also spends the weathercock's standard one-time +5 use
-award.
-
-Turning west invokes the HORIZON-GAZER's exact release line, sets
-`manor:weathercockFreed`, grants its one-time +5 progress award, and clears
-the post's fixed restraint. The release is irreversible: the remaining
-gargoyle pools cannot then be heard, but `TAKE SILVER WEATHERCOCK` earns the
-normal pickup award and the freed vane remains a treasure. ROOF prose, SEARCH
-text, item descriptions, and Gary's roof, gargoyle, and weathercock hints all
-warn of that ordering.
+The ROOF gains four fixed gargoyles around the 10-point RUSTED WEATHERVANE.
+The puff-cheeked NORTH, nose-pinching WEST, and rear-guarding SOUTH gargoyles
+each grip its center post with one hand and award +2 through their own
+twelve-line persisted pools. The FAR-GAZING GARGOYLE sits EAST, turned away
+from the vane with its curled stone tail on the post and one arm pointing
+SOUTHEAST at the TREE FORT's SPYGLASS. `TURN VANE <direction>` and descriptive
+gargoyle names select a direction. Turning EAST releases the vane, grants the
+one-time +5 `weathervaneFreed` progress award, and irreversibly ends further
+turns; TAKE then earns its normal pickup award.
 
 #### 12.37.3 Snuffbox
 

@@ -107,8 +107,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
   one compact slot. Each of the 62 obtainable Part-I portable items earns +5
-  once on acquisition and +5 once on successful use, including benign objects
-  (which can be handled harmlessly), generated items, equipment, and the
+  once on acquisition. The 45 items with a real gameplay effect earn +5 once
+  for that effect; handling a keepsake without changing state earns no use
+  credit. This includes generated items, equipment, and the
   DOOMSDAY CLOCK. Existing +5 key/gear pickup awards are the same pickup
   credit, never an extra one. Failed or inaccessible actions do not award use
   points, and saved flags prevent drop/re-take, repeat-use, and mushroom-regrowth
@@ -124,13 +125,13 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   flight to the garden. It completes the cave, realm, oak lift, manor, and
   reliquary routes, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**,
   and stops alive in the ROYAL HALL with both SOUTH (front door) and DOWN (Gary)
-  still available. The derived deterministic Part-I maximum is 1316 there;
-  SOUTH adds the existing 25 end-badge points for 1341, while DOWN enters Part II
-  at 1316.
+  still available. The derived deterministic Part-I maximum is 1236 there;
+  SOUTH adds the existing 25 end-badge points for 1261, while DOWN enters Part II
+  at 1236.
   Repeating `::win` after the bell safely takes the clock if it is still in
   the reliquary, or rereads it without choosing an ending. The route reads
-  but never opens the random MYSTERY PACKAGE; opening it yourself earns its
-  one-time use credit before it is consumed. `::powerup` remains available
+  but never opens the random MYSTERY PACKAGE; opening it yourself changes the
+  game before it is consumed. `::powerup` remains available
   for reusable equipment.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
@@ -184,18 +185,20 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   restored CANDELABRA, CORKSCREW, CRYSTAL DECANTER, DEMOGORGONZOLA RIND,
   BLACKWOOD FAMILY CREST, BLACKWOOD FAMILY RING, GOLD EYEPIECE, GOLD LOCKET,
   GRIMOIRE, KID'S DRAWING, JEWELED MUSIC BOX, PORTABLE TRANSISTOR RADIO, PURPLE
-  CRAYON, RAVENBLOOD RING, SILVER WEATHERCOCK, SNUFFBOX, BM SPYGLASS, STELLAR
+  CRAYON, RAVENBLOOD RING, RUSTED WEATHERVANE, SNUFFBOX, BM SPYGLASS, STELLAR
   MAP, and TALISMAN. The HALL BEDROOM has exactly one required heirloom, the
   family ring; the MUSIC BOX remains in the NURSERY.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT counts as one carried item and leaves capacity at 6 until
   worn. `WEAR BACKPACK` or `USE BACKPACK` raises capacity to 36 and changes the
-  indicator to `👜 used/36`.
+  indicator to `🎒 used/36`.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, `wear`, or `use` it, the game runs the normal TAKE pipeline first,
   including content handlers, capacity checks, and its one-time pickup reward,
-  then prints the derived sequence. TOILET mushrooms also derive the
-  missing `look in toilet` step.
+  then prints the derived sequence. A known item in a closed unlocked container
+  also derives OPEN first; unseen contents require LOOK, SEARCH, or hidden
+  sight before they can be targeted. TOILET mushrooms likewise require a look
+  unless hidden sight reveals them.
   `talk` infers `talk to <character>` when exactly one talkable character is present.
 - **Interact:** `open`/`close <x>`, `unlock <x> with <y>`, `put <x> in <y>`,
   `read <x>`, `push`/`pull`/`move <x>`, `light <x>`, `ext`/`extinguish [<x>]`,
@@ -215,9 +218,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
 - **The Upside Down:** after DREADMAW has moved, the MINING GALLERY's
-  MINERS' LOCKER opens onto WAYLAMP CLEARING. `OPEN LOCKER`, then `IN` (or
-  `ENTER LOCKER`) enters the realm; `OUT` from WAYLAMP CLEARING returns to the
-  gallery. The hub's paths reach the CHEESE GROTTO, AV CLUB DEN, PLANETARIUM,
+  MINERS' LOCKER opens onto WAYLAMP CLEARING. Opening it first awards +5 once;
+  `IN LOCKER` derives that opening and then enters the realm for its existing
+  +20 discovery award. `OUT` from WAYLAMP CLEARING returns to the gallery. The
+  hub's paths reach the CHEESE GROTTO, AV CLUB DEN, PLANETARIUM,
   MAP ROOM, SHACK, and the OAK UNDERCROFT. WINGED SHOES and a high can use
   named `FLY TO` or `FLOAT TO` travel there just as they can anywhere else.
   `COMBINE`, `SPELL`, `KICK`, `FIGHT`, `TURN`, `SET`, `START`, `POUR`, `FILL`,

@@ -29,7 +29,7 @@ const HEIRLOOMS = [
   ["kidsDrawing", "kid's drawing"],
   ["blackwoodDiamond", "Blackwood diamond"],
   ["baronessPhotograph", "Baroness photograph"],
-  ["silverWeathercock", "silver weathercock"],
+  ["rustedWeathervane", "rusted weathervane"],
   ["snuffbox", "snuffbox"],
   ["corkscrew", "corkscrew"],
 ];
@@ -56,7 +56,7 @@ const HEIRLOOM_LORE = {
   kidsDrawing: "A kid's drawing where every arrow points to one enormous fart.",
   blackwoodDiamond: "A diamond made by giving coal exactly the wrong amount of microwave time.",
   baronessPhotograph: "Four torn photo pieces joined into the Baroness beside a grandfather clock set to 1:30.",
-  silverWeathercock: "A silver rooster freed from the roof after it faces the horizon-gazer.",
+  rustedWeathervane: "A rusted iron vane freed from the roof after it faces the far ridge.",
   snuffbox: "A silver snuffbox recovered from Great-Grandpa Blackwood's left nostril.",
   corkscrew: "A plain iron corkscrew that opens the cellar's endless supply of stubborn wine bottles.",
 };

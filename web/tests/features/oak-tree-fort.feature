@@ -211,7 +211,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
     Then the output contains line "HEIRLOOMS: 1/24 +0"
-    And the game score is 18
+    And the game score is 13
 
   Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
@@ -277,6 +277,6 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the player is in room "grandHall"
     When I send "put hammer in reliquary"
     Then item "blackwoodHammer" is in "reliquary"
-    And the game score is 17
+    And the game score is 12
 
 # end oak-tree-fort.feature

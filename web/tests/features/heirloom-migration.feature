@@ -122,7 +122,7 @@ Feature: Heirloom correction save migration
     Given the player is in room "grandHall"
     When I send "put family ring in reliquary"
     Then item "familyRing" is in "reliquary"
-    And the game score is 30
+    And the game score is 25
 
   Scenario: Historical family ring ownership and deposit credit are preserved
     Given a historical save with the family ring worn is restored

@@ -173,6 +173,10 @@ export function createGame(world) {
   game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
   game.item = (id) => state.items[id] || null;
+  game.seeItem = (item) => {
+    if (item?.id) game.setFlag(`seenItem:${item.id}`);
+  };
+  game.itemKnown = (item) => !!item && (!!state.flags[`seenItem:${item.id}`] || game.hasHiddenSight());
   game.acquisitionBlock = (item) => {
     const container = item ? game.item(item.loc) : null;
     return item?.treasure && container?.locksTreasures
@@ -291,7 +295,8 @@ export function createGame(world) {
     game.addScore(points);
     return ` (+${points})`;
   };
-  game.awardUse = (item) => {
+  game.awardUse = (item, action = null) => {
+    if (typeof world.hasScoringUse === "function" && !world.hasScoringUse(item, action)) return "";
     const points = item?.takeable ? cfg.portableRewards?.use : 0;
     const flag = item?.useFlag || `useItem:${item.id}`;
     if (!points || game.getFlag(flag)) return "";
@@ -420,6 +425,10 @@ export function createGame(world) {
       const discovery = game.revealHiddenSight();
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
+      const concealed = game.itemsIn(state.room)
+        .filter((container) => container.container && container.openable && !container.open)
+        .flatMap((container) => game.itemsIn(container.id).map((item) => ({ container, item })));
+      for (const { item } of concealed) game.seeItem(item);
       const status = typeof world.visionStatus === "function"
         ? world.visionStatus(game)
         : { permanent: false, remaining: state.flags.high || 0 };
@@ -429,7 +438,13 @@ export function createGame(world) {
       const remaining = status?.permanent
         ? "∞"
         : `${displayTurns} turn${displayTurns === 1 ? "" : "s"} left`;
-      if (vision) out += `THIRD EYE (👁️ ${remaining})\n${vision}\n`;
+      if (vision || concealed.length) {
+        out += `THIRD EYE (👁️ ${remaining})\n`;
+        if (vision) out += `${vision}\n`;
+        for (const { container, item } of concealed) {
+          out += `Inside the ${itemTitle(container)}, you see ${itemTitle(item)}.\n`;
+        }
+      }
       if (discovery) out += `${discovery}\n`;
     }
     const directions = game.availableDirections();
@@ -438,11 +453,13 @@ export function createGame(world) {
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery || i.takeable);
     for (const it of here) {
+      game.seeItem(it);
       const roomDesc = game.itemText(it, "roomDesc");
       out += (roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {
         const inside = game.itemsIn(it.id);
         if (inside.length) {
+          for (const item of inside) game.seeItem(item);
           out += `The ${it.names[0]} contains:\n` +
             inside.map((x) => "  a " + x.names[0].toUpperCase()).join("\n") + "\n";
         }
@@ -529,9 +546,16 @@ export function createGame(world) {
 
   function dispatchWithoutTick(cmd) {
     const override = runHandlers(cmd);
-    if (override != null) return override;
     const handler = commands[cmd.verb];
-    const result = handler ? handler(game, cmd) : "You can't do that.";
+    const result = override != null
+      ? override
+      : (handler ? handler(game, cmd) : "You can't do that.");
+    if (cmd.verb === "open") {
+      const container = game.find(cmd.dobj);
+      if (container?.container && container.open) {
+        for (const item of game.itemsIn(container.id)) game.seeItem(item);
+      }
+    }
     return result == null ? "You can't do that." : result;
   }
 
@@ -556,7 +580,12 @@ export function createGame(world) {
       }
     }
 
-    const open = { verb: "open", dobj: target.names[0], prep: null, iobj: null };
+    const open = {
+      verb: "open",
+      dobj: world.itemShortNames?.[target.id] || target.names[0],
+      prep: null,
+      iobj: null,
+    };
     const result = dispatchWithoutTick(open);
     derivedSteps.push(`open ${itemTitle(target)}`);
     return target.open ? null : result;
@@ -588,10 +617,33 @@ export function createGame(world) {
     return container.open ? null : result;
   }
 
-  function implicitlyAcquire(cmd) {
-    if (!["read", "eat", "drink", "wear", "use"].includes(cmd.verb) || !cmd.dobj) return null;
-    const item = game.find(cmd.dobj);
+  function implicitTarget(phrase) {
+    const visible = game.find(phrase);
+    if (visible) return { item: visible, container: null };
+    for (const container of game.itemsIn(state.room)) {
+      if (!container.container || !container.openable || container.open) continue;
+      const item = game.find(phrase, game.itemsIn(container.id));
+      if (item && game.itemKnown(item)) return { item, container };
+    }
+    return null;
+  }
+
+  function implicitlyAcquire(cmd, derivedSteps) {
+    if (!["read", "eat", "drink", "wear", "use", "pour"].includes(cmd.verb) || !cmd.dobj) return null;
+    const target = implicitTarget(cmd.dobj);
+    const item = target?.item;
     if (!item || !item.takeable || game.has(item.id)) return null;
+    if (target.container) {
+      const open = {
+        verb: "open",
+        dobj: world.itemShortNames?.[target.container.id] || target.container.names[0],
+        prep: null,
+        iobj: null,
+      };
+      const result = dispatchWithoutTick(open);
+      derivedSteps.push(displayCommand(open));
+      if (!target.container.open) return { blocked: result, step: `get ${itemTitle(item)}` };
+    }
     const blocked = game.acquisitionBlock(item);
     if (blocked) return { blocked, step: `get ${itemTitle(item)}` };
     if (game.inventoryLoad() >= game.inventoryCapacity()) {
@@ -661,7 +713,7 @@ export function createGame(world) {
       };
       return { prompt: `(which ${noun}? ${labels.join(" or ")}?)` };
     }
-    const item = carried[0] || game.find(cmd.dobj);
+    const item = carried[0] || implicitTarget(cmd.dobj)?.item;
     if (!item || world.items[item.id]?.on?.use) return null;
     if (item.wearable) cmd.verb = "wear";
     else if (item.edible) cmd.verb = "eat";
@@ -752,7 +804,7 @@ export function createGame(world) {
     const implicitUse = useInference?.label || null;
     const executionLabel = implicitUse || displayCommand(cmd);
 
-    const acquisition = implicitlyAcquire(cmd);
+    const acquisition = implicitlyAcquire(cmd, derivedSteps);
     if (acquisition) derivedSteps.push(acquisition.step);
     const preparationBlocked = acquisition?.blocked
       || prepareOpenWithKey(cmd, derivedSteps)
@@ -774,6 +826,12 @@ export function createGame(world) {
       const handler = commands[cmd.verb === "pour" && cmd.dobj ? "use" : cmd.verb];
       const r = handler ? handler(game, cmd) : "You can't do that.";
       text = r == null ? "You can't do that." : r;
+    }
+    if (cmd.verb === "open") {
+      const container = game.find(cmd.dobj);
+      if (container?.container && container.open) {
+        for (const item of game.itemsIn(container.id)) game.seeItem(item);
+      }
     }
     const pickupNotices = game.inventory()
       .filter((item) => !previouslyCarried.has(item.id))

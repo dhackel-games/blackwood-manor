@@ -181,7 +181,7 @@ const INCORRECT_REDESIGN_TREASURES = [
 const LANE10_HEIRLOOMS = [
   "demogorgonzolaRind", "portableTransistorRadio", "goldEyepiece", "purpleCrayon",
   "stellarMap", "kidsDrawing", "blackwoodDiamond", "baronessPhotograph",
-  "silverWeathercock", "snuffbox", "corkscrew",
+  "rustedWeathervane", "snuffbox", "corkscrew",
 ];
 
 function deleteLane10Items(snapshot) {
@@ -694,6 +694,49 @@ Then("the traced win route omits worn-equipment removal steps", function () {
   assert.ok(this.tracedSteps?.every((step) => !/^(?:doff|remove)\b/i.test(step)), this.tracedSteps?.join("; "));
 });
 
+Then("the traced win route opens the locker only while entering it", function () {
+  const openings = this.tracedWinSteps?.filter(({ beforeLockerOpen, afterLockerOpen }) =>
+    !beforeLockerOpen && afterLockerOpen);
+  assert.deepEqual(openings?.map(({ step }) => step), ["in locker"]);
+  assert.match(openings[0].output, /\(open MINERS' LOCKER; enter MINERS' LOCKER\)/);
+});
+
+Then("the traced win route uses required heirlooms only for state-changing effects", function () {
+  const allowed = new Set(["talisman"]);
+  for (const step of this.tracedSteps || []) {
+    const action = parse(step);
+    if (action.verb !== "use") continue;
+    const itemId = Object.entries(world.itemShortNames)
+      .find(([, alias]) => alias === action.dobj)?.[0];
+    if (world.items[itemId]?.treasure) {
+      assert.ok(allowed.has(itemId), `Redundant heirloom use: ${step}`);
+    }
+  }
+});
+
+Then("the traced win route uses TAKE ALL only for two or more items", function () {
+  for (const { step, takeAllCount } of this.tracedWinSteps || []) {
+    if (parse(step).verb === "take" && /^(?:take|get|t) (?:all|everything)$/i.test(step)) {
+      assert.ok(takeAllCount >= 2, `${step} collected ${takeAllCount} item(s)`);
+    }
+  }
+});
+
+Then("the traced win route never takes an item the next action derives", function () {
+  const implicitVerbs = new Set(["use", "read", "eat", "drink", "wear", "pour"]);
+  const itemId = (action) => Object.entries(world.itemShortNames)
+    .find(([, alias]) => alias === action.dobj)?.[0];
+  for (let index = 0; index < (this.tracedSteps?.length || 0) - 1; index += 1) {
+    const take = parse(this.tracedSteps[index].step);
+    const next = parse(this.tracedSteps[index + 1].step);
+    if (take.verb === "take" && !["all", "everything"].includes(take.dobj)
+        && implicitVerbs.has(next.verb)) {
+      assert.notEqual(itemId(take), itemId(next),
+        `${this.tracedSteps[index].step}; ${this.tracedSteps[index + 1].step}`);
+    }
+  }
+});
+
 When("I trace sysop command {string}", function (command) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
@@ -705,6 +748,7 @@ When("I trace sysop command {string}", function (command) {
   let maxLoad = 0;
   let bulkReliquaryDeposits = 0;
   let singleReliquaryDeposits = 0;
+  const tracedWinSteps = [];
   for (const [index, step] of steps.entries()) {
     const action = parse(step);
     const beforeRoom = this.game.state.room;
@@ -713,6 +757,10 @@ When("I trace sysop command {string}", function (command) {
     const beforeRiding = !!this.game.getFlag("oakLiftRiding");
     const beforePlatform = this.game.roomOf("oakPlatform");
     const beforeFire = !!this.game.getFlag("onFire");
+    const beforeLockerOpen = !!this.game.item("minersLocker")?.open;
+    const takeAllCount = action.verb === "take" && ["all", "everything"].includes(action.dobj)
+      ? this.game.visibleItems().filter((candidate) => candidate.takeable && !this.game.has(candidate.id)).length
+      : null;
     const itemId = Object.entries(world.itemShortNames)
       .find(([, alias]) => alias === action.dobj)?.[0]
       || this.game.find(action.dobj)?.id
@@ -723,6 +771,8 @@ When("I trace sysop command {string}", function (command) {
     const beforeWorn = item?.worn;
     const beforeUse = this.game.getFlag(`useItem:${itemId}`);
     this.output = this.game.send(step);
+    const afterLockerOpen = !!this.game.item("minersLocker")?.open;
+    tracedWinSteps.push({ step, beforeLockerOpen, afterLockerOpen, takeAllCount, output: this.output });
     const detail = `${index + 1}/${steps.length}: ${step} in ${beforeRoom}\n${this.output}`;
     assert.equal(this.game.state.turns, index + 1, detail);
     assert.equal(this.game.state.dead, false, detail);
@@ -800,7 +850,11 @@ When("I trace sysop command {string}", function (command) {
         assert.equal(this.game.item(itemId).worn, false, detail);
         break;
       case "enter":
-        assert.equal(this.game.getFlag("oakLiftRiding"), true, detail);
+        if (action.dobj === "locker") {
+          assert.equal(this.game.state.room, "waylampClearing", detail);
+        } else {
+          assert.equal(this.game.getFlag("oakLiftRiding"), true, detail);
+        }
         break;
       case "wait":
         break;
@@ -836,6 +890,7 @@ When("I trace sysop command {string}", function (command) {
     bulkReliquaryDeposits,
     singleReliquaryDeposits,
   };
+  this.tracedWinSteps = tracedWinSteps;
 });
 
 When("I fast-forward into Part II", function () {
@@ -963,7 +1018,11 @@ Then("every Part I portable has its pickup and use rewards", function () {
   for (const [id, item] of portable) {
     assert.equal(this.game.getFlag(item.progressFlag || `progressItem:${id}`), true,
       `${id} was not acquired`);
-    assert.equal(this.game.getFlag(`useItem:${id}`), true, `${id} was not used`);
+    if (world.hasScoringUse({ ...item, id })) {
+      assert.equal(this.game.getFlag(`useItem:${id}`), true, `${id} was not used`);
+    } else {
+      assert.equal(this.game.getFlag(`useItem:${id}`), undefined, `${id} earned a keepsake-use award`);
+    }
   }
   assert.equal(this.game.getFlag("progressItem:emeraldOfTheQueen"), undefined);
 });
@@ -971,6 +1030,11 @@ Then("every Part I portable has its pickup and use rewards", function () {
 Then("the win route used at most two named flights", function () {
   assert.ok(this.winRoute);
   assert.ok(this.winRoute.flights <= 2, JSON.stringify(this.winRoute));
+});
+
+Then("the win route used exactly {int} named flights", function (expected) {
+  assert.ok(this.winRoute);
+  assert.equal(this.winRoute.flights, expected, JSON.stringify(this.winRoute));
   assert.ok(this.winRoute.traversals > 60, JSON.stringify(this.winRoute));
   assert.ok(this.winRoute.maxLoad <= 36, JSON.stringify(this.winRoute));
 });
@@ -1465,11 +1529,11 @@ Then("the static 2D rooms show the redesigned and Lane 8 item placements", funct
     { id: "bustNose", label: "nose", kind: "scenery" },
   ]);
   entries("roof", [
-    { id: "gargoyleBurper", label: "burper", kind: "fixture" },
-    { id: "gargoyleFarter", label: "farter", kind: "fixture" },
-    { id: "gargoyleShitter", label: "shitter", kind: "fixture" },
-    { id: "gargoyleHorizonGazer", label: "horizon-gazer", kind: "fixture" },
-    { id: "silverWeathercock", label: "silver weathercock", kind: "takeable" },
+    { id: "gargoylePuffCheeks", label: "puff-cheeked gargoyle", kind: "fixture" },
+    { id: "gargoyleNosePinch", label: "nose-pinching gargoyle", kind: "fixture" },
+    { id: "gargoyleRearGuard", label: "rear-guarding gargoyle", kind: "fixture" },
+    { id: "gargoyleFarGazing", label: "far-gazing gargoyle", kind: "fixture" },
+    { id: "rustedWeathervane", label: "rusted weathervane", kind: "takeable" },
   ]);
   entries("hedgeMazeLoop", [
     { id: "photoPieceB", label: "photo piece b", kind: "takeable" },
@@ -1524,7 +1588,7 @@ Then("every recurring flavor pool has twelve distinct entries and cycles without
     "foreshadowEarly", "foreshadowMid", "foreshadowOpen",
     "lightning", "lightningInvitations", "packageOpenings",
     "mushroomRegrowth", "dragonRebukes",
-    "gargoyleBurper", "gargoyleFarter", "gargoyleShitter",
+    "gargoylePuffCheeks", "gargoyleNosePinch", "gargoyleRearGuard",
   ]);
   for (const [name, pool] of Object.entries(CYCLING_FLAVOR_POOLS)) {
     assert.equal(pool.length, 12, `${name} must have exactly twelve entries`);

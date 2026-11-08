@@ -21,7 +21,7 @@ export function shortestCommand(command) {
   const text = String(command || "").trim();
   const direction = DIRECTION_SHORTCUTS[text.toLowerCase()];
   if (direction) return direction;
-  return text
+  const shortened = text
     .replace(/^open\b/i, "o")
     .replace(/^close\b/i, "c")
     .replace(/^(?:take|get)\b/i, "t")
@@ -36,6 +36,8 @@ export function shortestCommand(command) {
     .replace(/^lock\b/i, "lk")
     .replace(/^wait$/i, "z")
     .replace(/\s+with\s+/i, " w/");
+  return shortened.replace(/^(turn|point|move|rotate)\s+(?:weathervane|vane)\s+(north|east|south|west)$/i,
+    (_, verb, target) => `${verb} vane ${DIRECTION_SHORTCUTS[target.toLowerCase()]}`);
 }
 
 const join = (commands) => commands.map(shortestCommand).join("; ");
@@ -107,43 +109,41 @@ const BARON_VISIT = [
 
 const WIN_RECOVERY_OPENING = [
   "west", "move statue", "take iron", "west", "north",
-  "open mailbox", "take all", "read letter", "open frontd with iron", "north", "take all",
+  "open mailbox", "read letter", "open frontd with iron", "north", "read package",
   "west", "take candle", "south", "take matches", "take apple", "light candle",
   "north", "east", "south", "south", "west", "west", "south",
-  "offer apple to dragon", "use doubloon", "east", "east", "down",
+  "offer apple to dragon", "east", "east", "down",
 ];
 
 const WIN = [
   "{{winopening}}",
-  "use backpack", "up", "use headlamp", "open locker", "down", "east",
-  "say lore", "east", "use shoes", "take all", "use crest", "fly garden",
-  "move statue", "take all", "west", "north", "open mailbox", "take all", "read letter",
-  "open frontd with iron", "north", "take all", "read package", "east", "move profile",
-  "open safe with 7 3 9", "take coal", "take all", "wear talisman", "west", "up",
-  "pick nose", "sniff snuffbox", "pull cord", "up", "take all", "use ancestral", "up",
-  "turn weathercock to face burper", "turn weathercock to face farter",
-  "turn weathercock to face shitter", "turn weathercock to face horizon-gazer",
-  "take weathercock", "east", "pull bellrope", "take all", "wear goggles", "down",
-  "use obsidian", "south", "down", "west", "pull wallpaper", "take all",
-  "open musicbox", "take all", "in", "take all", "use bmhammer", "out", "west", "south",
+  "use backpack", "up", "use headlamp", "down", "east",
+  "say lore", "east", "use shoes", "take crest", "fly garden",
+  "move statue", "take iron", "west", "north", "open mailbox", "read letter",
+  "open frontd with iron", "north", "read package", "east", "move profile",
+  "open safe with 7 3 9", "take coal", "wear talisman", "west", "up",
+  "pick nose", "sniff snuffbox", "pull cord", "up", "take ancestral", "up",
+  "turn vane n", "turn vane w", "turn vane s", "turn vane e",
+  "take vane", "east", "pull bellrope", "wear goggles", "down",
+  "use obsidian", "south", "down", "west", "pull wallpaper", "take musicbox",
+  "open musicbox", "take tiny", "in", "take bmhammer", "out", "west", "south",
   "open fridge", "take all", "use burrito", "open cellard", "{{windried}}", "wait", "wait",
-  "use milk", "put coal in microwave", "set dial to B", "start microwave", "take all",
-  "use diamond", "down", "take all", "use decanter", "open wine bottle with corkscrew",
-  "drink wine", "south", "take all", "use locket", "north", "up", "north", "take all",
-  "light candle", "east", "light self with wrapper", "south", "south", "east", "{{winbrazier}}",
-  "down", "take all", "use ancient", "west", "west", "south",
-  "take all", "east", "south", "give apple to dragon", "use doubloon", "east", "east", "in",
-  "fill jug", "pour jug on fire", "take all", "west", "spell fart", "take all", "read drawing",
-  "use crayon", "east", "north",
-  "give limburger to dg", "give epoisses to dg", "give munster to dg", "take all", "use rind",
-  "south", "south", "{{winoak}}", "north", "east", "turn on cabinet radio", "{{winradio}}", "take all", "use transistor", "north",
-  "say 1", "take all", "use eyepiece", "east", "take all", "read starmap", "west", "say 4",
+  "use milk", "put coal in microwave", "set dial to B", "start microwave", "take diamond",
+  "down", "take all", "open wine bottle with corkscrew", "drink wine", "south", "take locket",
+  "north", "up", "north", "{{wincandlestick}}", "light candle", "east", "light self with wrapper",
+  "south", "south", "east", "{{winbrazier}}", "down", "take all", "west", "west", "south",
+  "take pieceb", "east", "south", "give apple to dragon", "east", "east", "in locker",
+  "fill jug", "pour jug on fire", "take cyan", "west", "spell fart", "take all", "read drawing",
+  "east", "north",
+  "give limburger to dg", "give epoisses to dg", "give munster to dg", "take rind",
+  "south", "south", "{{winoak}}", "north", "east", "turn on cabinet radio", "{{winradio}}", "take transistor", "north",
+  "say 1", "take eyepiece", "east", "read starmap", "west", "say 4",
   "ext self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",
-  "wear bmwatch", "north", "east", "open jewelry with tiny", "take all", "wear ravenblood",
-  "west", "north", "take shard", "open drawer", "take all", "wear family",
-  "south", "down", "west", "put candle in fixture", "put shard in fixture",
-  "take all", "use candelabra", "east", "east", "south", "pull lever", "read book", "take all",
-  "combine pieces", "read baronessphoto", "down", "take all", "read grimoire", "up", "north", "west",
+  "wear bmwatch", "north", "east", "open jewelry with tiny", "take ravenblood",
+  "west", "north", "take shard", "open drawer", "take family",
+  "south", "down", "west", "put candle in fixture", "put shard in fixture", "take candelabra",
+  "east", "east", "south", "pull lever", "read book", "take pieced",
+  "combine pieces", "read baronessphoto", "down", "read grimoire", "up", "north", "west",
   "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
   "open rq", "read gclock",
 ];
@@ -152,7 +152,7 @@ const WIN_OAK_ROUTE = [
   "take magenta", "take yellow", "put yellow in top slot", "put magenta in middle slot",
   "put cyan in bottom slot", "enter platform", "wait", "out", "take ruby", "take sapphire",
   "put ruby in top", "put emerald in middle", "put sapphire in bottom", "wait", "wait", "wait",
-  "enter platform", "wait", "out", "use spyglass", "wait", "wait", "wait",
+  "enter platform", "wait", "out", "take spyglass", "wait", "wait", "wait",
   "enter platform", "wait", "wait", "out",
 ];
 
@@ -350,7 +350,7 @@ export function expandSysopCommand(shortcut, game) {
     if (game.world.canFly?.(game)) return [];
     const freshLocation = game.roomOf("outhouseMushrooms");
     if (freshLocation === "inventory" || freshLocation === "privy") return ["use fresh"];
-    if (!game.getFlag("outhouseMushroomsFound")) return ["use fresh"];
+    if (!game.getFlag("outhouseMushroomsFound")) return ["look in toilet", "use fresh"];
 
     const driedLocation = game.roomOf("mushrooms");
     if (driedLocation === "inventory") return ["use dried"];
@@ -410,8 +410,8 @@ export function expandSysopCommand(shortcut, game) {
     && game.getFlag("outhouseMushroomsFound")
     && !["inventory", "privy"].includes(game.roomOf("outhouseMushrooms"));
   const winOpening = winRecovery
-    ? ["east", "east", "take all", ...WIN_RECOVERY_OPENING]
-    : ["east", "east", "take all", "use fresh", "fly shaft"];
+    ? ["east", "east", "take piecec", ...WIN_RECOVERY_OPENING]
+    : ["east", "east", "look in toilet", "take piecec", "use fresh", "fly shaft"];
   const baronWalkRoute = (() => {
     // Never fly — show the route through the front door from a fresh start.
     const toParlor = game.getFlag("frontDoorOpen")
@@ -430,6 +430,7 @@ export function expandSysopCommand(shortcut, game) {
     .replace(/\{\{winopening\}\}/gi, join(winOpening))
     .replace(/\{\{windried\}\}/gi,
       join(["inventory", "kitchen"].includes(game.roomOf("mushrooms")) ? ["use dried"] : []))
+    .replace(/\{\{wincandlestick\}\}/gi, join(winRecovery ? [] : ["take candlestick"]))
     .replace(/\{\{winbrazier\}\}/gi,
       join(game.getFlag("brazierLit") ? ["ext"] : ["light brazier"]))
     .replace(/\{\{winradio\}\}/gi, join(winRadioAnswers(game)));

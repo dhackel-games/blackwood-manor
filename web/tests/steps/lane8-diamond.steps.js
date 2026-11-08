@@ -54,7 +54,7 @@ Then("the Blackwood Diamond is a treasure heirloom worth {int}", function (point
 
 Then("the Diamond award was granted only once", function () {
   assert.equal(this.game.getFlag("progressAward:diamondMade"), true);
-  assert.equal(this.game.state.score, 20);
+  assert.equal(this.game.state.score, 15);
 });
 
 Then("the DIAL call state is {string}", function (value) {

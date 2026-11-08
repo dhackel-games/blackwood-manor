@@ -84,12 +84,15 @@ const items = {
     scenery: true,
     openable: true,
     open: false,
+    enterTo: "waylampClearing",
     on: {
       open(ctx) {
         const locker = ctx.item("minersLocker");
-        if (locker.open) return "The LOCKER is already open.";
+        const points = ctx.awardProgress("lockerFound");
+        if (locker.open) return "The LOCKER is already open." + (points ? ` (+${points})` : "");
         locker.open = true;
-        return "The LOCKER swings open onto a lamplit forest instead of its own back wall. You can go IN.";
+        return "The LOCKER swings open onto a lamplit forest instead of its own back wall. You can go IN." +
+          (points ? ` (+${points})` : "");
       },
       enter: enterRealm,
     },
@@ -180,6 +183,7 @@ const shortNames = {
 };
 
 const progressAwards = {
+  lockerFound: 5,
   realmDiscovered: 20,
 };
 

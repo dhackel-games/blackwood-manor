@@ -49,9 +49,9 @@ Feature: Maintained sysop shortcuts
       | wait                              | z                        |
 
   Scenario: The single win prompt starts with the backpack and walks the remaining map
-    Then sysop command "::win" contains sequence "e; e; t all; u fresh; g shaft; u backpack; u; u headlamp"
-    And sysop command "::win" contains sequence "g garden; move statue; t all"
-    And sysop command "::win" contains sequence "u spyglass; z; z; z"
+    Then sysop command "::win" contains sequence "e; e; look in toilet; t piecec; u fresh; g shaft; u backpack; u; u headlamp"
+    And sysop command "::win" contains sequence "g garden; move statue; t iron"
+    And sysop command "::win" contains sequence "t spyglass; z; z; z"
     And sysop command "::win" includes "pull bellrope"
     And sysop command "::win" includes "u goggles"
     And sysop command "::win" includes "read package"
@@ -63,6 +63,9 @@ Feature: Maintained sysop shortcuts
     And sysop command "::win" omits "g fort"
     And sysop command "::win" omits "g belfry"
     And sysop command "::win" omits "open package"
+    And sysop command "::win" omits "o locker"
+    And sysop command "::win" contains sequence "give apple to dragon; e; e; in locker; fill jug"
+    And sysop command "::win" includes "in locker" exactly once
     And sysop command "::win" omits "doff"
     And every hidden prompt avoids an explicit take immediately before direct use
 
@@ -119,11 +122,16 @@ Feature: Maintained sysop shortcuts
   Scenario: Every physical win step executes, with planner route metrics, and the clock remains in hand
     When I trace sysop command "::win"
     Then the game is alive
-    And the traced win route begins "e; e; t all; u fresh"
+    And the traced win route begins "e; e; look in toilet; t piecec; u fresh"
     And the traced win route omits worn-equipment removal steps
+    And the traced win route opens the locker only while entering it
+    And the traced win route uses required heirlooms only for state-changing effects
+    And the traced win route uses TAKE ALL only for two or more items
+    And the traced win route never takes an item the next action derives
     And the game is not won
     And the current room is "grandHall"
     And the win route used at most two named flights
+    And the win route used exactly 2 named flights
     And the win route used exactly one bulk RQ deposit
     And the win route used zero single-item RQ deposits
     And the win route uses fewer than 5.9 transitions per heirloom
@@ -154,7 +162,7 @@ Feature: Maintained sysop shortcuts
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 1316
+    And the game score is 1236
 
   @win @maxscore
   Scenario: Repeating the completed prompt cannot choose the front-door ending
@@ -163,7 +171,7 @@ Feature: Maintained sysop shortcuts
     And the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 1316
+    And the game score is 1236
     And both endings remain independently available
     Then sysop command "::win" includes "read gclock"
     And sysop command "::win" omits "s"
@@ -172,12 +180,12 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 1316
+    And the game score is 1236
     And both endings remain independently available
     When I send "use clock"
     Then the current room is "grandHall"
     And flag "partII" is unset
-    And the game score is 1316
+    And the game score is 1236
 
   @win @maxscore
   Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
@@ -186,7 +194,7 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And item "clockTalisman" is in "reliquary"
     And item "reliquary" is closed
-    And the game score is 1306
+    And the game score is 1226
     And sysop command "::win" contains sequence "o rq; read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
@@ -194,7 +202,7 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 1316
+    And the game score is 1236
     And both endings remain independently available
 
   @win @maxscore
@@ -209,7 +217,7 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 1316
+    And the game score is 1236
     And both endings remain independently available
 
   @win
@@ -227,7 +235,7 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And item "clockTalisman" is carried
     And every required family item is inside the Doomsday Clock
-    And the game score is 1271
+    And the game score is 1191
 
   Scenario: Powerup still recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
@@ -244,7 +252,7 @@ Feature: Maintained sysop shortcuts
   Scenario: An already-solved oak uses its physical platform instead of flying to the fort
     Given an already-solved oak has its platform at the roots
     Then sysop command "::win" contains sequence "put cyan in bottom slot; z; z; z; in platform; z; out"
-    And sysop command "::win" contains sequence "z; z; z; in platform; z; out; u spyglass; z; z; z"
+    And sysop command "::win" contains sequence "z; z; z; in platform; z; out; t spyglass; z; z; z"
     And sysop command "::win" omits "g fort"
     When I trace sysop command "::win"
     Then the game is alive

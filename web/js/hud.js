@@ -53,7 +53,7 @@ export const HUD_SLOT_DEFINITIONS = Object.freeze([
   {
     id: "inventory",
     label: "Capacity",
-    emoji: ({ game }) => game.has("backpack") ? "👜" : "👤",
+    emoji: ({ game }) => game.equipped("back")?.id === "backpack" ? "🎒" : "👤",
     calculate: ({ game }) => `${game.inventoryLoad()}/${game.inventoryCapacity()}`,
   },
   {

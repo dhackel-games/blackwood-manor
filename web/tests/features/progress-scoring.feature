@@ -10,7 +10,7 @@ Feature: One-time rewards for meaningful progress
 
   @maxscore
   Scenario: The derived Part I maximum includes every ratified award
-    Then the derived Part I maximum is 1316
+    Then the derived Part I maximum is 1236
 
   Scenario: Finding the iron key and opening the manor reward each breakthrough once
     Given the player is in room "garden"
@@ -174,21 +174,21 @@ Feature: One-time rewards for meaningful progress
     Given every treasure but the "ancestralPortrait" is already in the reliquary
     And the player is in room "grandHall"
     When I send "put ancestral portrait in reliquary"
-    Then the game score is 25
+    Then the game score is 20
     When I send "close reliquary"
     Then the output contains "(+5)"
-    And the game score is 30
+    And the game score is 25
     When I send "open reliquary"
     And I send "close reliquary"
-    Then the game score is 30
+    Then the game score is 25
     When I send "open bell closet"
     And I send "pull bell rope"
     Then the output contains "(+5)"
-    And the game score is 35
+    And the game score is 30
     When I send "open reliquary"
     And I send "take clock"
     Then flag "floorDoorOpen" is set
-    And the game score is 40
+    And the game score is 35
 
   Scenario: ONE TRIP rewards a fresh all-in reliquary deposit only once
     Given all required heirlooms are ready for one all-in deposit
@@ -197,7 +197,7 @@ Feature: One-time rewards for meaningful progress
     Then the output contains "One trip. Twenty-four heirlooms take their places in a single breath. (+25)"
     And the output contains line "HEIRLOOMS: 24/24 +1"
     And flag "progressAward:oneTrip" is set
-    And the game score is 475
+    And the game score is 355
     When I round-trip the game snapshot
     Then flag "progressAward:oneTrip" is set
     When I send "take all from reliquary"
@@ -215,29 +215,29 @@ Feature: One-time rewards for meaningful progress
     Then the output does not contain "One trip."
     And flag "progressAward:oneTrip" is unset
 
-  Scenario: Implicit pickup, safe use, dropping and restoring cannot farm the mystery package
+  Scenario: Implicit pickup and harmless handling cannot farm the mystery package
     Given the player is in room "grandHall"
     And the random number generator always returns 0.90
     When I send "use package"
     Then item "mysteryPackage" is carried
     And flag "progressItem:mysteryPackage" is set
-    And flag "useItem:mysteryPackage" is set
-    And the game score is 10
+    And flag "useItem:mysteryPackage" is unset
+    And the game score is 5
     When I send "read package"
-    And the game score is 10
+    And the game score is 5
     When I send "drop package"
     And I send "take package"
     And I round-trip the game snapshot
     And I send "use package"
     Then item "mysteryPackage" is carried
     And the game is alive
-    And the game score is 10
+    And the game score is 5
     When I send "open package"
     Then item "mysteryPackage" is destroyed
-    And flag "useItem:mysteryPackage" is set
-    And the game score is 10
+    And flag "useItem:mysteryPackage" is unset
+    And the game score is 5
 
-  Scenario: Opening an unread carried package earns its use reward before it disappears
+  Scenario: Opening an unread carried package changes the game without a keepsake-use reward
     Given the player is in room "grandHall"
     And the random number generator always returns 0.90
     When I send "take package"
@@ -245,17 +245,34 @@ Feature: One-time rewards for meaningful progress
     And the game score is 5
     When I send "open package"
     Then the output contains "walls are breathing again"
-    And the output contains "(+5)"
+    And the output does not contain "(+5)"
     And item "mysteryPackage" is destroyed
     And flag "progressItem:mysteryPackage" is set
-    And flag "useItem:mysteryPackage" is set
-    And the game score is 10
+    And flag "useItem:mysteryPackage" is unset
+    And the game score is 5
     When I send "read package"
     And I round-trip the game snapshot
     And I send "open package"
     Then the game is alive
-    And flag "useItem:mysteryPackage" is set
-    And the game score is 10
+    And flag "useItem:mysteryPackage" is unset
+    And the game score is 5
+
+  Scenario: Keepsakes do not earn use credit, deposits award only heirloom points, and real uses still score
+    Given item "familyCrest" is carried
+    When I send "use crest"
+    Then flag "useItem:familyCrest" is unset
+    And the game score is 0
+    Given a fresh manor game
+    And item "familyCrest" is carried
+    And the player is in room "grandHall"
+    When I send "put crest in reliquary"
+    Then flag "useItem:familyCrest" is unset
+    And the game score is 15
+    Given a fresh manor game
+    And item "backpack" is carried
+    When I send "wear backpack"
+    Then flag "useItem:backpack" is set
+    And the game score is 5
 
   Scenario: A legacy carried portable gains its missing pickup credit without double-crediting keys or gear
     Given a legacy save with a carried coin and credited key and pack is restored
@@ -401,7 +418,8 @@ Feature: One-time rewards for meaningful progress
 
   Scenario: Naturally regrown mushrooms cannot repeat pickup, use or vision awards after restore
     Given the player is in room "privy"
-    When I send "use fresh"
+    When I send "look in toilet"
+    And I send "use fresh"
     Then flag "progressItem:outhouseMushrooms" is set
     And flag "useItem:outhouseMushrooms" is set
     And the game score is 20

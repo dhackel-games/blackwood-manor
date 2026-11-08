@@ -1,0 +1,81 @@
+// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+
+import assert from "node:assert";
+import { Given, Then, When } from "@cucumber/cucumber";
+import { world } from "../../js/world.js";
+
+const POOL_KEYS = {
+  north: "gargoylePuffCheeks",
+  east: "gargoyleNosePinch",
+  south: "gargoyleRearGuard",
+};
+
+function poolKey(target) {
+  const key = POOL_KEYS[target];
+  assert.ok(key, `Unknown gargoyle pool "${target}"`);
+  return key;
+}
+
+Given("a legacy vane save is restored", function () {
+  const snapshot = this.game.snapshot();
+  const vane = snapshot.state.items.rustedWeathervane;
+  delete snapshot.state.items.rustedWeathervane;
+  snapshot.state.items.silverWeathercock = {
+    ...vane,
+    id: "silverWeathercock",
+    loc: "reliquary",
+    worn: true,
+  };
+  snapshot.state.flags["manor:weathercockFreed"] = true;
+  snapshot.state.flags["progressAward:weathercockFreed"] = true;
+  snapshot.state.flags["progressItem:silverWeathercock"] = true;
+  snapshot.state.flags["useItem:silverWeathercock"] = true;
+  snapshot.state.flags["heirloomScore:silverWeathercock"] = true;
+  this.game.restore(snapshot);
+});
+
+When("I turn the weathervane toward {string} {int} times, saving after {int}", function (target, count, saveAfter) {
+  const key = poolKey(target);
+  const pool = world.flavorPools[key];
+  assert.equal(pool.length, 12);
+  this.weathervaneReplies = [];
+  for (let index = 0; index < count; index += 1) {
+    this.output = this.game.send(`turn vane to face ${target}`);
+    const reply = pool.find((line) => this.output.includes(line));
+    assert.ok(reply, `Missing ${target} pool reply in:\n${this.output}`);
+    this.weathervaneReplies.push(reply);
+    if (index + 1 === saveAfter) {
+      const snapshot = this.game.snapshot();
+      this.game.restore(snapshot);
+    }
+  }
+});
+
+Then("the weathervane {string} replies cover a full unique cycle after restore", function (target) {
+  const key = poolKey(target);
+  const pool = world.flavorPools[key];
+  assert.deepEqual(this.weathervaneReplies.slice(0, 12), pool);
+  assert.equal(new Set(this.weathervaneReplies.slice(0, 12)).size, 12);
+  assert.equal(this.weathervaneReplies[12], this.weathervaneReplies[0]);
+  assert.equal(this.game.getFlag(`flavorCycle:${key}`), 1);
+});
+
+Then("the roof gargoyles are fixed and the weathervane is a treasure", function () {
+  for (const id of [
+    "gargoylePuffCheeks",
+    "gargoyleNosePinch",
+    "gargoyleRearGuard",
+    "gargoyleFarGazing",
+  ]) {
+    assert.equal(this.game.roomOf(id), "roof");
+    assert.equal(this.game.item(id).fixed, true);
+  }
+  const weathervane = this.game.item("rustedWeathervane");
+  assert.equal(weathervane.loc, "roof");
+  assert.equal(weathervane.fixed, true);
+  assert.equal(weathervane.takeable, true);
+  assert.equal(weathervane.treasure, true);
+  assert.equal(weathervane.points, 10);
+});
+
+// end lane8-weathervane.steps.js

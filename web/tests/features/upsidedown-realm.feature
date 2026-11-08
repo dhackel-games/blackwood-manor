@@ -12,10 +12,13 @@ Feature: The Upside Down realm hub
     Given flag "dragonMoved" is set
     And the player is in room "mineGallery"
     When I send "open locker"
-    Then the output contains "The LOCKER swings open onto a lamplit forest instead of its own back wall. You can go IN."
+    Then the output contains "The LOCKER swings open onto a lamplit forest instead of its own back wall. You can go IN. (+5)"
+    And flag "progressAward:lockerFound" is set
     When I send "in"
     Then the current room is "waylampClearing"
     And the output contains "The world folds around the hinge; you step into THE UPSIDE DOWN. (+20)"
+    And flag "progressAward:realmDiscovered" is set
+    And the game score is 25
     When I send "out"
     Then the current room is "mineGallery"
     And the output contains "You climb out through the MINERS' LOCKER into the MINING GALLERY."
@@ -25,12 +28,12 @@ Feature: The Upside Down realm hub
     And the player is in room "mineGallery"
     When I send "open locker"
     And I send "in"
-    Then the game score is 20
+    Then the game score is 25
     When I send "out"
     And I send "in"
     Then the output contains "You duck through the locker into THE UPSIDE DOWN."
     And the output does not contain "(+20)"
-    And the game score is 20
+    And the game score is 25
 
   Scenario: Realm discovery survives restore without another award
     Given flag "dragonMoved" is set
@@ -41,8 +44,24 @@ Feature: The Upside Down realm hub
     And I send "out"
     And I send "in"
     Then flag "progressAward:realmDiscovered" is set
+    And flag "progressAward:lockerFound" is set
     And the output does not contain "(+20)"
-    And the game score is 20
+    And the game score is 25
+
+  Scenario: Entering the closed locker derives opening and awards both discoveries once
+    Given flag "dragonMoved" is set
+    And the player is in room "mineGallery"
+    When I send "in locker"
+    Then the output contains "(open MINERS' LOCKER; enter MINERS' LOCKER)"
+    And the output contains "THE UPSIDE DOWN. (+20)"
+    And flag "progressAward:lockerFound" is set
+    And flag "progressAward:realmDiscovered" is set
+    And the game score is 25
+    When I round-trip the game snapshot
+    And I send "out"
+    And I send "in locker"
+    Then the output does not contain "(+20)"
+    And the game score is 25
 
   Scenario: The BM Watch routes through the declared locker portal
     Given item "backwardsWatch" is carried

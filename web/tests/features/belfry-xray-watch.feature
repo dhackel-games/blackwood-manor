@@ -86,7 +86,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     Given the player is in room "grandHall"
     When I send "put family ring in reliquary"
     Then item "familyRing" is in "reliquary"
-    And the game score is 30
+    And the game score is 25
 
   Scenario: The BM Watch can inspect any named room without moving
     Given item "backwardsWatch" is carried
@@ -263,7 +263,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
 
   Scenario: The redesigned required set contains exactly twenty-four heirlooms
     Then the required family item count is 24
-    And the required family items are exactly "ancestralPortrait,ancientCoin,baronessPhotograph,blackwoodDiamond,blackwoodHammer,candelabra,corkscrew,crystalDecanter,demogorgonzolaRind,familyCrest,familyRing,goldEyepiece,goldLocket,grimoire,kidsDrawing,musicBox,portableTransistorRadio,purpleCrayon,rubyRing,silverWeathercock,snuffbox,spyglass,stellarMap,talisman"
+    And the required family items are exactly "ancestralPortrait,ancientCoin,baronessPhotograph,blackwoodDiamond,blackwoodHammer,candelabra,corkscrew,crystalDecanter,demogorgonzolaRind,familyCrest,familyRing,goldEyepiece,goldLocket,grimoire,kidsDrawing,musicBox,portableTransistorRadio,purpleCrayon,rubyRing,rustedWeathervane,snuffbox,spyglass,stellarMap,talisman"
     And the required heirloom deposit total is 330
     And item "familyRing" has heirloom deposit value 20
     And item "blackwoodHammer" has heirloom deposit value 12

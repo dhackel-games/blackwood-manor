@@ -61,7 +61,7 @@ Feature: Blackwood Diamond microwave and DIAL
     When I send "take diamond"
     And I send "use diamond"
     Then the output contains "briefly give your own reflection a monocle"
-    And flag "useItem:blackwoodDiamond" is set
+    And flag "useItem:blackwoodDiamond" is unset
     When I send "start microwave"
     Then the output equals "The MICROWAVE has made its one DIAMOND. Another lump would only waste your time."
     And the Diamond award was granted only once
