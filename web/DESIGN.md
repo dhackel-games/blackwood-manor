@@ -1231,3 +1231,19 @@ the LIBRARY displays its still-latched stair and names the LEVER in the
 movement refusal. A visible physical obstruction remains blocked until its
 content puzzle resolves it.
 
+#### 12.37.4 Baroness Photograph
+
+The existing MAILBOX LETTER is PHOTO PIECE A: it keeps its id, warning text,
+pickup ledger, and one-time `letterRead` progress award while gaining the
+piece's torn-photo description and aliases. PHOTO PIECES B and C lie openly in
+the HEDGE MAZE LOOP and on the PRIVY wall. A fixed ROTTING BOOK in the LIBRARY
+releases PIECE D through READ BOOK or SEARCH BOOKS; hidden sight uses the same
+release hook and leaves the piece loose for normal pickup.
+
+COMBINE or ASSEMBLE PIECES requires all four carried pieces, consumes them into
+the 15-point, `pendingHeirloom` BARONESS PHOTOGRAPH, and awards its one-time
+`photoCombined` progress. The portrait shows THE BARONESS beside a GRANDFATHER
+CLOCK at 1:30, a future hook only. Its back retains the unchanged letter: READ
+PHOTOGRAPH or READ LETTER after combination awards any missing letter-read
+credit and the photograph's normal first use, with neither award repeatable.
+
