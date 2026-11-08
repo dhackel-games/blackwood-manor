@@ -8,7 +8,7 @@ Feature: Fire and food consequences
   Background:
     Given a fresh manor game
 
-  Scenario: Burn the letter, confirm the match, and ask Gary for rescue
+  Scenario: The letter cannot be burned, confirm the match, and ask Gary for rescue
     When I send "north"
     And I send "open mailbox"
     Then the output contains "letter"
@@ -16,8 +16,8 @@ Feature: Fire and food consequences
     Then the output equals "Taken. (+5)"
     And the letter has no hard line breaks
     When I send "burn letter"
-    Then the output matches "alight|ash|flakes"
-    And item "letter" is destroyed
+    Then the output contains "can't quite bring yourself to set fire to the letter"
+    And item "letter" is in "inventory"
     When I send "light self on fire"
     Then the output contains "source of ignition"
     And flag "onFire" is unset

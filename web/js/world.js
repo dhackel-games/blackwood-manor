@@ -1686,21 +1686,6 @@ function readLetter(ctx, cmd) {
   return (letter?.text || "It's blank.") + awardSuffix(points) + ctx.awardUse(letter);
 }
 
-// Burning the letter (Zork's leaflet, but arson).
-function burnLetter(ctx, cmd) {
-  if (ctx.find(cmd.dobj)?.id !== "letter") return null;
-  const l = ctx.item("letter");
-  if (!l || l.loc == null) return "There's no letter to burn — you've already reduced it to ash.";
-  const use = ctx.awardUse(l);
-  ctx.destroy("letter");
-  ctx.setFlag("letterBurned", true);
-  return (
-    "You don't remember striking a match, but the water-stained letter is suddenly alight. It curls " +
-    "into black flakes and crumbles away — warning, curse, crypt and all.\n\n" +
-    "Somewhere, the house seems to take note. That felt unwise. It felt GREAT, but unwise." + use
-  );
-}
-
 // --- Burn-up timer: being on fire will consume you if you don't act ----------
 const BURN_LINES = [
   "You are on fire. It remains, technically, fine.",
@@ -4679,7 +4664,7 @@ const logicWorld = {
     },
     letter: {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
-      on: { read: readLetter, burn: burnLetter },
+      on: { read: readLetter },
     },
 
     // --- the ceremonial brazier + its reward (garden) ---

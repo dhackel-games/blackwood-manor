@@ -459,7 +459,6 @@ the mansion.
   the fire is extinguished or becomes fatal.
 - **ASCII fire art** is stamped onto every room description while ablaze (`statusBanner`).
 - The player's own flames count as a light source in dark rooms.
-- **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
 
 ## 12.7 The brazier fire-puzzle (garden)
 - A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
