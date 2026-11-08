@@ -146,21 +146,21 @@ Feature: One-time rewards for meaningful progress
     Given the player is in room "deepShaft"
     When I send "take backpack"
     Then the output contains "(+5)"
-    And the game score is 30
+    And the game score is 25
     Given the player is in room "mineGallery"
     When I send "take headlamp"
     Then the output contains "(+5)"
-    And the game score is 35
+    And the game score is 30
     Given the player is in room "dreadmawVault"
     When I send "take winged shoes"
     Then the output contains "(+5)"
-    And the game score is 40
+    And the game score is 35
     Given flag "progressAward:belfryGogglesFreed" is set
     And the player is in room "belfry"
     When I send "pull rope"
     And I send "take xray goggles"
     Then the output contains "(+5)"
-    And the game score is 45
+    And the game score is 40
 
   Scenario: Lowering the attic ladder rewards the solved access mechanism once
     Given the player is in room "landing"
@@ -219,12 +219,11 @@ Feature: One-time rewards for meaningful progress
     Given the player is in room "grandHall"
     And the random number generator always returns 0.90
     When I send "use package"
-    Then flag "useItem:mysteryPackage" is unset
-    And the game score is 0
-    When I send "read package"
     Then item "mysteryPackage" is carried
     And flag "progressItem:mysteryPackage" is set
     And flag "useItem:mysteryPackage" is set
+    And the game score is 10
+    When I send "read package"
     And the game score is 10
     When I send "drop package"
     And I send "take package"

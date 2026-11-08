@@ -83,6 +83,16 @@ Feature: The kitchen fridge and Demogorgonzola
     And I send "feed epoisses"
     Then flag "realm:demoFed" is true
     And item "demogorgonzolaRind" is in "cheeseGrotto"
+
+  Scenario: DG is the canonical short name and legacy names remain accepted
+    Given the player is in room "cheeseGrotto"
+    And item "limburgerCheese" is carried
+    And item "epoissesCheese" is carried
+    And item "munsterCheese" is carried
+    When I send "give limburger to dg"
+    And I send "give epoisses to demo"
+    And I send "give munster to demogorgonzola"
+    Then flag "realm:demoFed" is true
     And the game score is 25
 
   Scenario: The rind is a treasure heirloom with normal pickup and use rewards

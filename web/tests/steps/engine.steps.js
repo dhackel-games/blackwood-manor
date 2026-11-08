@@ -314,12 +314,15 @@ Then("INFO is one alphabetized command-per-line data block", function () {
   assert.match(HELP_TEXT, /get\/\(t\)ake\/grab <thing>\/all \[from <container>\] \| Take \//);
   assert.match(HELP_TEXT, /\(g\)o <room> \| Go \//);
   assert.match(HELP_TEXT, /\(c\)lose\/shut <thing> \| Close \//);
+  assert.match(HELP_TEXT, /dial <setting> \| Dial \/ Set a visible dial; bare DIAL or DIAL GARY calls the hint line\./);
+  assert.match(HELP_TEXT, /ext\/extinguish \[thing\] \| Extinguish \/ Put out yourself first when burning, or a lit thing in scope\./);
   assert.match(HELP_TEXT, /lock\/\(lk\) <thing> with <key> \| Lock \//);
   assert.match(HELP_TEXT, /unlock\/\(un\) <thing> with <key> \| Unlock \//);
   assert.match(HELP_TEXT, /put\/place <thing>\/all in <container\/slot> \| Put \//);
+  assert.match(HELP_TEXT, /pour\/tip <thing> \[on <target>\] \| Pour \/ Use a liquid or item on a target; equivalent to USE <thing> ON <target>\./);
   assert.match(HELP_TEXT, /say\/talk <words\/person> \| Speak \//);
   assert.match(HELP_TEXT, /show\/scry <room\/object> \[in watch\] \| Scry \//);
-  assert.match(HELP_TEXT, /\(u\)se\/wear\/don\/eat\/drink <thing> \| Use \//);
+  assert.match(HELP_TEXT, /\(u\)se\/wear\/don\/eat\/drink <thing> \[on <target>\] \| Use \//);
   assert.match(HELP_TEXT, /WITH may be shortened to w\//);
   assert.match(HELP_TEXT, /\nCHAINING\n/);
   assert.match(HELP_TEXT, /\nGARY'S HINT LINE\n/);

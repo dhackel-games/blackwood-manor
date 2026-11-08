@@ -321,6 +321,52 @@ function containingRoom(ctx, item) {
   }
   return null;
 }
+function selfDouseWithLiquid(ctx, prefix, use = "") {
+  ctx.setFlag("onFire", false);
+  ctx.setFlag("burnTurns", 0);
+  const useText = use && !use.startsWith(" (+") ? `\n\n${use}` : use;
+  return `${prefix} You are no longer on fire.${useText}` + surviveSelfFire(ctx);
+}
+function selfLiquidInterceptor(ctx, cmd) {
+  if (!ctx.getFlag("onFire")) return null;
+  const target = String(cmd.iobj || "").toLowerCase();
+  if (!["self", "myself", "me", "yourself"].includes(target)) return null;
+  const direct = ctx.find(cmd.dobj, ctx.inventory());
+  const source = String(cmd.dobj || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (direct?.id === "milkJug" || ["water", "streamwater", "jug", "milkjug", "emptymilkjug"].includes(source)) {
+    const jug = ctx.item("milkJug");
+    if (!ctx.has("milkJug")) return "You need the MILK JUG in your hands.";
+    if (!jug.filled) return "The MILK JUG is EMPTY. FILL JUG before trying to douse yourself.";
+    jug.filled = false;
+    return selfDouseWithLiquid(ctx,
+      "You dump the MILK JUG'S cold stream water over your head. The flames hiss and die.",
+      ctx.awardUse(jug));
+  }
+  if (direct?.id === "milk" || ["milk", "bottleofmilk"].includes(source)) {
+    if (!ctx.has("milk")) return "You need the BOTTLE OF MILK in your hands.";
+    const milk = ctx.item("milk");
+    const use = ctx.awardUse(milk);
+    ctx.destroy("milk");
+    return selfDouseWithLiquid(ctx,
+      "You pour the BOTTLE OF MILK over yourself. The flames curdle into a sour-smelling steam and die.",
+      use);
+  }
+  const wine = direct?.id === "wineBottle" || direct?.templateId === "wineBottle" ? direct : null;
+  if (wine || ["wine", "winebottle", "dustywinebottle", "vintage", "bottle"].includes(source)) {
+    if (!wine) return "You need an opened WINE BOTTLE in your hands.";
+    if (!wine.open) return "The WINE BOTTLE is still corked. OPEN BOTTLE WITH CORKSCREW.";
+    const sips = { ...(ctx.getFlag("manor:wineSips") || {}) };
+    const consumed = (Number(sips[wine.id]) || 0) + 1;
+    sips[wine.id] = consumed;
+    ctx.setFlag("manor:wineSips", sips);
+    wine.highSource.doses = Math.max(0, 4 - (consumed - 1));
+    const sip = ctx.world.useHighSource(ctx, wine, { verb: "drink", dobj: wine.names[0] });
+    return selfDouseWithLiquid(ctx,
+      "You pour one precious sip of WINE over yourself. The flames flare purple, sputter, and die.",
+      sip || "");
+  }
+  return null;
+}
 
 function resolveWatchDestination(ctx, phrase) {
   const roomMatch = resolveWatchRoom(ctx, phrase);
@@ -1112,7 +1158,7 @@ function hintEntries(ctx) {
   const dragonHint = !ctx.getFlag("dragonMoved")
     ? "A family heirloom, the BLACKWOOD FAMILY CREST, waits in DREADMAW'S VAULT. Bring the kitchen APPLE through the HEDGE MAZE and OFFER APPLE TO DRAGON."
     : !ctx.getFlag("dragonVaultOpen")
-      ? "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, TAKE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE."
+      ? "Follow DREADMAW'S cave through the ANTECHAMBER and MINING GALLERY. WEAR the HEADLAMP, go DOWN, USE the BACKPACK in the DEEP SHAFT, then TALK TO TROLL at the TROLL GATE."
       : "The VAULT is open. TAKE the BLACKWOOD FAMILY CREST and PUT it in the RELIQUARY.";
   const oakHint = !ctx.getFlag("brazierLit")
     ? "The missing GEM for the GREAT OAK'S PANEL is hidden in the GARDEN BRAZIER. A lone match is too brief: carry the LIT CANDLE, carry the restored CANDELABRA, or LIGHT YOURSELF ON FIRE first."
@@ -1715,8 +1761,9 @@ function garyTurnInfo(ctx, text) {
 }
 
 function descendWell(ctx) {
-  const floating = canFly(ctx);
-  if (!ctx.has("rope") && !floating) {
+  const usingRope = ctx.has("rope");
+  const floating = canFly(ctx) && !usingRope;
+  if (!usingRope && !floating) {
     return ctx.kill(
       "You clamber over the mossy lip of the well and lower yourself into the dark — " +
       "but there is nothing to hold to. You plunge, and strike the dry stone bottom " +
@@ -1732,7 +1779,7 @@ function descendWell(ctx) {
       "and float back into the garden without touching the walls."
     : "Bracing against the rope, you descend into the well. At the muddy bottom your " +
       "fingers close on a cold disc of metal — an ancient coin! You climb back into the last grey light.") +
-    awardSuffix(points) + (!floating ? ctx.awardUse(ctx.item("rope")) : "");
+    awardSuffix(points) + (usingRope ? ctx.awardUse(ctx.item("rope")) : "");
 }
 
 // ---------------------- Andy's "light self on fire" gag ----------------------
@@ -1939,7 +1986,19 @@ function selfExtinguishInterceptor(ctx, cmd) {
   const d = (cmd.dobj || "").toLowerCase();
   if (ctx.getFlag("onFire") && (["self", "myself", "me", "fire", "flame", "flames"].includes(d) || !d))
     return putOutSelf(ctx);
-  return null;
+  if (d && !["fire", "flame", "flames"].includes(d)) return null;
+  const brazier = ctx.item("brazier");
+  const campfire = ctx.item("upsideDownCampfire");
+  const burning = [
+    ctx.getFlag("brazierLit") && brazier?.loc === ctx.state.room ? brazier : null,
+    !ctx.getFlag("realm:campfireOut") && campfire?.loc === ctx.state.room ? campfire : null,
+    ...ctx.visibleItems().filter((item) => item.lit),
+  ].find(Boolean);
+  if (!burning) return "Nothing here is burning.";
+  const handler = ctx.world.items[burning.id]?.on?.extinguish;
+  if (handler) return handler(ctx, { ...cmd, dobj: burning.names[0] });
+  burning.lit = false;
+  return `You extinguish the ${burning.names[0]}.`;
 }
 
 // Gary, when you dial in while ablaze.
@@ -2420,6 +2479,12 @@ function lightBrazier(ctx, cmd) {
     "You stagger back, smoking but no longer ablaze, as the bowl roars up in gold-and-green flame.\n\n" +
     `In the light, something green glints in the ash at its foot: an EMERALD GEM. (+${points})\n\n` +
     "A fair trade: you gave the fire away, and it gave you this." + survival;
+}
+function extinguishBrazier(ctx, cmd) {
+  if (ctx.find(cmd.dobj)?.id !== "brazier") return null;
+  if (!ctx.getFlag("brazierLit")) return "The BRAZIER is not lit.";
+  ctx.setFlag("brazierLit", false);
+  return "You smother the BRAZIER'S flames. The ash settles, but its old reward remains spent.";
 }
 
 const OAK_GEMS = Object.freeze({
@@ -3138,6 +3203,7 @@ function flushToilet() {
   return "It is a hole in the ground. There is no plumbing and nothing to flush.";
 }
 function inspectToilet(ctx) {
+  ctx.setFlag("usedInspection");
   const mushrooms = ctx.item("outhouseMushrooms");
   if (!ctx.getFlag("outhouseMushroomsFound")) {
     ctx.setFlag("outhouseMushroomsFound");
@@ -4234,6 +4300,10 @@ const logicWorld = {
           if (cmd.dobj !== "down") return null;
           return descendWell(ctx);
         },
+        use(ctx, cmd) {
+          if (ctx.find(cmd.dobj, ctx.inventory())?.id !== "rope") return null;
+          return descendWell(ctx);
+        },
       },
     },
 
@@ -4487,11 +4557,13 @@ const logicWorld = {
           if (["all", "everything"].includes(cmd.dobj)) return null;
           const it = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj, ctx.inventory());
           if (!it || ctx.roomOf(it.id) !== "inventory") return "You aren't carrying that.";
-          if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
           if (it.id === "talisman" && ctx.roomOf("goldLocket") === "crypt") {
             return "The BM crest on the TALISMAN warms against your palm, but the RELIQUARY refuses it. This " +
               "heirloom still has work to do against the WRAITH; recover the GOLD LOCKET first.";
           }
+          if (it.worn && !it.treasure) return `Remove the ${it.names[0]} before putting it anywhere.`;
+          const removed = it.worn;
+          if (removed) it.worn = false;
           const alreadyLiftable = ctx.getFlag("curseLiftable");
           ctx.moveItem(it.id, "reliquary");
           const use = it.treasure ? ctx.awardUse(it) : "";
@@ -4503,7 +4575,8 @@ const logicWorld = {
               ctx.setFlag(scoreFlag);
             }
           }
-          let msg = `You place the ${it.names[0]} in its fitted recess in the RELIQUARY.` + use;
+          let msg = `${removed ? `You slip off the ${it.names[0]}. ` : ""}` +
+            `You place the ${it.names[0]} in its fitted recess in the RELIQUARY.` + use;
           if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
@@ -4942,6 +5015,7 @@ const logicWorld = {
       on: {
         light: lightBrazier,
         burn: lightBrazier,
+        extinguish: extinguishBrazier,
         touch(ctx, cmd) {
           return /\bcandelabra\b/i.test(cmd.iobj || "") ? lightBrazier(ctx) : null;
         },
@@ -5083,7 +5157,7 @@ const logicWorld = {
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
-      wearSlot: "back", autoWearOnTake: true, carryCapacity: 36,
+      wearSlot: "back", carryCapacity: 36,
       progressPoints: 5, progressFlag: "progressItem:backpack",
     },
     headlamp: {
@@ -5599,11 +5673,14 @@ function revealWallGap(ctx) {
 for (const room of Object.values(world.rooms)) {
   room.on = room.on || {};
   const pLight = room.on.light, pBurn = room.on.burn, pExt = room.on.extinguish, pOff = room.on.off;
+  const pPour = room.on.pour, pUse = room.on.use;
   const pYes = room.on.yes, pNo = room.on.no;
   room.on.light = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pLight ? pLight(ctx, cmd) : null);
   room.on.burn = (ctx, cmd) => selfLightInterceptor(ctx, cmd) ?? (pBurn ? pBurn(ctx, cmd) : null);
   room.on.extinguish = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pExt ? pExt(ctx, cmd) : null);
   room.on.off = (ctx, cmd) => selfExtinguishInterceptor(ctx, cmd) ?? (pOff ? pOff(ctx, cmd) : null);
+  room.on.pour = (ctx, cmd) => selfLiquidInterceptor(ctx, cmd) ?? (pPour ? pPour(ctx, cmd) : null);
+  room.on.use = (ctx, cmd) => selfLiquidInterceptor(ctx, cmd) ?? (pUse ? pUse(ctx, cmd) : null);
   room.on.yes = (ctx, cmd) => selfFireAnswerInterceptor(ctx, cmd) ?? (pYes ? pYes(ctx, cmd) : null);
   room.on.no = (ctx, cmd) => selfFireAnswerInterceptor(ctx, cmd) ?? (pNo ? pNo(ctx, cmd) : null);
 }

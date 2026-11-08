@@ -143,6 +143,7 @@ const items = {
       examine: fireDescription,
       search: fireDescription,
       pour: pourOnFire,
+      extinguish: bodyExtinguish,
       stomp: bodyExtinguish,
       smother: bodyExtinguish,
     },

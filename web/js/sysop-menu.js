@@ -27,6 +27,7 @@ export function shortestCommand(command) {
     .replace(/^(?:take|get)\b/i, "t")
     .replace(/^place\b/i, "put")
     .replace(/^(?:use|wear|don|eat)\b/i, "u")
+    .replace(/^extinguish\b/i, "ext")
     .replace(/^remove\b/i, "doff")
     .replace(/^offer\b/i, "give")
     .replace(/^enter\b/i, "in")
@@ -114,8 +115,8 @@ const WIN_RECOVERY_OPENING = [
 
 const WIN = [
   "{{winopening}}",
-  "take all", "up", "take all", "wear headlamp", "open locker", "down", "east",
-  "say lore", "east", "take all", "wear shoes", "use crest", "fly garden",
+  "use backpack", "up", "use headlamp", "open locker", "down", "east",
+  "say lore", "east", "use shoes", "take all", "use crest", "fly garden",
   "move statue", "take all", "west", "north", "open mailbox", "take all", "read letter",
   "open frontd with iron", "north", "take all", "read package", "east", "move profile",
   "open safe with 7 3 9", "take coal", "take all", "wear talisman", "west", "up",
@@ -123,35 +124,35 @@ const WIN = [
   "turn weathercock to face burper", "turn weathercock to face farter",
   "turn weathercock to face shitter", "turn weathercock to face horizon-gazer",
   "take weathercock", "east", "pull bellrope", "take all", "wear goggles", "down",
-  "take obsidian", "wear obsidian", "south", "down", "west", "pull wallpaper", "take all",
+  "use obsidian", "south", "down", "west", "pull wallpaper", "take all",
   "open musicbox", "take all", "in", "take all", "use bmhammer", "out", "west", "south",
   "open fridge", "take all", "use burrito", "open cellard", "{{windried}}", "wait", "wait",
   "use milk", "put coal in microwave", "set dial to B", "start microwave", "take all",
   "use diamond", "down", "take all", "use decanter", "open wine bottle with corkscrew",
   "drink wine", "south", "take all", "use locket", "north", "up", "north", "take all",
   "light candle", "east", "light self with wrapper", "south", "south", "east", "{{winbrazier}}",
-  "remove shoes", "down", "wear shoes", "take all", "use ancient", "west", "west", "south",
+  "down", "take all", "use ancient", "west", "west", "south",
   "take all", "east", "south", "give apple to dragon", "use doubloon", "east", "east", "in",
   "fill jug", "pour jug on fire", "take all", "west", "spell fart", "take all", "read drawing",
-  "use crayon", "east", "south", "{{winoak}}", "north", "north",
-  "give limburger to demo", "give epoisses to demo", "give munster to demo", "take all", "use rind",
-  "south", "east", "turn on cabinet radio", "{{winradio}}", "take all", "use transistor", "north",
+  "use crayon", "east", "north",
+  "give limburger to dg", "give epoisses to dg", "give munster to dg", "take all", "use rind",
+  "south", "south", "{{winoak}}", "north", "east", "turn on cabinet radio", "{{winradio}}", "take all", "use transistor", "north",
   "say 1", "take all", "use eyepiece", "east", "take all", "read starmap", "west", "say 4",
-  "extinguish self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",
+  "ext self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",
   "wear bmwatch", "north", "east", "open jewelry with tiny", "take all", "wear ravenblood",
-  "remove ravenblood", "west", "north", "take shard", "open drawer", "take all", "wear family",
-  "remove family", "south", "down", "west", "put candle in fixture", "put shard in fixture",
+  "west", "north", "take shard", "open drawer", "take all", "wear family",
+  "south", "down", "west", "put candle in fixture", "put shard in fixture",
   "take all", "use candelabra", "east", "east", "south", "pull lever", "read book", "take all",
   "combine pieces", "read baronessphoto", "down", "take all", "read grimoire", "up", "north", "west",
-  "remove talisman", "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
-  "open rq", "take gclock", "read gclock",
+  "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
+  "open rq", "read gclock",
 ];
 
 const WIN_OAK_ROUTE = [
   "take magenta", "take yellow", "put yellow in top slot", "put magenta in middle slot",
   "put cyan in bottom slot", "enter platform", "wait", "out", "take ruby", "take sapphire",
   "put ruby in top", "put emerald in middle", "put sapphire in bottom", "wait", "wait", "wait",
-  "enter platform", "wait", "out", "use spyglass", "take spyglass", "wait", "wait",
+  "enter platform", "wait", "out", "use spyglass", "wait", "wait", "wait",
   "enter platform", "wait", "wait", "out",
 ];
 
@@ -171,7 +172,7 @@ export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::win",
     name: "Complete Part I",
-    description: "Follow the planner-verified full route, use two flights, seal all heirlooms in one transfer, and take the clock; choose either ending yourself.",
+    description: "Follow the planner-verified full route, use two flights and EXT at the fire, seal all heirlooms in one transfer, and take the clock; INFO documents POUR/USE, FILL, STOMP, SMOTHER, SPELL, COMBINE, TURN/SET/START, and DIAL.",
     compoundPrompt: join(WIN),
   }),
 ]);
@@ -339,7 +340,7 @@ export function expandSysopCommand(shortcut, game) {
       return join([
         ...pathToRoom(game, "grandHall"),
         ...(game.item("reliquary").open ? [] : ["open rq"]),
-        "take gclock", "read gclock",
+        "read gclock",
       ]);
     }
     return join([game.has("clockTalisman") ? "read gclock" : "inventory"]);
@@ -410,7 +411,7 @@ export function expandSysopCommand(shortcut, game) {
     && !["inventory", "privy"].includes(game.roomOf("outhouseMushrooms"));
   const winOpening = winRecovery
     ? ["east", "east", "take all", ...WIN_RECOVERY_OPENING]
-    : ["east", "east", "look in toilet", "take fresh", "take all", "use fresh", "fly shaft"];
+    : ["east", "east", "take all", "use fresh", "fly shaft"];
   const baronWalkRoute = (() => {
     // Never fly — show the route through the front door from a fresh start.
     const toParlor = game.getFlag("frontDoorOpen")
@@ -430,7 +431,7 @@ export function expandSysopCommand(shortcut, game) {
     .replace(/\{\{windried\}\}/gi,
       join(["inventory", "kitchen"].includes(game.roomOf("mushrooms")) ? ["use dried"] : []))
     .replace(/\{\{winbrazier\}\}/gi,
-      join(game.getFlag("brazierLit") ? ["extinguish self"] : ["light brazier"]))
+      join(game.getFlag("brazierLit") ? ["ext"] : ["light brazier"]))
     .replace(/\{\{winradio\}\}/gi, join(winRadioAnswers(game)));
   const filterCommands = (text) => {
     const removed = new Set();

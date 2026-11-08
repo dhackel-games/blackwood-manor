@@ -53,6 +53,7 @@ Feature: Blackwood Manor adventure
       wear headlamp
       down
       take backpack
+      use backpack
       east
       say lore to troll
       east
@@ -257,7 +258,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 1161
+    And the game score is 1166
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal

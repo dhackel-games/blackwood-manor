@@ -18,7 +18,7 @@ const VERBS = {
   read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
   pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
-  extinguish: ["extinguish", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
+  extinguish: ["extinguish", "ext", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
   eat: ["eat"], drink: ["drink"], wear: ["wear", "don"], remove: ["remove", "doff"],
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in", "board", "ride", "step"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
@@ -137,9 +137,21 @@ export function parse(input) {
     word.value && (word.quoted || !ARTICLES.has(word.value)));
   if (!words.length) return { verb: null, dobj: null, prep: null, iobj: null, error: "empty" };
 
-  // Bare direction => go <dir>
-  if (words.length === 1 && !words[0].quoted && DIRECTIONS[words[0].value]) {
-    return { verb: "go", dobj: DIRECTIONS[words[0].value], prep: null, iobj: null };
+  // Directional travel can name the tool used for the move ("DOWN WITH ROPE").
+  if (!words[0].quoted && DIRECTIONS[words[0].value]
+      && (words.length === 1 || !["u", "d", "in", "out"].includes(words[0].value))) {
+    if (words.length === 1) {
+      return { verb: "go", dobj: DIRECTIONS[words[0].value], prep: null, iobj: null };
+    }
+    const tail = words.slice(1);
+    const withIndex = tail.findIndex((word) => !word.quoted && word.value === "with");
+    const tool = tail.slice(withIndex >= 0 ? withIndex + 1 : 0).map((word) => word.value).join(" ");
+    return {
+      verb: "go",
+      dobj: DIRECTIONS[words[0].value],
+      prep: tool ? "with" : null,
+      iobj: tool || null,
+    };
   }
 
   // "turn on/off X" => verb on/off
@@ -183,7 +195,15 @@ export function parse(input) {
   // "go north" / "go n" / "climb up"
   if ((verb === "go" || verb === "climb" || sourceVerb === "run") && rest.length &&
       !rest[0].quoted && DIRECTIONS[rest[0].value]) {
-    return { verb: "go", dobj: DIRECTIONS[rest[0].value], prep: null, iobj: null };
+    const tail = rest.slice(1);
+    const withIndex = tail.findIndex((word) => !word.quoted && word.value === "with");
+    const tool = tail.slice(withIndex >= 0 ? withIndex + 1 : 0).map((word) => word.value).join(" ");
+    return {
+      verb: "go",
+      dobj: DIRECTIONS[rest[0].value],
+      prep: tool ? "with" : null,
+      iobj: tool || null,
+    };
   }
   if (verb !== "say") {
     rest = rest.map((word) => ({

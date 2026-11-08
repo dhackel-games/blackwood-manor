@@ -19,7 +19,12 @@ Feature: Player command parsing
       | southwest                           | go      | sw        | [none]      | [none]    |
       | u                                   | go      | up        | [none]      | [none]    |
       | dn                                  | go      | down      | [none]      | [none]    |
+      | down with rope                      | go      | down      | with        | rope      |
+      | climb down rope                     | go      | down      | with        | rope      |
+      | climb down well with rope           | go      | down      | with        | rope      |
       | u talisman                          | use     | talisman  | [none]      | [none]    |
+      | ext                                 | extinguish | [none] | [none]      | [none]    |
+      | ext self                            | extinguish | self   | [none]      | [none]    |
       | take the brass key                  | take    | brass key | [none]      | [none]    |
       | t rope                              | take    | rope      | [none]      | [none]    |
       | grab brass key                      | take    | brass key | [none]      | [none]    |

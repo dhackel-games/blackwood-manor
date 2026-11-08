@@ -62,6 +62,77 @@ Feature: Fire and food consequences
     When I send "light mailbox"
     Then the output equals "You can't light that."
 
+  Scenario Outline: Water, milk, and wine douse a self-immolation without farming awards
+    Given the player is on fire
+    And the player is awaiting self-fire survival
+    And the self-dousing source "<source>" is ready
+    When I send "<command>"
+    Then flag "onFire" is false
+    And flag "progressAward:selfFireSurvived" is set
+    And flag "useItem:<item>" is set
+    And the game score is <score>
+    When I send "<command>"
+    Then the game score is <score>
+
+    Examples:
+      | source | command            | item       | score |
+      | water  | pour water on self | milkJug    | 15    |
+      | jug    | pour jug on self   | milkJug    | 15    |
+      | jug    | use jug on self    | milkJug    | 15    |
+      | milk   | pour milk on self  | milk       | 15    |
+      | wine   | pour wine on self  | wineBottle | 25    |
+
+  Scenario: USE and POUR share item-on-target handling
+    Given the player is in room "waylampClearing"
+    And the self-dousing source "jug" is ready
+    Then command "use jug on fire" behaves exactly like "pour jug on fire"
+    Given a fresh manor game
+    And the player is on fire
+    And the player is awaiting self-fire survival
+    And the self-dousing source "water" is ready
+    Then command "use water on self" behaves exactly like "pour water on self"
+
+  Scenario: EXT extinguishes active brazier and campfire fixtures without undoing awards
+    Given the player is in room "garden"
+    And flag "brazierLit" is set
+    And flag "progressAward:brazier" is set
+    When I send "ext brazier"
+    Then the output contains "smother the BRAZIER"
+    And flag "brazierLit" is false
+    And flag "progressAward:brazier" is set
+    Given a fresh manor game
+    And the player is in room "waylampClearing"
+    When I send "ext campfire"
+    Then the output contains "You smother the fire"
+    And flag "realm:campfireOut" is set
+
+  Scenario: Bare EXT and EXT FIRE stop self-fire, while an unlit room refuses clearly
+    Given the player is on fire
+    And the player is awaiting self-fire survival
+    When I send "ext"
+    Then flag "onFire" is false
+    And the game score is 10
+    Given a fresh manor game
+    And the player is on fire
+    And the player is awaiting self-fire survival
+    When I send "ext fire"
+    Then flag "onFire" is false
+    And the game score is 10
+    Given a fresh manor game
+    When I send "ext"
+    Then the output equals "Nothing here is burning."
+
+  Scenario: EXT handles a candle but the restored candelabra remains protected
+    Given item "candlestick" is carried
+    And item "matches" is carried
+    When I send "light candle"
+    And I send "ext candle"
+    Then item "candlestick" is unlit
+    Given a fresh manor game
+    And the restored candelabra is carried
+    When I send "ext candelabra"
+    Then the output contains "rise again"
+
   Scenario: Declining self-immolation preserves the match
     Given item "matches" is carried
     When I send "light self on fire"

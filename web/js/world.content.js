@@ -502,7 +502,7 @@ export const content = {
     },
     backpack: {
       roomDesc: "A sturdy canvas BACKPACK rests here, still sound after years underground.",
-      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to twenty items.",
+      desc: "A sturdy mining BACKPACK with enough pockets and straps to raise your carrying capacity to thirty-six items while worn.",
     },
     headlamp: {
       roomDesc: "A battered mining HEADLAMP rests here, its battery pack still sealed.",

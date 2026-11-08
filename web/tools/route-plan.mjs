@@ -189,9 +189,9 @@ export function solveSmallProblem({ start, end, tasks, flags = {}, canFly = fals
 }
 
 const OPENING = [
-  "e", "e", "look in toilet", "take fresh", "take all", "use fresh",
-  "fly shaft", "take all", "u", "take all", "wear headlamp", "open locker",
-  "d", "e", "say lore", "e", "take all", "wear shoes", "use crest",
+  "e", "e", "take all", "use fresh",
+  "fly shaft", "use backpack", "u", "use headlamp", "open locker",
+  "d", "e", "say lore", "e", "use shoes", "take all", "use crest",
 ];
 
 const TASKS = [
@@ -227,14 +227,14 @@ const TASKS = [
     commands: ["pick nose", "sniff snuffbox", "pull cord"],
     grants: { ladderDown: true } },
   { id: "hallBedroom", room: "hallBedroom",
-    commands: ["take shard", "open drawer", "take all", "wear family", "remove family"] },
+    commands: ["take shard", "open drawer", "take all", "wear family"] },
   { id: "nursery", room: "nursery",
     commands: ["pull wallpaper", "take all", "open musicbox", "take all"],
     grants: { wallGapFound: true } },
   { id: "betweenWalls", room: "betweenWalls",
     commands: ["take all", "use bmhammer"] },
   { id: "masterBedroom", room: "masterBedroom", dependsOn: ["nursery"],
-    commands: ["open jewelry with tiny", "take all", "wear ravenblood", "remove ravenblood"] },
+    commands: ["open jewelry with tiny", "take all", "wear ravenblood"] },
   { id: "study", room: "study",
     commands: ["open studrawer", "take all", "read diary", "wear bmwatch"] },
   { id: "attic", room: "attic",
@@ -246,7 +246,7 @@ const TASKS = [
   { id: "belfry", room: "belfry",
     commands: ["pull bellrope", "take all", "wear goggles"] },
   { id: "hiddenVault", room: "hiddenVault",
-    commands: ["take obsidian", "wear obsidian"] },
+    commands: ["use obsidian"] },
   { id: "dragon", room: "dragonCaveMouth", dependsOn: ["kitchenBasics"],
     commands: ["give apple to dragon", "use doubloon"],
     grants: { dragonMoved: true } },
@@ -254,13 +254,13 @@ const TASKS = [
     commands: ["light self with wrapper", "s", "s", "e", "light brazier"],
     movesTo: "garden", movesCost: 3 },
   { id: "gardenWell", room: "garden", dependsOn: ["bodyFire"],
-    commands: ["remove shoes", "d", "wear shoes", "take all", "use ancient"] },
+    commands: ["down", "take all", "use ancient"] },
   { id: "oakPanel", room: "greatOak", dependsOn: ["gardenWell"],
     commands: ["take ruby", "take sapphire", "put ruby in top",
       "put emerald in middle", "put sapphire in bottom"],
     grants: { oakLightAligned: true } },
-  { id: "treeFort", room: "treeFort",
-    commands: ["use spyglass", "take spyglass"] },
+  { id: "treeFort", room: "treeFort", dependsOn: ["lowerPanel"],
+    commands: ["use spyglass", "wait"] },
   { id: "realmCampfire", room: "waylampClearing", dependsOn: ["kitchenBasics"],
     commands: ["fill jug", "pour jug on fire", "take all"] },
   { id: "lowerPanel", room: "below", dependsOn: ["realmCampfire"],
@@ -268,8 +268,8 @@ const TASKS = [
       "put magenta in middle slot", "put cyan in bottom slot"],
     grants: { "oak:lowerPanelAligned": true } },
   { id: "grotto", room: "cheeseGrotto", dependsOn: ["kitchenBasics"],
-    commands: ["give limburger to demo", "give epoisses to demo",
-      "give munster to demo", "take all", "use rind"] },
+    commands: ["give limburger to dg", "give epoisses to dg",
+      "give munster to dg", "take all", "use rind"] },
   { id: "shack", room: "shack",
     commands: ["spell fart", "take all", "read drawing", "use crayon"] },
   { id: "radio", room: "avClubDen",
@@ -282,7 +282,7 @@ const TASKS = [
   { id: "planetariumEject", room: "planetarium",
     dependsOn: ["realmCampfire", "lowerPanel", "grotto", "shack", "radio",
       "mapRoom", "planetariumSafe"],
-    commands: ["say 4", "extinguish self"], movesTo: "gate", movesCost: 1 },
+    commands: ["say 4", "ext self"], movesTo: "gate", movesCost: 1 },
   { id: "combinePhoto", room: null, dependsOn: ["mazePiece", "porchDoor", "library"],
     commands: ["combine pieces", "read baronessphoto"] },
   { id: "diningRestore", room: "diningRoom",
@@ -292,8 +292,8 @@ const TASKS = [
 ];
 TASKS.push({
   id: "deposit", room: "grandHall", dependsOn: TASKS.map((task) => task.id),
-  commands: ["remove talisman", "open rq", "put all in rq", "close rq",
-    "open bellcloset", "pull closetrope", "open rq", "take gclock", "read gclock"],
+  commands: ["open rq", "put all in rq", "close rq",
+    "open bellcloset", "pull closetrope", "open rq", "read gclock"],
 });
 
 const TASK_INDEX = new Map(TASKS.map((task, index) => [task.id, index]));
@@ -558,10 +558,9 @@ function realize(order, secondFlight) {
       if (command === "put all in rq") {
         const carried = Object.entries(world.items)
           .filter(([, item]) => item.treasure)
-          .filter(([itemId]) => game.roomOf(itemId) === "inventory"
-            && !game.item(itemId).worn);
+          .filter(([itemId]) => game.roomOf(itemId) === "inventory");
         if (carried.length !== 24) {
-          throw new Error(`${id}: ${carried.length}/24 unworn heirlooms before the one bulk deposit`);
+          throw new Error(`${id}: ${carried.length}/24 carried heirlooms before the one bulk deposit`);
         }
       }
       const output = send(command, id);

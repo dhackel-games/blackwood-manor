@@ -66,7 +66,7 @@ When("I order the safe constellation and burning ejection", function () {
     start: "planetarium", end: "gate",
     tasks: [
       { id: "eject", room: "planetarium", dependsOn: ["safe"], movesTo: "gate",
-        commands: ["say 4", "extinguish self"] },
+        commands: ["say 4", "ext self"] },
       { id: "safe", room: "planetarium", commands: ["say 1"] },
     ],
   });

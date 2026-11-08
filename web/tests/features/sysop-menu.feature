@@ -38,7 +38,7 @@ Feature: Maintained sysop shortcuts
       | close reliquary                   | c reliquary              |
       | take family crest                 | t family crest           |
       | wear winged shoes                 | u winged shoes           |
-      | remove talisman                   | doff talisman            |
+      | extinguish self                   | ext self                 |
       | offer apple to dragon             | give apple to dragon     |
       | place ruby gem in panel           | put ruby gem in panel    |
       | unlock front door with iron key   | un front door w/iron key |
@@ -49,9 +49,9 @@ Feature: Maintained sysop shortcuts
       | wait                              | z                        |
 
   Scenario: The single win prompt starts with the backpack and walks the remaining map
-    Then sysop command "::win" contains sequence "e; e; look in toilet; t fresh; t all; u fresh; g shaft; t all; u; t all; u headlamp"
+    Then sysop command "::win" contains sequence "e; e; t all; u fresh; g shaft; u backpack; u; u headlamp"
     And sysop command "::win" contains sequence "g garden; move statue; t all"
-    And sysop command "::win" contains sequence "u spyglass; t spyglass"
+    And sysop command "::win" contains sequence "u spyglass; z; z; z"
     And sysop command "::win" includes "pull bellrope"
     And sysop command "::win" includes "u goggles"
     And sysop command "::win" includes "read package"
@@ -59,10 +59,11 @@ Feature: Maintained sysop shortcuts
     And sysop command "::win" includes "put candle in fixture"
     And sysop command "::win" includes "put shard in fixture"
     And sysop command "::win" includes "pull closetrope" exactly once
-    And sysop command "::win" contains sequence "c rq; o bellcloset; pull closetrope; o rq; t gclock; read gclock"
+    And sysop command "::win" contains sequence "c rq; o bellcloset; pull closetrope; o rq; read gclock"
     And sysop command "::win" omits "g fort"
     And sysop command "::win" omits "g belfry"
     And sysop command "::win" omits "open package"
+    And sysop command "::win" omits "doff"
     And every hidden prompt avoids an explicit take immediately before direct use
 
   Scenario: The win prompt derives its radio answers from the persisted LCG seed
@@ -118,6 +119,8 @@ Feature: Maintained sysop shortcuts
   Scenario: Every physical win step executes, with planner route metrics, and the clock remains in hand
     When I trace sysop command "::win"
     Then the game is alive
+    And the traced win route begins "e; e; t all; u fresh"
+    And the traced win route omits worn-equipment removal steps
     And the game is not won
     And the current room is "grandHall"
     And the win route used at most two named flights
@@ -184,7 +187,7 @@ Feature: Maintained sysop shortcuts
     And item "clockTalisman" is in "reliquary"
     And item "reliquary" is closed
     And the game score is 1306
-    And sysop command "::win" contains sequence "o rq; t gclock; read gclock"
+    And sysop command "::win" contains sequence "o rq; read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
     When I execute sysop command "::win"
@@ -199,7 +202,7 @@ Feature: Maintained sysop shortcuts
     When I execute sysop command "::win" through "pull closetrope"
     And I send "open reliquary"
     Then item "reliquary" is open
-    And sysop command "::win" contains sequence "t gclock; read gclock"
+    And sysop command "::win" contains sequence "read gclock"
     And sysop command "::win" omits "o rq"
     And sysop command "::win" omits "s"
     When I execute sysop command "::win"
@@ -240,8 +243,8 @@ Feature: Maintained sysop shortcuts
   @win
   Scenario: An already-solved oak uses its physical platform instead of flying to the fort
     Given an already-solved oak has its platform at the roots
-    Then sysop command "::win" contains sequence "put cyan in bottom slot; z; z; in platform; z; out"
-    And sysop command "::win" contains sequence "z; z; z; in platform; z; out; u spyglass; t spyglass"
+    Then sysop command "::win" contains sequence "put cyan in bottom slot; z; z; z; in platform; z; out"
+    And sysop command "::win" contains sequence "z; z; z; in platform; z; out; u spyglass; z; z; z"
     And sysop command "::win" omits "g fort"
     When I trace sysop command "::win"
     Then the game is alive

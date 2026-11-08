@@ -685,10 +685,20 @@ When("I execute sysop command {string} through {string}", function (command, las
   this.output = this.game.send(steps.slice(0, index + 1).join("; "));
 });
 
+Then("the traced win route begins {string}", function (prefix) {
+  const expected = prefix.split("; ");
+  assert.deepEqual(this.tracedSteps?.slice(0, expected.length), expected);
+});
+
+Then("the traced win route omits worn-equipment removal steps", function () {
+  assert.ok(this.tracedSteps?.every((step) => !/^(?:doff|remove)\b/i.test(step)), this.tracedSteps?.join("; "));
+});
+
 When("I trace sysop command {string}", function (command) {
   const shortcut = sysopCommand(command);
   assert.ok(shortcut, `Unknown sysop command: ${command}`);
   const steps = expandSysopCommand(shortcut, this.game).split("; ");
+  this.tracedSteps = steps;
   assert.ok(steps.length <= 256, "The engine must execute the entire prompt");
   let flights = 0;
   let traversals = 0;
@@ -730,8 +740,12 @@ When("I trace sysop command {string}", function (command) {
         } else if (action.dobj === "out" && beforeRiding) {
           assert.equal(this.game.state.room, beforeRoom, detail);
         } else if (beforeRoom === "garden" && action.dobj === "down") {
-          assert.equal(beforeFly, false, detail);
           assert.equal(this.game.getFlag("wellLooted"), true, detail);
+          if (this.game.has("rope")) {
+            assert.equal(this.game.getFlag("useItem:rope"), true, detail);
+          } else {
+            assert.equal(beforeFly, false, detail);
+          }
           assert.ok(this.game.state.score > beforeScore, detail);
         } else {
           const exit = world.rooms[beforeRoom].exits?.[action.dobj];
@@ -1121,11 +1135,48 @@ Then("every hidden prompt avoids an explicit take immediately before direct use"
     const commands = entry.compoundPrompt.split(";").map((part) => part.trim());
     for (let index = 0; index < commands.length - 1; index += 1) {
       const take = commands[index].match(/^t (\S+)$/);
-      if (take && take[1] !== "obsidian") {
-        assert.notEqual(commands[index + 1], `u ${take[1]}`, `${entry.cmd}: ${take[1]}`);
+      if (take) {
+        assert.ok(!new RegExp(`^(?:u|read) ${take[1]}$`).test(commands[index + 1]),
+          `${entry.cmd}: ${take[1]}`);
       }
     }
   }
+});
+
+Given("the player is awaiting self-fire survival", function () {
+  this.game.setFlag("selfFireAwaitingSurvival", true);
+});
+
+Given("the self-dousing source {string} is ready", function (source) {
+  if (["water", "jug"].includes(source)) {
+    this.game.moveItem("milkJug", "inventory");
+    this.game.item("milkJug").filled = true;
+    return;
+  }
+  if (source === "milk") {
+    this.game.moveItem("milk", "inventory");
+    return;
+  }
+  if (source === "wine") {
+    this.game.moveItem("wineBottle", "inventory");
+    this.game.item("wineBottle").open = true;
+    return;
+  }
+  throw new Error(`Unknown self-dousing source: ${source}`);
+});
+
+Then("command {string} behaves exactly like {string}", function (firstCommand, secondCommand) {
+  const snapshot = this.game.snapshot();
+  const first = createGame(world);
+  first.restore(snapshot);
+  const second = createGame(world);
+  second.restore(snapshot);
+  assert.equal(first.send(firstCommand), second.send(secondCommand));
+  const firstSnapshot = first.snapshot();
+  const secondSnapshot = second.snapshot();
+  delete firstSnapshot.previousCommand;
+  delete secondSnapshot.previousCommand;
+  assert.deepEqual(firstSnapshot, secondSnapshot);
 });
 
 Then("every hidden prompt uses globally unique one-word targets", function () {

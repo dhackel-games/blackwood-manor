@@ -102,8 +102,9 @@ bug <description> | Report bug / Open a GitHub issue with session diagnostics.
 clear | Clear / Erase the entire scrollback and redisplay the basic prompt for the current room.
 (c)lose/shut <thing> | Close / Close an open door or container.
 combine/assemble <things> | Combine / Join puzzle pieces when their content supports it.
+dial <setting> | Dial / Set a visible dial; bare DIAL or DIAL GARY calls the hint line.
 drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
-extinguish <thing> | Extinguish / Put out a light or flame.
+ext/extinguish [thing] | Extinguish / Put out yourself first when burning, or a lit thing in scope.
 fight/brawl <thing> | Fight / Pick a fight when content makes one meaningful.
 fill/refill <container> | Fill / Fill a container from a local source.
 get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
@@ -120,7 +121,7 @@ lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 move <thing> | Move / Shift or jostle something.
 (n)orth, (s)outh, (e)ast, (w)est, northeast (ne), northwest (nw), southeast (se), southwest (sw), (u)p, (d)own, in, out | Directions / Go that direction.
 (o)pen <thing> [w/<key>] | Open / Unlock with a supplied key, then open.
-pour/tip <thing> on <target> | Pour / Pour something where content supports it.
+pour/tip <thing> [on <target>] | Pour / Use a liquid or item on a target; equivalent to USE <thing> ON <target>.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
 put/place <thing>/all in <container/slot> | Put / Place one carried item or every unworn carried item inside a container.
@@ -146,7 +147,7 @@ throw <thing> at <target> | Throw / Throw a carried item.
 top | Top / Scroll to the top of the page.
 turn/rotate/spin <thing> | Turn / Turn an object when content gives it a position.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
-(u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
+(u)se/wear/don/eat/drink <thing> [on <target>] | Use / Use an item; equipment is worn and food or drink is consumed. USE <thing> ON <target> equals POUR.
 verbose | Verbose mode / Always print full room descriptions.
 (ver)sion/build | Version / Show the loaded build and compare iOS cached content with GitHub.io.
 wait/(z) | Wait / Let one turn pass.
@@ -240,8 +241,7 @@ function takeAll(ctx, cmd) {
   const results = [];
   const leftBehind = [];
   for (const item of candidates) {
-    const limit = Math.max(ctx.inventoryCapacity(), item.carryCapacity || 0);
-    if (ctx.inventoryLoad() >= limit) {
+    if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
       leftBehind.push(item.names[0]);
       continue;
     }
@@ -252,15 +252,11 @@ function takeAll(ctx, cmd) {
     }
     const handled = runBulkItemHandler(ctx, "take", item, cmd);
     if (handled != null) {
-      results.push(`${item.names[0]}: ${handled}` +
-        (ctx.has(item.id) && item.worn ? ctx.awardUse?.(item) || "" : ""));
+      results.push(`${item.names[0]}: ${handled}`);
       continue;
     }
     ctx.moveItem(item.id, "inventory");
-    const autoWorn = item.autoWearOnTake && (!item.wearSlot || !ctx.equipped(item.wearSlot));
-    if (autoWorn) item.worn = true;
-    results.push(`${item.names[0].toUpperCase()}: ${autoWorn ? "Taken and worn." : "Taken."}` +
-      pickupAward(ctx, item) + (autoWorn ? ctx.awardUse?.(item) || "" : ""));
+    results.push(`${item.names[0].toUpperCase()}: Taken.` + pickupAward(ctx, item));
   }
   if (leftBehind.length) {
     results.push(source
@@ -294,8 +290,8 @@ function putAll(ctx, cmd) {
   const dest = resolved.container;
   const inventory = ctx.inventory().filter((item) => item.id !== dest.id);
   if (!inventory.length) return "You aren't carrying anything to put there.";
-  const candidates = inventory.filter((item) => !item.worn);
-  const worn = inventory.filter((item) => item.worn);
+  const candidates = inventory.filter((item) => !item.worn
+    || (dest.id === "reliquary" && item.treasure));
   const results = [];
   const leftBehind = [];
   const bulkTransferStartItems = ctx.itemsIn(dest.id).map((item) => item.id);
@@ -321,6 +317,7 @@ function putAll(ctx, cmd) {
   if (leftBehind.length) {
     results.push(`The ${dest.names[0]} is full. Left in your inventory: ${leftBehind.join(", ")}.`);
   }
+  const worn = inventory.filter((item) => item.worn);
   if (worn.length) {
     results.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
   }
@@ -388,19 +385,15 @@ export const commands = {
   take(ctx, cmd) {
     if (!cmd.dobj) return "Take what?";
     if (cmd.dobj === "all" || cmd.dobj === "everything") return takeAll(ctx, cmd);
-    const it = ctx.find(cmd.dobj);
+    const it = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
     if (ctx.has(it.id)) return "You already have that.";
     const blocked = ctx.acquisitionBlock?.(it);
     if (blocked) return blocked;
     if (it.fixed || !it.takeable) return "That's hardly portable.";
-    if (ctx.inventoryLoad() >= Math.max(ctx.inventoryCapacity(), it.carryCapacity || 0))
+    if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
       return "Your hands are full. You'll have to drop something first.";
     ctx.moveItem(it.id, "inventory");
-    if (it.autoWearOnTake && (!it.wearSlot || !ctx.equipped(it.wearSlot))) {
-      it.worn = true;
-      return "Taken and worn." + pickupAward(ctx, it) + (ctx.awardUse?.(it) || "");
-    }
     return "Taken." + pickupAward(ctx, it);
   },
 
@@ -542,7 +535,12 @@ export const commands = {
     if (it.worn) return "You're already wearing it.";
     if (it.wearSlot) {
       const occupied = ctx.equipped(it.wearSlot);
-      if (occupied) return `Your ${it.wearSlot} slot is already occupied by the ${occupied.names[0]}.`;
+      if (occupied) {
+        if (!it.treasure || !occupied.treasure) {
+          return `Your ${it.wearSlot} slot is already occupied by the ${occupied.names[0]}.`;
+        }
+        occupied.worn = false;
+      }
     }
     it.worn = true;
     if (it.activatesOnWear && (it.fuel == null || it.fuel > 0)) {

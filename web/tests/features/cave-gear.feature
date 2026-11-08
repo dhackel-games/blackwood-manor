@@ -16,11 +16,42 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And I send "down"
     Then the output contains "BACKPACK"
     When I send "take backpack"
-    Then the output contains "Taken and worn"
+    Then the output contains "Taken"
+    And item "backpack" is carried
+    And item "backpack" is not worn
+    And the inventory capacity is 6
+    And the inventory load is 1
+    When I send "use backpack"
+    Then the output contains "(wear STURDY BACKPACK)"
     And item "backpack" is worn in slot "back"
     And the inventory capacity is 36
     And the inventory load is 0
     And the inventory HUD shows "👜" with "0/36"
+
+  Scenario: TAKE ALL leaves the backpack unworn until a USE derives taking and wearing it
+    Given the player is in room "deepShaft"
+    When I send "take all"
+    Then item "backpack" is carried
+    And item "backpack" is not worn
+    And the inventory capacity is 6
+    And the inventory load is 1
+    Given a fresh manor game
+    And the player is in room "deepShaft"
+    When I send "use backpack"
+    Then the output contains "(get STURDY BACKPACK; wear STURDY BACKPACK)"
+    And item "backpack" is worn in slot "back"
+    And flag "progressItem:backpack" is set
+    And flag "useItem:backpack" is set
+    And the game score is 10
+    When I send "use backpack"
+    Then the game score is 10
+
+  Scenario: A saved worn backpack remains worn after restore
+    Given item "backpack" is carried
+    When I send "wear backpack"
+    And I round-trip the game snapshot
+    Then item "backpack" is worn in slot "back"
+    And the inventory capacity is 36
 
   Scenario: The mining headlamp lights the deep shaft for two hundred turns
     Given flag "dragonMoved" is set
@@ -74,8 +105,8 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the inventory load is 0
     When the player moves directly to room "grandHall"
     And I send "put ring in reliquary"
-    Then the output contains "Remove the ravenblood ring"
-    And item "rubyRing" is worn in slot "finger"
+    Then the output contains "You slip off the ravenblood ring"
+    And item "rubyRing" is in "reliquary"
 
   Scenario: Only one item can occupy an equipment slot
     Given item "headlamp" is carried
@@ -129,6 +160,30 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And the output contains "BM WATCH"
     And the output contains "XRAY GOGGLES"
 
+  Scenario Outline: PUT ALL IN RQ slips off and seats a worn heirloom
+    Given item "goldLocket" is carried
+    And item "<item>" is carried
+    And the player is in room "grandHall"
+    When I send "wear <wear>"
+    And I send "put all in reliquary"
+    Then item "<item>" is in "reliquary"
+    And the output contains "You slip off"
+    And the output does not contain "Still worn"
+
+    Examples:
+      | item       | wear       |
+      | rubyRing   | ravenblood |
+      | familyRing | family     |
+      | talisman   | talisman   |
+
+  Scenario: PUT ALL IN RQ keeps the talisman worn until the crypt locket is recovered
+    Given item "talisman" is carried
+    And the player is in room "grandHall"
+    When I send "wear talisman"
+    And I send "put all in reliquary"
+    Then the output contains "still has work to do against the WRAITH"
+    And item "talisman" is worn in slot "neck"
+
   Scenario: Wearing the WINGED SHOES shows the flying-shoe art and lift-off flavor
     Given item "wingedShoes" is carried
     And the player is in room "garden"
@@ -165,6 +220,28 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And I send "up"
     Then the game is alive
     And the current room is "attic"
+
+  Scenario Outline: A carried rope takes precedence over flight for every well descent form
+    Given item "wingedShoes" is carried
+    And item "rope" is carried
+    And the player is in room "garden"
+    When I send "wear shoes"
+    And I send "<command>"
+    Then the game is alive
+    And the output contains "Bracing against the rope"
+    And flag "useItem:rope" is set
+    And item "ancientCoin" is in "garden"
+    And the game score is 15
+    When I send "down"
+    Then the game score is 15
+
+    Examples:
+      | command                   |
+      | climb down rope           |
+      | use rope                  |
+      | down with rope            |
+      | climb down well with rope |
+      | down                      |
 
   Scenario Outline: Mushrooms can fly to every named rooftop room
     Given flag "high" is 8

@@ -72,7 +72,7 @@ function rindDescription() {
 const rooms = {};
 const items = {
   demogorgonzola: {
-    names: ["demogorgonzola", "monster", "cheese monster", "creature"],
+    names: ["demogorgonzola", "demo", "monster", "cheese monster", "creature"],
     loc: "cheeseGrotto",
     fixed: true,
     on: {
@@ -126,7 +126,7 @@ const content = {
 };
 const shortNames = {
   items: {
-    demogorgonzola: "demo",
+    demogorgonzola: "dg",
     demogorgonzolaRind: "rind",
   },
 };

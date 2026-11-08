@@ -84,8 +84,27 @@ Feature: The mushroom trip's third eye
     When I send "use eye"
     Then item "obsidianEye" is worn in slot "forehead"
     And flag "obsidianEyeClaimed" is set
+    And flag "progressItem:obsidianEye" is set
+    And flag "useItem:obsidianEye" is set
     And the game score is 25
     And the output contains "(get OBSIDIAN EYE; wear OBSIDIAN EYE)"
+    When I send "use eye"
+    Then the game score is 25
+
+  Scenario Outline: Implicit reads, meals, and drinks award pickup and use only once
+    Given the player is in room "<room>"
+    When I send "<command>"
+    Then flag "progressItem:<item>" is set
+    And flag "useItem:<item>" is set
+    And the game score is <score>
+    When I send "<command>"
+    Then the game score is <score>
+
+    Examples:
+      | room      | command      | item           | score |
+      | grandHall | read package | mysteryPackage | 10    |
+      | kitchen   | eat apple    | apple          | 10    |
+      | kitchen   | drink milk   | milk           | 15    |
 
   Scenario: The Obsidian Eye and XRAY GOGGLES can be worn together
     Given item "obsidianEye" is carried

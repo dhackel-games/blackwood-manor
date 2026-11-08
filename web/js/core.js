@@ -168,7 +168,7 @@ export function createGame(world) {
   game.inventoryLoad = () => game.inventory().filter((item) => !item.worn).length;
   game.inventoryCapacity = () => Math.max(
     world.config.maxCarry ?? 99,
-    ...game.inventory().map((item) => item.carryCapacity || 0),
+    ...game.inventory().filter((item) => item.worn).map((item) => item.carryCapacity || 0),
   );
   game.equipped = (slot) => game.inventory().find((item) => item.worn && (!slot || item.wearSlot === slot)) || null;
   game.roomOf = (id) => (state.items[id] ? state.items[id].loc : undefined);
@@ -502,7 +502,7 @@ export function createGame(world) {
 
   // Content override hook: item-targeted handler first, then room handler.
   function runHandlers(cmd) {
-    const direct = cmd.dobj ? game.find(cmd.dobj) : null;
+    const direct = cmd.itemId ? game.item(cmd.itemId) : (cmd.dobj ? game.find(cmd.dobj) : null);
     const indirect = cmd.iobj ? game.find(cmd.iobj) : null;
     const directDefinition = itemDefinition(direct);
     const indirectDefinition = itemDefinition(indirect);
@@ -515,9 +515,14 @@ export function createGame(world) {
     if (direct) targets.push(directDefinition);
     if (indirect && indirect.id !== direct?.id) targets.push(indirectDefinition);
     targets.push(world.rooms[state.room]);
-    for (const t of targets) {
-      const h = t && t.on && t.on[cmd.verb];
-      if (h) { const r = h(game, cmd); if (r != null) return r; }
+    const verbs = ["use", "pour"].includes(cmd.verb)
+      ? ["pour", "use"]
+      : [cmd.verb];
+    for (const verb of verbs) {
+      for (const t of targets) {
+        const h = t && t.on && t.on[verb];
+        if (h) { const r = h(game, cmd); if (r != null) return r; }
+      }
     }
     return null;
   }
@@ -584,12 +589,12 @@ export function createGame(world) {
   }
 
   function implicitlyAcquire(cmd) {
-    if (!["read", "eat", "drink", "wear"].includes(cmd.verb) || !cmd.dobj) return null;
+    if (!["read", "eat", "drink", "wear", "use"].includes(cmd.verb) || !cmd.dobj) return null;
     const item = game.find(cmd.dobj);
     if (!item || !item.takeable || game.has(item.id)) return null;
     const blocked = game.acquisitionBlock(item);
     if (blocked) return { blocked, step: `get ${itemTitle(item)}` };
-    if (game.inventoryLoad() >= Math.max(game.inventoryCapacity(), item.carryCapacity || 0)) {
+    if (game.inventoryLoad() >= game.inventoryCapacity()) {
       return {
         blocked: `Your hands are full. You cannot get the ${item.names[0]} first.`,
         step: `get ${itemTitle(item)}`,
@@ -602,19 +607,7 @@ export function createGame(world) {
       iobj: null,
       itemId: item.id,
     };
-    const itemHandler = itemDefinition(item)?.on?.take;
-    let result = itemHandler ? itemHandler(game, takeCommand) : null;
-    const roomHandler = world.rooms[state.room]?.on?.take;
-    if (result == null && roomHandler) result = roomHandler(game, takeCommand);
-    if (result == null) {
-      game.moveItem(item.id, "inventory");
-      if (item.autoWearOnTake && (!item.wearSlot || !game.equipped(item.wearSlot))) {
-        item.worn = true;
-        result = "Taken and worn.";
-      } else {
-        result = "Taken.";
-      }
-    }
+    let result = dispatchWithoutTick(takeCommand);
     if (game.has(item.id)) {
       result = (result || "Taken.") + game.awardPickup(item);
       if (item.worn && cmd.verb === "wear") result += game.awardUse(item);
@@ -653,7 +646,8 @@ export function createGame(world) {
   }
 
   function inferUseAction(cmd) {
-    if (cmd.verb !== "use" || !cmd.dobj) return null;
+    if (!["use", "pour"].includes(cmd.verb) || !cmd.dobj) return null;
+    if (cmd.iobj) return null;
     const carried = game.findItems(cmd.dobj, game.inventory()) || [];
     if (carried.length > 1) {
       const choices = [...carried].sort((a, b) => Number(!!b.fresh) - Number(!!a.fresh));
@@ -777,7 +771,7 @@ export function createGame(world) {
     if (override != null) {
       text = override;
     } else {
-      const handler = commands[cmd.verb];
+      const handler = commands[cmd.verb === "pour" && cmd.dobj ? "use" : cmd.verb];
       const r = handler ? handler(game, cmd) : "You can't do that.";
       text = r == null ? "You can't do that." : r;
     }
