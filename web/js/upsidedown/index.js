@@ -25,13 +25,21 @@ function mergeRoomHooks(current, additions) {
   return merged;
 }
 
+function mergeContent(current, additions) {
+  const merged = { ...current };
+  for (const [id, prose] of Object.entries(additions || {})) {
+    merged[id] = { ...(merged[id] || {}), ...prose };
+  }
+  return merged;
+}
+
 function mergeModules(entries) {
   return entries.reduce((merged, module) => ({
     rooms: { ...merged.rooms, ...(module.rooms || {}) },
     items: { ...merged.items, ...(module.items || {}) },
     content: {
-      rooms: { ...merged.content.rooms, ...(module.content?.rooms || {}) },
-      items: { ...merged.content.items, ...(module.content?.items || {}) },
+      rooms: mergeContent(merged.content.rooms, module.content?.rooms),
+      items: mergeContent(merged.content.items, module.content?.items),
     },
     shortNames: {
       rooms: { ...merged.shortNames.rooms, ...(module.shortNames?.rooms || {}) },

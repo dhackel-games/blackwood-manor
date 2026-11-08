@@ -1231,6 +1231,27 @@ the LIBRARY displays its still-latched stair and names the LEVER in the
 movement refusal. A visible physical obstruction remains blocked until its
 content puzzle resolves it.
 
+#### 12.36.6 Campfire, lower panel, and the oak lift
+
+WAYLAMP CLEARING's UPSIDE-DOWN CAMPFIRE accepts WINE, MILK, a filled reusable
+MILK JUG, STOMP, or SMOTHER. Its first extinction persists
+`realm:campfireOut`, awards +5 once, and reveals the CYAN GEM; the nearby
+STREAM fills and refills the carried jug without creating a water item.
+
+The OAK UNDERCROFT's LOWER PANEL persists its MAGENTA-top and YELLOW-bottom
+starting slots in `oak:lowerPanelSlots`. CYAN, MAGENTA, and YELLOW must occupy
+BOTTOM, MIDDLE, and TOP respectively; wrong full arrangements eject every gem,
+while bulk transfers are refused. Alignment awards +10 once, sets
+`oak:lowerPanelAligned`, and activates BELOW immediately without a realm-wide
+puzzle gate or an in-game order hint.
+
+Before that alignment, the upper oak's GROUND/ABOVE lift remains unchanged.
+Afterward, `oak:liftBeat` drives GROUND, ABOVE, GROUND, BELOW one turn at a
+time. Riders remain aboard through every stop until OUT, so either the realm
+or the GREAT OAK supports repeat round trips. LOOK UP and WAIT at BELOW report
+the current cycle, and the existing upper-panel award never resets an active
+lower-panel lift.
+
 #### 12.37.1 Blackwood Diamond and DIAL
 
 The PARLOR COAL STACK supplies a single portable COAL LUMP at a time. Its
