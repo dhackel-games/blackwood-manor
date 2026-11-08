@@ -1249,7 +1249,7 @@ Then("every recurring flavor pool has twelve distinct entries and cycles without
     "therapyAsides",
     "signoffs0", "signoffs1", "signoffs2", "signoffs3",
     "waterOffers", "mushroomHigh",
-    "mushroomRevelations",
+    "mushroomRevelations", "highReactions",
     "sickBurp", "sickBarf", "sickFart", "sickPoop",
     "foreshadowEarly", "foreshadowMid", "foreshadowOpen",
     "lightning", "lightningInvitations", "packageOpenings",

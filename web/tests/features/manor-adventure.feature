@@ -535,7 +535,7 @@ Feature: Blackwood Manor adventure
     And item "tinyKey" is carried
     And the player is in room "nursery"
     When I send "look"
-    Then the output contains "TINY KEY-shaped scuff"
+    Then the output contains "WALLPAPER hides a narrow opening"
     And the output contains "WALLPAPER"
     And the output does not contain "TINY KEY gleams inside"
     Given item "rubyRing" is carried

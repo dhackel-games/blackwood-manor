@@ -23,8 +23,8 @@ Feature: Mushroom vision and flight
     And the output contains "purple glimmer"
     When I send "eat mushrooms"
     Then the output contains "(look in OUTHOUSE TOILET; get FRESH MUSHROOMS; eat FRESH MUSHROOMS)"
-    Then the output contains "literal crap and piss"
-    And the output contains "actual human waste"
+    Then the output contains "actual crap and piss"
+    And the output contains "Your bravery is not contagious"
     And flag "high" equals 12
     And item "outhouseMushrooms" is destroyed
     And item "mushrooms" is in "kitchen"
@@ -84,7 +84,7 @@ Feature: Mushroom vision and flight
 
   Scenario: Dried kitchen mushrooms hint that flight is possible
     Then the output contains "dried kitchen mushrooms"
-    Then the output contains "so light you could FLY TO any room you can name"
+    Then the output contains "so light you can FLY TO or FLOAT TO any room you can name"
     And flag "high" equals 12
 
   Scenario: Eating dried and fresh mushrooms adds both durations

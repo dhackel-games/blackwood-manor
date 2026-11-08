@@ -123,7 +123,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     When I send "show library in watch"
     Then the output contains "BM WATCH — LIBRARY"
     And the output contains "THIRD EYE"
-    And the output contains "brass LEVER is polished"
+    And the output contains "A DOWN stair waits behind the bookcase"
     And the output contains "ROUTE READY"
     And the output contains "w; dn; dn; dn; e; s"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; e; s"

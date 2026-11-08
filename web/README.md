@@ -56,13 +56,16 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   brief revisits show their abbreviations on a separate line.
   `go <visible door/object>` infers `enter <object>`, including obvious unlock
   and open steps; named-room GO remains available while flying.
-- **Mushroom powers:** while high, hidden clues appear on first entry, vertical
+- **Shared high powers:** every declared high source uses the same stacking
+  `high` counter. While high, hidden clues appear on first entry, vertical
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
-  `fly to <room>` carries you directly there. Eating another mushroom cluster
-  adds its full duration to the remaining high. The trip's third eye reveals
-  hidden clues and lets you see in dark rooms. The HUD tracks the trip itself
-  as `🍄`, vision as `👁️`, and flight as `🪽`, allowing those capabilities to
-  diverge. Supernatural hazards still apply.
+  `fly to <room>` carries you directly there. The fresh and dried MUSHROOMS
+  each add 12 turns; the source's opening is distinct, but the reaction,
+  capabilities, trip indicator (`🍄`), and end-of-trip text are shared. The
+  trip's third eye reveals what `SEARCH` would find and lets you see in dark
+  rooms. Vision and flight remain separately visible as `👁️` and `🪽`, so
+  permanent equipment can diverge from the trip. Supernatural hazards still
+  apply.
 - **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
   HEADLAMP provides 200 turns of light with a `💡` HUD countdown; the antique

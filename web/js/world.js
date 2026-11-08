@@ -2062,20 +2062,48 @@ const HIGH_LINES = [
   "You can hear the color purple humming from somewhere behind your teeth.",
   "For one radiant moment, you understand the architecture. It is mostly anxiety with stairs.",
 ];
-const MUSHROOM_REVELATIONS = [
+export const HIGH_SOURCE_OPENINGS = Object.freeze({
+  freshMushrooms:
+    "You eat the fresh MUSHROOMS from the TOILET HOLE. They are slick with actual crap and piss, and you know exactly where they grew. Your bravery is not contagious.",
+  driedMushrooms:
+    "You chew through the dried KITCHEN MUSHROOMS. They taste like a dusty cellar and bad judgment; the trip is already catching up.",
+  snuff:
+    "You sniff a pinch from the SNUFFBOX. Your nose fires a sneeze large enough to rattle a portrait, and the world answers by going sideways.",
+  wine:
+    "You take a sip of WINE. It tastes like old plums and a badly kept promise; then the room decides it has elbows.",
+});
+export const MUSHROOM_REVELATIONS = [
   "...oh. OH. Colours have SOUNDS now. The wallpaper is humming directly into your teeth.",
-  "The mushrooms arrive all at once. Every shadow acquires a personality and most seem supportive.",
+  "The trip arrives all at once. Every shadow acquires a personality and most seem supportive.",
   "A purple chord rings behind your eyes. The manor unfolds like a diagram drawn by an anxious wizard.",
   "The floor exhales beneath you, the ceiling leans closer, and perspective becomes an optional courtesy.",
   "Your thoughts grow feathers. Gravity looks embarrassed to have taken itself so seriously.",
   "The room separates into light, sound, and several new categories for which language has not prepared you.",
   "Every edge glows with private meaning. Even the dust seems to know where it is going.",
-  "The mushrooms kick open a door behind your forehead and leave the hinges spinning.",
+  "The trip kicks open a door behind your forehead and leaves the hinges spinning.",
   "Colour pours through the silence. For one lucid second, the entire house makes terrible sense.",
   "Your pulse becomes visible, your shadow becomes opinionated, and the walls begin breathing in rounds.",
   "A warm violet buzz climbs your spine. Reality loosens its collar and stops enforcing the dress code.",
   "The manor turns translucent around you, less a building now than a nervous system with wallpaper.",
 ];
+export const HIGH_REACTIONS = [
+  "You are high. The ceiling has adopted an accent, and it is not from here.",
+  "You are high enough to hear two floorboards debating whether they are load-bearing.",
+  "The trip makes your shadow look like it has been elected to local office.",
+  "You are high. A staircase waves hello with the confidence of an old friend.",
+  "The trip informs you that your elbows have been quietly doing excellent work.",
+  "You are high enough to suspect every locked door is practicing its poker face.",
+  "The wallpaper breathes so politely that you almost thank it for waiting.",
+  "You are high. Time has pulled up a chair and is refusing to explain its schedule.",
+  "The trip makes a dust mote look like the mayor of a very small galaxy.",
+  "You are high enough to feel the floor negotiate a truce with gravity.",
+  "The old house looks briefly like a diagram drawn by a worried octopus.",
+  "You are high. Your third eye blinks at a wall and the wall looks away first.",
+];
+export const SHARED_HIGH_CAPABILITY_TEXT =
+  "Your body feels so light you can FLY TO or FLOAT TO any room you can name. An astral eye opens between your brows. " +
+  "The dark becomes legible grey, and a SECRET DOOR shows itself in the ATTIC's north gable. " +
+  "(Your THIRD EYE is open: hidden details and dark rooms are visible while the trip lasts.)";
 const SICK_DURATION = 40;
 const SICK_BURP_LINES = [
   "A blast of stomach acid climbs your throat and escapes as a burp hot enough to tarnish silver.",
@@ -2163,25 +2191,41 @@ const DIARRHEA_ART = [
   "         _||_   ( pants )  . ° tiny embers ° .",
 ].join("\n");
 const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
-function eatMushrooms(ctx, cmd) {
-  const mushrooms = ctx.find(cmd.dobj);
-  const use = ctx.awardUse(mushrooms);
-  if (mushrooms) ctx.destroy(mushrooms.id);
-  ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 12));
+export function beginHigh(ctx, { opening, turns }) {
+  ctx.setFlag("high", (ctx.getFlag("high") || 0) + turns);
   ctx.setFlag("highGrace", true);
-  ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
   const points = awardProgress(ctx, "mushroomVisionOpened");
-  const origin = mushrooms?.fresh
-    ? "You eat the fresh mushrooms. They are slick with literal crap and piss from the TOILET HOLE — " +
-      "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway."
-    : "You chew through the dried kitchen mushrooms. They are dusty and bitter, but the trip hits just the same.";
-  return origin + "\n\n" + cycleFlavor(ctx, "mushroomRevelations") + "\n\n" +
-    "The house isn't haunted, man — it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
-    "Your body feels so light you could FLY TO any room you can name.\n\n" +
-    "Something else opens too: between your brows, an astral eye blinks awake. The dark of the house turns " +
-    "to legible grey, and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, behind it " +
-    "something that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark, and hidden " +
-    "detail keeps revealing itself while the trip lasts.)" + awardSuffix(points) + use;
+  return opening + "\n\n" + cycleFlavor(ctx, "mushroomRevelations") + "\n\n" +
+    cycleFlavor(ctx, "highReactions") + "\n\n" + SHARED_HIGH_CAPABILITY_TEXT + awardSuffix(points);
+}
+
+function highSourceActions(item) {
+  const declared = item.highSource?.actions;
+  if (declared) return declared;
+  return [
+    ...(item.edible ? ["eat"] : []),
+    ...(item.drinkable ? ["drink"] : []),
+    ...(item.sniffable ? ["smell"] : []),
+    ...(item.usable ? ["use"] : []),
+  ];
+}
+
+function useHighSource(ctx, item, cmd) {
+  const source = item?.highSource;
+  if (!source || !highSourceActions(item).includes(cmd.verb)) return null;
+  const doses = Number.isFinite(source.doses) ? source.doses : null;
+  if (doses !== null && doses <= 0) {
+    return source.emptyMessage || `The ${item.names[0].toUpperCase()} is empty.`;
+  }
+
+  const use = ctx.awardUse(item);
+  if (doses === null) {
+    ctx.destroy(item.id);
+  } else {
+    source.doses -= 1;
+    if (source.doses === 0 && source.whenEmpty === "destroy") ctx.destroy(item.id);
+  }
+  return beginHigh(ctx, source) + use;
 }
 
 function capabilityStatus(ctx, equipmentFlag) {
@@ -2209,6 +2253,10 @@ function hasMushroomVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
     || ctx.inventory().some((item) =>
       item.worn && (item.grantsMushroomVision || item.grantsHiddenSight));
+}
+function revealHiddenSight(ctx) {
+  const hook = ctx.room()?.hiddenSight;
+  return typeof hook === "function" ? hook(ctx) : null;
 }
 function hasDarkVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
@@ -3210,6 +3258,7 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   waterOffers: WATER_OFFERS,
   mushroomHigh: HIGH_LINES,
   mushroomRevelations: MUSHROOM_REVELATIONS,
+  highReactions: HIGH_REACTIONS,
   sickBurp: SICK_BURP_LINES,
   sickBarf: SICK_BARF_LINES,
   sickFart: SICK_FART_LINES,
@@ -3701,6 +3750,8 @@ const logicWorld = {
   canFly,            // temporary mushroom flight or worn WINGED SHOES
   hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
   hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
+  revealHiddenSight,
+  useHighSource,
   flavorPools: CYCLING_FLAVOR_POOLS,
   cycleFlavor,
   awardProgress,
@@ -4358,7 +4409,11 @@ const logicWorld = {
       exits: {
         north: "parlor",
         down: { to: "secretChamber", via: "leverPulled", revealedBy: "leverPulled",
-          lockedMsg: "The shelves stand solid and shut." },
+          lockedMsg(ctx) {
+            return hasMushroomVision(ctx)
+              ? "You can see the stair behind the shelves, but the bookcase is still shut. PULL the LEVER to open it."
+              : "The shelves stand solid and shut.";
+          } },
       },
     },
 
@@ -4450,6 +4505,9 @@ const logicWorld = {
 
     nursery: {
       art: ROOM_ART.nursery,
+      hiddenSight(ctx) {
+        return ctx.getFlag("wallGapFound") ? null : revealWallGap(ctx);
+      },
       exits: {
         east: "landing",
         // A crawl-gap into the space between the walls — the one deliberate,
@@ -4492,6 +4550,10 @@ const logicWorld = {
     attic: {
       art: ROOM_ART.attic,
       extraDirections: (ctx) => canFly(ctx) ? ["up"] : [],
+      hiddenSight(ctx) {
+        if (!ctx.getFlag("vaultFound")) ctx.setFlag("vaultFound", true);
+        return null;
+      },
       exits: {
         down: "landing",
         // The astral door in the north gable — hidden and impassable until the
@@ -4784,14 +4846,19 @@ const logicWorld = {
     // --- kitchen edibles: high / sick / help ---
     mushrooms: {
       names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
-      loc: "kitchen", takeable: true, edible: true, highTurns: 12,
-      on: { eat: eatMushrooms },
+      loc: "kitchen", takeable: true, edible: true,
+      highSource: {
+        opening: HIGH_SOURCE_OPENINGS.driedMushrooms, turns: 12, whenEmpty: "destroy",
+      },
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
       adjectives: ["fresh", "crap-fueled", "purple", "toilet"],
-      loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
-      on: { take: takeToiletMushrooms, eat: eatMushrooms },
+      loc: null, takeable: true, edible: true, fresh: true,
+      highSource: {
+        opening: HIGH_SOURCE_OPENINGS.freshMushrooms, turns: 12, whenEmpty: "destroy",
+      },
+      on: { take: takeToiletMushrooms },
     },
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
@@ -5285,6 +5352,29 @@ function mergeContentModules(baseWorld) {
           return null;
         };
       }
+    }
+  }
+  for (const module of CONTENT_MODULES) {
+    for (const [roomId, hooks] of Object.entries(module.hiddenSightHooks || {})) {
+      const room = merged.rooms[roomId];
+      if (!room) throw new Error(`Content module hidden-sight hook targets unknown room "${roomId}".`);
+      const existing = room.hiddenSight;
+      const additions = Array.isArray(hooks) ? hooks : [hooks];
+      room.hiddenSight = (ctx) => {
+        const results = [existing?.(ctx), ...additions.map((hook) => hook(ctx))].filter(Boolean);
+        return results.length ? results.join("\n\n") : null;
+      };
+    }
+  }
+  for (const item of Object.values(merged.items)) {
+    if (!item.highSource) continue;
+    item.on = { ...(item.on || {}) };
+    for (const verb of highSourceActions(item)) {
+      const existing = item.on[verb];
+      item.on[verb] = (ctx, cmd) => {
+        const result = useHighSource(ctx, ctx.find(cmd.dobj), cmd);
+        return result ?? existing?.(ctx, cmd) ?? null;
+      };
     }
   }
   return merged;
