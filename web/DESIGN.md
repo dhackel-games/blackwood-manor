@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1374,4 +1374,4 @@ sip destroys that physical bottle after the shared-high output; its rack
 replacement is already waiting. Bare BOTTLE remains MILK except for the cellar
 TAKE BOTTLE and OPEN BOTTLE WITH CORKSCREW collision rules.
 
-
+<!-- end DESIGN.md -->

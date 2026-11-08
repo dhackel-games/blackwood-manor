@@ -1,4 +1,4 @@
-// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
 
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";
@@ -95,7 +95,7 @@ Then("the roof gargoyles are fixed and the weathervane is a treasure", function 
 });
 
 Then("every roof gargoyle reply comes to life, does its deed, apologizes, and turns back to stone", function () {
-  const deeds = { gargoylePuffCheeks: /BURP/, gargoyleNosePinch: /FART/, gargoyleRearGuard: /SHART|SPLATTER|POOP EXPLOSION|ERUPTS|BLAST/ };
+  const deeds = { gargoylePuffCheeks: /BURP/, gargoyleNosePinch: /FART/, gargoyleRearGuard: /SHART|SPLATTER|POOP EXPLOSION|ERUPTS/ };
   for (const [key, deed] of Object.entries(deeds)) {
     const pool = world.flavorPools[key];
     assert.equal(pool.length, 12);
@@ -104,7 +104,9 @@ Then("every roof gargoyle reply comes to life, does its deed, apologizes, and tu
       assert.match(line, /(life|wak|animates|alive|blinks|twitches|shudders|springs)/i, `${key} must come to life: ${line}`);
       assert.match(line, deed, `${key} must perform its deed: ${line}`);
       assert.match(line, /(sorry|pardon|apolog|excuse me|forgive)/i, `${key} must apologize: ${line}`);
-      assert.match(line, /(stone|statue|stiffen|freez|petrif|still|solidif|harden)/i, `${key} must return to stone: ${line}`);
+      const lastSentence = line.trim().split(/(?<=\.)\s+(?=[A-Z])/).pop();
+      assert.match(lastSentence, /\b(stone|statue|petrif)/i, `${key} must end back in stone: ${line}`);
+      assert.match(line, /\byou(r)?\b/i, `${key} must hit the player: ${line}`);
       assert.doesNotMatch(line, /silver|rooster|weathercock|BURPER|FARTER|SHITTER/i);
     }
   }
