@@ -2,16 +2,16 @@
 
 # Action Pipelines: master orchestration
 
-Status: inProgress. Follow-up to the released [Doomsday Clock master](2026-11-07_plan_done_DoomsdayClock.md), driven by AndrewC's 2026-11-08 playtest notes on `::win` and verbs.
+Status: done. Pushed directly to origin/main as bd9a520 (PR waived by AndrewC); Pages serves CONTENT_VERSION 20261108002.
 
 ## Current status
 
 * Code complete on branch `fix/sysop-divad`: 790/790 scenarios pass; `::win` is 201 steps (was 232), 68 walking transitions, 2 named flights, 0 doffs, and 1236/1236.
-* Todos: 26 done / 28 total (93%); 2 remaining.
+* Todos: 28 done / 28 total (100%); 0 remaining.
 * Coding progress: the pre-push ARCH/QUALITY/PROCESS triad and its consolidated fix pass are complete; the requested no-push scope leaves only the downstream push and operator reload notice.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.
-* Next shareable build: content 2026.11.8 build 2 (20261108002) goes live on GitHub Pages and to installed iOS apps by OTA as soon as the branch reaches origin/main and Pages deploys.
+* Next shareable build: live now; content 20261108002 on GitHub Pages and by OTA to installed iOS apps.
 * BLOCKERS: EMPTY.
 
 ## Stated goals
@@ -57,8 +57,8 @@ Status: inProgress. Follow-up to the released [Doomsday Clock master](2026-11-07
 * [x] X. A worn BACKPACK holds 36 normally and 100 immediately after any sysop password unlock; the saved unlock survives restore and the HUD reports 🎒 `used/100`.
 * [x] Run the one pre-push ARCH/QUALITY/PROCESS curmudgeon triad on `fix/sysop-divad` and apply every finding in one fix pass. Disposition: ARCH fixed BRAZIER reward/reveal idempotence, closed-FRIDGE knowledge gating, weathercock definition rebasing, and gargoyle identity/directions; QUALITY fixed automatic toilet revelation preserving Extra Super Duper Helpless; PROCESS fixed explicit known-container TAKE derivation, `_orch.md` identity pointers, and the moved D-L14 decision.
 * [x] Final validation: full `cd web && npm test` exits 0 (790 scenarios, 6851 steps); `node tools/route-plan.mjs` reports 1236/1236 in 201 steps, 68 walking transitions, and 2 named flights.
-* [ ] Push directly to origin/main (PR waived by AndrewC) and verify the Pages deploy serves CONTENT_VERSION 20261108002.
-* [ ] Tell AndrewC the build is ready to reload; flip this master to `_done_` in a separate commit.
+* [x] Push directly to origin/main (PR waived by AndrewC) and verify the Pages deploy serves CONTENT_VERSION 20261108002.
+* [x] Tell AndrewC the build is ready to reload; flip this master to `_done_` in a separate commit.
 
 ## Decisions
 
