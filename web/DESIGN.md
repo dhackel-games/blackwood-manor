@@ -274,6 +274,19 @@ SHARD, and loose CANDLE now each earn +5 on first acquisition and +5 on first
 successful use; the BLACKWOOD HAMMER and BLACKWOOD FAMILY RING retain +12 and
 +20 deposit values in addition to those universal rewards.
 
+ONE TRIP awards +25 once when one `PUT ALL IN RQ` or `DROP ALL IN RQ` seats all
+twenty-four heirlooms while none were seated at the command's start. Its
+`progressAward:oneTrip` ledger survives saves; any single or incomplete
+heirloom deposit persists the forfeit, so neither partial seating nor a later
+bulk transfer can farm the award. The BACKPACK carries 36 items, the measured
+all-in delivery peak: twenty-four heirlooms plus twelve required tools. The
+RELIQUARY's 36 places leave those tools room beside its twenty-four fitted
+recesses. The existing single MATCH already lights the CANDLE (verified in
+`fire-food.feature`); no behavior changed. Body fire remains the BRAZIER's
+highest-paying method at +30 versus +10 for a candle or candelabra, including
+when the player ignites several turns before reaching it and survives within
+the burn limit.
+
 Every obtainable Part-I portable object earns +5 once on acquisition and +5
 once on meaningful use. This includes safe handling of benign keepsakes,
 implicit/custom/bulk pickups, and generated wrapper, doubloon, and clock.
@@ -291,8 +304,8 @@ flags are preserved; an originally hidden item at null or a revealed item
 still at its spawn location does not establish pickup.
 The pre-ending Part-I maximum is derived, never hardcoded: +330 heirloom
 deposits (the original 195 plus 80 realm and 55 manor), +310 portable pickups,
-+310 portable uses, +281 puzzle/progression awards, and +60 standalone
-rewards: **1291**.
++310 portable uses, +306 puzzle/progression awards (including ONE TRIP), and
++60 standalone rewards: **1316**.
 
 `::win` starts at the privy, eats fresh mushrooms, flies once to the shaft
 for the backpack, then traverses connected rooms: gallery/troll/crest/shoes,
@@ -301,7 +314,7 @@ self-fire brazier, oak's actual pulley platform, library/bedrooms/nursery gap,
 attic/roof/belfry/hidden vault, and wine cellar/crypt. Phase B updates `::win` to deposit all twenty-four heirlooms, close the
 RELIQUARY, ring the closet bell, **take and read the DOOMSDAY CLOCK**, and stop
 alive in the ROYAL HALL before SOUTH or DOWN. SOUTH then adds the existing +45
-end badges for **1336**; DOWN meets Gary and enters Part II at **1291**. The
+end badges for **1361**; DOWN meets Gary and enters Part II at **1316**. The
 MYSTERY PACKAGE is carried and read safely
 but never opened; opening it voluntarily instead earns its one-time use credit
 before the box disappears, alongside a random consequence. After the bell,
@@ -312,7 +325,8 @@ It never walks SOUTH into an ending on a repeat invocation.
 
 For reference, the deterministic fresh `::win` expansion has 165 commands,
 75 directional commands, 77 actual room transitions, one named-room flight,
-and peak inventory load 12/20; the headlamp retains 42 fuel turns. The
+and its former route peak inventory load was 12/20; the all-in delivery
+capacity is 36/36. The headlamp retains 42 fuel turns. The
 previous maximum-bell expansion had 113 commands, 19 directional commands,
 and 21 named-room flights. This comparison demonstrates the intended
 tradeoff for exhaustive collection and physical traversal, not a claim of

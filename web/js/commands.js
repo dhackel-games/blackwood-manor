@@ -215,10 +215,10 @@ function runBulkItemHandler(ctx, verb, item, cmd) {
   return handled;
 }
 
-function appendBulkTransferSummary(ctx, container, results) {
+function appendBulkTransferSummary(ctx, container, results, cmd) {
   const summarize = ctx.world.items[container.id]?.bulkTransferSummary;
   if (typeof summarize !== "function") return;
-  const summary = summarize(ctx);
+  const summary = summarize(ctx, cmd);
   if (summary) results.push(summary);
 }
 
@@ -298,13 +298,17 @@ function putAll(ctx, cmd) {
   const worn = inventory.filter((item) => item.worn);
   const results = [];
   const leftBehind = [];
+  const bulkTransferStartItems = ctx.itemsIn(dest.id).map((item) => item.id);
 
   for (const item of candidates) {
     if (ctx.itemsIn(dest.id).length >= (dest.capacity ?? 99)) {
       leftBehind.push(item.names[0]);
       continue;
     }
-    const handled = runBulkItemHandler(ctx, "put", item, cmd);
+    const handled = runBulkItemHandler(ctx, "put", item, {
+      ...cmd,
+      bulkTransferStartItems,
+    });
     if (handled != null) {
       results.push(`${item.names[0]}: ${handled}`);
       continue;
@@ -320,7 +324,11 @@ function putAll(ctx, cmd) {
   if (worn.length) {
     results.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
   }
-  appendBulkTransferSummary(ctx, dest, results);
+  appendBulkTransferSummary(ctx, dest, results, {
+    ...cmd,
+    bulkTransfer: true,
+    bulkTransferStartItems,
+  });
   return results.join("\n");
 }
 

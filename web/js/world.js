@@ -847,6 +847,7 @@ const PROGRESS_AWARDS = Object.freeze({
   bellRung: 5,
   burritoSurvived: 25,
   selfFireSurvived: 10,
+  oneTrip: 25,
   ...MODULE_PROGRESS_AWARDS,
 });
 const STANDALONE_MAX_AWARDS = Object.freeze({
@@ -872,6 +873,20 @@ function awardProgress(ctx, id) {
 
 function awardSuffix(points) {
   return points ? ` (+${points})` : "";
+}
+
+function oneTripBonus(ctx, cmd) {
+  if (!cmd?.bulkTransfer) return "";
+  const hadSeatedHeirloom = (cmd.bulkTransferStartItems || [])
+    .some((id) => ctx.world.items[id]?.treasure);
+  if (allTreasuresDeposited(ctx) && !hadSeatedHeirloom && !ctx.getFlag("oneTripForfeited")) {
+    const points = awardProgress(ctx, "oneTrip");
+    if (points) {
+      return "One trip. Twenty-four heirlooms take their places in a single breath." + awardSuffix(points);
+    }
+  }
+  if (depositedFamilyItemCount(ctx) > 0) ctx.setFlag("oneTripForfeited");
+  return "";
 }
 
 function maximumScore(ctx) {
@@ -4463,8 +4478,8 @@ const logicWorld = {
           if (!dest || dest.id !== "reliquary") return null; // let generic put handle other containers
           if (!dest.open) return "The RELIQUARY'S glass doors are closed.";
           if (["all", "everything"].includes(cmd.dobj)) return null;
-          const it = ctx.find(cmd.dobj, ctx.inventory());
-          if (!it) return "You aren't carrying that.";
+          const it = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj, ctx.inventory());
+          if (!it || ctx.roomOf(it.id) !== "inventory") return "You aren't carrying that.";
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
           if (it.id === "talisman" && ctx.roomOf("goldLocket") === "crypt") {
             return "The BM crest on the TALISMAN warms against your palm, but the RELIQUARY refuses it. This " +
@@ -4474,6 +4489,7 @@ const logicWorld = {
           ctx.moveItem(it.id, "reliquary");
           const use = it.treasure ? ctx.awardUse(it) : "";
           if (it.treasure) {
+            if (!cmd.bulkTransfer) ctx.setFlag("oneTripForfeited");
             const scoreFlag = it.depositScoreFlag || `heirloomScore:${it.id}`;
             if (!ctx.getFlag(scoreFlag)) {
               ctx.addScore(it.points || 0);
@@ -4813,7 +4829,8 @@ const logicWorld = {
       names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
       loc: "grandHall", fixed: true, container: true, capacity: 36,
       openable: true, open: false, autoOpenOnAccess: true,
-      bulkTransferSummary: (ctx) => reliquaryCountLine(ctx),
+      bulkTransferSummary: (ctx, cmd) => [oneTripBonus(ctx, cmd), reliquaryCountLine(ctx)]
+        .filter(Boolean).join("\n\n"),
       desc: "A tall glass-fronted RELIQUARY set into the stone wall. Twenty-four fitted recesses form a clock face behind carved doors.",
       on: {
         examine: (ctx) => inspectReliquary(ctx),
@@ -5059,7 +5076,7 @@ const logicWorld = {
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
-      wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
+      wearSlot: "back", autoWearOnTake: true, carryCapacity: 36,
       progressPoints: 5, progressFlag: "progressItem:backpack",
     },
     headlamp: {
