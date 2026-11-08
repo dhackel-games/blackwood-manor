@@ -510,6 +510,22 @@ function inventoryForBugReport() {
   });
 }
 
+function realmStateForBugReport() {
+  const puzzleFlags = [
+    "realm:demoFed",
+    "realm:radioWon",
+    "realm:eyepieceDropped",
+    "realm:shackSpelled",
+    "realm:campfireOut",
+    "oak:lowerPanelAligned",
+  ];
+  return {
+    realmRoom: game.room().realm ? `${game.room().name} (${game.state.room})` : "outside THE UPSIDE DOWN",
+    liftStop: game.roomOf("oakPlatform") || "inactive",
+    puzzleFlags: Object.fromEntries(puzzleFlags.map((flag) => [flag, game.getFlag(flag)])),
+  };
+}
+
 function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
   const hudState = [
     `SFX: ${sfxMuted ? "off" : "on"}`,
@@ -525,6 +541,7 @@ function openBugReport(description = DEFAULT_ISSUE_DESCRIPTION) {
     userName: bugTrace.userName,
     hud: hudState,
     inventory: inventoryForBugReport(),
+    ...realmStateForBugReport(),
   });
   window.open(
     bugReportUrl(game.room().name, body),

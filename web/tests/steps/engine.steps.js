@@ -778,10 +778,16 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
     commands: trace.commands,
     hud,
     inventory: ["BRASS KEY", "CANDLE (WORN)"],
+    realmRoom: "Waylamp Clearing (waylampClearing)",
+    liftStop: "below",
+    puzzleFlags: { "realm:radioWon": true, "oak:lowerPanelAligned": false },
   });
   assert.match(body,
     /^Copyright test 1\.2\.3\nthe mirror shows two of me\n\n2 turns from page reload: east; take rope; again; bug the mirror shows two of me/m);
   assert.match(body, /\nHUD: Score\/turns: 🏆 0\/0;/);
+  assert.match(body, /\nRealm room: Waylamp Clearing \(waylampClearing\)/);
+  assert.match(body, /\nLift stop: below/);
+  assert.match(body, /\nPuzzle flags: realm:radioWon=true; oak:lowerPanelAligned=false/);
   assert.match(body, /\nInv: BRASS KEY, CANDLE \(WORN\)$/);
   const decoded = new URL(bugReportUrl("Hall Bedroom", body)).searchParams.get("body");
   assert.equal(decoded, body);
@@ -798,6 +804,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
   assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
   assert.match(ui, /inventoryForBugReport\(\)/);
+  assert.match(ui, /realmStateForBugReport\(\)/);
   assert.match(ui, /version: Native\.version\(\)/);
   assert.doesNotMatch(ui, /`Version: \$\{Native\.version\(\)\}`/);
 });

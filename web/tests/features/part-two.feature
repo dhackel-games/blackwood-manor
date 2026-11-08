@@ -89,6 +89,7 @@ Feature: Part II — the Thirteenth Hour
     And the output contains "Okay! I'll call you Professor Ada McPoopypants"
     And the output contains "just kidding, I'll call you Ada from now on"
 
+  @win
   Scenario: Finding the queen and using the mirror pool frees the emerald safely
     When I fast-forward into Part II
     And I send "examine clock"
@@ -100,6 +101,7 @@ Feature: Part II — the Thirteenth Hour
     And flag "emeraldFreed" is true
     And the output contains "greying to STONE"
 
+  @win
   Scenario: Returning the emerald to the garden closes Hour XIII (full seam from the brink)
     When I execute sysop command "::win"
     And I send "go down"

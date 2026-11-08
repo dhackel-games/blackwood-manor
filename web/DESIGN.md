@@ -1124,3 +1124,24 @@ hammer and candelabra migrations remain one-for-one, and score flags are
 transferred rather than re-awarded so restored games cannot double-score.
 Saves with an already-restored candelabra receive the new +20 completion credit
 once and persist its progress flag on the next save.
+
+### 12.36 The Upside Down realm hub and content-module seam
+
+The UPSIDE DOWN is registered through `js/upsidedown/index.js`; its initial
+portal and atlas live in `realm.js`, while the remaining puzzle modules are
+registered stubs ready to own their own rooms, items, prose, hints, hooks,
+awards, and cycling flavor. `js/manor/index.js` registers the matching manor
+stubs. Every module exports the same content shape:
+`{ rooms, items, content, shortNames, progressAwards, hints, roomHooks,
+flavorPools }`. `world.js` merges those fields once, chains room hooks without
+discarding existing handlers, and exposes progress awards and flavor cycling to
+content handlers.
+
+The fixed MINERS' LOCKER in the MINING GALLERY opens onto WAYLAMP CLEARING.
+`IN` enters the realm and `OUT` returns to the gallery; first discovery is a
+persisted +20 award. The hub's open walking paths reach the CHEESE GROTTO, AV
+CLUB DEN, PLANETARIUM, MAP ROOM, SHACK, and OAK UNDERCROFT. The map and 2D
+layouts render this as a separate floor. Named flight uses the same generic
+flight path as every other room, so it can enter and leave the realm without a
+realm-specific flight exception. The parser supplies generic fallback verbs
+for future puzzle modules; the engine contains no realm puzzle rules.

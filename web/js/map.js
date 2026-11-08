@@ -28,6 +28,8 @@ const LABELS = {
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
   roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
   treeFort: "Tree Fort", secretChamber: "Hidden Rm",
+  waylampClearing: "Waylamp", cheeseGrotto: "Cheese Grotto", avClubDen: "AV Club",
+  planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 
 // Rooms that must not appear on the map until you have been there.
@@ -155,6 +157,26 @@ const FLOORS = [
       { a: "mineGallery", b: "deepShaft", note: "down" },
       { a: "deepShaft", b: "trollGate" },
       { a: "trollGate", b: "dreadmawVault" },
+    ],
+  },
+  {
+    title: "THE UPSIDE DOWN",
+    rooms: [
+      { id: "cheeseGrotto", col: 1, row: 0 },
+      { id: "planetarium", col: 2, row: 0 },
+      { id: "mapRoom", col: 3, row: 0 },
+      { id: "shack", col: 0, row: 1 },
+      { id: "waylampClearing", col: 1, row: 1 },
+      { id: "avClubDen", col: 2, row: 1 },
+      { id: "below", col: 1, row: 2 },
+    ],
+    links: [
+      { a: "cheeseGrotto", b: "waylampClearing" },
+      { a: "waylampClearing", b: "avClubDen" },
+      { a: "waylampClearing", b: "shack" },
+      { a: "avClubDen", b: "planetarium" },
+      { a: "planetarium", b: "mapRoom" },
+      { a: "waylampClearing", b: "below" },
     ],
   },
 ];

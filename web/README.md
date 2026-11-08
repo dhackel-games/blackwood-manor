@@ -202,6 +202,15 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
+- **The Upside Down:** after DREADMAW has moved, the MINING GALLERY's
+  MINERS' LOCKER opens onto WAYLAMP CLEARING. `OPEN LOCKER`, then `IN` (or
+  `ENTER LOCKER`) enters the realm; `OUT` from WAYLAMP CLEARING returns to the
+  gallery. The hub's paths reach the CHEESE GROTTO, AV CLUB DEN, PLANETARIUM,
+  MAP ROOM, SHACK, and the OAK UNDERCROFT. WINGED SHOES and a high can use
+  named `FLY TO` or `FLOAT TO` travel there just as they can anywhere else.
+  `COMBINE`, `SPELL`, `KICK`, `FIGHT`, `TURN`, `SET`, `START`, `POUR`, `FILL`,
+  `STOMP`, and `SMOTHER` are available generic puzzle verbs; their effects
+  depend on the objects in the current room.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
   `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
   INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
@@ -251,6 +260,8 @@ js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
 js/world.js           world structure, handlers, and dynamic prose
 js/world.content.js   static player-facing room and item prose
+js/upsidedown/*.js    registered Upside Down content modules
+js/manor/*.js         registered manor content modules
 js/hud.js             declarative HudSlot definitions and renderer
 js/native.js          native bridge detection, messaging, and version formatting
 js/ui.js              browser terminal adapter

@@ -32,6 +32,8 @@ export const LABELS = {
   treeFort: "Tree Fort",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
   betweenWalls: "The Walls",
+  waylampClearing: "Waylamp", cheeseGrotto: "Cheese Grotto", avClubDen: "AV Club",
+  planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 
 export const SECRET = new Set([
@@ -165,6 +167,27 @@ export const FLOORS = [
       { a: "trollGate", b: "dreadmawVault" },
     ],
     start: "dragonAntechamber",
+  },
+  {
+    title: "THE UPSIDE DOWN",
+    rooms: [
+      { id: "cheeseGrotto", col: 1, row: 0 },
+      { id: "planetarium", col: 2, row: 0 },
+      { id: "mapRoom", col: 3, row: 0 },
+      { id: "shack", col: 0, row: 1 },
+      { id: "waylampClearing", col: 1, row: 1 },
+      { id: "avClubDen", col: 2, row: 1 },
+      { id: "below", col: 1, row: 2 },
+    ],
+    links: [
+      { a: "cheeseGrotto", b: "waylampClearing" },
+      { a: "waylampClearing", b: "avClubDen" },
+      { a: "waylampClearing", b: "shack" },
+      { a: "avClubDen", b: "planetarium" },
+      { a: "planetarium", b: "mapRoom" },
+      { a: "waylampClearing", b: "below" },
+    ],
+    start: "waylampClearing",
   },
 ];
 

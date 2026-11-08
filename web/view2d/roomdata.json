@@ -58,12 +58,17 @@
   },
   "mineGallery": {
     "name": "Mining Gallery",
-    "desc": "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
+    "desc": "A timber-braced MINING GALLERY follows a rusted rail line. A dented MINERS' LOCKER stands against one timber support. The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
     "items": [
       {
         "id": "headlamp",
         "label": "headlamp",
         "kind": "takeable"
+      },
+      {
+        "id": "minersLocker",
+        "label": "miners' locker",
+        "kind": "scenery"
       }
     ]
   },
@@ -541,5 +546,40 @@
         "kind": "scenery"
       }
     ]
+  },
+  "waylampClearing": {
+    "name": "Waylamp Clearing",
+    "desc": "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH beneath the GREAT OAK.",
+    "items": []
+  },
+  "cheeseGrotto": {
+    "name": "Cheese Grotto",
+    "desc": "The CHEESE GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
+    "items": []
+  },
+  "avClubDen": {
+    "name": "AV Club Den",
+    "desc": "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. Its dial points to a quiz show that refuses to end. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
+    "items": []
+  },
+  "planetarium": {
+    "name": "Planetarium",
+    "desc": "A plain PLANETARIUM dome looms above a single brass PROJECTOR. The ceiling is marked with five groups of stars; one patch looks like a drain and another has scorched the plaster. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+    "items": []
+  },
+  "mapRoom": {
+    "name": "Map Room",
+    "desc": "A tiny MAP ROOM is wallpapered in star charts with more confidence than scientific merit. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
+    "items": []
+  },
+  "shack": {
+    "name": "Shack",
+    "desc": "A run-down SHACK leans against the trees. The ALPHABET WALL carries letters A through Z, each beneath a tiny bulb. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.",
+    "items": []
+  },
+  "below": {
+    "name": "Oak Undercroft",
+    "desc": "The OAK UNDERCROFT is a chamber hollowed among roots as thick as bridge cables. A LOWER PANEL holds three vertical slots beneath a dangling PLATFORM shaft. NORTH returns to the WAYLAMP CLEARING. The shaft continues UP, but no lift stops here yet.",
+    "items": []
   }
 }

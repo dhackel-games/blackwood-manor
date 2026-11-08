@@ -105,6 +105,7 @@ Feature: Maintained sysop shortcuts
     And the game is not won
     And the game score is 120
 
+  @win @maxscore
   Scenario: Every physical win step executes, every portable has two rewards, and the clock remains in hand
     When I trace sysop command "::win"
     Then the game is alive
@@ -140,6 +141,7 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:candelabraRestored" is set
     And the game score is 825
 
+  @win @maxscore
   Scenario: Repeating the completed prompt cannot choose the front-door ending
     When I execute sysop command "::win"
     Then the game is alive
@@ -162,6 +164,7 @@ Feature: Maintained sysop shortcuts
     And flag "partII" is unset
     And the game score is 825
 
+  @win @maxscore
   Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
     When I execute sysop command "::win" through "pull closetrope"
     Then the current room is "grandHall"
@@ -179,6 +182,7 @@ Feature: Maintained sysop shortcuts
     And the game score is 825
     And both endings remain independently available
 
+  @win @maxscore
   Scenario: After the bell, the prompt takes the clock from an already open reliquary
     When I execute sysop command "::win" through "pull closetrope"
     And I send "open reliquary"
@@ -193,6 +197,7 @@ Feature: Maintained sysop shortcuts
     And the game score is 825
     And both endings remain independently available
 
+  @win
   Scenario: The complete route recovers physically when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
     And item "outhouseMushrooms" has been destroyed
@@ -220,6 +225,7 @@ Feature: Maintained sysop shortcuts
     And the current room is "hiddenVault"
     And the game is alive
 
+  @win
   Scenario: An already-solved oak uses its physical platform instead of flying to the fort
     Given an already-solved oak has its platform at the roots
     Then sysop command "::win" contains sequence "z; in platform; z; u spyglass; t spyglass; in platform; z"

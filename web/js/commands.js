@@ -81,14 +81,18 @@ brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
 clear | Clear / Erase the entire scrollback and redisplay the basic prompt for the current room.
 (c)lose/shut <thing> | Close / Close an open door or container.
+combine/assemble <things> | Combine / Join puzzle pieces when their content supports it.
 drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
 extinguish <thing> | Extinguish / Put out a light or flame.
+fight/brawl <thing> | Fight / Pick a fight when content makes one meaningful.
+fill/refill <container> | Fill / Fill a container from a local source.
 get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
 give <thing> to <character> | Give / Hand over an item.
 (g)o <room> | Go / Go to a named room when movement or flight allows; bare g repeats AGAIN.
 help/call/hint | Gary / Call Gary's paid hint line.
 info/? | Info / Show this command reference.
 (i)nventory | Inventory / List everything you carry and wear.
+kick/boot <thing> | Kick / Kick an object when content makes that useful.
 light <thing> | Light / Ignite a usable light source.
 lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 (l)ook/e(x)amine/search | Inspect / Inspect the room or a visible thing more closely.
@@ -96,6 +100,7 @@ lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 move <thing> | Move / Shift or jostle something.
 (n)orth, (s)outh, (e)ast, (w)est, northeast (ne), northwest (nw), southeast (se), southwest (sw), (u)p, (d)own, in, out | Directions / Go that direction.
 (o)pen <thing> [w/<key>] | Open / Unlock with a supplied key, then open.
+pour/tip <thing> on <target> | Pour / Pour something where content supports it.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
 put/place <thing>/all in <container/slot> | Put / Place one carried item or every unworn carried item inside a container.
@@ -111,9 +116,15 @@ route/guide/path to <room/object> | Route / Use the BM Watch to prepare, but not
 save | Save / Save the current game in this browser.
 say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
 score | Score / Show points, turns, and rank.
+set/adjust <thing> | Set / Set an object when content gives it a setting.
 show/scry <room/object> [in watch] | Scry / Reveal its containing room and prepare the route.
+smother/suffocate <thing> | Smother / Smother something when content allows it.
+spell/type <word> | Spell / Spell or type a word where content accepts one.
+start/run/activate <thing> | Start / Start an object when content supports it.
+stomp/stamp <thing> | Stomp / Stomp something when content makes it useful.
 throw <thing> at <target> | Throw / Throw a carried item.
 top | Top / Scroll to the top of the page.
+turn/rotate/spin <thing> | Turn / Turn an object when content gives it a position.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
 verbose | Verbose mode / Always print full room descriptions.
