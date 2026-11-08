@@ -3717,6 +3717,10 @@ const logicWorld = {
       state.flags.playerName = state.flags.ghostName;
     }
     delete state.flags.ghostName;
+    if (savedItems?.milk?.loc === "kitchen") state.items.milk.loc = "fridge";
+    if (savedItems?.milkJug && "filled" in savedItems.milkJug) {
+      state.items.milkJug.filled = savedItems.milkJug.filled;
+    }
     if (state.flags.partII) state.flags.bellRung = true;
     if (state.room === "hollowPassage" || state.room === "hollowSanctum") {
       state.room = "grandHall";

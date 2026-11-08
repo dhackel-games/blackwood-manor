@@ -1148,6 +1148,22 @@ flight path as every other room, so it can enter and leave the realm without a
 realm-specific flight exception. The parser supplies generic fallback verbs
 for future puzzle modules; the engine contains no realm puzzle rules.
 
+#### 12.36.1 Fridge and Demogorgonzola
+
+The KITCHEN's fixed, closed FRIDGE starts with the existing MILK, an EMPTY MILK
+JUG, LIMBURGER, ÉPOISSES, and MUNSTER. Existing saves gain the new FRIDGE and
+its new contents, while MILK moves inside only when it remains at its original
+KITCHEN location. The three cheeses remain intact when eaten and are the only
+safe gifts for DEMOGORGONZOLA in the CHEESE GROTTO.
+
+DEMOGORGONZOLA's visible creature and grotto text warn that physical or
+directed interactions cause an intact-inventory ejection to the FRONT GATE.
+LOOK, EXAMINE, and SMELL remain safe. Each distinct cheese is consumed once;
+the third grants its persisted +10 progress award and leaves a 15-point,
+`pendingHeirloom` DEMOGORGONZOLA RIND on the grotto floor. The RIND has normal
+portable pickup and use awards but is not a treasure until the later
+all-heirloom switch.
+
 #### 12.36.2 Cabinet radio quiz
 
 The AV CLUB DEN's fixed CABINET RADIO starts a name-that-tune round with TURN
@@ -1185,3 +1201,4 @@ under a blizzard of arrows, is independently takeable, and is the fair clue.
 Both it and the crayon are `pendingHeirloom` entries until the coordinated
 heirloom switch; their pickup and first use awards, plus the wall's persisted
 `realm:shackSpelled` progress award, cannot be farmed.
+
