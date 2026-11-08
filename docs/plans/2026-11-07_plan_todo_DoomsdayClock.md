@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Doomsday Clock: master orchestration
 
@@ -8,7 +8,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 
 * Plan v2 written; no implementation started; `::win` untouched.
 * Todos: 0 done / 106 total (0%); 106 remaining.
-* Coding progress: none. Realm and shared high are ratified; the manor quintet is pitched and under refinement with AndrewC.
+* Coding progress: none. Realm, shared high, and manor quintet designs are ratified (manor: D24, D25, ratified by AndrewC 2026-11-08); D20 to D23 and D26 to D28 stay OPEN.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.
 * Next shareable build: UNKNOWN; requires the single release PR to merge, a content stamp, and the Pages deploy (OTA). No native change is planned, so no TestFlight build is needed.
@@ -80,9 +80,9 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
   * 4.2. Exit: once every realm puzzle is solved, the ROOT HOLLOW opens and links to the oak lift's BELOW stop.
   * 4.3. Modules:
     * 4.3.1. `web/js/lanternwild/index.js` aggregates `realm.js` (hub, locker, flight refusal), `demogorgonzola.js`, `radio.js` with its data file `radio-clues.js`, `planetarium.js`, `shack.js`, and `rootgate.js`.
-    * 4.3.2. `web/js/manor/index.js` aggregates `fridge.js`, `diamond.js`, `estatemap.js`, `corkscrew.js`, `snuffbox.js`, and `weathercock.js`.
-    * 4.3.3. Each module exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks }`. `world.js` merges them once and chains any room hooks onto existing handlers.
-  * 4.4. Verbs: Lane 2 adds the generic verbs Lane 1 lists (expected KNOCK, COMBINE, SPELL, KICK, FIGHT) to `parser.js` with default refusals in `commands.js`. FEED already maps to GIVE, SNIFF to SMELL, and ANSWER to SAY.
+    * 4.3.2. `web/js/manor/index.js` aggregates `fridge.js`, `diamond.js`, `photograph.js`, `corkscrew.js`, `snuffbox.js`, and `weathercock.js`.
+    * 4.3.3. Each module exports `{ rooms, items, content, shortNames, progressAwards, hints, roomHooks, flavorPools }`. `world.js` merges them once, chains any room hooks onto existing handlers, adds `flavorPools` to `CYCLING_FLAVOR_POOLS`, and lets module handlers call `cycleFlavor` through `ctx`.
+  * 4.4. Verbs: Lane 2 adds the generic verbs Lane 1 lists (expected COMBINE, SPELL, KICK, FIGHT, TURN, SET, START) to `parser.js` with default refusals in `commands.js`. FEED already maps to GIVE, SNIFF to SMELL, ANSWER to SAY, and PICK to TAKE. DIAL is already a hotline verb, so the microwave grammar keeps DIAL as a noun after SET or TURN.
   * 4.5. Shared high: `world.js` owns `beginHigh(ctx, { opening, turns })`. Items declare `highSource: { opening, turns, doses }` and the module merge attaches the shared handler, so content modules never import `world.js`.
   * 4.6. Flow: commands reach item and room `on` handlers exactly as manor content does. Awards use the existing `awardProgress`, `awardPickup`, and `awardUse`. Ejections move the player to `gate` and keep inventory.
   * 4.7. Canonical data: the heirloom set derives from `treasure: true`. `REQUIRED_FAMILY_ITEM_COUNT` becomes 24, and `maximumScore()` stays derived.
@@ -117,19 +117,38 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
   * 6.2. Seating all three opens the ROOT GATE. The lift then runs a four-beat cycle, one beat per turn: GROUND, ABOVE, GROUND, BELOW, GROUND. Until the root gate opens, the existing GROUND and ABOVE cycle is unchanged.
   * 6.3. Arriving from below, the player observes the cycle from the ROOT HOLLOW (LOOK UP or WAIT shows where the platform is). Boarding when it reaches BELOW carries the rider up. Stepping OUT at GROUND exits to the GREAT OAK; staying aboard reaches the TREE FORT.
   * 6.4. From the GREAT OAK, a rider can descend to BELOW once the gate is open. Before it opens, BELOW shows sealed roots.
-* 7. Manor quintet (PITCHED; each item is under refinement with AndrewC, and Lane 1 records the refined design)
-  * 7.1. BLACKWOOD DIAMOND (Maniac Mansion nod), under refinement: a MICROWAVE in the KITCHEN has a dial of SECONDS, YEARS, CENTURIES, and EONS. Microwaving COAL on EONS makes the DIAMOND; shorter settings yield slightly older coal, and longer ones yield dust. Coal source OPEN (D24).
-  * 7.2. ESTATE MAP, under refinement: COMBINE four torn MAP PIECES into the ESTATE MAP. Pitched hiding places: the privy TOILET, DREADMAW's nostril, the Baron portrait's mouth, and under a mattress.
-  * 7.3. CORKSCREW, under refinement: KNOCK on the WINE CELLAR casks; the hollow one yields the CORKSCREW. Knock-knock joke flavor is pitched.
-  * 7.4. SNUFFBOX, under refinement: a liar-logic puzzle with Baron Munchhausen (a famous liar) and two portraits in the PARLOR. Ratified use: SNIFF or USE SNUFFBOX takes one pinch, adding 6 turns of the shared high (Section 10). Pinches stack like mushrooms. After 3 pinches the box is EMPTY but remains an heirloom. The first sniff earns the normal +5 use award.
-  * 7.5. WEATHERCOCK, under refinement: the ROOF gargoyles' gazes give a compass order. TURN WEATHERVANE through it to open a CHIMNEY CACHE holding the SILVER WEATHERCOCK. The gag is the rooster crowing.
+* 7. Manor quintet (ratified by AndrewC 2026-11-08; same tone as Section 5.1; Lane 1 records exact grammar and text)
+  * 7.1. BLACKWOOD DIAMOND (Maniac Mansion nod):
+    * 7.1.1. The PARLOR's cold fireplace holds a stack of COAL. TAKE COAL yields one lump; a second is refused until the first is used up.
+    * 7.1.2. The KITCHEN gains a MICROWAVE whose dial is labeled only `1 · 100 · M · B · T`. No units or clue appear anywhere; like the oak's RGB gems, it needs the outside knowledge that diamonds take about a billion years.
+    * 7.1.3. PUT COAL IN MICROWAVE, SET DIAL TO <setting>, START (Lane 1 finalizes the grammar). 1 or 100 leaves the same lump unchanged for a retry. M turns it to graphite and T to dust; both consume the lump, so the player fetches another. B yields the BLACKWOOD DIAMOND (heirloom).
+    * 7.1.4. No pressure gag, no beard or centuries jokes, and no geology book clue.
+  * 7.2. SILVER WEATHERCOCK:
+    * 7.2.1. Access: fly up through the ATTIC skylight, or walk through the ATTIC north door (revealed by `vaultFound`) to the HIDDEN VAULT, UP to the BELFRY, and WEST to the ROOF.
+    * 7.2.2. Four fixed GARGOYLES (never randomized) ring the roof: the BURPER (cheeks puffed, fist to chest), the FARTER (holding its nose), the SHITTER (both hands covering its butt), and the HORIZON-GAZER (staring into the distance).
+    * 7.2.3. TURN WEATHERCOCK TO FACE <gargoyle or direction>. Facing the BURPER, FARTER, or SHITTER awards +2 the first time per gargoyle (max +6, one persisted flag each), and that gargoyle answers from its own 12-entry pose-themed pool in `CYCLING_FLAVOR_POOLS` (36 lines total).
+    * 7.2.4. Facing the HORIZON-GAZER makes it say "For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. You, rooster, I can set free." It breaks the weathercock off its post; TAKE SILVER WEATHERCOCK (heirloom). No fight.
+    * 7.2.5. A freed weathercock can no longer be turned, so the three +2 awards come before the HORIZON-GAZER; Lane 1 hint text and the Lane 13 route respect that order.
+  * 7.3. SNUFFBOX:
+    * 7.3.1. A MARBLE BUST of Great-Grandpa Blackwood with a heroic nose stands on the upstairs LANDING. EXAMINE BUST reveals a silver glint up the left nostril.
+    * 7.3.2. PICK NOSE (also PICK BUST'S NOSE) yields the SNUFFBOX (heirloom).
+    * 7.3.3. Use (D18, unchanged): SNIFF or USE SNUFFBOX takes one pinch, adding 6 turns of the shared high (Section 10). Pinches stack like mushrooms. After 3 pinches the box is EMPTY but remains an heirloom. The first sniff earns the normal +5 use, and the HUD stays 🍄.
+  * 7.4. BARONESS PHOTOGRAPH (replaces the ESTATE MAP everywhere; unrelated to the TROLL, whose riddle is unchanged):
+    * 7.4.1. Four torn PHOTO PIECES COMBINE into a photograph of THE BARONESS standing beside a GRANDFATHER CLOCK whose hands read 1:30 (heirloom).
+    * 7.4.2. Piece A: the porch MAILBOX. The existing warning LETTER is written on its back; READ keeps the existing text and the +5 `letterRead` award, and after COMBINE the letter stays readable on the back of the photograph. Burning it is D28.
+    * 7.4.3. Piece B: on the ground in the HEDGE MAZE LOOP (`hedgeMazeLoop`).
+    * 7.4.4. Piece C: on a nail on the PRIVY wall (not in the toilet).
+    * 7.4.5. Piece D: tucked loosely inside a rotting LIBRARY book, found by SEARCH BOOKS or READ BOOK.
+    * 7.4.6. Future hook (out of scope): a later puzzle uses the 1:30 time; nothing reads it now.
+  * 7.5. CORKSCREW: simply placed in the WINE CELLAR beside the existing CRYSTAL DECANTER (heirloom). No puzzle.
 * 8. Scoring (values proposed, D26; Lane 10 derives and documents the new maximum)
   * 8.1. Existing mechanics stay: +5 pickup and +5 use per portable item, each granted once through `awardProgress` flags. `maximumScore()` stays derived.
-  * 8.2. Proposed progress awards: realm discovery +20; each realm puzzle +10 (four); root gate opened +10; each manor puzzle +5 (five).
-  * 8.3. Proposed deposit values:
-    * 8.3.1. Realm (80 total): DEMOGORGONZOLA RIND 15, PORTABLE TRANSISTOR RADIO 15, GOLD EYEPIECE 15, PURPLE CRAYON 15, STELLAR MAP 10, KID'S DRAWING 10.
-    * 8.3.2. Manor (65 total): BLACKWOOD DIAMOND 15, ESTATE MAP 15, SILVER WEATHERCOCK 15, SNUFFBOX 10, CORKSCREW 10.
-  * 8.4. Phase B keeps the ONE TRIP bulk-deposit bonus, the BACKPACK capacity raise, and the verified evidence below.
+  * 8.2. Proposed progress awards: realm discovery +20; each realm puzzle +10 (four); root gate opened +10; each manor puzzle +5 (four: DIAMOND made, PHOTOGRAPH combined, WEATHERCOCK freed, SNUFFBOX found; the CORKSCREW has no puzzle).
+  * 8.3. Ratified progress awards (AndrewC 2026-11-08): +2 the first time the weathercock faces each of the BURPER, FARTER, and SHITTER (max +6).
+  * 8.4. Proposed deposit values:
+    * 8.4.1. Realm (80 total): DEMOGORGONZOLA RIND 15, PORTABLE TRANSISTOR RADIO 15, GOLD EYEPIECE 15, PURPLE CRAYON 15, STELLAR MAP 10, KID'S DRAWING 10.
+    * 8.4.2. Manor (55 total): BLACKWOOD DIAMOND 15, BARONESS PHOTOGRAPH 15, SILVER WEATHERCOCK 10, SNUFFBOX 10, CORKSCREW 5.
+  * 8.5. Phase B keeps the ONE TRIP bulk-deposit bonus, the BACKPACK capacity raise, and the verified evidence below.
 * 9. Doomsday clock
   * 9.1. The COUNTDOWN CLOCK becomes the 24-hour DOOMSDAY CLOCK; COUNTDOWN CLOCK names stay as aliases.
   * 9.2. The reliquary shows 24 recesses ringed like a clock face.
@@ -162,7 +181,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 12.1.2. [Lane 2 RealmHub](2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md) runs next.
     * 12.1.3. Then these run in parallel: [Lane 3 Demogorgonzola](2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md), [Lane 4 RadioQuiz](2026-11-07_plan_todo_DoomsdayClock_Lane4-RadioQuiz.md), [Lane 5 Planetarium](2026-11-07_plan_todo_DoomsdayClock_Lane5-Planetarium.md), [Lane 6 Shack](2026-11-07_plan_todo_DoomsdayClock_Lane6-Shack.md), and [Lane 9 SharedHigh](2026-11-07_plan_todo_DoomsdayClock_Lane9-SharedHigh.md).
     * 12.1.4. [Lane 7 RootGateLift](2026-11-07_plan_todo_DoomsdayClock_Lane7-RootGateLift.md) runs after Lanes 3 to 6.
-    * 12.1.5. [Lane 8 ManorQuintet](2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md) runs after Lane 9 (the snuffbox needs the high hook); each heirloom worker spawns only once Lane 1 records that heirloom's refined design.
+    * 12.1.5. [Lane 8 ManorQuintet](2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md) runs after Lane 9 (the snuffbox needs the high hook); each heirloom worker spawns only once Lane 1 records that heirloom's exact grammar and text.
     * 12.1.6. [Lane 10 DoomsdayCount](2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md) runs last, after Lanes 7 and 8.
   * 12.2. WAIT: before spawning any Phase B lane, confirm every Phase A lane is done and that `cd web && npm test -- --tags "not @win"` exits 0 on the integration branch. AndrewC directive: "dont do anything with ::win yet until we build the new section."
   * 12.3. Phase B:
@@ -172,141 +191,151 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 12.3.4. [Lane 14 ContentRelease](2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md) runs last.
   * 12.4. Seam contract (fixed before any spawn):
     * 12.4.1. Lane 2 creates and registers every module stub in Section 4.3. Each later lane edits only its own modules, feature file, and lane-listed shared lines.
-    * 12.4.2. Flag names: `realm:demoFed`, `realm:radioWon`, `realm:eyepieceDropped`, `realm:shackSpelled`, `realm:allSolved`, `oak:rootGateOpen`; radio seed `realm:radioSeed`; snuff pinches `manor:snuffPinches`.
+    * 12.4.2. Flag names: `realm:demoFed`, `realm:radioWon`, `realm:eyepieceDropped`, `realm:shackSpelled`, `realm:allSolved`, `oak:rootGateOpen`; radio seed `realm:radioSeed`; snuff pinches `manor:snuffPinches`; gargoyle award keys and flavor pools `gargoyleBurper`, `gargoyleFarter`, `gargoyleShitter`.
     * 12.4.3. Lift-stop values: `below`, `greatOak`, `treeFort`.
     * 12.4.4. New heirlooms ship as `pendingHeirloom: true` (not `treasure`) until Lane 10 flips all eleven at once, so the game stays winnable at 13 during Phase A.
     * 12.4.5. Phase A lanes validate with `cd web && npm test -- --tags "not @win and not @maxscore"`; Lane 10 drops `@maxscore`; Lane 13 runs the full suite.
 * 13. Decisions (newest first; AUTODECISIONS unless marked ratified; AndrewC may override any)
-  * 13.1. D26: Deposit and progress award values (OPEN).
-    * 13.1.1. Framing: eleven new heirlooms and nine new puzzles need point values.
-    * 13.1.2. Options: flat values for all, or weighted by puzzle effort.
-    * 13.1.3. **Chosen:** OPEN; recommendation is the weighted values in Section 8.
-    * 13.1.4. Why: harder puzzles pay more, and totals stay derived.
-  * 13.2. D25: Manor puzzle details (OPEN).
-    * 13.2.1. Framing: the five manor heirlooms are pitched and under refinement with AndrewC.
-    * 13.2.2. Options: build the pitches as written, or refine each first.
-    * 13.2.3. **Chosen:** OPEN; refine each with AndrewC, record it in the canon doc, then spawn its worker.
-    * 13.2.4. Why: the snuffbox use is the only ratified manor mechanic.
-  * 13.3. D24: Coal source for the BLACKWOOD DIAMOND (OPEN).
-    * 13.3.1. Framing: the microwave needs COAL from somewhere fair.
-    * 13.3.2. Options: an existing fireplace or grate, the mine, or a new coal scuttle.
-    * 13.3.3. **Chosen:** OPEN; no recommendation yet.
-    * 13.3.4. Why: it depends on the refined DIAMOND design (D25).
-  * 13.4. D23: Cheese choice (OPEN).
-    * 13.4.1. Framing: three real, famously stinky cheeses go in the FRIDGE.
-    * 13.4.2. Options: Vieux-Boulogne, Époisses, Limburger, or Stinking Bishop.
-    * 13.4.3. **Chosen:** OPEN; recommendation is Vieux-Boulogne, Époisses, and Limburger, with Stinking Bishop as the alternate.
-    * 13.4.4. Why: they are widely cited as the stinkiest, and their names are funny on their own.
-  * 13.5. D22: Inverted WINGED SHOES hazard (OPEN).
-    * 13.5.1. Framing: v1 killed players who walked the realm in WINGED SHOES.
-    * 13.5.2. Options: build the hazard, or rely on named-flight refusal alone.
-    * 13.5.3. **Chosen:** OPEN; not built unless AndrewC ratifies it.
-    * 13.5.4. Why: AndrewC did not ratify it, and flight refusal already prevents the cheat.
-  * 13.6. D21: Source of the three INVERTED GEMS (OPEN).
-    * 13.6.1. Framing: the root panel needs three INVERTED GEMS; the v1 source is withdrawn.
-    * 13.6.2. Options: one gem per puzzle, three hidden finds, or a root nest revealed by the last solve.
-    * 13.6.3. **Chosen:** OPEN; recommendation is that solving the last realm puzzle reveals the ROOT HOLLOW, where the three gems hang in a root nest.
-    * 13.6.4. Why: completion stays the single trigger and no new character is needed.
-  * 13.7. D20: Realm name (OPEN).
-    * 13.7.1. Framing: the realm needs a final display name.
-    * 13.7.2. Options: keep the working name Lanternwild, or choose a parody name.
-    * 13.7.3. **Chosen:** OPEN; Lanternwild stays the working name, and code paths keep `lanternwild` whatever the display name.
-    * 13.7.4. Why: renaming paths later would churn every lane.
-  * 13.8. D19: v1 realm content withdrawn (ratified by AndrewC 2026-11-08).
-    * 13.8.1. Framing: the v1 realm challenges, characters, items, and premise no longer fit.
-    * 13.8.2. Options: keep parts, or replace them entirely.
-    * 13.8.3. **Chosen:** replace them entirely with Sections 5 and 6.
-    * 13.8.4. Why: the new realm is a comedy parody built on fair classic puzzles.
-  * 13.9. D18: Snuffbox use (ratified by AndrewC 2026-11-08).
-    * 13.9.1. Framing: the SNUFFBOX needs a use beyond deposit.
-    * 13.9.2. Options: decorative only, or a limited high.
-    * 13.9.3. **Chosen:** three stacking pinches of 6 high turns each; the empty box remains an heirloom; the first sniff earns +5 use.
-    * 13.9.4. Why: it reuses the shared high and gives the snuffbox a real use.
-  * 13.10. D17: Shared high (ratified by AndrewC 2026-11-08).
-    * 13.10.1. Framing: mushrooms and snuff would otherwise duplicate the trip logic and text.
-    * 13.10.2. Options: separate effects, or one generic high.
-    * 13.10.3. **Chosen:** one generic high, the 🍄 indicator for both, a 12-entry cycling pool, and source-specific opening lines only.
-    * 13.10.4. Why: one behavior, varied text, no early repeats.
-  * 13.11. D16: P5:MinimalCrossings replaces P5:SelfContainedRealm (ratified by AndrewC 2026-11-08).
-    * 13.11.1. Framing: the DEMOGORGONZOLA cheeses come from the manor FRIDGE.
-    * 13.11.2. Options: a fully self-contained realm, or minimal crossings.
-    * 13.11.3. **Chosen:** only the three fridge cheeses may cross.
-    * 13.11.4. Why: one fair, telegraphed crossing ties the realm to the manor without sprawl.
-  * 13.12. D15: Realm completion (ratified by AndrewC 2026-11-08).
-    * 13.12.1. Framing: the return path must wait for full completion.
-    * 13.12.2. Options: open the root gate per puzzle, or once all are solved.
-    * 13.12.3. **Chosen:** once all are solved, keeping the Section 6 root panel and four-beat lift.
-    * 13.12.4. Why: completion is the trigger, and the lift design was already approved.
-  * 13.13. D14: SHACK alphabet wall (ratified by AndrewC 2026-11-08).
-    * 13.13.1. Framing: parody the alphabet wall without a color mechanic or holiday theme.
-    * 13.13.2. Options: one secret word, or several accepted words.
-    * 13.13.3. **Chosen:** FART, STINK, or CHEESE all work; the KID'S DRAWING on the door is the clue and an heirloom.
-    * 13.13.4. Why: the drawing's arrows make the answer fair and funny.
-  * 13.14. D13: PLANETARIUM (ratified by AndrewC 2026-11-08).
-    * 13.14.1. Framing: a Myst Stoneship nod with a fixed number puzzle.
-    * 13.14.2. Options: a shuffled per-game mapping, or a fixed alphabetical mapping.
-    * 13.14.3. **Chosen:** fixed alphabetical numbering explained by the STELLAR MAP; 1, 3, 5 are safe, 2 ejects, 4 ignites.
-    * 13.14.4. Why: the map is the clue, and the burning exit chains into the brazier.
-  * 13.15. D12: RADIO QUIZ (ratified by AndrewC 2026-11-08).
-    * 13.15.1. Framing: an 80s name-that-tune that respects copyright.
-    * 13.15.2. Options: quoted lyrics, or original literal paraphrases.
-    * 13.15.3. **Chosen:** about 20 songs by 5 original clues, five numbered titles per round, three in a row wins, a miss resets, seedable random draw.
-    * 13.15.4. Why: titles are not protected expression, the literal paraphrase is the joke, and seeding keeps tests deterministic.
-  * 13.16. D11: DEMOGORGONZOLA (ratified by AndrewC 2026-11-08).
-    * 13.16.1. Framing: a monster puzzle with a feeding solution.
-    * 13.16.2. Options: an ordered feeding rule, or any order.
-    * 13.16.3. **Chosen:** all three cheeses in any order; any other interaction swallows you to the FRONT GATE; no petal key.
-    * 13.16.4. Why: the puzzle is finding the cheeses, not guessing an order.
-  * 13.17. D10: Named flights in the realm (ratified by AndrewC 2026-11-08).
-    * 13.17.1. Framing: mushroom or snuff flight could bypass the locker and root gate.
-    * 13.17.2. Options: allow flight, or refuse named flights in both directions.
-    * 13.17.3. **Chosen:** refuse named flights in both directions.
-    * 13.17.4. Why: the locker and root gate stay the only ways in and out.
-  * 13.18. D9: Realm theme and tone (ratified by AndrewC 2026-11-08).
-    * 13.18.1. Framing: the realm needs a comic identity.
-    * 13.18.2. Options: the v1 inverted fairy tale, or a Stranger Things and Narnia parody.
-    * 13.18.3. **Chosen:** the parody, with classic fair puzzles and light upside-down touches; no holiday theme; no reuse of existing gags as mechanics.
-    * 13.18.4. Why: the humor sells the puzzles without replacing them.
-  * 13.19. D8: Split of the 24 (ratified by AndrewC 2026-11-08).
-    * 13.19.1. Framing: 11 new heirlooms reach 24.
-    * 13.19.2. Options: 13+7 realm+4 manor, or 13+6 realm+5 manor.
-    * 13.19.3. **Chosen:** 13 existing, 5 manor, 6 realm.
-    * 13.19.4. Why: four realm puzzles yield six heirlooms, and five manor puzzles are pitched.
-  * 13.20. D7: Lift cycle before the gate opens.
-    * 13.20.1. Framing: the four-beat lift must not disturb existing play.
-    * 13.20.2. Options: always four beats, or the existing two beats until the gate opens.
-    * 13.20.3. **Chosen:** two beats until the gate opens.
-    * 13.20.4. Why: this preserves the solved-oak experience and existing saves.
-  * 13.21. D6: Part II hour labels.
-    * 13.21.1. Framing: the clock now has 24 hours.
-    * 13.21.2. Options: keep XIII, or relabel the implemented scene XXIV.
-    * 13.21.3. **Chosen:** XXIV.
-    * 13.21.4. Why: the clock now starts at 24.
-  * 13.22. D5: `::win` coupling.
-    * 13.22.1. Framing: requiring 24 heirlooms makes today's `::win` unwinnable.
-    * 13.22.2. Options: two PRs with `::win` temporarily broken on main, stacked PRs, or one PR with a phase gate.
-    * 13.22.3. **Chosen:** one PR with a phase gate.
-    * 13.22.4. Why: main never receives content without the matching route. Phase A validates with `@win` scenarios excluded; the final gate runs the full suite.
-  * 13.23. D4: Icons.
-    * 13.23.1. Framing: eleven new heirlooms need tray art.
-    * 13.23.2. Options: wait for Firefly PNGs, or use the tray's emoji fallback.
-    * 13.23.3. **Chosen:** run the existing Firefly tool when credentials exist; otherwise ship the tray's built-in emoji.
-    * 13.23.4. Why: no gameplay depends on art.
-  * 13.24. D3: Prose location.
-    * 13.24.1. Framing: parallel lanes write prose at once.
-    * 13.24.2. Options: `world.content.js`, or a per-module `content` export.
-    * 13.24.3. **Chosen:** per-module `content`.
-    * 13.24.4. Why: parallel lanes then avoid collisions.
-  * 13.25. D2: Realm exit.
-    * 13.25.1. Framing: the realm needs a way back to the manor.
-    * 13.25.2. Options: a GRAND BEDROOM wardrobe, or the root gate under the oak.
-    * 13.25.3. **Chosen:** the root gate.
-    * 13.25.4. Why: AndrewC's direction; the realm becomes a mine-to-oak traversal.
-  * 13.26. D1: Portal.
-    * 13.26.1. Framing: the realm needs an entrance.
-    * 13.26.2. Options: a new side tunnel, or a MINERS' LOCKER in the MINING GALLERY.
-    * 13.26.3. **Chosen:** the locker.
-    * 13.26.4. Why: it sits after DREADMAW and before the TROLL, and the gallery already shows where mining gear hung.
+  * 13.1. D28: BURN LETTER versus PHOTO PIECE A (OPEN).
+    * 13.1.1. Framing: the existing BURN LETTER gag destroys the `letter` item, which is now PHOTO PIECE A, so burning it would make the 24 unreachable.
+    * 13.1.2. Options: keep the burn and respawn the piece, or refuse the burn once the letter is a photo piece.
+    * 13.1.3. **Chosen:** OPEN; recommendation is that BURN LETTER (and BURN PHOTOGRAPH) is refused with original text (the glossy photo stock will not catch), `fire-food.feature` drops its burn step, and Lane 10 migration returns piece A to the MAILBOX for saves with `letterBurned`, with no award change (P4).
+    * 13.1.4. Why: a required heirloom must never be destroyable, and LIGHT SELF ON FIRE keeps the arson gag.
+  * 13.2. D27: Hidden sight reveals the ATTIC north door (OPEN).
+    * 13.2.1. Framing: today only eating mushrooms sets `vaultFound`, which reveals the ATTIC north door on the walking route to the ROOF.
+    * 13.2.2. Options: keep mushrooms as the only trigger, or let SEARCH ATTIC with any hidden sight (the high, worn XRAY GOGGLES, or the OBSIDIAN EYE) reveal the door and set `vaultFound`.
+    * 13.2.3. **Chosen:** OPEN; recommendation is yes, pending AndrewC.
+    * 13.2.4. Why: `hasMushroomVision` already treats all three as one hidden sight.
+  * 13.3. D26: Deposit and progress award values (OPEN except the ratified gargoyle awards).
+    * 13.3.1. Framing: eleven new heirlooms, eight new puzzles, and three gargoyle replies need point values.
+    * 13.3.2. Options: flat values for all, or weighted by puzzle effort.
+    * 13.3.3. **Chosen:** OPEN; recommendation is the weighted values in Section 8. The +2 per BURPER, FARTER, and SHITTER (max +6) is ratified by AndrewC 2026-11-08.
+    * 13.3.4. Why: harder puzzles pay more, the CORKSCREW has no puzzle, and totals stay derived.
+  * 13.4. D25: Manor heirloom designs (ratified by AndrewC 2026-11-08).
+    * 13.4.1. Framing: the five pitched manor heirlooms needed fair final designs.
+    * 13.4.2. Options: build the original pitches, or the refined designs.
+    * 13.4.3. **Chosen:** Section 7: the microwave dial, four fixed roof gargoyles, the bust's nostril, the BARONESS PHOTOGRAPH (replacing the ESTATE MAP everywhere), and the CORKSCREW placed beside the decanter.
+    * 13.4.4. Why: each is a fair classic puzzle with absurd paint; the photograph reuses the existing letter and plants the 1:30 clock hook.
+  * 13.5. D24: Coal source for the BLACKWOOD DIAMOND (ratified by AndrewC 2026-11-08).
+    * 13.5.1. Framing: the microwave needs COAL from somewhere fair.
+    * 13.5.2. Options: an existing fireplace or grate, the mine, or a new coal scuttle.
+    * 13.5.3. **Chosen:** a stack of COAL in the PARLOR's cold fireplace, carried one lump at a time.
+    * 13.5.4. Why: the PARLOR text already shows the cold fireplace, and one lump at a time makes each wrong setting cost a trip.
+  * 13.6. D23: Cheese choice (OPEN).
+    * 13.6.1. Framing: three real, famously stinky cheeses go in the FRIDGE.
+    * 13.6.2. Options: Vieux-Boulogne, Époisses, Limburger, or Stinking Bishop.
+    * 13.6.3. **Chosen:** OPEN; recommendation is Vieux-Boulogne, Époisses, and Limburger, with Stinking Bishop as the alternate.
+    * 13.6.4. Why: they are widely cited as the stinkiest, and their names are funny on their own.
+  * 13.7. D22: Inverted WINGED SHOES hazard (OPEN).
+    * 13.7.1. Framing: v1 killed players who walked the realm in WINGED SHOES.
+    * 13.7.2. Options: build the hazard, or rely on named-flight refusal alone.
+    * 13.7.3. **Chosen:** OPEN; not built unless AndrewC ratifies it.
+    * 13.7.4. Why: AndrewC did not ratify it, and flight refusal already prevents the cheat.
+  * 13.8. D21: Source of the three INVERTED GEMS (OPEN).
+    * 13.8.1. Framing: the root panel needs three INVERTED GEMS; the v1 source is withdrawn.
+    * 13.8.2. Options: one gem per puzzle, three hidden finds, or a root nest revealed by the last solve.
+    * 13.8.3. **Chosen:** OPEN; recommendation is that solving the last realm puzzle reveals the ROOT HOLLOW, where the three gems hang in a root nest.
+    * 13.8.4. Why: completion stays the single trigger and no new character is needed.
+  * 13.9. D20: Realm name (OPEN).
+    * 13.9.1. Framing: the realm needs a final display name.
+    * 13.9.2. Options: keep the working name Lanternwild, or choose a parody name.
+    * 13.9.3. **Chosen:** OPEN; Lanternwild stays the working name, and code paths keep `lanternwild` whatever the display name.
+    * 13.9.4. Why: renaming paths later would churn every lane.
+  * 13.10. D19: v1 realm content withdrawn (ratified by AndrewC 2026-11-08).
+    * 13.10.1. Framing: the v1 realm challenges, characters, items, and premise no longer fit.
+    * 13.10.2. Options: keep parts, or replace them entirely.
+    * 13.10.3. **Chosen:** replace them entirely with Sections 5 and 6.
+    * 13.10.4. Why: the new realm is a comedy parody built on fair classic puzzles.
+  * 13.11. D18: Snuffbox use (ratified by AndrewC 2026-11-08).
+    * 13.11.1. Framing: the SNUFFBOX needs a use beyond deposit.
+    * 13.11.2. Options: decorative only, or a limited high.
+    * 13.11.3. **Chosen:** three stacking pinches of 6 high turns each; the empty box remains an heirloom; the first sniff earns +5 use.
+    * 13.11.4. Why: it reuses the shared high and gives the snuffbox a real use.
+  * 13.12. D17: Shared high (ratified by AndrewC 2026-11-08).
+    * 13.12.1. Framing: mushrooms and snuff would otherwise duplicate the trip logic and text.
+    * 13.12.2. Options: separate effects, or one generic high.
+    * 13.12.3. **Chosen:** one generic high, the 🍄 indicator for both, a 12-entry cycling pool, and source-specific opening lines only.
+    * 13.12.4. Why: one behavior, varied text, no early repeats.
+  * 13.13. D16: P5:MinimalCrossings replaces P5:SelfContainedRealm (ratified by AndrewC 2026-11-08).
+    * 13.13.1. Framing: the DEMOGORGONZOLA cheeses come from the manor FRIDGE.
+    * 13.13.2. Options: a fully self-contained realm, or minimal crossings.
+    * 13.13.3. **Chosen:** only the three fridge cheeses may cross.
+    * 13.13.4. Why: one fair, telegraphed crossing ties the realm to the manor without sprawl.
+  * 13.14. D15: Realm completion (ratified by AndrewC 2026-11-08).
+    * 13.14.1. Framing: the return path must wait for full completion.
+    * 13.14.2. Options: open the root gate per puzzle, or once all are solved.
+    * 13.14.3. **Chosen:** once all are solved, keeping the Section 6 root panel and four-beat lift.
+    * 13.14.4. Why: completion is the trigger, and the lift design was already approved.
+  * 13.15. D14: SHACK alphabet wall (ratified by AndrewC 2026-11-08).
+    * 13.15.1. Framing: parody the alphabet wall without a color mechanic or holiday theme.
+    * 13.15.2. Options: one secret word, or several accepted words.
+    * 13.15.3. **Chosen:** FART, STINK, or CHEESE all work; the KID'S DRAWING on the door is the clue and an heirloom.
+    * 13.15.4. Why: the drawing's arrows make the answer fair and funny.
+  * 13.16. D13: PLANETARIUM (ratified by AndrewC 2026-11-08).
+    * 13.16.1. Framing: a Myst Stoneship nod with a fixed number puzzle.
+    * 13.16.2. Options: a shuffled per-game mapping, or a fixed alphabetical mapping.
+    * 13.16.3. **Chosen:** fixed alphabetical numbering explained by the STELLAR MAP; 1, 3, 5 are safe, 2 ejects, 4 ignites.
+    * 13.16.4. Why: the map is the clue, and the burning exit chains into the brazier.
+  * 13.17. D12: RADIO QUIZ (ratified by AndrewC 2026-11-08).
+    * 13.17.1. Framing: an 80s name-that-tune that respects copyright.
+    * 13.17.2. Options: quoted lyrics, or original literal paraphrases.
+    * 13.17.3. **Chosen:** about 20 songs by 5 original clues, five numbered titles per round, three in a row wins, a miss resets, seedable random draw.
+    * 13.17.4. Why: titles are not protected expression, the literal paraphrase is the joke, and seeding keeps tests deterministic.
+  * 13.18. D11: DEMOGORGONZOLA (ratified by AndrewC 2026-11-08).
+    * 13.18.1. Framing: a monster puzzle with a feeding solution.
+    * 13.18.2. Options: an ordered feeding rule, or any order.
+    * 13.18.3. **Chosen:** all three cheeses in any order; any other interaction swallows you to the FRONT GATE; no petal key.
+    * 13.18.4. Why: the puzzle is finding the cheeses, not guessing an order.
+  * 13.19. D10: Named flights in the realm (ratified by AndrewC 2026-11-08).
+    * 13.19.1. Framing: mushroom or snuff flight could bypass the locker and root gate.
+    * 13.19.2. Options: allow flight, or refuse named flights in both directions.
+    * 13.19.3. **Chosen:** refuse named flights in both directions.
+    * 13.19.4. Why: the locker and root gate stay the only ways in and out.
+  * 13.20. D9: Realm theme and tone (ratified by AndrewC 2026-11-08).
+    * 13.20.1. Framing: the realm needs a comic identity.
+    * 13.20.2. Options: the v1 inverted fairy tale, or a Stranger Things and Narnia parody.
+    * 13.20.3. **Chosen:** the parody, with classic fair puzzles and light upside-down touches; no holiday theme; no reuse of existing gags as mechanics.
+    * 13.20.4. Why: the humor sells the puzzles without replacing them.
+  * 13.21. D8: Split of the 24 (ratified by AndrewC 2026-11-08).
+    * 13.21.1. Framing: 11 new heirlooms reach 24.
+    * 13.21.2. Options: 13+7 realm+4 manor, or 13+6 realm+5 manor.
+    * 13.21.3. **Chosen:** 13 existing, 5 manor, 6 realm.
+    * 13.21.4. Why: four realm puzzles yield six heirlooms, and five manor puzzles are pitched.
+  * 13.22. D7: Lift cycle before the gate opens.
+    * 13.22.1. Framing: the four-beat lift must not disturb existing play.
+    * 13.22.2. Options: always four beats, or the existing two beats until the gate opens.
+    * 13.22.3. **Chosen:** two beats until the gate opens.
+    * 13.22.4. Why: this preserves the solved-oak experience and existing saves.
+  * 13.23. D6: Part II hour labels.
+    * 13.23.1. Framing: the clock now has 24 hours.
+    * 13.23.2. Options: keep XIII, or relabel the implemented scene XXIV.
+    * 13.23.3. **Chosen:** XXIV.
+    * 13.23.4. Why: the clock now starts at 24.
+  * 13.24. D5: `::win` coupling.
+    * 13.24.1. Framing: requiring 24 heirlooms makes today's `::win` unwinnable.
+    * 13.24.2. Options: two PRs with `::win` temporarily broken on main, stacked PRs, or one PR with a phase gate.
+    * 13.24.3. **Chosen:** one PR with a phase gate.
+    * 13.24.4. Why: main never receives content without the matching route. Phase A validates with `@win` scenarios excluded; the final gate runs the full suite.
+  * 13.25. D4: Icons.
+    * 13.25.1. Framing: eleven new heirlooms need tray art.
+    * 13.25.2. Options: wait for Firefly PNGs, or use the tray's emoji fallback.
+    * 13.25.3. **Chosen:** run the existing Firefly tool when credentials exist; otherwise ship the tray's built-in emoji.
+    * 13.25.4. Why: no gameplay depends on art.
+  * 13.26. D3: Prose location.
+    * 13.26.1. Framing: parallel lanes write prose at once.
+    * 13.26.2. Options: `world.content.js`, or a per-module `content` export.
+    * 13.26.3. **Chosen:** per-module `content`.
+    * 13.26.4. Why: parallel lanes then avoid collisions.
+  * 13.27. D2: Realm exit.
+    * 13.27.1. Framing: the realm needs a way back to the manor.
+    * 13.27.2. Options: a GRAND BEDROOM wardrobe, or the root gate under the oak.
+    * 13.27.3. **Chosen:** the root gate.
+    * 13.27.4. Why: AndrewC's direction; the realm becomes a mine-to-oak traversal.
+  * 13.28. D1: Portal.
+    * 13.28.1. Framing: the realm needs an entrance.
+    * 13.28.2. Options: a new side tunnel, or a MINERS' LOCKER in the MINING GALLERY.
+    * 13.28.3. **Chosen:** the locker.
+    * 13.28.4. Why: it sits after DREADMAW and before the TROLL, and the gallery already shows where mining gear hung.
 * 14. Review gate (exactly one triad on the integrated batch, after Lane 13 and normal validation)
   * 14.1. ARCH brief: check P1 and P5.
     * 14.1.1. No realm or manor puzzle logic appears in `core.js`, `parser.js`, or `commands.js`; only generic verbs were added.
@@ -323,13 +352,12 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
   * 14.3. PROCESS brief:
     * 14.3.1. Work happened only in assigned worktrees, with no per-lane PRs.
     * 14.3.2. Phase B was spawned only after the recorded Phase A gate, and `::win` was untouched before it.
-    * 14.3.3. Each manor heirloom worker spawned only after its refined design was recorded.
+    * 14.3.3. Each manor heirloom worker spawned only after Lane 1 recorded its ratified design's exact grammar and text.
     * 14.3.4. The master status is current, and the CodeRabbit trigger follows the Coven route.
 
 ## Operator next actions
 
-* Decide or override the OPEN decisions D20 to D26 in Section 13. Without a reply, Lane 1 proceeds on each recommendation and records it as an AUTODECISION; D24 and D25 wait for the manor refinement.
-* Finish refining the five manor heirlooms in Section 7 with the main session so Lane 1 can record them.
+* Decide or override the OPEN decisions D20 to D23 and D26 to D28 in Section 13. Without a reply, Lane 1 proceeds on each recommendation and records it as an AUTODECISION.
 
 ## Verified evidence
 
