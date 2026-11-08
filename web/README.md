@@ -289,6 +289,48 @@ All test behavior is executable Gherkin. The gameplay-tagged scenarios play the
 entire game to victory, check its final score, and cover each death trap. Run the
 complete local suite after any change to the world.
 
+### Development-only route planning
+
+Run `node tools/route-plan.mjs` from `web/` to print the complete Part I command
+list and JSON metrics. This Node-only tool imports the actual merged `world`;
+game code never imports the tool. It plans 24 heirlooms, portable-item uses,
+puzzle prerequisites, bulk TAKE ALL, one PUT ALL IN RQ, and the ONE TRIP bonus.
+It executes every planned command against a fresh game and requires the derived
+maximum score, all 24 treasures inside the clock, and a live player in the
+ROYAL HALL. The simulation requires the 36-item BACKPACK.
+
+The opening flight goes to SHAFT for gear. A bounded branch-and-bound search
+(72 states per layer, at most 18,000 expansions per refined start) evaluates
+no second flight and 29 legal second-flight starting rooms; it chooses a
+second flight only when it reduces non-flight room changes. All subsequent
+travel is physical walking or the moving oak platform. The search honors
+gated `via` exits, locker access, the upper lift's original two beats, the
+aligned lower lift's four beats, and the planetarium's forced ejection to GATE.
+The fire route ignites in the ROYAL HALL, reaches the BRAZIER on turn four,
+and lights it while extinguishing the player.
+
+`transitions` and `transitionsPerHeirloom` count directional walking steps,
+matching the win trace's 77/13 = 5.9 baseline. Named flights, lift moves, and
+the involuntary ejection are listed separately; `roomChangesIncludingLiftAndEjection`
+is the search objective, excluding named flights. Revisits count entries
+after a room's first visit. The dev fixture uses radio seed `0x1a2b3c4d` and
+disables random chaos for repeatable output. Its three printed ANSWER numbers
+are **not** universal: an in-game route must read the persisted
+`realm:radioRound.correctOption` after starting the radio and after each
+correct answer (the LCG draws a new round), then send that answer.
+
+The exported `shortestWalk(from, to, options)` computes gated walking paths
+through lift beats; `solveSmallProblem` exactly orders up to twelve tasks
+with prerequisites. For example:
+
+```
+node --input-type=module -e 'import {shortestWalk} from "./tools/route-plan.mjs"; console.log(shortestWalk("gate", "privy"))'
+```
+
+Run `npx cucumber-js tests/features/route-planner.feature --import 'tests/steps/**/*.js'`
+to check the route-planner feature, or `npm test -- --tags "not @win"` for all
+non-win scenarios.
+
 ## Expanding the game (the whole point)
 
 **You only ever edit `js/world.js`.** The engine never needs to change.
