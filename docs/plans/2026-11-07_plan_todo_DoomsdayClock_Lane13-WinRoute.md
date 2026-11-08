@@ -1,10 +1,10 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane13-WinRoute.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-07.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane13-WinRoute.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
 # Lane 13: WinRoute
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
-* ModelPicker: mod:c60+s75='copilot:gpt-5.6-terra:1M:xhigh'
+* mod:c60+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `::win` rewrite in `web/js/sysop-menu.js` and `web/tests/features/sysop-menu.feature`.
 * Not produces: new content, planner internals.
 * Depends on: Lanes 11 and 12.
@@ -13,12 +13,12 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Opening: privy mushrooms, one named flight to the shaft; BACKPACK, HEADLAMP, troll riddle, vault (TAKE ALL: crest, shoes); REMOVE SHOES before the realm.
-* [ ] Realm in one pass: all five challenges, casket, root panel, ride the lift up from BELOW.
-* [ ] Walk the remaining grounds and manor in planner order with TAKE ALL per room, using items on arrival; ignite self early enough to arrive at the brazier ablaze.
+* [ ] Opening: KITCHEN FRIDGE cheeses with the other early gear, privy mushrooms, one named flight to the shaft; BACKPACK, HEADLAMP, troll riddle, vault (TAKE ALL).
+* [ ] Realm in one pass: feed DEMOGORGONZOLA, answer the radio quiz from its drawn clues until three in a row, take the STELLAR MAP and pick a safe number, spell the wall, take the drawing, seat the root panel, ride the lift up from BELOW.
+* [ ] Walk the remaining grounds and manor in planner order with TAKE ALL per room, solving the five manor puzzles and using items on arrival; ignite self early enough to arrive at the brazier ablaze.
 * [ ] One PUT ALL IN RQ; CLOSE RQ; open closet; pull rope; take and read the DOOMSDAY CLOCK; stop in the ROYAL HALL.
 * [ ] Update `pathToRoom` for the four-beat lift and keep the no-mushroom and after-bell recovery paths working.
-* [ ] Trace scenario asserts: one named flight, one bulk deposit, zero single-item RQ deposits, alive in ROYAL HALL holding the clock, score equals derived maximum, transitions per heirloom below 5.9; remove the `@win` exclusion.
+* [ ] Trace scenario asserts: one named flight, one bulk deposit, zero single-item RQ deposits, alive in the ROYAL HALL holding the clock, score equals the derived maximum, transitions per heirloom below 5.9; remove the `@win` exclusion.
 * [ ] Update `web/DESIGN.md` §8 route statistics and the sysop description.
 
 ## Acceptance

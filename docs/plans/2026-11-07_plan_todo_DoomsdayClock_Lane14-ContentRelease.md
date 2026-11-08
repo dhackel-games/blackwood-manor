@@ -1,10 +1,10 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-07.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
 # Lane 14: ContentRelease
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
-* ModelPicker: mod:c20+s90='copilot:gpt-6-luna:400K:medium'
+* mod:c20+s90='copilot:gpt-6-luna:400K:medium'
 * Produces: the content stamp commit, the single PR, and its merge.
 * Not produces: source changes.
 * Depends on: the single pre-PR triad and its one fix-worker result.

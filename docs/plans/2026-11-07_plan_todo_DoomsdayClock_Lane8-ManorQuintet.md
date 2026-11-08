@@ -1,24 +1,25 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane9-ManorQuartet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-07.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
-# Lane 9: ManorQuartet
+# Lane 8: ManorQuintet
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
-* ModelPicker: mod:c50+s80='copilot:gpt-5.6-terra:1M:xhigh'
-* Produces: `web/js/manor/{map,weathercock,snuffbox,corkscrew}.js` and `web/tests/features/manor-quartet.feature` (lane orch spawns one task worker per heirloom).
-* Not produces: Lanternwild modules, `::win`.
-* Depends on: Lane 2.
+* mod:c55+s60='copilot:gpt-5.6-terra:1M:xhigh'
+* Produces: `web/js/manor/{diamond,estatemap,corkscrew,snuffbox,weathercock}.js` and `web/tests/features/manor-quintet.feature` (the lane orchestrator spawns one task worker per heirloom).
+* Not produces: realm modules, `fridge.js`, the shared high handler, `::win`.
+* Depends on: Lane 2 and Lane 9; each heirloom also waits for its refined design in the Lane 1 canon doc (designs are under refinement with AndrewC).
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
 * Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
-* [ ] ESTATE MAP: four MAP PIECES at the GATE, HEDGE MAZE LOOP, PORCH, and ROOF; COMBINE PIECES yields the BLACKWOOD ESTATE MAP (`pendingHeirloom`, 15); puzzle +5 once.
-* [ ] WEATHERCOCK: ROOF gargoyle gazes give the compass order; TURN WEATHERVANE TO <direction> in order opens the CHIMNEY CACHE; wrong turn resets; SILVER WEATHERCOCK (`pendingHeirloom`, 15); +5 once.
-* [ ] SNUFFBOX: PARLOR urns plus two portraits flanking the Baron; ASK <portrait> ABOUT SNUFFBOX yields liar/truth/alternating statements; OPEN the deduced urn yields the BLACKWOOD SNUFFBOX (`pendingHeirloom`, 10); wrong urn releases harmless snuff and resets; +5 once.
-* [ ] CORKSCREW: KNOCK on WINE CELLAR casks; the hollow cask's BUNG can be UNSCREWed for the BLACKWOOD CORKSCREW (`pendingHeirloom`, 10); +5 once.
-* [ ] Gary hints and room search text for all four; `map.js` and `view2d/roomdata.json` item updates.
-* [ ] Feature covers each puzzle's success, reset, award once, and item rewards.
+* [ ] BLACKWOOD DIAMOND (under refinement): KITCHEN MICROWAVE dial SECONDS, YEARS, CENTURIES, EONS; COAL on EONS yields the DIAMOND (`pendingHeirloom: true`); too short gives slightly older coal; too long gives dust; coal source per D24; +5 once.
+* [ ] ESTATE MAP (under refinement): four MAP PIECES at the refined locations (pitched: privy TOILET, DREADMAW's nostril, Baron portrait's mouth, under a mattress); COMBINE yields the ESTATE MAP (`pendingHeirloom: true`); +5 once.
+* [ ] CORKSCREW (under refinement): KNOCK on WINE CELLAR casks with knock-knock joke replies; the hollow cask yields the CORKSCREW (`pendingHeirloom: true`); +5 once.
+* [ ] SNUFFBOX (under refinement): PARLOR liar-logic puzzle with Baron Munchhausen and two portraits yields the SNUFFBOX (`pendingHeirloom: true`); +5 once. Ratified use via Lane 9 `highSource`: SNIFF or USE takes one pinch for 6 stacking high turns with a sneeze opening; 3 pinches (`manor:snuffPinches`), then EMPTY but still an heirloom; first sniff earns +5 use.
+* [ ] WEATHERCOCK (under refinement): ROOF gargoyle gazes give a compass order; TURN WEATHERVANE through it opens the CHIMNEY CACHE with the SILVER WEATHERCOCK (`pendingHeirloom: true`) and a rooster crow; a wrong turn resets; +5 once.
+* [ ] Gary hints and room search text for all five; `web/js/map.js` and `web/view2d/roomdata.json` item updates.
+* [ ] Feature covers each puzzle's success, reset or failure, award once, item rewards, and the three snuff pinches stacking then EMPTY.
 
 ## Acceptance
 
@@ -29,4 +30,4 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 * None yet.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane9-ManorQuartet.md -->
+<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md -->

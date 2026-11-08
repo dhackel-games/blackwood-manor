@@ -7,7 +7,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
 ## Current status
 
 * Plan v2 written; no implementation started; `::win` untouched.
-* Todos: 0 done / 117 total (0%); 117 remaining.
+* Todos: 0 done / 106 total (0%); 106 remaining.
 * Coding progress: none. Realm and shared high are ratified; the manor quintet is pitched and under refinement with AndrewC.
 * Average task duration: UNKNOWN (0 measured tasks).
 * Completion ETA: UNKNOWN.

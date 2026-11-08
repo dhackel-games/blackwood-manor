@@ -1,27 +1,27 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-07.001:acoven. -->
+<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
 # Lane 10: DoomsdayCount
 
 Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
-* ModelPicker: mod:c65+s75='copilot:gpt-5.6-terra:1M:xhigh'
+* mod:c65+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: the 24-heirloom switch across `web/js/world.js`, `web/js/howto.js`, tests, and docs.
 * Not produces: `::win` route, route planner.
-* Depends on: Lanes 8 and 9.
+* Depends on: Lanes 7 and 8.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
 * Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
-* [ ] Flip every `pendingHeirloom` item to `treasure: true`; set `REQUIRED_FAMILY_ITEM_COUNT = 24`; remove the `pendingHeirloom` field.
-* [ ] Reliquary: 24 recesses ringed like a clock face in text and art; bell answers only when all 24 are seated.
-* [ ] Rename the clock to the DOOMSDAY CLOCK with prior names as aliases; describe 24 hours.
-* [ ] Part II: clock starts at XXIV; relabel the implemented Medusa/emerald scene Hour XXIV; ticking moves to XXIII; update `part-two.feature`.
+* [ ] Flip all eleven `pendingHeirloom` items (six realm, five manor) to `treasure: true`; set `REQUIRED_FAMILY_ITEM_COUNT = 24`; remove the `pendingHeirloom` field.
+* [ ] Reliquary: 24 recesses ringed like a clock face in text and art; the bell answers only when all 24 are seated.
+* [ ] Rename the clock to the DOOMSDAY CLOCK with COUNTDOWN CLOCK names as aliases; describe 24 hours.
+* [ ] Part II: the clock starts at XXIV; relabel the implemented Medusa/emerald scene Hour XXIV; ticking moves to XXIII; update `part-two.feature`.
 * [ ] Replace every stale "thirteen"/13-heirloom reference in `world.js`, `howto.js`, HUD, and features.
 * [ ] Save migration: saves with `curseLiftable` but fewer than 24 seated clear it; bell-rung and Part II saves keep their state; prove in `heirloom-migration.feature`.
 * [ ] 2D tray: emoji for all 11 new heirlooms; run `web/tools/gen-firefly-icons.py` for PNGs only if Firefly credentials exist in the environment.
 * [ ] Gary progression hints cover all 24.
-* [ ] Recompute the derived maximum; update `@maxscore` assertions; document the breakdown in `web/DESIGN.md` §8.
+* [ ] Apply the D26 values, recompute the derived maximum, update `@maxscore` assertions, and document the breakdown in `web/DESIGN.md` §8.
 * [ ] Docs: `README.md`, `web/README.md`, `web/DESIGN.md` §7, §8, §12.36; correction banners in `docs/design/0001` and `0002` pointing to `docs/plans/2026-11-07_info_LanternwildAndDoomsdayClockCanon.md`.
 
 ## Acceptance
