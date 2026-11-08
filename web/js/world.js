@@ -3150,6 +3150,14 @@ function enterSafeCode(ctx, cmd) {
   if (safeCode(cmd) !== SAFE_CODE) return "You dial that combination. The safe remains locked.";
   return finishOpeningSafe(ctx, "You dial seven left, three right, nine left.");
 }
+function dialSafe(ctx, cmd) {
+  const setting = String(cmd.setting || "").trim();
+  if (!setting) return "The DIAL needs a setting.";
+  if (safeCode({ dobj: setting }) !== SAFE_CODE) {
+    return `The SAFE dial accepts its own numbers, not ${setting.toUpperCase()}.`;
+  }
+  return enterSafeCode(ctx, { dobj: setting, iobj: null });
+}
 function openSafe(ctx, cmd) {
   const safe = ctx.item("safe");
   if (safe.open) return "The safe already stands open.";
@@ -5112,9 +5120,10 @@ const logicWorld = {
     },
     safe: {
       names: ["safe"], adjectives: ["iron"], loc: null, fixed: true, container: true, openable: true,
-      open: false, locked: true, capacity: 3,
+      open: false, locked: true, capacity: 3, dialable: true,
       on: {
         open: openSafe,
+        dial: dialSafe,
       },
     },
     talisman: {

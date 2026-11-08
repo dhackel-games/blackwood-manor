@@ -32,7 +32,8 @@ const VERBS = {
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],
   sit: ["sit"], use: ["use", "u"], flush: ["flush"],
-  hotline: ["hotline", "help", "call", "dial", "phone", "telephone", "hint", "hints"],
+  hotline: ["hotline", "help", "call", "phone", "telephone", "hint", "hints"],
+  dial: ["dial"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again"],
   map: ["map", "m", "chart", "floorplan"],
   code: ["code", "combination"],
@@ -147,7 +148,8 @@ export function parse(input) {
     words = [words[1], ...words.slice(2)];
   }
 
-  let verb = SYN[words[0].value];
+  const sourceVerb = words[0].value;
+  let verb = SYN[sourceVerb];
   if (!verb) {
     return {
       verb: null,
@@ -220,5 +222,7 @@ export function parse(input) {
     prep = null;
     iobj = null;
   }
-  return { verb, dobj, prep, iobj };
+  const parsed = { verb, dobj, prep, iobj };
+  if (sourceVerb === "spin") parsed.dialAction = "spin";
+  return parsed;
 }

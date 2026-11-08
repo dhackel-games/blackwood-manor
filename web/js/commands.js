@@ -7,6 +7,26 @@
 import { renderMap } from "./map.js?v=source";
 
 const normalizeRoomName = (name) => String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+const DIAL_HOTLINE_TARGETS = new Set(["gary", "phone", "hotline"]);
+
+function visibleDial(ctx) {
+  return ctx.visibleItems().find((item) =>
+    item.dialable && typeof ctx.world.items[item.id]?.on?.dial === "function") || null;
+}
+
+function runDial(ctx, dial, cmd, setting) {
+  return ctx.world.items[dial.id].on.dial(ctx, {
+    ...cmd,
+    dialId: dial.id,
+    setting,
+  });
+}
+
+function routeVisibleDial(ctx, cmd) {
+  if (normalizeRoomName(cmd.dobj) !== "dial") return null;
+  const dial = visibleDial(ctx);
+  return dial ? runDial(ctx, dial, cmd, cmd.iobj) : null;
+}
 
 function resolveRoom(ctx, phrase) {
   const wanted = normalizeRoomName(phrase);
@@ -556,8 +576,12 @@ export const commands = {
   spell() { return "There is nothing here to spell on."; },
   kick() { return "Kicking that would not help."; },
   fight() { return "There is no fight to pick here."; },
-  turn() { return "Nothing here turns."; },
-  set() { return "There is nothing here to set."; },
+  turn(ctx, cmd) {
+    return routeVisibleDial(ctx, cmd) ?? "Nothing here turns.";
+  },
+  set(ctx, cmd) {
+    return routeVisibleDial(ctx, cmd) ?? "There is nothing here to set.";
+  },
   start() { return "Nothing here starts."; },
   pour() { return "You have nothing suitable to pour there."; },
   fill() { return "There is nothing here to fill that with."; },
@@ -642,6 +666,14 @@ export const commands = {
     ctx.setFlag("usedGaryHelp", true);
     ctx.setFlag("onCall", true); // you're now on the line — see core.send routing
     return ctx.world.hotline(ctx);
+  },
+
+  dial(ctx, cmd) {
+    const target = normalizeRoomName(cmd.dobj);
+    if (DIAL_HOTLINE_TARGETS.has(target)) return commands.hotline(ctx, cmd);
+    const dial = visibleDial(ctx);
+    if (!dial) return commands.hotline(ctx, cmd);
+    return runDial(ctx, dial, cmd, cmd.dobj);
   },
 
   score(ctx) {
