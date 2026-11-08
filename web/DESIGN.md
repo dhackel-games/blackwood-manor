@@ -1147,3 +1147,14 @@ layouts render this as a separate floor. Named flight uses the same generic
 flight path as every other room, so it can enter and leave the realm without a
 realm-specific flight exception. The parser supplies generic fallback verbs
 for future puzzle modules; the engine contains no realm puzzle rules.
+
+#### 12.36.4 Shack alphabet wall
+
+The run-down SHACK's ALPHABET WALL is a typed-word puzzle, never a color
+mechanic: `SPELL` or `TYPE` FART, STINK, or CHEESE (including space-separated
+letters) produces the PURPLE CRAYON once. Other words reset the bulbs with a
+rude raspberry. The KID'S DRAWING on the door depicts DEMOGORGONZOLA farting
+under a blizzard of arrows, is independently takeable, and is the fair clue.
+Both it and the crayon are `pendingHeirloom` entries until the coordinated
+heirloom switch; their pickup and first use awards, plus the wall's persisted
+`realm:shackSpelled` progress award, cannot be farmed.
