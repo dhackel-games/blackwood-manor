@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane1-Canon.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane1-Canon.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 1: Canon
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c70+s60='copilot:gpt-6-sol:1M:max'
 * Produces: `docs/plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md`.
 * Not produces: source, tests, other docs, git operations beyond its own commit.
 * Depends on: none.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -32,4 +32,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 
 * None yet.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane1-Canon.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane1-Canon.md -->

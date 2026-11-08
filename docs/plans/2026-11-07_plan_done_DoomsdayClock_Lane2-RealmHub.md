@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane2-RealmHub.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 2: RealmHub
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c50+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/realm.js`, every module stub, module registration, generic verbs, and `web/tests/features/upsidedown-realm.feature`.
 * Not produces: puzzle logic, manor heirloom logic, shared high logic, `::win`, heirloom count.
 * Depends on: Lane 1.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -37,4 +37,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
   optional realm does not alter existing deterministic teleport destinations.
   Named flight remains entirely generic (D10).
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane2-RealmHub.md -->

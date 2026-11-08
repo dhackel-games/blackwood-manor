@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane13-WinRoute.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane13-WinRoute.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 13: WinRoute
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c60+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `::win` rewrite in `web/js/sysop-menu.js` and `web/tests/features/sysop-menu.feature`.
 * Not produces: new content, planner internals.
 * Depends on: Lanes 11 and 12.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -38,4 +38,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L13-02: When the upper oak puzzle was already solved, calculate the pre-alignment lift beat and wait only until the four-beat platform reaches BELOW before boarding; fresh runs retain the planner's 232-command route.
 * D-L13-03: Preserve an inventory DOOMSDAY CLOCK during save migration after heirloom transformation; otherwise the post-bell `::win` recovery and Part II branch lose the carried clock on restore.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane13-WinRoute.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane13-WinRoute.md -->

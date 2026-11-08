@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane11-ScoringIncentives.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane11-ScoringIncentives.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
 # Lane 11: ScoringIncentives
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c45+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: scoring changes in `web/js/world.js` and `web/tests/features/progress-scoring.feature`.
 * Not produces: `::win` route, planner.
 * Depends on: Phase A WAIT gate.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -32,4 +32,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L11-04: Verified existing evidence in `fire-food.feature`: the single MATCH lights the CANDLE; no production behavior changed.
 * D-L11-05: `maximumScore()` derives 1316: +330 deposits, +310 pickups, +310 uses, +306 progression, and +60 standalone awards. The sibling `::win` route remains out of this lane.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane11-ScoringIncentives.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane11-ScoringIncentives.md -->

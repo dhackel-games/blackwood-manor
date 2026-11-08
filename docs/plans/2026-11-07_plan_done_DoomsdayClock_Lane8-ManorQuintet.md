@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane8-ManorQuintet.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 8: ManorQuintet
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c55+s60='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/manor/{diamond,photograph,corkscrew,snuffbox,weathercock}.js` (`corkscrew.js` also holds the WINE BOTTLE) and `web/tests/features/manor-quintet.feature` (the lane orchestrator spawns one task worker per heirloom).
 * Not produces: realm modules, `fridge.js`, the shared high handler, the `letter` save migration (Lane 10), `::win`.
 * Depends on: Lane 2 and Lane 9; each heirloom also waits for Lane 1 to record its exact grammar and text (designs ratified by AndrewC 2026-11-08, master Section 7).
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -40,4 +40,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L8-corkscrew-01: Saved refill instances use `templateId: "wineBottle"` and `winebtl<N>` short names, preserving each bottle's state without adding another maximum-score item.
 * D-L8-corkscrew-02: WINE BOTTLE's pickup and use rewards share `progressItem:wineBottle` and `useItem:wineBottle` across all refill instances.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane8-ManorQuintet.md -->

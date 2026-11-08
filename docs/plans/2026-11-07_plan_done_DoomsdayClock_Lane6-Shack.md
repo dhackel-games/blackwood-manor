@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane6-Shack.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane6-Shack.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 6: Shack
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c40+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/shack.js` and `web/tests/features/upsidedown-shack.feature`.
 * Not produces: other modules, `::win`, any color mechanic or holiday decor.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -31,4 +31,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
   The SHACK content hook restores its normalized `F R T` form to `FART`, preserving
   the canonical spelling grammar without adding realm knowledge to the parser.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane6-Shack.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane6-Shack.md -->

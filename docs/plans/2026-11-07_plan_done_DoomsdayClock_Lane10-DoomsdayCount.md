@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane10-DoomsdayCount.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 10: DoomsdayCount
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c65+s75='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: the 24-heirloom switch across `web/js/world.js`, `web/js/howto.js`, tests, and docs.
 * Not produces: `::win` route, route planner.
 * Depends on: Lanes 7 and 8.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -34,4 +34,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L10-01: Firefly credentials were absent from the environment, so no PNG generation ran; the 2D tray ships all eleven new emoji fallbacks.
 * D-L10-02: A legacy transformed save moves the newly required treasure definitions inside the DOOMSDAY CLOCK without assigning their deposit-score flags or points, preserving its earned award ledger.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane10-DoomsdayCount.md -->

@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane12-RoutePlanner.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane12-RoutePlanner.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven. -->
 
 # Lane 12: RoutePlanner
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c72+s65='copilot:gpt-6-sol:1M:max'
 * Produces: `web/tools/route-plan.mjs`, `web/tests/features/route-planner.feature`, `web/tests/steps/lane12.steps.js`, and usage in `web/README.md`.
 * Not produces: `sysop-menu.js`, game modules.
 * Depends on: Phase A WAIT gate.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -37,4 +37,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L12-06: Report `transitions` as directional walking moves, matching the trace's 77/13 = 5.9 baseline; report lift moves and ejection separately, and minimize total non-flight room changes. The selected route walks 68 transitions (2.83 per heirloom), changes rooms 73 times excluding flights, flies to SHAFT and GARDEN, and visits the ROYAL HALL eight times (seven revisits).
 * D-L12-07: The coordinator requested the completed Lane 11 branch locally merged at `c21dd44` (wave head `b24ed66`); its `cmd.itemId` bulk fix, BACKPACK capacity 36, and ONE TRIP +25 are exercised directly without altering game modules. Peak carried load is 32 and the derived maximum is 1316.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane12-RoutePlanner.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane12-RoutePlanner.md -->

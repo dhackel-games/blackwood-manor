@@ -1,4 +1,4 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Doomsday Clock: master orchestration
 
@@ -191,18 +191,18 @@ Status: done. Released in PR #10 (merge commit 2bbece5) on 2026-11-08; content 2
     * 11.15.2. QUALITY and PROCESS: mod:c65+s60='copilot:gpt-5.6-terra:1M:xhigh'
 * 12. planit lanes (one integration branch `wave/doomsday-clock`, one PR)
   * 12.1. Phase A:
-    * 12.1.1. [Lane 1 Canon](2026-11-07_plan_todo_DoomsdayClock_Lane1-Canon.md) runs first.
-    * 12.1.2. [Lane 2 RealmHub](2026-11-07_plan_todo_DoomsdayClock_Lane2-RealmHub.md) runs next.
-    * 12.1.3. Then these run in parallel: [Lane 3 Demogorgonzola](2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md), [Lane 4 RadioQuiz](2026-11-07_plan_todo_DoomsdayClock_Lane4-RadioQuiz.md), [Lane 5 Planetarium](2026-11-07_plan_todo_DoomsdayClock_Lane5-Planetarium.md), [Lane 6 Shack](2026-11-07_plan_todo_DoomsdayClock_Lane6-Shack.md), and [Lane 9 SharedHigh](2026-11-07_plan_todo_DoomsdayClock_Lane9-SharedHigh.md).
-    * 12.1.4. [Lane 7 LowerPanelLift](2026-11-07_plan_todo_DoomsdayClock_Lane7-LowerPanelLift.md) runs after Lanes 3 and 8 (the campfire accepts the fridge MILK and JUG and the WINE BOTTLE).
-    * 12.1.5. [Lane 8 ManorQuintet](2026-11-07_plan_todo_DoomsdayClock_Lane8-ManorQuintet.md) runs after Lane 9 (the snuffbox needs the high hook); each heirloom worker spawns only once Lane 1 records that heirloom's exact grammar and text.
-    * 12.1.6. [Lane 10 DoomsdayCount](2026-11-07_plan_todo_DoomsdayClock_Lane10-DoomsdayCount.md) runs last, after Lanes 7 and 8.
+    * 12.1.1. [Lane 1 Canon](2026-11-07_plan_done_DoomsdayClock_Lane1-Canon.md) runs first.
+    * 12.1.2. [Lane 2 RealmHub](2026-11-07_plan_done_DoomsdayClock_Lane2-RealmHub.md) runs next.
+    * 12.1.3. Then these run in parallel: [Lane 3 Demogorgonzola](2026-11-07_plan_done_DoomsdayClock_Lane3-Demogorgonzola.md), [Lane 4 RadioQuiz](2026-11-07_plan_done_DoomsdayClock_Lane4-RadioQuiz.md), [Lane 5 Planetarium](2026-11-07_plan_done_DoomsdayClock_Lane5-Planetarium.md), [Lane 6 Shack](2026-11-07_plan_done_DoomsdayClock_Lane6-Shack.md), and [Lane 9 SharedHigh](2026-11-07_plan_done_DoomsdayClock_Lane9-SharedHigh.md).
+    * 12.1.4. [Lane 7 LowerPanelLift](2026-11-07_plan_done_DoomsdayClock_Lane7-LowerPanelLift.md) runs after Lanes 3 and 8 (the campfire accepts the fridge MILK and JUG and the WINE BOTTLE).
+    * 12.1.5. [Lane 8 ManorQuintet](2026-11-07_plan_done_DoomsdayClock_Lane8-ManorQuintet.md) runs after Lane 9 (the snuffbox needs the high hook); each heirloom worker spawns only once Lane 1 records that heirloom's exact grammar and text.
+    * 12.1.6. [Lane 10 DoomsdayCount](2026-11-07_plan_done_DoomsdayClock_Lane10-DoomsdayCount.md) runs last, after Lanes 7 and 8.
   * 12.2. WAIT: before spawning any Phase B lane, confirm every Phase A lane is done and that `cd web && npm test -- --tags "not @win"` exits 0 on the integration branch. AndrewC directive: "dont do anything with ::win yet until we build the new section."
   * 12.3. Phase B:
-    * 12.3.1. [Lane 11 ScoringIncentives](2026-11-07_plan_todo_DoomsdayClock_Lane11-ScoringIncentives.md) and [Lane 12 RoutePlanner](2026-11-07_plan_todo_DoomsdayClock_Lane12-RoutePlanner.md) run in parallel.
-    * 12.3.2. [Lane 13 WinRoute](2026-11-07_plan_todo_DoomsdayClock_Lane13-WinRoute.md) runs after both.
+    * 12.3.1. [Lane 11 ScoringIncentives](2026-11-07_plan_done_DoomsdayClock_Lane11-ScoringIncentives.md) and [Lane 12 RoutePlanner](2026-11-07_plan_done_DoomsdayClock_Lane12-RoutePlanner.md) run in parallel.
+    * 12.3.2. [Lane 13 WinRoute](2026-11-07_plan_done_DoomsdayClock_Lane13-WinRoute.md) runs after both.
     * 12.3.3. The single pre-PR triad follows.
-    * 12.3.4. [Lane 14 ContentRelease](2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md) runs last.
+    * 12.3.4. [Lane 14 ContentRelease](2026-11-07_plan_done_DoomsdayClock_Lane14-ContentRelease.md) runs last.
   * 12.4. Seam contract (fixed before any spawn):
     * 12.4.1. Lane 2 creates and registers every module stub in Section 4.3. Each later lane edits only its own modules, feature file, and lane-listed shared lines.
     * 12.4.2. Flag names: `realm:demoFed`, `realm:radioWon`, `realm:eyepieceDropped`, `realm:shackSpelled`, `realm:campfireOut`, `oak:lowerPanelAligned`, `oak:lowerPanelSlots`; radio seed `realm:radioSeed`; snuff pinches `manor:snuffPinches`; wine sips `manor:wineSips`; gargoyle award keys and flavor pools `gargoyleBurper`, `gargoyleFarter`, `gargoyleShitter`.
@@ -442,4 +442,4 @@ The triad's operator-noted surprises were ratified design changes, and its remai
 * The FRONT GATE (`gate`) exits east to the GARDEN, where the BRAZIER stands (checked in `web/js/world.js` on 2026-11-08).
 * P7 verified: hidden sight from the high, XRAY GOGGLES, or OBSIDIAN EYE reveals and enables the ATTIC NORTH and NURSERY IN passages, while the LIBRARY refusal acknowledges the revealed stair and names its physical LEVER requirement.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock.md -->

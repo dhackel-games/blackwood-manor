@@ -2,7 +2,7 @@
 
 # Goal
 
-Active master orchestration: [docs/plans/2026-11-07_plan_todo_DoomsdayClock.md](docs/plans/2026-11-07_plan_todo_DoomsdayClock.md). Root pointer: [_orch.md](_orch.md).
+Active master orchestration: [docs/plans/2026-11-07_plan_done_DoomsdayClock.md](docs/plans/2026-11-07_plan_done_DoomsdayClock.md). Root pointer: [_orch.md](_orch.md).
 
 * G1:Realm: a Stranger Things and Narnia parody realm, THE UPSIDE DOWN, behind a MINERS' LOCKER, with four classic adventure puzzles (DEMOGORGONZOLA, RADIO QUIZ, PLANETARIUM, SHACK), six heirlooms, and a return by the GREAT OAK lift once its LOWER PANEL is aligned.
 * G2:DoomsdayClock: 24 required heirlooms (13 existing, 5 new manor, 6 realm) forming a 24-hour DOOMSDAY CLOCK, with fair save migration.

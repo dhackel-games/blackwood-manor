@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane7-LowerPanelLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane7-LowerPanelLift.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 7: LowerPanelLift
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c65+s80='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/campfire.js`, `web/js/upsidedown/lowerpanel.js`, oak lift changes, `web/tests/features/upsidedown-campfire.feature`, `web/tests/features/upsidedown-lowerpanel.feature`, and `oak-tree-fort.feature` updates.
 * Not produces: `::win`, `sysop-menu.js` path helpers, the MILK JUG item (Lane 3), the WINE BOTTLE item (Lane 8).
 * Depends on: Lanes 3 and 8 (the campfire accepts the fridge MILK and JUG and the WINE BOTTLE).
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -34,4 +34,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * D-L7-01: Merge content prose by room and item id within the UPSIDE DOWN module seam, so puzzle-owned dynamic prose retains atlas-owned names and room details.
 * D-L7-02: On lower-panel alignment, retain an active upper lift at its current GROUND or ABOVE stop; otherwise create the lift at BELOW, matching D-L1-04.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane7-LowerPanelLift.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane7-LowerPanelLift.md -->

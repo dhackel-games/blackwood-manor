@@ -2,7 +2,7 @@
 
 # The Upside Down and Doomsday Clock canon
 
-This is the exact player-facing text and constant contract for Lanes 2 through 10. The [master plan](2026-11-07_plan_todo_DoomsdayClock.md) owns scope and award values; the quoted strings here are literal content, not examples. Existing prose not specifically replaced here stays unchanged.
+This is the exact player-facing text and constant contract for Lanes 2 through 10. The [master plan](2026-11-07_plan_done_DoomsdayClock.md) owns scope and award values; the quoted strings here are literal content, not examples. Existing prose not specifically replaced here stays unchanged.
 
 ## Conventions and parser grammar
 

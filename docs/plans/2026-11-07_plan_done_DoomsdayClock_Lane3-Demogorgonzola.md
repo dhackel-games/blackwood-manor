@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane3-Demogorgonzola.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Lane 3: Demogorgonzola
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c45+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/demogorgonzola.js`, `web/js/manor/fridge.js`, the MILK starting-location line in `web/js/world.js`, and `web/tests/features/upsidedown-demogorgonzola.feature`.
 * Not produces: other modules, `::win`.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -45,4 +45,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 * `cd /Users/acoven/dev/bm/wt-lane3-demogorgonzola/web && npm test -- --tags "not @win and not @maxscore"` — exit 0; 603 scenarios and 4931 steps passed.
 * `cd /Users/acoven/dev/bm/wt-lane3-demogorgonzola/web && npm test` — exit 1; the existing `@win` `::win` trace remains at 825 while the derived maximum is 875 because it does not collect the new Lane 3 portable rewards. Lane 13 owns the route update.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane3-Demogorgonzola.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane3-Demogorgonzola.md -->

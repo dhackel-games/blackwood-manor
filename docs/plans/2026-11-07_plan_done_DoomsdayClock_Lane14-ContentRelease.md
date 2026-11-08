@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane14-ContentRelease.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Lane 14: ContentRelease
 
-Status: done (filename flips to _done_ in the following commit). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in the following commit). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c20+s90='copilot:gpt-6-luna:400K:medium'
 * Produces: the content stamp commit, the single PR, and its merge.
 * Not produces: source changes.
 * Depends on: the single pre-PR triad and its one fix-worker result.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -30,4 +30,4 @@ Status: done (filename flips to _done_ in the following commit). Master: [2026-1
 
 * Release policy (master D34): all code, including the two completed local main commits, pushes only when the whole effort is done; plan docs may be pushed earlier.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane14-ContentRelease.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane14-ContentRelease.md -->

@@ -1,15 +1,15 @@
-<!-- 2026-11-07_plan_todo_DoomsdayClock_Lane9-SharedHigh.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
+<!-- 2026-11-07_plan_done_DoomsdayClock_Lane9-SharedHigh.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:acoven. -->
 
 # Lane 9: SharedHigh
 
-Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_done_DoomsdayClock.md](2026-11-07_plan_done_DoomsdayClock.md).
 
 * mod:c45+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: the shared high in `web/js/world.js` (`beginHigh`, the `highSource` merge hook, flavor pools), the P7:HiddenSightIsSearch reveal, `web/tests/features/shared-high.feature`, and `web/tests/features/hidden-sight.feature`.
 * Not produces: snuffbox or WINE BOTTLE items or puzzles, realm modules, `::win`.
 * Depends on: Lane 2.
 * Worktree: orchestrator-assigned absolute path, stated in the spawn brief; first preflight is `pwd` match.
-* Operator actions surface: [2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_todo_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
+* Operator actions surface: [2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions](2026-11-07_plan_done_DoomsdayClock.md#operator-next-actions) (record/reference only; no numbered lists in chat).
 
 ## Tasks
 
@@ -35,4 +35,4 @@ Status: done (filename flips to _done_ in a separate post-merge commit per plan_
 
 * Wine source (master D29) and P7:HiddenSightIsSearch (master D27) ratified by AndrewC 2026-11-08.
 
-<!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane9-SharedHigh.md -->
+<!-- end 2026-11-07_plan_done_DoomsdayClock_Lane9-SharedHigh.md -->
