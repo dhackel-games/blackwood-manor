@@ -184,6 +184,7 @@ const items = {
     takeable: true,
     serial: 1,
     shortName: "winebtl",
+    open: false,
     progressFlag: "progressItem:wineBottle",
     useFlag: "useItem:wineBottle",
     highSource: {

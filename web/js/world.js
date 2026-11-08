@@ -1137,7 +1137,7 @@ function hintEntries(ctx) {
     { topics: ["coin", "well", "rope", "garden"], done: dep("ancientCoin"), text: coinHint },
     { topics: ["grimoire", "library", "lever", "bookcase", "chamber"], done: dep("grimoire"),
       text: "In the LIBRARY there's a brass LEVER where a book should be. PULL it — a bookcase swings open onto a stair DOWN to a hidden chamber. The grimoire's there. Bring your lit candle; it's black as pitch." },
-    { topics: ["decanter", "wine", "cellar", "trapdoor"], done: dep("crystalDecanter"),
+    { topics: ["decanter", "cellar", "trapdoor"], done: dep("crystalDecanter"),
       text: "Crystal decanter's in the WINE CELLAR. OPEN the CELLAR trap-door in the KITCHEN, go DOWN. Pitch dark — candle had better be lit or you're a grue's dinner. Unlike me, who has eaten NOTHING." },
     { topics: ["portrait", "attic", "ladder", "cord", "landing"], done: dep("ancestralPortrait"),
       text: "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first." },
