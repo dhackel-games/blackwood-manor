@@ -13,7 +13,7 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] Run `ios/release-testflight.sh --stamp-only --force-next-build` and commit the content identity before final validation.
+* [x] Run `ios/release-testflight.sh --stamp-only --force-next-build` and commit the content identity before final validation.
 * [ ] Final head gate: full `npm test` exit 0 on HEAD; record `validated_final_sha`.
 * [ ] Before opening one PR from `wave/doomsday-clock`, confirm the master Closure, AUTODECISIONS, and No new INTs recap are current; then post the exact `@coderabbitai review` comment and follow prreview's bounded lifecycle.
 * [ ] Merge with a merge commit; verify server MERGED; Pages deploy succeeds; cleanup removes branch and worktree residue.
