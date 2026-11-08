@@ -122,7 +122,7 @@ Feature: Fire and food consequences
     And I send "place emerald gem in reliquary"
     Then item "emberStone" is in "reliquary"
     And the game score is 50
-    And the output contains line "HEIRLOOMS: 0/13 +1"
+    And the output contains line "HEIRLOOMS: 0/24 +1"
 
   Scenario: The lit portable candle can patiently ignite the garden brazier
     Given the player is in room "garden"

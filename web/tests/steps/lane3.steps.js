@@ -20,10 +20,9 @@ Then("item {string} is gone", function (id) {
   assert.equal(this.game.roomOf(id), null);
 });
 
-Then("item {string} is pending heirloom worth {int} and not treasure", function (id, points) {
+Then("item {string} is a treasure heirloom worth {int}", function (id, points) {
   const item = this.game.world.items[id];
-  assert.equal(item.pendingHeirloom, true);
-  assert.equal(item.treasure, undefined);
+  assert.equal(item.treasure, true);
   assert.equal(item.points, points);
 });
 

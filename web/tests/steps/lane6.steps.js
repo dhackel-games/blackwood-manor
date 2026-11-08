@@ -6,11 +6,10 @@ Then("item {string} is in room {string}", function (item, room) {
   assert.equal(this.game.roomOf(item), room);
 });
 
-Then("item {string} is a pending heirloom", function (item) {
+Then("item {string} is a treasure heirloom", function (item) {
   const definition = this.game.world.items[item];
   assert.ok(definition, `Missing item "${item}"`);
-  assert.equal(definition.pendingHeirloom, true);
-  assert.equal(definition.treasure, undefined);
+  assert.equal(definition.treasure, true);
 });
 
 // end lane6.steps.js

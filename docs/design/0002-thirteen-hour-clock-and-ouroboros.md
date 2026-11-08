@@ -2,18 +2,12 @@
 
 # Chapter 2 — The Thirteen-Hour Clock & the Ouroboros (design update)
 
-> **CORRECTION 2026-09-21 — Part-I heirloom roster.** The required set remains
-> exactly thirteen and keeps its 195-point deposit total. The +20 slot belongs
-> to the BLACKWOOD FAMILY RING in the HALL BEDROOM night-table drawer. The
-> BELFRY bats still drop XRAY GOGGLES, but the goggles are non-heirloom EYES
-> equipment. The BM WATCH waits inside the STUDY desk drawer beneath the diary as a
-> non-heirloom WRIST crystal-ball-like `SHOW`/`SCRY` and route utility, while a +12 BLACKWOOD HAMMER holds its
-> former heirloom role between the walls. The old candlestick becomes the sole
-> portable CANDLE; it and the removable HALL BEDROOM MIRROR SHARD restore the
-> DINING ROOM CANDELABRA for a one-time +20 puzzle bonus; depositing the
-> restored heirloom separately awards +10. Hour XIII's already-implemented emerald scene
-> remains a non-reliquary Part-II set-piece, so the unbuilt Hours XII–I roster
-> must be reconciled against the current thirteen before those hours ship.
+> **CORRECTION 2026-11-08 — Part-I heirloom roster.** This historical design
+> note is superseded for the roster, clock, and award contract by [The Upside
+> Down and Doomsday Clock
+> canon](../plans/2026-11-07_info_UpsideDownAndDoomsdayClockCanon.md). The
+> current game uses twenty-four heirlooms, the DOOMSDAY CLOCK, and the canon's
+> authoritative award ledger.
 >
 > **UPDATE 2026-09-15 — the simplified reliquary/clock seam is implemented.**
 > The game shows its title and initial AI status, composes a fallback from

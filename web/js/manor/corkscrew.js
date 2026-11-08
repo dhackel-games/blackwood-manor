@@ -173,7 +173,7 @@ const items = {
     adjectives: ["plain", "iron", "wine"],
     loc: "wineCellar",
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
     points: 5,
     on: { use: useCorkscrew, open: openWithCorkscrew },
   },

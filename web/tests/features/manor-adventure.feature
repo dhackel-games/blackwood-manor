@@ -9,6 +9,7 @@ Feature: Blackwood Manor adventure
     Given a fresh manor game
 
   Scenario: Complete the manor and leave through the opened front door
+    Given the random number generator always returns 0.0
     When I play this command sequence:
       """
       east
@@ -18,6 +19,8 @@ Feature: Blackwood Manor adventure
       north
       unlock door with iron key
       open door
+      open mailbox
+      take letter
       north
       west
       take candle
@@ -56,6 +59,65 @@ Feature: Blackwood Manor adventure
       take family crest
       take winged shoes
       wear winged shoes
+      fly kitchen
+      open fridge
+      take limburger
+      take epoisses
+      take munster
+      fly wine cellar
+      take corkscrew
+      fly parlor
+      take coal
+      fly kitchen
+      put coal in microwave
+      set dial to b
+      start microwave
+      take blackwood diamond
+      fly landing
+      examine bust
+      pick nose
+      fly roof
+      turn weathercock to face burper
+      turn weathercock to face farter
+      turn weathercock to face shitter
+      turn weathercock to face horizon gazer
+      take weathercock
+      fly loop
+      take photo piece b
+      fly privy
+      take photo piece c
+      fly library
+      read rotting book
+      take pieced
+      combine pieces
+      fly gallery
+      open locker
+      in
+      north
+      feed limburger
+      feed epoisses
+      feed munster
+      take rind
+      south
+      east
+      turn on cabinet radio
+      answer 5
+      answer 1
+      answer 4
+      take transistor
+      north
+      east
+      take stellar map
+      west
+      say 1
+      take eyepiece
+      south
+      west
+      west
+      take drawing
+      spell fart
+      take crayon
+      fly dreadmaw vault
       west
       west
       up
@@ -67,6 +129,17 @@ Feature: Blackwood Manor adventure
       north
       north
       put family crest in reliquary
+      put blackwood diamond in reliquary
+      put silver weathercock in reliquary
+      put snuffbox in reliquary
+      put baroness photograph in reliquary
+      put corkscrew in reliquary
+      put rind in reliquary
+      put transistor in reliquary
+      put gold eyepiece in reliquary
+      put purple crayon in reliquary
+      put stellar map in reliquary
+      put kids drawing in reliquary
       drop doubloon
       south
       south
@@ -184,7 +257,7 @@ Feature: Blackwood Manor adventure
       south
       """
     Then the game is won
-    And the game score is 750
+    And the game score is 1161
     And the player rank contains "Master of Blackwood Manor"
 
   Scenario: Entering the well without a rope is fatal
@@ -372,7 +445,7 @@ Feature: Blackwood Manor adventure
     And I send "open bell closet"
     And I send "pull bell rope"
     And I send "examine reliquary"
-    Then the output contains "COUNTDOWN CLOCK"
+    Then the output contains "DOOMSDAY CLOCK"
     And the game is not won
     And item "clockTalisman" is in "reliquary"
 

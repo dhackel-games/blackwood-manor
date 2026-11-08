@@ -4,10 +4,11 @@ import assert from "node:assert";
 import { Then } from "@cucumber/cucumber";
 import { HUD_SLOT_DEFINITIONS } from "../../js/hud.js";
 
-Then("the snuffbox is carried as a pending heirloom", function () {
+Then("the snuffbox is carried as a treasure heirloom", function () {
   const snuffbox = this.game.item("snuffbox");
   assert.equal(snuffbox.loc, "inventory");
-  assert.equal(snuffbox.pendingHeirloom, true);
+  assert.equal(snuffbox.treasure, true);
+  assert.equal(snuffbox.points, 10);
 });
 
 Then("the snuffbox has {int} pinches remaining", function (pinches) {

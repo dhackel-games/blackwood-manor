@@ -20,7 +20,7 @@ Feature: Planetarium projector and stellar map
     And the output contains "5 URANUS MAJOR"
     And flag "useItem:stellarMap" is set
     And the game score is 10
-    And the Planetarium heirlooms remain pending and non-treasures
+    And the Planetarium heirlooms are treasures with ratified deposits
 
   Scenario Outline: Gary has the Planetarium safety hints
     Given the random number generator always returns 1.0

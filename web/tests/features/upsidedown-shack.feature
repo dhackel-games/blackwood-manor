@@ -13,7 +13,7 @@ Feature: The Shack alphabet wall
     Then the output contains "The bulbs spell <word> back at you. The wall hiccups and spits out a PURPLE CRAYON with a tiny BM stamped on its wrapper. (+10)"
     And flag "realm:shackSpelled" is true
     And item "purpleCrayon" is in room "shack"
-    And item "purpleCrayon" is a pending heirloom
+    And item "purpleCrayon" is a treasure heirloom
     And the game score is 10
 
     Examples:
@@ -45,7 +45,7 @@ Feature: The Shack alphabet wall
     Then the output contains "The drawing has enough arrows to turn a single rude noise into a road map. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
     When I send "take kid's drawing"
     Then the game score is 5
-    And item "kidsDrawing" is a pending heirloom
+    And item "kidsDrawing" is a treasure heirloom
     When I send "search"
     Then the output contains "The door's nail remembers a drawing covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
     When I send "read drawing"

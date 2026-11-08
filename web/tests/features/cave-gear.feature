@@ -198,19 +198,19 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Then item "familyCrest" is in "inventory"
     And item "wingedShoes" is worn in slot "feet"
 
-  Scenario: Thirteen family heirlooms are required to lift the curse
-    Then the required family item count is 13
+  Scenario: Twenty-four family heirlooms are required to lift the curse
+    Then the required family item count is 24
 
   Scenario: The reliquary accepts junk but marks it as non-contributing
     Then the reliquary HUD is hidden
     Given the player is in room "grandHall"
     When I send "examine rq"
-    Then the output contains line "HEIRLOOMS: 0/13 +0"
+    Then the output contains line "HEIRLOOMS: 0/24 +0"
     Given item "rope" is carried
     When I send "put rope in reliquary"
     Then item "rope" is in "reliquary"
-    And the output contains line "HEIRLOOMS: 0/13 +1"
-    And the reliquary HUD shows "0/13 +1"
+    And the output contains line "HEIRLOOMS: 0/24 +1"
+    And the reliquary HUD shows "0/24 +1"
 
   Scenario: The protective talisman becomes an heirloom after its crypt work is done
     Given item "talisman" is carried
@@ -224,7 +224,7 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     Given item "goldLocket" is carried
     When I send "put talisman in reliquary"
     Then item "talisman" is in "reliquary"
-    And the output contains line "HEIRLOOMS: 1/13 +0"
+    And the output contains line "HEIRLOOMS: 1/24 +0"
     And the game score is 20
 
   Scenario: USE wears wearable equipment
@@ -286,14 +286,14 @@ Feature: Dreadmaw's mine, wearable gear, and the roof route
     And item "backpack" is carried
     And item "backpack" is worn in slot "back"
     And the output contains "Still worn"
-    And the output contains line "HEIRLOOMS: 1/13 +1"
+    And the output contains line "HEIRLOOMS: 1/24 +1"
     And the game score is 25
     When I send "close rq"
     And I send "<withdraw>"
     Then the output contains "(open GLASS RELIQUARY; take ALL from GLASS RELIQUARY)"
     And item "familyCrest" is carried
     And item "rope" is carried
-    And the output contains line "HEIRLOOMS: 0/13 +0"
+    And the output contains line "HEIRLOOMS: 0/24 +0"
     And the game score is 35
 
     Examples:

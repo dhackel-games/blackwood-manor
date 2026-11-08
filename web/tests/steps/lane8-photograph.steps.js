@@ -9,10 +9,9 @@ Given("all loose photograph pieces are carried", function () {
   }
 });
 
-Then("the Baroness Photograph is a pending heirloom worth {int}", function (points) {
+Then("the Baroness Photograph is a treasure heirloom worth {int}", function (points) {
   const photograph = this.game.world.items.baronessPhotograph;
-  assert.equal(photograph.pendingHeirloom, true);
-  assert.equal(photograph.treasure, undefined);
+  assert.equal(photograph.treasure, true);
   assert.equal(photograph.points, points);
 });
 

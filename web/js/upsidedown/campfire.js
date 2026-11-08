@@ -202,7 +202,7 @@ const shortNames = {
   },
 };
 const progressAwards = {
-  campfireOut: { points: 5, maximumScore: false },
+  campfireOut: 5,
 };
 const hints = [
   (ctx) => ({

@@ -193,7 +193,7 @@ const items = {
     names: ["portable transistor radio", "transistor radio", "portable radio", "transistor"],
     loc: "cabinetRadio",
     takeable: true,
-    pendingHeirloom: true,
+    treasure: true,
     points: 15,
     on: {
       listen: transistorUse,
@@ -226,7 +226,7 @@ const shortNames = {
 };
 
 const progressAwards = {
-  radioWon: { points: 10, maximumScore: false },
+  radioWon: 10,
 };
 
 const hints = [

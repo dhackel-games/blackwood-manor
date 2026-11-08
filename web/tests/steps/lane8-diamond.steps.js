@@ -46,10 +46,9 @@ Then("the microwave coal outcome is {string}", function (outcome) {
   throw new Error(`Unknown microwave outcome "${outcome}"`);
 });
 
-Then("the Blackwood Diamond remains a pending heirloom worth {int}", function (points) {
+Then("the Blackwood Diamond is a treasure heirloom worth {int}", function (points) {
   const diamond = this.game.world.items.blackwoodDiamond;
-  assert.equal(diamond.pendingHeirloom, true);
-  assert.equal(diamond.treasure, undefined);
+  assert.equal(diamond.treasure, true);
   assert.equal(diamond.points, points);
 });
 

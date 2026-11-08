@@ -77,7 +77,7 @@ Feature: Copilot's mystery package and lightning jumps
     When I send "out"
     Then the current room is "grandHall"
     When I send "put bm hammer in reliquary"
-    Then the output contains line "HEIRLOOMS: 1/13 +0"
+    Then the output contains line "HEIRLOOMS: 1/24 +0"
     And the game score is 22
 
   Scenario: Opening the package can teleport you straight into the crypt wraith
