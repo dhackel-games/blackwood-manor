@@ -25,6 +25,21 @@ Feature: Development-only route planner
     Then the planned walk has 1 room transition
     And the planned walk commands are "in"
 
+  Scenario: DREADMAW and the troll each guard a flagged cave exit
+    Given the route has no unlocked exits
+    When I plan a walk from "dragonCaveMouth" to "mineGallery"
+    Then the planned walk is unreachable
+    Given route flag "dragonMoved" is set
+    When I plan a walk from "dragonCaveMouth" to "mineGallery"
+    Then the planned walk has 2 room transitions
+    And the planned walk commands are "e; e"
+    When I plan a walk from "trollGate" to "dreadmawVault"
+    Then the planned walk is unreachable
+    Given route flag "dragonVaultOpen" is set
+    When I plan a walk from "trollGate" to "dreadmawVault"
+    Then the planned walk has 1 room transition
+    And the planned walk commands are "e"
+
   Scenario: The aligned lift rides the actual four-beat cycle
     Given the route has no unlocked exits
     And route flag "oak:lowerPanelAligned" is set
@@ -63,5 +78,14 @@ Feature: Development-only route planner
     Then the planned task order is "safe, eject"
     And the planned task route has 1 room transition
     And the planned task commands are "say 1; say 4; extinguish self"
+
+  Scenario: The full sweep scores every portable and deposits every heirloom at once
+    When I plan the complete Part I sweep
+    Then the planned player ends alive in the Royal Hall with all 24 heirlooms in the clock
+    And the planned sweep earns the derived maximum and ONE TRIP bonus
+    And the planned sweep uses one bulk deposit and no more than two named flights
+    And the planned sweep lights the brazier from body fire on its fourth turn
+    And the planned transition ratio improves on the 77-for-13 baseline
+    And the optional second flight saves non-flight room transitions
 
 # end route-planner.feature
