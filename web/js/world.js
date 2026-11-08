@@ -5372,8 +5372,8 @@ function mergeContentModules(baseWorld) {
     for (const verb of highSourceActions(item)) {
       const existing = item.on[verb];
       item.on[verb] = (ctx, cmd) => {
-        const result = useHighSource(ctx, ctx.find(cmd.dobj), cmd);
-        return result ?? existing?.(ctx, cmd) ?? null;
+        const result = existing?.(ctx, cmd);
+        return result ?? useHighSource(ctx, ctx.find(cmd.dobj), cmd) ?? null;
       };
     }
   }
