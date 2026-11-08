@@ -1,4 +1,4 @@
-# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
 
 @walkthrough
 Feature: Rusted weathervane and roof gargoyles
@@ -16,6 +16,12 @@ Feature: Rusted weathervane and roof gargoyles
     And the output contains "The FAR-GAZING GARGOYLE faces EAST"
     And the output contains "SOUTHEAST toward the TREE FORT"
     And the output does not match "BURPER|FARTER|SHITTER|HORIZON-GAZER"
+    When I send "examine north gargoyle"
+    Then the output contains "as if it is about to burp."
+    When I send "examine west gargoyle"
+    Then the output contains "as if dreading the fart it is about to let rip."
+    When I send "examine south gargoyle"
+    Then the output contains "as if trying to hold back a poop explosion."
     When I send "search"
     Then the output contains "The ridge from the BELFRY is solid enough to walk."
     And the output does not match "BURPER|FARTER|SHITTER|HORIZON-GAZER"
@@ -23,20 +29,22 @@ Feature: Rusted weathervane and roof gargoyles
 
   Scenario: Directional and legacy grammar direct the weathervane and award once
     When I send "point vane n"
-    Then the output contains "The north gargoyle pats its chest and makes the gutter ring. (+2) (+5)"
+    Then the output contains "unleashes a BURP so huge it rattles every slate on the roof"
+    And the output contains "settles back into stone. (+2) (+5)"
     And flag "progressAward:gargoylePuffCheeks" is set
     And flag "useItem:rustedWeathervane" is set
     And the game score is 7
     When I send "move vane w"
-    Then the output contains "The west gargoyle pinches its nose and points accusingly at an innocent cloud. (+2)"
+    Then the output contains "FARTS a blast that flattens your hair"
+    And the output contains "turns back to stone. (+2)"
     And flag "progressAward:gargoyleNosePinch" is set
     And the game score is 9
     When I send "rotate vane s"
-    Then the output contains "The south gargoyle clutches its stone rear. Even the mortar looks nervous. (+2)"
+    Then the output contains "comes to life and SHARTS magnificently, splattering you from boots to eyebrows. It apologizes profusely and turns back to stone. (+2)"
     And flag "progressAward:gargoyleRearGuard" is set
     And the game score is 11
     When I send "turn vane n"
-    Then the output contains "Its puffed cheeks deflate like sad bagpipes; three pigeons resign."
+    Then the output contains "BURPS a gale of ancient pigeon breath into your face"
     And the game score is 11
 
   Scenario: Gargoyle pools persist through a save without an early repeat
@@ -110,6 +118,9 @@ Feature: Rusted weathervane and roof gargoyles
       | topic           | hint                                                                                                                          |
       | hint roof       | From the ATTIC, fly through the skylight, or find the NORTH door with hidden sight, then go UP from the HIDDEN VAULT and WEST from the BELFRY. |
       | hint gargoyles  | The WEATHERVANE can face the NORTH, WEST, SOUTH, or EAST gargoyle. Visit the first three before the FAR-GAZING GARGOYLE EAST; a freed vane cannot turn again. |
-      | hint weathervane | TURN VANE TO FACE a gargoyle or direction. The FAR-GAZING GARGOYLE EAST points SOUTHEAST toward the TREE FORT and frees the RUSTED WEATHERVANE. |
+      | hint weathervane | TURN VANE NORTH, WEST, SOUTH, or EAST. The FAR-GAZING GARGOYLE EAST points SOUTHEAST toward the TREE FORT and frees the RUSTED WEATHERVANE. |
+
+  Scenario: Every gargoyle reply is a full scene that comes to life, acts, apologizes, and returns to stone
+    Then every roof gargoyle reply comes to life, does its deed, apologizes, and turns back to stone
 
 # end manor-weathervane.feature

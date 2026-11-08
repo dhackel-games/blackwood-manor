@@ -1,4 +1,4 @@
-// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
 
 const WEATHERVANE_FREED = "manor:weathervaneFreed";
 
@@ -151,21 +151,21 @@ const content = {
         "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
         "a narrow ridge runs EAST to the BELFRY. Four fixed GARGOYLES crouch around a RUSTED WEATHERVANE. Each grips its center post with one hand, except the FAR-GAZING GARGOYLE EAST, which faces away and braces it with a curled stone tail while pointing SOUTHEAST toward the TREE FORT.",
       searchDesc:
-        "The ridge from the BELFRY is solid enough to walk. The NORTH GARGOYLE has ballooned cheeks and a free fist against its chest; the EAST GARGOYLE faces away, its curled stone tail bracing the WEATHERVANE post while one arm points SOUTHEAST at the TREE FORT; the SOUTH GARGOYLE guards its own backside; the WEST GARGOYLE pinches its nose with watering eyes.",
+        "The ridge from the BELFRY is solid enough to walk. The NORTH GARGOYLE has ballooned cheeks and a free fist against its chest, about to burp; the EAST GARGOYLE faces away, its curled stone tail bracing the WEATHERVANE post while one arm points SOUTHEAST at the TREE FORT; the SOUTH GARGOYLE clamps a hand over its backside, trying to hold back a poop explosion; the WEST GARGOYLE pinches its nose with watering eyes, dreading the fart it is about to let rip.",
     },
   },
   items: {
     gargoylePuffCheeks: {
-      roomDesc: "The PUFF-CHEEKED GARGOYLE faces NORTH, one hand on the WEATHERVANE post and its free fist against its chest.",
-      desc: "The puff-cheeked gargoyle grips the center post with one hand, cheeks swollen and free fist pressed to its chest.",
+      roomDesc: "The PUFF-CHEEKED GARGOYLE faces NORTH, one hand on the WEATHERVANE post and its free fist against its chest, looking about to burp.",
+      desc: "The puff-cheeked gargoyle grips the center post with one hand, cheeks swollen and free fist pressed to its chest, as if it is about to burp.",
     },
     gargoyleNosePinch: {
-      roomDesc: "The NOSE-PINCHING GARGOYLE faces WEST, one hand on the post and its free hand pinching its nose.",
-      desc: "The nose-pinching gargoyle grips the center post with one hand, pinches its nose with the other, and looks offended by an inescapable wind.",
+      roomDesc: "The NOSE-PINCHING GARGOYLE faces WEST, one hand on the post and its free hand pinching its nose, as if dreading the fart it is about to let rip.",
+      desc: "The nose-pinching gargoyle grips the center post with one hand and pinches its nose with the other, as if dreading the fart it is about to let rip.",
     },
     gargoyleRearGuard: {
-      roomDesc: "The REAR-GUARDING GARGOYLE faces SOUTH, one hand on the post and its free hand guarding its backside.",
-      desc: "The rear-guarding gargoyle grips the center post with one hand and guards its own backside with the other.",
+      roomDesc: "The REAR-GUARDING GARGOYLE faces SOUTH, one hand on the post and its free hand guarding its backside, as if trying to hold back a poop explosion.",
+      desc: "The rear-guarding gargoyle grips the center post with one hand and clamps the other over its own backside, as if trying to hold back a poop explosion.",
     },
     gargoyleFarGazing: {
       roomDesc: "The FAR-GAZING GARGOYLE faces EAST away from the vane, its curled stone tail bracing the post while one arm points SOUTHEAST toward the TREE FORT.",
@@ -206,7 +206,7 @@ const hints = [
   {
     topics: ["weathervane", "vane"],
     done: false,
-    text: "TURN VANE TO FACE a gargoyle or direction. The FAR-GAZING GARGOYLE EAST points SOUTHEAST toward the TREE FORT and frees the RUSTED WEATHERVANE.",
+    text: "TURN VANE NORTH, WEST, SOUTH, or EAST. The FAR-GAZING GARGOYLE EAST points SOUTHEAST toward the TREE FORT and frees the RUSTED WEATHERVANE.",
   },
 ];
 const roomHooks = {
@@ -223,46 +223,46 @@ const roomHooks = {
 };
 const flavorPools = {
   gargoylePuffCheeks: [
-    "The north gargoyle pats its chest and makes the gutter ring.",
-    "Its puffed cheeks deflate like sad bagpipes; three pigeons resign.",
-    "One stone fist thumps its chest, and a deep rumble rolls down the roof like a loose barrel.",
-    "It holds both cheeks swollen until a gutter pipe answers with a rude echo.",
-    "Its fist remains over its heart while its mouth releases an extremely personal thunderclap.",
-    "Its cheeks bulge so far that the silver vane seems to duck.",
-    "A squeak slips through clenched lips and frightens a piece of mortar loose.",
-    "It taps its chest, waits for applause, and supplies its own booming encore.",
-    "Air escapes its puffed cheeks in a long note that sounds like a tuba clearing its throat.",
-    "Its free fist rises to its chest just before a pigeon learns about shock waves.",
-    "Its cheeks inflate like two tiny moons, then collapse into one enormous stone rumble.",
-    "It slaps its chest and answers the rusted vane with an uninvited digestive fanfare.",
+    "The puff-cheeked gargoyle creaks to life, unleashes a BURP so huge it rattles every slate on the roof and blows your hair straight back, mutters \"pardon me,\" and settles back into stone.",
+    "With a grinding of granite the gargoyle wakes, swells, and BURPS a gale of ancient pigeon breath into your face. It whispers \"so sorry, centuries of gas,\" and stiffens back into stone.",
+    "It blinks to life, thumps its chest once, and BURPS loud enough to echo off the BELFRY, showering you in mortar dust. It bows apologetically and turns back to stone.",
+    "The gargoyle comes alive just long enough to BURP a perfect smoke ring of grit around your head, coughs \"excuse me,\" and freezes back into stone.",
+    "Stone cracks as it comes to life, cheeks pop, and a thunderous BURP sends three shingles cartwheeling past your ear. \"My apologies,\" it rumbles, and hardens back into stone.",
+    "It wakes, gulps, and BURPS the alphabet up to G right in your face before running out of air. It murmurs \"forgive me\" and turns back to stone.",
+    "The gargoyle shudders to life and lets loose a wet, gravelly BURP that sprays your face with warm moss. \"Terribly sorry,\" it sighs, and turns back to stone.",
+    "It comes to life, its stone chest heaves, and a BURP like a cannon blast knocks you back a step. The gargoyle covers its mouth, mouths \"oops, pardon me,\" and turns back to stone.",
+    "It comes alive and BURPS at you so hard its own ears flap, apologizes to you and then separately to the pigeons, and turns back to stone.",
+    "With a crunch of waking granite it BURPS a cloud that smells like a cave full of old eggs straight up your nostrils, says \"sorry, that one got away from me,\" and stiffens back into stone.",
+    "The gargoyle wakes, BURPS the deepest note ever heard in this county, and pelts you with pebbles. \"A thousand pardons,\" it groans, and petrifies again.",
+    "It animates, holds the BURP for one dramatic beat, then releases it directly into your ear. \"Excuse me, that was rude,\" it apologizes, and returns to stone.",
   ],
   gargoyleNosePinch: [
-    "The west gargoyle pinches its nose and points accusingly at an innocent cloud.",
-    "One hand stays over its nose while a suspicious breeze arrives from behind the stone.",
-    "It holds its nostrils shut and insists the sound came from the BELFRY.",
-    "Its nose-pinching fingers tighten; a pigeon on the gutter makes a rapid career change.",
-    "Its pose says innocence while the air says it needs a lawyer.",
-    "A squeak rises from the roof, and it covers its nose with renewed commitment.",
-    "The gargoyle keeps one hand clamped over its nose, then blames a passing leaf.",
-    "Its free hand waves the air away while its other hand guards its nostrils.",
-    "It pinches its nose so tightly that the next gust whistles through a crack in the stone.",
-    "It looks upwind and acts surprised when the smell keeps up.",
-    "Its fingers stay on its nose while the silver vane points directly at the culprit.",
-    "It refuses to uncover its nostrils until the last pigeon has evacuated.",
+    "The nose-pinching gargoyle grinds to life, lifts one stone leg, and FARTS a blast that flattens your hair and peels moss off the slates. Eyes watering, it gasps \"sorry, sorry,\" and turns back to stone.",
+    "It wakes, swings its granite backside toward you, and FARTS with the force of a church organ. The smell arrives a second later and sits on your face. It apologizes through its pinched nose and stiffens back into stone.",
+    "The gargoyle comes alive, squeaks out a tiny FART, looks relieved, then follows it with an enormous one that blows you clean off your feet. \"Excuse me,\" it wheezes, and turns back to stone.",
+    "Granite shifts as it comes to life, cheeks clench, and a FART like tearing canvas blasts grit all over you. It pinches its nose harder, mumbles an apology, and turns back to stone.",
+    "It wakes just long enough to FART a green-tinged cloud that drifts lazily onto you and refuses to leave. \"Unforgivable. I am so sorry,\" it admits, and turns back to stone.",
+    "The gargoyle animates and FARTS three short notes at you that sound suspiciously like a doorbell, blushes through solid rock, apologizes, and petrifies back into stone.",
+    "With a groan it comes alive and FARTS so hard it lifts an inch off the ridge. You are engulfed. It lands, whispers \"my deepest apologies,\" and turns to stone.",
+    "It wakes, FARTS a long, wavering note directly at you, and finishes with a hopeful little squeak. \"Sorry about that,\" it says nasally, and stiffens back into stone.",
+    "The gargoyle twitches to life and FARTS a gust that spins the WEATHERVANE twice and plasters a dead leaf to your forehead. It apologizes and freezes back into stone.",
+    "It comes alive, aims carefully, and FARTS a hot blast that fogs your eyeballs. \"Sorry, that was not my best work,\" it mutters, returning to stone.",
+    "Stone creaks as it comes to life, and a FART like a sputtering motorboat rattles past your knees and lingers in your clothes. The gargoyle waves an apologetic claw and hardens back into stone.",
+    "It wakes and FARTS straight at you, a smell so old it has its own family crest, then sobs \"I'm so sorry,\" and turns back to stone, still pinching its nose.",
   ],
   gargoyleRearGuard: [
-    "The south gargoyle clutches its stone rear. Even the mortar looks nervous.",
-    "Its free hand stays behind it while it asks the weather for privacy.",
-    "It checks its backside twice and discovers that granite is not reassuring.",
-    "Its free hand covers the danger zone so firmly that the roof slate blushes.",
-    "It squeezes its stone cheeks together and apologizes to the gutter.",
-    "One marble palm guards its backside as if a small disaster has applied for entry.",
-    "It leans forward without moving its free hand. Nobody asks why.",
-    "Its free hand stays behind it while the gargoyle gives the horizon a worried look.",
-    "It pats its stone backside, counts the cracks, and decides not to trust the count.",
-    "A gust hits; it grabs its rear with fresh architectural urgency.",
-    "Its free hand shelters the back of its stone trousers from a crisis that cannot be seen.",
-    "It folds around its backside like a very small, very embarrassed fortress.",
+    "The rear-guarding gargoyle comes to life and SHARTS magnificently, splattering you from boots to eyebrows. It apologizes profusely and turns back to stone.",
+    "It wakes, loses its grip on the situation, and a geyser of brown gravel SPLATTERS across you and the slates. \"I held it for three hundred years,\" it sobs, apologizes, and petrifies.",
+    "Granite cracks as it comes to life, its hand slips, and a POOP EXPLOSION paints you and a startled pigeon the same shade of brown. It begs your pardon and turns back to stone.",
+    "The gargoyle animates, clenches heroically, fails, and SHARTS a wet stone avalanche all over your shoes. \"Terribly sorry,\" it moans, and freezes back into stone.",
+    "It comes alive with a gurgle, then ERUPTS behind itself; the blowback SPLATTERS you head to toe. It whispers \"so, so sorry\" and stiffens back into stone.",
+    "It comes to life, its stone hand flies off its backside, and it SHARTS a brown comet across the roof, catching you on the backswing. It apologizes and hardens back into stone.",
+    "The gargoyle wakes and sneezes, and the sneeze triggers a full POOP EXPLOSION that splatters you generously. \"Sorry, that's on me,\" it admits, and turns to stone.",
+    "It springs to life, loses the battle instantly, and SHARTS a muddy spray that leaves a gargoyle-shaped outline around you. It apologizes and petrifies.",
+    "It groans to life and relaxes for one fatal second; the resulting SPLATTER coats you and drips off the gutter. \"Forgive me,\" it begs, and freezes back into stone.",
+    "It comes alive, does a frantic little dance, then SHARTS spectacularly, splattering you, the WEATHERVANE, and a passing moth. It apologizes and turns back to stone.",
+    "The gargoyle wakes, releases three centuries of pressure in one brown BLAST that SPLATTERS you, then wipes your face with its free claw as an apology. It did not help. It turns back to stone.",
+    "It animates, SHARTS with operatic volume, splattering you thoroughly, then bows, apologizes, and returns to solid stone with its hand clamped back over its rear.",
   ],
 };
 

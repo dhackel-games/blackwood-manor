@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1315,8 +1315,11 @@ and command engine contain no setting, combination, or puzzle knowledge.
 
 The ROOF gains four fixed gargoyles around the 10-point RUSTED WEATHERVANE.
 The puff-cheeked NORTH, nose-pinching WEST, and rear-guarding SOUTH gargoyles
-each grip its center post with one hand and award +2 through their own
-twelve-line persisted pools. The FAR-GAZING GARGOYLE sits EAST, turned away
+each grip its center post with one hand. Their descriptions foreshadow the
+payoff (about to burp; dreading the fart it is about to let rip; trying to hold
+back a poop explosion), and turning the vane at one awards +2 through its own
+twelve-line persisted pool in which the gargoyle comes to life, BURPS, FARTS,
+or SHARTS on the player, apologizes, and turns back to stone. The FAR-GAZING GARGOYLE sits EAST, turned away
 from the vane with its curled stone tail on the post and one arm pointing
 SOUTHEAST at the TREE FORT's SPYGLASS. `TURN VANE <direction>` and descriptive
 gargoyle names select a direction. Turning EAST releases the vane, grants the
@@ -1371,4 +1374,4 @@ sip destroys that physical bottle after the shared-high output; its rack
 replacement is already waiting. Bare BOTTLE remains MILK except for the cellar
 TAKE BOTTLE and OPEN BOTTLE WITH CORKSCREW collision rules.
 
-
+<!-- end DESIGN.md -->
