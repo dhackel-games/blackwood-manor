@@ -2,16 +2,16 @@
 
 # Doomsday Clock: master orchestration
 
-Status: inProgress. The integrated 24-heirloom release is complete in code and validation; Lane 14 owns the remaining release actions.
+Status: done. Released in PR #10 (merge commit 2bbece5) on 2026-11-08; content 2026.11.8 build 1 (20261108001) is live on GitHub Pages.
 
 ## Current status
 
-* The 24-heirloom route, THE UPSIDE DOWN, manor quintet, shared high, and integrated `::win` route work locally. Content is stamped 2026.11.8 build 1 (20261108001); the remaining Lane 14 actions are the PR, CodeRabbit review, merge, and post-merge filename flips.
-* Todos: 111 done / 115 total (97%); 4 remaining.
-* Coding progress: complete through Lane 13. `::win` collects all 24 heirlooms, deposits them in one transfer, takes the DOOMSDAY CLOCK, and reaches the derived maximum score.
+* Shipped: THE UPSIDE DOWN, the manor quintet, the shared high, 24 heirlooms and the DOOMSDAY CLOCK, HELP/INFO, ONE TRIP scoring, and the planner-driven `::win` (2 flights, 68 walking transitions, 1316/1316).
+* Todos: 115 done / 115 total (100%); 0 remaining.
+* Coding progress: complete and released; 744/744 scenarios pass on the merged head.
 * Average task duration: UNKNOWN (0 measured tasks).
-* Completion ETA: UNKNOWN.
-* Next shareable build: content 20261108001 goes live on GitHub Pages (web) and to installed iOS apps by OTA as soon as the PR merges and the Pages deploy finishes. No native change is planned, so no TestFlight build is needed.
+* Completion ETA: done 2026-11-08.
+* Next shareable build: live now; GitHub Pages serves CONTENT_VERSION 20261108001 and installed iOS apps update over the air. No TestFlight build was needed.
 * BLOCKERS: EMPTY.
 * Status surfaces: `code/README.md` does not exist in this repository, so no dashboard was written there.
 
