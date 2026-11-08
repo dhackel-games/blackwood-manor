@@ -1164,7 +1164,7 @@ onto the PORTABLE TRANSISTOR RADIO. The portable radio is a 15-point
 answers reset the persisted streak and describe a cracking falsetto without
 printing lyrics; save/restore retains active rounds exactly.
 
-### 12.36.3 Planetarium
+#### 12.36.3 Planetarium
 
 The PLANETARIUM's brass PROJECTOR always asks for a number from 1 to 5. Its
 three safe fixed settings light BIG DIPPER OF RANCH, ORION'S WEDGIE, or URANUS
