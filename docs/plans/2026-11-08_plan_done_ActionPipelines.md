@@ -1,4 +1,4 @@
-<!-- 2026-11-08_plan_inProgress_ActionPipelines.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
+<!-- 2026-11-08_plan_done_ActionPipelines.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
 
 # Action Pipelines: master orchestration
 
@@ -68,4 +68,4 @@ Status: done. Pushed directly to origin/main as bd9a520 (PR waived by AndrewC); 
 * D4: Moved D-L14 from the done Doomsday Clock master: TAKE and TAKE ALL never equip gear; an unworn BACKPACK counts as one carried item at capacity 6, WEAR or USE raises it to 36, and a persisted sysop-menu unlock raises only the worn BACKPACK to 100.
 * D5: The triad's closed-container audit found the legacy FRIDGE MILK drink/use handler as the only action bypass; action access now uses the shared knowledge-gated OPEN → TAKE → action pipeline, while other custom item moves are puzzle reveals or item-specific transformations rather than concealed-container access.
 
-<!-- end 2026-11-08_plan_inProgress_ActionPipelines.md -->
+<!-- end 2026-11-08_plan_done_ActionPipelines.md -->
