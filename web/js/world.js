@@ -2517,16 +2517,73 @@ function putOakGem(ctx, cmd) {
     return `${placement} Sunlight passes through the gem, but the separate beams fail to converge.` + use;
   }
   ctx.setFlag("oakLightAligned");
-  ctx.setFlag("oakLiftGrace");
-  ctx.moveItem("oakPlatform", "greatOak");
+  if (!ctx.getFlag("oak:lowerPanelAligned")) {
+    ctx.setFlag("oakLiftGrace");
+    ctx.moveItem("oakPlatform", "greatOak");
+  }
   const points = awardProgress(ctx, "oakPanelAligned");
+  const liftText = ctx.getFlag("oak:lowerPanelAligned")
+    ? "brilliant white shaft. High above, the pulley CLUNKS awake without disturbing the moving PLATFORM."
+    : "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots.";
   return `${placement}\n\nSunlight passes through all three gems and the mirrored beams converge into a ` +
-    "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots." +
+    liftText +
     awardSuffix(points) + use;
 }
 
+const OAK_LIFT_STOPS = Object.freeze(["greatOak", "treeFort", "greatOak", "below"]);
+
+function oakLiftStopName(room) {
+  return ({ greatOak: "GROUND", treeFort: "ABOVE", below: "BELOW" })[room];
+}
+
+function oakLiftMotion(from, to) {
+  if (from === "greatOak" && to === "treeFort") {
+    return "The pulley catches the white beam. The PLATFORM rises through the branches and settles beside the TREE FORT.";
+  }
+  if (from === "treeFort" && to === "greatOak") {
+    return "The beam shifts. The PLATFORM descends through the leaves and settles among the GREAT OAK'S roots.";
+  }
+  if (from === "greatOak" && to === "below") {
+    return "The PLATFORM slips under the GREAT OAK'S roots and settles in the OAK UNDERCROFT.";
+  }
+  return "The ropes tug the PLATFORM up through the roots until it settles beside the GREAT OAK.";
+}
+
+function leaveOakPlatform(ctx, cmd) {
+  if (cmd.dobj !== "out" || !ctx.getFlag("oak:lowerPanelAligned")
+      || !ctx.getFlag("oakLiftRiding") || ctx.roomOf("oakPlatform") !== ctx.state.room) {
+    return null;
+  }
+  ctx.setFlag("oakLiftRiding", false);
+  ctx.setFlag("oakLiftGrace");
+  return ctx.state.room === "greatOak"
+    ? "You step off at the GREAT OAK'S roots."
+    : "You step off inside the TREE FORT.";
+}
+
+function oakNavigation(ctx, cmd) {
+  if (cmd.dobj === "in" && ctx.state.room === "greatOak") return enterOakPlatform(ctx);
+  const disembark = leaveOakPlatform(ctx, cmd);
+  if (disembark) return disembark;
+  if (cmd.dobj !== "out") return null;
+  if (ctx.state.room === "greatOak") {
+    ctx.state.room = "privy";
+    return ctx.describeRoom();
+  }
+  if (ctx.state.room === "treeFort") return enterOakPlatform(ctx);
+  return null;
+}
+
 function enterOakPlatform(ctx) {
-  if (ctx.roomOf("oakPlatform") !== ctx.state.room) return "The PLATFORM is currently at the other end of the pulley.";
+  if (ctx.roomOf("oakPlatform") !== ctx.state.room) {
+    if (ctx.state.room === "below" && !ctx.getFlag("oak:lowerPanelAligned")) {
+      return "No PLATFORM stops BELOW yet. The LOWER PANEL has not been aligned.";
+    }
+    if (ctx.getFlag("oak:lowerPanelAligned")) {
+      return `The PLATFORM is at ${oakLiftStopName(ctx.roomOf("oakPlatform"))}, not here. WAIT for it.`;
+    }
+    return "The PLATFORM is currently at the other end of the pulley.";
+  }
   if (ctx.getFlag("oakLiftRiding")) return "You are already standing on the PLATFORM.";
   ctx.setFlag("oakLiftRiding");
   ctx.setFlag("oakLiftGrace");
@@ -2556,6 +2613,30 @@ function takeSpyglass(ctx) {
 }
 
 function oakLiftTick(ctx) {
+  if (ctx.getFlag("oak:lowerPanelAligned")) {
+    if (ctx.getFlag("oakLiftGrace")) {
+      ctx.setFlag("oakLiftGrace", false);
+      return null;
+    }
+    const from = ctx.roomOf("oakPlatform");
+    let beat = Number(ctx.getFlag("oak:liftBeat"));
+    if (!Number.isInteger(beat) || beat < 0 || beat >= OAK_LIFT_STOPS.length) {
+      beat = from === "treeFort" ? 1 : from === "below" ? 3 : 0;
+    }
+    const nextBeat = (beat + 1) % OAK_LIFT_STOPS.length;
+    const to = OAK_LIFT_STOPS[nextBeat];
+    ctx.setFlag("oak:liftBeat", nextBeat);
+    ctx.moveItem("oakPlatform", to);
+    const riding = ctx.getFlag("oakLiftRiding") && ctx.state.room === from;
+    if (riding) {
+      ctx.state.room = to;
+      return oakLiftMotion(from, to) + "\n\n" + ctx.describeRoom();
+    }
+    if (ctx.state.room === from) {
+      return oakLiftMotion(from, to).replace("The PLATFORM", "The empty PLATFORM");
+    }
+    return null;
+  }
   if (!ctx.getFlag("oakLightAligned")) return null;
   if (ctx.getFlag("oakLiftGrace")) {
     ctx.setFlag("oakLiftGrace", false);
@@ -4239,8 +4320,17 @@ const logicWorld = {
           : ctx.getFlag("oakLightAligned")
             ? " The PLATFORM is currently somewhere above the branches."
             : " The overhead PULLEY hangs far beyond reach.";
-        return describeOakPanel(ctx) + platform;
+        const thirdStop = ctx.getFlag("oak:lowerPanelAligned")
+          ? " The PLATFORM'S ropes now vanish beneath the roots to a third stop."
+          : "";
+        return describeOakPanel(ctx) + platform + thirdStop;
       },
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "The PLATFORM'S ropes now vanish beneath the roots to a third stop."
+          : undefined;
+      },
+      interceptImplicitNavigation: true,
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "greatOak" ? ["in"] : [],
       exits: { west: "privy" },
       on: {
@@ -4251,6 +4341,7 @@ const logicWorld = {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
         put: putOakGem,
+        go: oakNavigation,
       },
     },
 
@@ -4263,6 +4354,12 @@ const logicWorld = {
         "    | [___]  |  |",
         "    |___||___|__|",
       ].join("\n"),
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "The PLATFORM now visits a chamber under the roots as well."
+          : undefined;
+      },
+      interceptImplicitNavigation: true,
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "treeFort" ? ["out"] : [],
       exits: {},
       on: {
@@ -4272,6 +4369,7 @@ const logicWorld = {
         climb(ctx, cmd) {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
+        go: oakNavigation,
       },
     },
 
@@ -4827,6 +4925,11 @@ const logicWorld = {
     oakPlatform: {
       names: ["platform", "lift"], adjectives: ["wooden", "oak", "pulley"],
       loc: null, fixed: true, scenery: true,
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It visits the GREAT OAK'S roots, the TREE FORT, and the OAK UNDERCROFT below."
+          : undefined;
+      },
       on: { enter: enterOakPlatform, climb: enterOakPlatform },
     },
     signalFlags: {

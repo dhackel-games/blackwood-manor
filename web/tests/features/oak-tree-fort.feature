@@ -122,6 +122,46 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the current room is "privy"
     And flag "oakLiftRiding" is false
 
+  Scenario: The lower panel adds the four-beat return lift and repeated oak round trips
+    Given the player is in room "below"
+    And item "cyanGem" is carried
+    When I send "take magenta gem"
+    And I send "take yellow gem"
+    And I send "put yellow gem in top slot"
+    And I send "put magenta gem in middle slot"
+    And I send "put cyan gem in bottom slot"
+    Then item "oakPlatform" is in "below"
+    And flag "oak:liftBeat" equals 3
+    When I send "enter platform"
+    And I send "wait"
+    Then the current room is "greatOak"
+    And flag "oakLiftRiding" is true
+    And flag "oak:liftBeat" equals 0
+    When I send "wait"
+    Then the current room is "treeFort"
+    And flag "oak:liftBeat" equals 1
+    When I send "wait"
+    Then the current room is "greatOak"
+    And flag "oak:liftBeat" equals 2
+    When I send "wait"
+    Then the current room is "below"
+    And flag "oak:liftBeat" equals 3
+    When I send "out"
+    Then the output contains "You step off into the OAK UNDERCROFT."
+    And flag "oakLiftRiding" is false
+    When I send "enter platform"
+    And I send "wait"
+    Then the current room is "greatOak"
+    When I send "out"
+    Then the output contains "You step off at the GREAT OAK'S roots."
+    And flag "oakLiftRiding" is false
+    When I send "enter platform"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    Then the current room is "below"
+    And flag "oak:liftBeat" equals 3
+
   Scenario: Hidden shortcuts can route down from the tree fort
     When I send "place emerald in panel"
     And I send "enter platform"
