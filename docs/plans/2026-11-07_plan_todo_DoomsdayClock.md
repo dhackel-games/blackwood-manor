@@ -213,7 +213,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 13.7.3. **Chosen:** OPEN; Lanternwild stays the working name, and code paths keep `lanternwild` whatever the display name.
     * 13.7.4. Why: renaming paths later would churn every lane.
   * 13.8. D19: v1 realm content withdrawn (ratified by AndrewC 2026-11-08).
-    * 13.8.1. Framing: the v1 realm challenges, characters, items, and winter premise no longer fit.
+    * 13.8.1. Framing: the v1 realm challenges, characters, items, and premise no longer fit.
     * 13.8.2. Options: keep parts, or replace them entirely.
     * 13.8.3. **Chosen:** replace them entirely with Sections 5 and 6.
     * 13.8.4. Why: the new realm is a comedy parody built on fair classic puzzles.
@@ -264,7 +264,7 @@ Status: todo. Plan v2 (2026-11-08) replaces the v1 realm and manor design with t
     * 13.17.4. Why: the locker and root gate stay the only ways in and out.
   * 13.18. D9: Realm theme and tone (ratified by AndrewC 2026-11-08).
     * 13.18.1. Framing: the realm needs a comic identity.
-    * 13.18.2. Options: an inverted winter fairy tale, or a Stranger Things and Narnia parody.
+    * 13.18.2. Options: the v1 inverted fairy tale, or a Stranger Things and Narnia parody.
     * 13.18.3. **Chosen:** the parody, with classic fair puzzles and light upside-down touches; no holiday theme; no reuse of existing gags as mechanics.
     * 13.18.4. Why: the humor sells the puzzles without replacing them.
   * 13.19. D8: Split of the 24 (ratified by AndrewC 2026-11-08).
