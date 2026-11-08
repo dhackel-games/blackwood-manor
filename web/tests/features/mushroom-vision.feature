@@ -10,11 +10,14 @@ Feature: The mushroom trip's third eye
   Background:
     Given a fresh manor game
 
-  Scenario: Eating the mushrooms opens the third eye, reveals the vault, and lights the dark
+  Scenario: Eating the mushrooms opens the third eye, reveals the vault on sight, and lights the dark
     Given the player is in room "kitchen"
     When I send "eat mushrooms"
     Then flag "high" is positive
-    And flag "vaultFound" is set
+    And flag "vaultFound" is unset
+    Given the player is in room "attic"
+    When I send "look"
+    Then flag "vaultFound" is set
     And the output matches "SECRET DOOR|THIRD EYE"
     # a normally pitch-black room is now legible through astral sight
     Given the player is in room "crypt"

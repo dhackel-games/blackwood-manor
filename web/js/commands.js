@@ -308,6 +308,8 @@ export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
     const room = ctx.room();
+    const discovery = ctx.revealHiddenSight?.();
+    const withDiscovery = (text) => discovery ? `${discovery}\n\n${text}` : text;
     let exit = room.exits && room.exits[dir];
     const canFly = (ctx.getFlag("high") || 0) > 0
       || (typeof ctx.world.canFly === "function" && ctx.world.canFly(ctx));
@@ -315,19 +317,20 @@ export const commands = {
       const destination = resolveRoom(ctx, dir);
       if (destination) {
         const [roomId, roomDef] = destination;
-        if (typeof ctx.world.floatTo === "function") return ctx.world.floatTo(ctx, roomId);
+        if (typeof ctx.world.floatTo === "function") return withDiscovery(ctx.world.floatTo(ctx, roomId));
         ctx.state.room = roomId;
-        return `You float weightlessly to ${roomDef.name}.\n\n${ctx.describeRoom()}`;
+        return withDiscovery(`You float weightlessly to ${roomDef.name}.\n\n${ctx.describeRoom()}`);
       }
     }
-    if (!exit) return "You can't go that way.";
+    if (!exit) return withDiscovery("You can't go that way.");
     if (typeof exit === "object") {
-      if (exit.locked) return exit.lockedMsg || "That way is locked.";
-      if (exit.via && !ctx.getFlag(exit.via)) return exit.lockedMsg || "You can't go that way.";
+      const lockedMsg = typeof exit.lockedMsg === "function" ? exit.lockedMsg(ctx) : exit.lockedMsg;
+      if (exit.locked) return withDiscovery(lockedMsg || "That way is locked.");
+      if (exit.via && !ctx.getFlag(exit.via)) return withDiscovery(lockedMsg || "You can't go that way.");
       exit = exit.to;
     }
     ctx.state.room = exit;
-    return ctx.describeRoom();
+    return withDiscovery(ctx.describeRoom());
   },
 
   look(ctx, cmd) {

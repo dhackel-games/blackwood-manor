@@ -351,14 +351,19 @@ export function createGame(world) {
       || !!state.flags.onFire
       || darkVision;
   };
+  game.hasHiddenSight = () => (state.flags.high || 0) > 0
+    || (typeof world.hasMushroomVision === "function" && world.hasMushroomVision(game));
+  game.revealHiddenSight = () => game.hasHiddenSight()
+    && typeof world.revealHiddenSight === "function"
+    ? world.revealHiddenSight(game)
+    : null;
 
   game.availableDirections = () => {
     const room = world.rooms[state.room];
     const directions = Object.entries(room.exits || {})
       .filter(([, exit]) => {
         if (typeof exit === "string") return true;
-        const enhancedVision = (state.flags.high || 0) > 0
-          || (typeof world.hasMushroomVision === "function" && world.hasMushroomVision(game));
+        const enhancedVision = game.hasHiddenSight();
         return enhancedVision || !exit.revealedBy || !!state.flags[exit.revealedBy];
       })
       .map(([direction]) => direction);
@@ -387,11 +392,9 @@ export function createGame(world) {
       out += desc + "\n";
     }
     // Mushroom and XRAY vision share one status heading and hidden-detail view.
-    const highOn = (state.flags.high || 0) > 0;
-    const enhancedVision = typeof world.hasMushroomVision === "function"
-      ? world.hasMushroomVision(game)
-      : highOn;
+    const enhancedVision = game.hasHiddenSight();
     if (enhancedVision) {
+      const discovery = game.revealHiddenSight();
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
       const status = typeof world.visionStatus === "function"
@@ -404,6 +407,7 @@ export function createGame(world) {
         ? "∞"
         : `${displayTurns} turn${displayTurns === 1 ? "" : "s"} left`;
       if (vision) out += `THIRD EYE (👁️ ${remaining})\n${vision}\n`;
+      if (discovery) out += `${discovery}\n`;
     }
     const directions = game.availableDirections();
     out += extended
@@ -478,6 +482,11 @@ export function createGame(world) {
     const direct = cmd.dobj ? game.find(cmd.dobj) : null;
     const indirect = cmd.iobj ? game.find(cmd.iobj) : null;
     const targets = [];
+    if (direct && !world.items[direct.id]?.on?.[cmd.verb]
+        && typeof world.useHighSource === "function") {
+      const highSourceResult = world.useHighSource(game, direct, cmd);
+      if (highSourceResult != null) return highSourceResult;
+    }
     if (direct) targets.push(world.items[direct.id]);
     if (indirect && indirect.id !== direct?.id) targets.push(world.items[indirect.id]);
     targets.push(world.rooms[state.room]);

@@ -1147,3 +1147,32 @@ layouts render this as a separate floor. Named flight uses the same generic
 flight path as every other room, so it can enter and leave the realm without a
 realm-specific flight exception. The parser supplies generic fallback verbs
 for future puzzle modules; the engine contains no realm puzzle rules.
+
+### 12.36.5 Shared high and hidden sight
+
+`beginHigh(ctx, { opening, turns })` is the single high source API. It stacks
+the persisted `high` turns, grants the source command its grace turn, retains
+the existing one-time `mushroomVisionOpened` award, and prints the source
+opening followed by cycling source-neutral revelation and reaction pools plus
+fixed flight, dark-sight, and third-eye instructions. `highReactions` has
+twelve entries and persists through `flavorCycle:highReactions`; the historical
+`mushroomHigh` and `mushroomRevelations` keys remain for save compatibility.
+
+An item opts in with `highSource: { opening, turns, doses, whenEmpty }`. Its
+declared EAT, SNIFF/SMELL, USE, or DRINK action runs the common source handler.
+Sources without doses are consumed; a positive dose count decrements in saved
+item state and either remains empty or is destroyed according to `whenEmpty`.
+The fresh and dried MUSHROOMS are 12-turn consumed sources. Lane 8 can use the
+same hook for three 6-turn SNUFFBOX pinches and four 10-turn WINE sips without
+importing this world module. The HUD needs no source-specific state: any
+positive `high` keeps its existing `🍄` indicator.
+
+P7:HiddenSightIsSearch is generic engine plumbing backed by room content.
+`core.js` invokes a room's hidden-sight hook while describing a lit room and
+before movement; content modules add compatible hooks through
+`hiddenSightHooks`. Thus all high, worn XRAY GOGGLES, and worn OBSIDIAN EYE
+users receive the same SEARCH-only discoveries and their persisted awards once.
+The ATTIC sets `vaultFound`; the NURSERY reveals and opens its wallpaper gap;
+the LIBRARY displays its still-latched stair and names the LEVER in the
+movement refusal. A visible physical obstruction remains blocked until its
+content puzzle resolves it.
