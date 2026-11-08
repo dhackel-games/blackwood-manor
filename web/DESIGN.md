@@ -138,7 +138,7 @@ Classic Infocom style, richer than strict two-word.
   Bare `g` remains AGAIN; `g <room>` means GO and replaces `fly <room>` in
   generated SYSOP routes.
 - **Meta:** inventory/i, wait/z, again/g, look, score, save, restore, restart,
-  verbose/brief, help, quit
+  verbose/brief, info/?, quit (HELP joins CALL/HINT as a way to reach Gary's hint line)
 - **Niceties:** synonyms, "it" pronoun resolution, up-arrow command history, tolerant of
   articles, helpful errors ("I don't know the word 'X'." / "You can't see any X here.").
 - **Canonical one-word names:** `ITEM_SHORT_NAMES` and `ROOM_SHORT_NAMES` give every
@@ -506,7 +506,7 @@ the mansion.
 - 🕯️ **"The Old Ways"** — lit the brazier with your own body.
 - 🥵 **"Slow Burn"** — stayed ablaze 4+ turns and lived.
 - 🥛 **"Got Milk?"** — drank the curative milk.
-- 🆘 **"Helpless"** (+15) — finished without MAP, HELP, or Gary's CALL/HINT line.
+- 🆘 **"Helpless"** (+15) — finished without MAP, INFO, or Gary's HELP/CALL/HINT line.
 - 🙈 **"Extra Super Duper Helpless"** (+20 beyond HELPLESS) — also never issued
   LOOK, EXAMINE, or SEARCH. Automatic prerequisite actions do not count.
 - ⏩ **"No Takebacks"** (+10) — finished without explicitly using SAVE or RESTORE.
@@ -642,7 +642,7 @@ The `.map` font-size is a `clamp()` on viewport width so the widest panel fits a
 **Discoverability (v2.5.0).** `MAP` also has a button in the touch bar, between `Inv` and
 `Call`. A feature you only reach by typing a word nobody told you about is, for most players,
 not a feature — Gary's offer only fires once you're measurably stuck, which is late, and the
-`HELP` listing is a wall of text. The button costs one wrapped row (`#controls .verbs` is
+`INFO` listing is a wall of text. The button costs one wrapped row (`#controls .verbs` is
 `flex-wrap: wrap`) and no new wiring: `ui.js` binds every `#controls [data-cmd]` generically,
 so `data-cmd="map"` routes through the same `handle()` path as typing it. It sits with the
 orientation verbs rather than the phone cluster (`Call`/`Hint`) because `MAP` is ungated — it

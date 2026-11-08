@@ -3389,7 +3389,7 @@ export const END_AWARDS = Object.freeze([
     points: 15,
     qualifies: (ctx) =>
       !ctx.getFlag("usedMap") && !ctx.getFlag("usedGaryHelp") && !ctx.getFlag("usedHelp"),
-    text: "🆘 BADGE: \"Helpless\" — you escaped without MAP, Gary's hint line, or HELP. (+15)",
+    text: "🆘 BADGE: \"Helpless\" — you escaped without MAP, Gary's hint line, or INFO. (+15)",
   }),
   Object.freeze({
     id: "extraSuperDuperHelpless",

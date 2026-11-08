@@ -49,7 +49,7 @@ Feature: Build metadata and touch-control contract
     Then the page has a "use " prefill control
 
   Scenario: Redundant inspection and hint-line buttons stay out of the shortcut strip
-    Then the shortcut strip keeps Look, Call, and question-mark Help without Examine or Hint
+    Then the shortcut strip keeps Look, Call, and question-mark Info without Examine or Hint
 
   Scenario: Bug reports open the repository issue form outside the game
     Then the page has an icon-only Bug button

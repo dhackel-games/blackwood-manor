@@ -44,6 +44,7 @@ Feature: End-game self-reliance awards
       | command |
       | map     |
       | help    |
+      | info    |
       | call    |
 
   Scenario: Derived convenience actions do not count as inspection help

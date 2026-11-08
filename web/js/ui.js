@@ -214,7 +214,7 @@ const BIG_BANNER = (versionLine) =>
 An Adventure in the Classic Style
 ${versionLine}
 
-Type HELP for commands.  Type LOOK to look around.  Beware the dark.`;
+Type INFO for commands.  Type LOOK to look around.  Beware the dark.`;
 
 // Compact banner for narrow (phone) screens, where the ASCII art would wrap.
 const SMALL_BANNER = (versionLine) =>
@@ -225,7 +225,7 @@ const SMALL_BANNER = (versionLine) =>
 An Adventure in the Classic Style
 ${versionLine}
 
-Type HELP for commands. Type LOOK
+Type INFO for commands. Type LOOK
 to look around. Beware the dark.`;
 
 function bannerText(versionLine = Native.version()) {

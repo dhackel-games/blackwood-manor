@@ -216,12 +216,13 @@ Feature: Generic text-adventure engine
     When I send "score"
     Then the output contains "Trespasser"
 
-  Scenario: HELP is an alphabetized data block with one command per line
-    When I send "help"
-    Then HELP is one alphabetized command-per-line data block
+  Scenario: INFO is an alphabetized data block with one command per line
+    When I send "info"
+    Then INFO is one alphabetized command-per-line data block
     And the output contains "show/scry <room/object> [in watch]"
-    And the output contains "CALL or HINT"
-    And the output contains "HELP only prints this reference"
+    And the output contains "HELP, CALL, or HINT"
+    And the output contains "INFO (or ?) only prints this reference"
+    And flag "onCall" is unset
 
   Scenario: Content handlers override generic commands
     Given a fresh fixture game with a working lever

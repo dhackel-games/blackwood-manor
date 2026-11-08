@@ -1081,8 +1081,8 @@ Then("item {string} is absent from game state", function (item) {
   assert.equal(this.game.item(item), null);
 });
 
-Then("public HELP does not reveal sysop commands", function () {
-  const help = this.game.send("help");
+Then("public INFO does not reveal sysop commands", function () {
+  const help = this.game.send("info");
   for (const entry of SYSOP_COMMANDS) assert.ok(!help.includes(entry.cmd));
   assert.ok(!help.includes(SYSOP_MENU_COMMAND));
 });

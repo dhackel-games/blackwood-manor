@@ -17,7 +17,7 @@ Feature: Maintained sysop shortcuts
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
     And hidden shortcuts replace the editable command prompt without executing
-    And public HELP does not reveal sysop commands
+    And public INFO does not reveal sysop commands
     And no sysop command uses the removed su command
 
   Scenario: Dynamic path tokens resolve from the current room

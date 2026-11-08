@@ -28,13 +28,13 @@ const VERBS = {
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],
   sit: ["sit"], use: ["use", "u"], flush: ["flush"],
-  hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
+  hotline: ["hotline", "help", "call", "dial", "phone", "telephone", "hint", "hints"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again"],
   map: ["map", "m", "chart", "floorplan"],
   code: ["code", "combination"],
   yes: ["yes", "y", "yeah", "yep"], no: ["no", "nope", "nah"],
   score: ["score"], save: ["save"], restore: ["restore", "load"], restart: ["restart"],
-  verbose: ["verbose"], brief: ["brief"], help: ["help", "?", "commands"], quit: ["quit", "q"],
+  verbose: ["verbose"], brief: ["brief"], info: ["info", "?", "commands"], quit: ["quit", "q"],
 };
 const SYN = {};
 for (const [canon, list] of Object.entries(VERBS)) {

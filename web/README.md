@@ -203,7 +203,8 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
-  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `help`, `quit`.
+  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
+  INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
   TOP scrolls to the top of the page; CLEAR erases the entire scrollback and redisplays the basic prompt for the current room.
   In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
@@ -229,7 +230,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   item titles, such as `(unlock FRONT DOOR; open FRONT DOOR)`.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
-  MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
+  MAP/HELP/CALL/HINT/INFO, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
   LOOK/EXAMINE/SEARCH, and NO TAKEBACKS (+10) without explicit SAVE/RESTORE.
 
 ### Survival tips (it is a *cruel* game)

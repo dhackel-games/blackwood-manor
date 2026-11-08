@@ -79,7 +79,6 @@ ai | AI status / Report whether Gary is scripted or using an on-device model.
 attack <thing> | Attack / Attack a visible target.
 brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
-call/hint | Gary / Call Gary's paid hint line.
 clear | Clear / Erase the entire scrollback and redisplay the basic prompt for the current room.
 (c)lose/shut <thing> | Close / Close an open door or container.
 drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
@@ -87,7 +86,8 @@ extinguish <thing> | Extinguish / Put out a light or flame.
 get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
 give <thing> to <character> | Give / Hand over an item.
 (g)o <room> | Go / Go to a named room when movement or flight allows; bare g repeats AGAIN.
-help/? | Help / Show this command reference.
+help/call/hint | Gary / Call Gary's paid hint line.
+info/? | Info / Show this command reference.
 (i)nventory | Inventory / List everything you carry and wear.
 light <thing> | Light / Ignite a usable light source.
 lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
@@ -129,7 +129,7 @@ TOUCH CONTROLS
 The on-screen buttons mirror typed commands.
 Compass pad: the eight arrows are compass directions - up-left northwest, up north, up-right northeast, left west, right east, down-left southwest, down south, down-right southeast. The center star is decorative.
 Up/down column: the two chevrons are UP and DOWN; the two door icons are IN and OUT.
-Verbs: Look inspects the room; Take, Use, and Say fill the input box so you can type a target; Inv lists inventory; Map shows Gary's map; Call rings Gary; ? opens this help; the beetle reports a bug.
+Verbs: Look inspects the room; Take, Use, and Say fill the input box so you can type a target; Inv lists inventory; Map shows Gary's map; Call rings Gary; ? opens this reference; the beetle reports a bug.
 
 CHAINING
 Separate commands with ".", ";", ",", or THEN.
@@ -140,8 +140,8 @@ WITH may be shortened to w/ with or without a following space: unlock frontd w/i
 In object names, d means DOOR and br means BEDROOM: open front d; fly grand br.
 
 GARY'S HINT LINE
-CALL or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
-Say HANG UP to end the call. HELP only prints this reference; it never calls Gary.`;
+HELP, CALL, or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
+Say HANG UP to end the call. INFO (or ?) only prints this reference; it never calls Gary.`;
 
 function pickupAward(ctx, item) {
   return ctx.awardPickup?.(item) || "";
@@ -634,7 +634,7 @@ export const commands = {
   verbose(ctx) { ctx.setFlag("__verbose", true); return "Maximum verbosity."; },
   brief(ctx) { ctx.setFlag("__verbose", false); return "Brief descriptions."; },
   again() { return null; }, // handled by core before dispatch
-  help(ctx) {
+  info(ctx) {
     ctx.setFlag("usedHelp", true);
     return HELP_TEXT;
   },
