@@ -1,5 +1,7 @@
 // sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
 
+import { RADIO_SONGS } from "./upsidedown/radio-clues.js?v=source";
+
 const DIRECTION_SHORTCUTS = Object.freeze({
   north: "n",
   northeast: "ne",
@@ -24,7 +26,7 @@ export function shortestCommand(command) {
     .replace(/^close\b/i, "c")
     .replace(/^(?:take|get)\b/i, "t")
     .replace(/^place\b/i, "put")
-    .replace(/^(?:use|wear|don|eat|drink)\b/i, "u")
+    .replace(/^(?:use|wear|don|eat)\b/i, "u")
     .replace(/^remove\b/i, "doff")
     .replace(/^offer\b/i, "give")
     .replace(/^enter\b/i, "in")
@@ -104,66 +106,53 @@ const BARON_VISIT = [
 
 const WIN_RECOVERY_OPENING = [
   "west", "move statue", "take iron", "west", "north",
-  "open mailbox", "read letter", "open frontd with iron", "north", "read package",
-  "west", "take candle", "south",
-  "take matches", "take coil", "take apple", "light candle",
+  "open mailbox", "take all", "read letter", "open frontd with iron", "north", "take all",
+  "west", "take candle", "south", "take matches", "take apple", "light candle",
   "north", "east", "south", "south", "west", "west", "south",
   "offer apple to dragon", "use doubloon", "east", "east", "down",
 ];
 
-const WIN_FRONT_ENTRANCE = [
-  "east", "move statue", "take iron", "west", "north",
-  "open mailbox", "read letter", "open frontd with iron", "north", "read package",
-];
-
-const WIN_DRAGON_VISIT = [
-  "south", "south", "west", "west", "south", "offer apple to dragon",
-  "use doubloon", "north", "east", "east",
-];
-
-const WIN_OAK_PANEL = [
-  "take ruby", "take sapphire",
-  "put ruby in top", "put emerald in middle", "put sapphire in bottom",
-];
-
-const WIN_OAK_PLATFORM = [
-  "enter platform", "wait", "use spyglass", "take spyglass",
-  "enter platform", "wait",
-];
-
 const WIN = [
-  "{{pathto:PRIVY}}", "{{winopening}}",
-  "wear backpack", "up", "wear headlamp", "down", "east",
-  "talk troll", "say lore", "east", "wear shoes", "take crest",
-  "west", "west", "up", "west", "west", "north", "east", "east",
-  "{{winfront}}",
-  "west", "{{wincandle}}", "south",
-  "{{windried}}", "{{winkitchenbasics}}", "{{winlightcandle}}",
-  "use burrito", "open cellard", "down", "take decanter", "up", "use milk",
-  "north", "east", "put crest in rq", "put decanter in rq",
-  "{{windragon}}",
-  "east", "remove shoes", "down", "take ancient",
-  "{{winbrazier}}", "{{winemerald}}", "wear shoes",
-  "east", "east", "{{winoak}}", "west", "west", "west", "north", "north",
-  "put ancient in rq", "put spyglass in rq",
-  "east", "move profile", "open safe with 7 3 9", "wear talisman",
-  "south", "pull lever", "down", "read grimoire", "up", "north", "west",
-  "put grimoire in rq", "up", "south", "read diary", "open studrawer", "wear bmwatch",
-  "north", "north", "open drawer", "take family", "take shard", "south",
-  "west", "take musicbox", "open musicbox", "take tiny", "pull wallpaper",
-  "in", "take bmhammer", "out",
-  "put family in rq", "put musicbox in rq", "put bmhammer in rq",
-  "up", "east", "open jewelry with tiny", "take ravenblood", "west",
-  "pull cord", "up", "take ancestral", "up", "east", "pull bellrope",
-  "wear goggles", "down", "wear obsidian", "south", "down", "down",
-  "put ancestral in rq", "put ravenblood in rq",
-  "west", "put candle in fixture", "put shard in fixture",
-  "take candelabra", "east", "put candelabra in rq",
-  "west", "south", "down", "south", "take locket",
-  "north", "up", "north", "east", "remove talisman",
-  "put talisman in rq", "put locket in rq",
-  "close rq", "open bellcloset", "pull closetrope",
+  "{{winopening}}",
+  "take all", "up", "take all", "wear headlamp", "open locker", "down", "east",
+  "say lore", "east", "take all", "wear shoes", "use crest", "fly garden",
+  "move statue", "take all", "west", "north", "open mailbox", "take all", "read letter",
+  "open frontd with iron", "north", "take all", "read package", "east", "move profile",
+  "open safe with 7 3 9", "take coal", "take all", "wear talisman", "west", "up",
+  "pick nose", "sniff snuffbox", "pull cord", "up", "take all", "use ancestral", "up",
+  "turn weathercock to face burper", "turn weathercock to face farter",
+  "turn weathercock to face shitter", "turn weathercock to face horizon-gazer",
+  "take weathercock", "east", "pull bellrope", "take all", "wear goggles", "down",
+  "take obsidian", "wear obsidian", "south", "down", "west", "pull wallpaper", "take all",
+  "open musicbox", "take all", "in", "take all", "use bmhammer", "out", "west", "south",
+  "open fridge", "take all", "use burrito", "open cellard", "{{windried}}", "wait", "wait",
+  "use milk", "put coal in microwave", "set dial to B", "start microwave", "take all",
+  "use diamond", "down", "take all", "use decanter", "open wine bottle with corkscrew",
+  "drink wine", "south", "take all", "use locket", "north", "up", "north", "take all",
+  "light candle", "east", "light self with wrapper", "south", "south", "east", "{{winbrazier}}",
+  "remove shoes", "down", "wear shoes", "take all", "use ancient", "west", "west", "south",
+  "take all", "east", "south", "give apple to dragon", "use doubloon", "east", "east", "in",
+  "fill jug", "pour jug on fire", "take all", "west", "spell fart", "take all", "read drawing",
+  "use crayon", "east", "south", "{{winoak}}", "north", "north",
+  "give limburger to demo", "give epoisses to demo", "give munster to demo", "take all", "use rind",
+  "south", "east", "turn on cabinet radio", "{{winradio}}", "take all", "use transistor", "north",
+  "say 1", "take all", "use eyepiece", "east", "take all", "read starmap", "west", "say 4",
+  "extinguish self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",
+  "wear bmwatch", "north", "east", "open jewelry with tiny", "take all", "wear ravenblood",
+  "remove ravenblood", "west", "north", "take shard", "open drawer", "take all", "wear family",
+  "remove family", "south", "down", "west", "put candle in fixture", "put shard in fixture",
+  "take all", "use candelabra", "east", "east", "south", "pull lever", "read book", "take all",
+  "combine pieces", "read baronessphoto", "down", "take all", "read grimoire", "up", "north", "west",
+  "remove talisman", "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
   "open rq", "take gclock", "read gclock",
+];
+
+const WIN_OAK_ROUTE = [
+  "take magenta", "take yellow", "put yellow in top slot", "put magenta in middle slot",
+  "put cyan in bottom slot", "enter platform", "wait", "out", "take ruby", "take sapphire",
+  "put ruby in top", "put emerald in middle", "put sapphire in bottom", "wait", "wait", "wait",
+  "enter platform", "wait", "out", "use spyglass", "take spyglass", "wait", "wait",
+  "enter platform", "wait", "wait", "out",
 ];
 
 export const SYSOP_COMMANDS = Object.freeze([
@@ -182,7 +171,7 @@ export const SYSOP_COMMANDS = Object.freeze([
   Object.freeze({
     cmd: "::win",
     name: "Complete Part I",
-    description: "Walk the full collectible and puzzle route, seal the heirlooms, ring the bell, and take the clock; choose either ending yourself.",
+    description: "Follow the planner-verified full route, use two flights, seal all heirlooms in one transfer, and take the clock; choose either ending yourself.",
     compoundPrompt: join(WIN),
   }),
 ]);
@@ -197,6 +186,91 @@ function resolveRoomId(game, target) {
       .some((name) => normalize(name) === wanted))?.[0] || null;
 }
 
+function nextRadioSeed(seed) {
+  return (Math.imul(1664525, seed) + 1013904223) >>> 0;
+}
+
+function radioSeed(game) {
+  const saved = game.getFlag("realm:radioSeed");
+  if (Number.isInteger(saved)) return saved >>> 0;
+  const seed = Math.floor(Math.random() * 0x100000000) >>> 0;
+  game.setFlag("realm:radioSeed", seed);
+  return seed;
+}
+
+function drawRadioRound(seed, previousSong) {
+  const draw = (count) => {
+    seed = nextRadioSeed(seed);
+    return seed % count;
+  };
+  const songCandidates = RADIO_SONGS
+    .map((_, index) => index)
+    .filter((index) => index !== previousSong);
+  const songIndex = songCandidates[draw(songCandidates.length)];
+  draw(RADIO_SONGS[songIndex].clues.length);
+  const distractorCandidates = RADIO_SONGS
+    .map((_, index) => index)
+    .filter((index) => index !== songIndex);
+  const optionIndices = [];
+  for (let count = 0; count < 4; count++) {
+    optionIndices.push(distractorCandidates.splice(draw(distractorCandidates.length), 1)[0]);
+  }
+  optionIndices.push(songIndex);
+  for (let index = optionIndices.length - 1; index > 0; index--) {
+    const other = draw(index + 1);
+    [optionIndices[index], optionIndices[other]] = [optionIndices[other], optionIndices[index]];
+  }
+  return {
+    seed,
+    round: {
+      songIndex,
+      optionIndices,
+      correctOption: optionIndices.indexOf(songIndex) + 1,
+    },
+  };
+}
+
+function validRadioRound(round) {
+  return round
+    && Number.isInteger(round.songIndex)
+    && Array.isArray(round.optionIndices)
+    && Number.isInteger(round.correctOption);
+}
+
+function winRadioAnswers(game) {
+  if (game.getFlag("realm:radioWon")) return [];
+  let seed = radioSeed(game);
+  let previousSong = game.getFlag("realm:radioPreviousSong");
+  let round = validRadioRound(game.getFlag("realm:radioRound"))
+    ? game.getFlag("realm:radioRound")
+    : null;
+  let streak = Number(game.getFlag("realm:radioStreak")) || 0;
+  const answers = [];
+  while (streak < 3) {
+    if (!round) {
+      ({ seed, round } = drawRadioRound(seed, previousSong));
+      previousSong = round.songIndex;
+    }
+    answers.push(`answer ${round.correctOption}`);
+    streak++;
+    round = null;
+  }
+  return answers;
+}
+
+function navigationLinkCommands(game, room) {
+  return (game.world.navigationLinks || [])
+    .filter((link) => link.from === room && (!link.when || link.when(game)))
+    .map((link) => {
+      const commands = typeof link.commands === "function" ? link.commands(game) : link.commands;
+      return {
+        to: link.to,
+        commands: Array.isArray(commands) ? commands : [commands],
+      };
+    })
+    .filter((link) => link.to && link.commands.every(Boolean));
+}
+
 export function pathToRoom(game, target) {
   const destination = resolveRoomId(game, target);
   if (!destination) throw new Error(`Unknown path target: ${target}`);
@@ -209,30 +283,51 @@ export function pathToRoom(game, target) {
       if (game.world.canFly?.(game)) return [`fly ${target.toLowerCase()}`];
       throw new Error(`No available path from ${game.state.room} to ${destination}`);
     }
-    const platformHere = game.roomOf("oakPlatform") === "treeFort";
-    if (game.getFlag("oakLiftRiding") && platformHere) {
-      prefix.push("wait");
-    } else if (platformHere) {
-      prefix.push("out", "wait");
+    const stops = game.getFlag("oak:lowerPanelAligned")
+      ? ["greatOak", "treeFort", "greatOak", "below"]
+      : ["greatOak", "treeFort"];
+    let beat = Number(game.getFlag("oak:liftBeat"));
+    if (!Number.isInteger(beat) || beat < 0 || beat >= stops.length) {
+      beat = game.roomOf("oakPlatform") === "treeFort" ? 1 : 0;
+    }
+    let platform = stops[beat];
+    let grace = !!game.getFlag("oakLiftGrace");
+    const waitFor = (room) => {
+      for (let count = 0; platform !== room && count <= stops.length; count++) {
+        prefix.push("wait");
+        if (grace) grace = false;
+        else {
+          beat = (beat + 1) % stops.length;
+          platform = stops[beat];
+        }
+      }
+      if (platform !== room) throw new Error(`No available path from ${game.state.room} to ${destination}`);
+    };
+    if (game.getFlag("oakLiftRiding") && platform === "treeFort") {
+      waitFor("greatOak");
     } else {
-      prefix.push("wait", "out", "wait");
+      waitFor("treeFort");
+      prefix.push("out", "wait");
     }
     start = "greatOak";
     if (start === destination) return prefix.map(shortestCommand);
   }
 
-  const queue = [{ room: start, directions: [] }];
+  const queue = [{ room: start, commands: [] }];
   const visited = new Set([start]);
   while (queue.length) {
     const current = queue.shift();
-    for (const [direction, exit] of Object.entries(game.world.rooms[current.room]?.exits || {})) {
-      if (typeof exit === "object" && exit.via && !game.getFlag(exit.via)) continue;
+    const exits = Object.entries(game.world.rooms[current.room]?.exits || {}).flatMap(([direction, exit]) => {
+      if (typeof exit === "object" && exit.via && !game.getFlag(exit.via)) return [];
       const next = typeof exit === "object" ? exit.to : exit;
-      if (!next || visited.has(next)) continue;
-      const directions = [...current.directions, direction];
-      if (next === destination) return [...prefix, ...directions].map(shortestCommand);
-      visited.add(next);
-      queue.push({ room: next, directions });
+      return next ? [{ to: next, commands: [direction] }] : [];
+    });
+    for (const edge of [...exits, ...navigationLinkCommands(game, current.room)]) {
+      if (visited.has(edge.to)) continue;
+      const commands = [...current.commands, ...edge.commands];
+      if (edge.to === destination) return [...prefix, ...commands].map(shortestCommand);
+      visited.add(edge.to);
+      queue.push({ room: edge.to, commands });
     }
   }
   throw new Error(`No available path from ${game.state.room} to ${destination}`);
@@ -313,25 +408,9 @@ export function expandSysopCommand(shortcut, game) {
   const winRecovery = shortcut.cmd === "::win" && !game.world.canFly?.(game)
     && game.getFlag("outhouseMushroomsFound")
     && !["inventory", "privy"].includes(game.roomOf("outhouseMushrooms"));
-  const freshAvailable = !game.getFlag("outhouseMushroomsFound")
-    || ["inventory", "privy"].includes(game.roomOf("outhouseMushrooms"));
-  const winRoutes = {
-    winopening: winRecovery
-      ? WIN_RECOVERY_OPENING
-      : [...(freshAvailable ? ["use fresh"] : []), "fly shaft"],
-    winfront: winRecovery ? ["north", "north"] : WIN_FRONT_ENTRANCE,
-    wincandle: winRecovery ? [] : ["take candle"],
-    windried: ["inventory", "kitchen"].includes(game.roomOf("mushrooms")) ? ["use dried"] : [],
-    winkitchenbasics: winRecovery ? [] : ["take coil", "take matches", "take apple"],
-    winlightcandle: winRecovery ? [] : ["light candle"],
-    windragon: winRecovery ? ["south", "south"] : WIN_DRAGON_VISIT,
-    winbrazier: game.getFlag("brazierLit")
-      ? (game.getFlag("progressAward:selfFireSurvived")
-        ? ["use wrapper"]
-        : ["light self with wrapper", "extinguish self"])
-      : ["light self with wrapper", "light brazier"],
-    winemerald: game.getFlag("oakLightAligned") ? [] : ["take emerald"],
-  };
+  const winOpening = winRecovery
+    ? ["east", "east", "take all", ...WIN_RECOVERY_OPENING]
+    : ["east", "east", "look in toilet", "take fresh", "take all", "use fresh", "fly shaft"];
   const baronWalkRoute = (() => {
     // Never fly — show the route through the front door from a fresh start.
     const toParlor = game.getFlag("frontDoorOpen")
@@ -347,8 +426,12 @@ export function expandSysopCommand(shortcut, game) {
     .replace(/\{\{pathto:([^}]+)\}\}/gi, (_, target) => pathToRoom(game, target).join("; "))
     .replace(/\{\{baronwalk\}\}/gi, join(baronWalkRoute))
     .replace(/\{\{flightmushroom\}\}/gi, join(flightMushroomRoute))
-    .replace(/\{\{(winopening|winfront|wincandle|windried|winkitchenbasics|winlightcandle|windragon|winbrazier|winemerald)\}\}/gi,
-      (_, key) => join(winRoutes[key.toLowerCase()]));
+    .replace(/\{\{winopening\}\}/gi, join(winOpening))
+    .replace(/\{\{windried\}\}/gi,
+      join(["inventory", "kitchen"].includes(game.roomOf("mushrooms")) ? ["use dried"] : []))
+    .replace(/\{\{winbrazier\}\}/gi,
+      join(game.getFlag("brazierLit") ? ["extinguish self"] : ["light brazier"]))
+    .replace(/\{\{winradio\}\}/gi, join(winRadioAnswers(game)));
   const filterCommands = (text) => {
     const removed = new Set();
     return text.split(";").map(shortestCommand).filter((command) => {
@@ -371,12 +454,8 @@ export function expandSysopCommand(shortcut, game) {
   };
   if (shortcut.cmd !== "::win") return filterCommands(expanded).join("; ");
 
-  const oakRoute = [
-    ...(game.getFlag("oakLightAligned") ? [] : WIN_OAK_PANEL),
-    ...(["inventory", "reliquary", "clockTalisman"].includes(game.roomOf("spyglass"))
-      ? [] : WIN_OAK_PLATFORM),
-  ];
-  if (game.getFlag("oakLightAligned") && oakRoute.includes("enter platform")) {
+  let oakRoute = [...WIN_OAK_ROUTE];
+  if (game.getFlag("oakLightAligned") && !game.getFlag("oak:lowerPanelAligned")) {
     let platform = game.roomOf("oakPlatform");
     let grace = !!game.getFlag("oakLiftGrace");
     const beforeOak = filterCommands(expanded.split("{{winoak}}")[0]).length;
@@ -384,7 +463,12 @@ export function expandSysopCommand(shortcut, game) {
       if (grace) grace = false;
       else platform = platform === "greatOak" ? "treeFort" : "greatOak";
     }
-    if (platform === "treeFort") oakRoute.unshift("wait");
+    const beat = platform === "treeFort" ? 1 : platform === "greatOak" ? 0 : 3;
+    oakRoute = [
+      ...WIN_OAK_ROUTE.slice(0, 5),
+      ...Array.from({ length: (3 - beat + 4) % 4 }, () => "wait"),
+      ...WIN_OAK_ROUTE.slice(5),
+    ];
   }
   return filterCommands(expanded.replace("{{winoak}}", join(oakRoute))).join("; ");
 }

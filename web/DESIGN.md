@@ -138,7 +138,7 @@ Classic Infocom style, richer than strict two-word.
   Bare `g` remains AGAIN; `g <room>` means GO and replaces `fly <room>` in
   generated SYSOP routes.
 - **Meta:** inventory/i, wait/z, again/g, look, score, save, restore, restart,
-  verbose/brief, help, quit
+  verbose/brief, info/?, quit (HELP joins CALL/HINT as a way to reach Gary's hint line)
 - **Niceties:** synonyms, "it" pronoun resolution, up-arrow command history, tolerant of
   articles, helpful errors ("I don't know the word 'X'." / "You can't see any X here.").
 - **Canonical one-word names:** `ITEM_SHORT_NAMES` and `ROOM_SHORT_NAMES` give every
@@ -233,13 +233,20 @@ Attic), and the dark cellar/crypt (Wine Cellar, Crypt).
 - **Crypt:** need protection (salt / talisman) to face the wraith and claim the final heirloom.
 - **Win:** deposit all heirlooms in the **reliquary** + perform the ritual → curse lifts,
   you escape.
+- **The Upside Down:** the MINERS' LOCKER reaches the realm's six heirlooms:
+  DEMOGORGONZOLA RIND, PORTABLE TRANSISTOR RADIO, GOLD EYEPIECE, PURPLE
+  CRAYON, STELLAR MAP, and KID'S DRAWING.
+- **Manor quintet:** the BLACKWOOD DIAMOND, BARONESS PHOTOGRAPH, SILVER
+  WEATHERCOCK, SNUFFBOX, and CORKSCREW complete the new manor heirlooms.
 
-**13 required family heirlooms**, each worth points: ancestral portrait, ancient
-coin (well), BLACKWOOD HAMMER, restored candelabra, crystal decanter, Blackwood
-family crest, BLACKWOOD FAMILY RING, gold locket, first-edition grimoire,
-jeweled music box, Ravenblood Ring, BM spyglass recovered from the tree fort,
-and the BM-crested protective talisman after it has served against the crypt
-wraith.
+**24 required family heirlooms**, each worth points: ancestral portrait, ancient
+coin (well), BARONESS PHOTOGRAPH, BLACKWOOD DIAMOND, BLACKWOOD HAMMER, restored
+candelabra, CORKSCREW, crystal decanter, DEMOGORGONZOLA RIND, Blackwood family
+crest, BLACKWOOD FAMILY RING, GOLD EYEPIECE, gold locket, first-edition
+grimoire, KID'S DRAWING, jeweled music box, PORTABLE TRANSISTOR RADIO, PURPLE
+CRAYON, Ravenblood Ring, SILVER WEATHERCOCK, SNUFFBOX, BM spyglass recovered
+from the tree fort, STELLAR MAP, and the BM-crested protective talisman after
+it has served against the crypt wraith.
 
 ---
 
@@ -267,6 +274,19 @@ SHARD, and loose CANDLE now each earn +5 on first acquisition and +5 on first
 successful use; the BLACKWOOD HAMMER and BLACKWOOD FAMILY RING retain +12 and
 +20 deposit values in addition to those universal rewards.
 
+ONE TRIP awards +25 once when one `PUT ALL IN RQ` or `DROP ALL IN RQ` seats all
+twenty-four heirlooms while none were seated at the command's start. Its
+`progressAward:oneTrip` ledger survives saves; any single or incomplete
+heirloom deposit persists the forfeit, so neither partial seating nor a later
+bulk transfer can farm the award. The BACKPACK carries 36 items, the measured
+all-in delivery peak: twenty-four heirlooms plus twelve required tools. The
+RELIQUARY's 36 places leave those tools room beside its twenty-four fitted
+recesses. The existing single MATCH already lights the CANDLE (verified in
+`fire-food.feature`); no behavior changed. Body fire remains the BRAZIER's
+highest-paying method at +30 versus +10 for a candle or candelabra, including
+when the player ignites several turns before reaching it and survives within
+the burn limit.
+
 Every obtainable Part-I portable object earns +5 once on acquisition and +5
 once on meaningful use. This includes safe handling of benign keepsakes,
 implicit/custom/bulk pickups, and generated wrapper, doubloon, and clock.
@@ -282,19 +302,22 @@ heirloom, a known carried-only consumable's disappearance, a generation flag,
 or a changed location proves prior acquisition. Already-credited key/gear
 flags are preserved; an originally hidden item at null or a revealed item
 still at its spawn location does not establish pickup.
-The pre-ending Part-I maximum derives from +195 heirloom deposits, +195
-portable pickups, +195 portable uses, +180 puzzle/progression awards, and
-+60 standalone rewards: **825**.
+The pre-ending Part-I maximum is derived, never hardcoded: +330 heirloom
+deposits (the original 195 plus 80 realm and 55 manor), +310 portable pickups,
++310 portable uses, +306 puzzle/progression awards (including ONE TRIP), and
++60 standalone rewards: **1316**.
 
-`::win` starts at the privy, eats fresh mushrooms, flies once to the shaft
-for the backpack, then traverses connected rooms: gallery/troll/crest/shoes,
-front door/mailbox/kitchen, Dreadmaw's apple, garden rope descent and
-self-fire brazier, oak's actual pulley platform, library/bedrooms/nursery gap,
-attic/roof/belfry/hidden vault, and wine cellar/crypt. It deposits all
-thirteen heirlooms, closes the RELIQUARY, rings the closet bell, **takes and
-reads the COUNTDOWN CLOCK**, and stops alive in the ROYAL HALL before SOUTH
-or DOWN. SOUTH adds the existing +45 end badges for **870**; DOWN meets Gary
-and enters Part II at **825**. The MYSTERY PACKAGE is carried and read safely
+`::win` starts with the privy mushrooms and cheeses, flies to the shaft for the
+BACKPACK, HEADLAMP, and WINGED SHOES, then makes its only other named flight to
+the GARDEN. It collects and uses room items on arrival, including the
+weathercock's BURPER/FARTER/SHITTER faces before HORIZON-GAZER, opens and drinks
+the WINE BOTTLE before depositing the CORKSCREW, and reaches the BRAZIER
+already ablaze. It solves the four-beat oak lift, realm radio, manor, and
+reliquary routes before one bulk deposit. The route closes the
+RELIQUARY, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**, and stops
+alive in the ROYAL HALL before SOUTH or DOWN. SOUTH then adds the existing +25
+end badges for **1341**; DOWN meets Gary and enters Part II at **1316**. The
+MYSTERY PACKAGE is carried and read safely
 but never opened; opening it voluntarily instead earns its one-time use credit
 before the box disappears, alongside a random consequence. After the bell,
 re-expanding `::win` opens the RELIQUARY only if necessary, takes and reads
@@ -302,13 +325,15 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 165 commands,
-75 directional commands, 77 actual room transitions, one named-room flight,
-and peak inventory load 12/20; the headlamp retains 42 fuel turns. The
-previous maximum-bell expansion had 113 commands, 19 directional commands,
-and 21 named-room flights. This comparison demonstrates the intended
-tradeoff for exhaustive collection and physical traversal, not a claim of
-globally shortest path.
+For reference, the deterministic fresh `::win` expansion has 232 commands,
+68 directional walking transitions, four lift transitions, one forced
+ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
+per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
+GARDEN; peak load is 32 against the BACKPACK's 36 places; and exactly one
+`PUT ALL IN RQ` earns ONE TRIP while no single-item reliquary deposit occurs.
+The derived pre-ending maximum is 1316/1316. The headlamp retains 42 fuel
+turns. These planner-verified statistics describe the physical collection
+route, not a claim of globally shortest play in every save state.
 
 `SCORE` shows points + turn count. End rank scales like Zork:
 *Trespasser → Amateur Ghost-Hunter → Seasoned Investigator → Master of Blackwood Manor.*
@@ -432,8 +457,8 @@ the mansion.
   speech completion (or a bounded safety timeout).
 
 ## 12.5 Reliquary choice / true ending
-- Ringing the bell over the full, closed reliquary transforms all thirteen
-  heirlooms into the **COUNTDOWN CLOCK**, opens the **FRONT DOOR**, and starts a
+- Ringing the bell over the full, closed reliquary transforms all twenty-four
+  heirlooms into the **DOOMSDAY CLOCK**, opens the **FRONT DOOR**, and starts a
   rumble beneath the floor.
 - Leaving through the front door is the clean ending. Examining the reliquary
   reveals the clock; taking it opens the stair DOWN to Gary and Part II.
@@ -459,7 +484,6 @@ the mansion.
   the fire is extinguished or becomes fatal.
 - **ASCII fire art** is stamped onto every room description while ablaze (`statusBanner`).
 - The player's own flames count as a light source in dark rooms.
-- **Burning the letter:** the Zork mailbox leaflet is now flammable (`burn letter`).
 
 ## 12.7 The brazier fire-puzzle (garden)
 - A cold iron **brazier** whose grave-damp moss a lone match cannot light. A carried
@@ -506,7 +530,7 @@ the mansion.
 - 🕯️ **"The Old Ways"** — lit the brazier with your own body.
 - 🥵 **"Slow Burn"** — stayed ablaze 4+ turns and lived.
 - 🥛 **"Got Milk?"** — drank the curative milk.
-- 🆘 **"Helpless"** (+15) — finished without MAP, HELP, or Gary's CALL/HINT line.
+- 🆘 **"Helpless"** (+15) — finished without MAP, INFO, or Gary's HELP/CALL/HINT line.
 - 🙈 **"Extra Super Duper Helpless"** (+20 beyond HELPLESS) — also never issued
   LOOK, EXAMINE, or SEARCH. Automatic prerequisite actions do not count.
 - ⏩ **"No Takebacks"** (+10) — finished without explicitly using SAVE or RESTORE.
@@ -642,7 +666,7 @@ The `.map` font-size is a `clamp()` on viewport width so the widest panel fits a
 **Discoverability (v2.5.0).** `MAP` also has a button in the touch bar, between `Inv` and
 `Call`. A feature you only reach by typing a word nobody told you about is, for most players,
 not a feature — Gary's offer only fires once you're measurably stuck, which is late, and the
-`HELP` listing is a wall of text. The button costs one wrapped row (`#controls .verbs` is
+`INFO` listing is a wall of text. The button costs one wrapped row (`#controls .verbs` is
 `flex-wrap: wrap`) and no new wiring: `ui.js` binds every `#controls [data-cmd]` generically,
 so `data-cmd="map"` routes through the same `handle()` path as typing it. It sits with the
 orientation verbs rather than the phone cluster (`Call`/`Hint`) because `MAP` is ungated — it
@@ -941,7 +965,7 @@ preserving spoiler hiding for both secret destinations.
 - **Open deposits.** Any unworn carried item can be put into the RELIQUARY. Required
   heirlooms advance the shared total and score; ordinary objects are accepted but
   explicitly reported as non-contributing. The HUD appears after the first deposit
-  in terse `💎 required/13 +extra` form. The RELIQUARY is a glass-fronted cabinet:
+  in terse `💎 required/24 +extra` form. The RELIQUARY is a glass-fronted cabinet:
   PUT (and explicit retrieval) derives OPEN when needed, but the player must
   explicitly CLOSE the completed cabinet, OPEN the BELL CLOSET beside the front
   door, and PULL its lower rope to finish the ritual.
@@ -977,7 +1001,7 @@ Blackwood Manor has one ritual and two immediate choices.
 - **The ritual.** Put all `REQUIRED_FAMILY_ITEM_COUNT` heirlooms into the
   RELIQUARY, CLOSE its doors, OPEN the BELL CLOSET beside the FRONT DOOR, and
   PULL the lower rope. The remote bell toll awards its one-time points, produces
-  magical light, transforms all thirteen heirlooms into the COUNTDOWN CLOCK,
+  magical light, transforms all twenty-four heirlooms into the DOOMSDAY CLOCK,
   slams the FRONT DOOR shut and then wide open, and opens the floor trapdoor.
   The event only hints at what replaced the heirlooms; EXAMINE RELIQUARY reveals
   the clock.
@@ -985,7 +1009,7 @@ Blackwood Manor has one ritual and two immediate choices.
   ends immediately with the current score and ending badges. The BONE KEY,
   HOLLOW PASSAGE, HOLLOW SANCTUM, robed spirit, and SILVER MIRROR branch are
   retired.
-- **The Part-II choice.** Open the RELIQUARY and TAKE the COUNTDOWN CLOCK. The
+- **The Part-II choice.** Open the RELIQUARY and TAKE the DOOMSDAY CLOCK. The
   floor trapdoor is already open, but DOWN refuses the player until the clock is
   carried. DOWN then reaches Gary's call-cave.
 - **Gary's room.** Gary is not serving another caller. He sits beside a silent
@@ -993,7 +1017,7 @@ Blackwood Manor has one ritual and two immediate choices.
   He clubs the player with the receiver and escapes. The player wakes alone as
   a ghost, still carrying the clock.
 - **Clock disclosure.** The awakening only says to EXAMINE the CLOCK. That
-  inspection explains the thirteen-hour recovery loop and enables USE CLOCK.
+  inspection explains the twenty-four-hour recovery loop and enables USE CLOCK.
   `saveBm2Seed(ctx)` persists `{score, turns, playerName, holdsClock}`.
 - **Part-II death recovery.** Entering Part II captures a serialized `partII`
   checkpoint at the ghost awakening. A death in Part II explicitly offers
@@ -1030,8 +1054,8 @@ and a brass SPYGLASS etched BM. Its rusted cradle points at the BELFRY; looking
 through it reveals the maintenance hatch inside the roofline and hints that the
 ATTIC is not the manor's highest reachable level. The SPYGLASS replaces the
 EMERALD GEM as a +8 required heirloom; the BM-crested TALISMAN, restored
-CANDELABRA, BLACKWOOD HAMMER, and BLACKWOOD FAMILY RING keep the collection at
-exactly thirteen required heirlooms.
+CANDELABRA, BLACKWOOD HAMMER, and BLACKWOOD FAMILY RING remain part of the
+twenty-four required heirlooms.
 
 ### 12.32 Twelve-line flavor cycles
 
@@ -1054,6 +1078,8 @@ first line, followed immediately by the reporter's description. If the hint line
 also includes the chronological Gary/user exchange: Gary turns are numbered,
 first speaker labels are written out, and later labels use the shortest unique
 prefix (including caller names learned from `my name is` or `call me`).
+Reports also record the current realm-room status, oak lift stop, and persisted
+realm/lower-panel puzzle flags when the UPSIDE DOWN is present.
 `URLSearchParams` safely encodes the
 line breaks. The full trail remains in memory; only exceptionally long issue
 URLs compact command history to a 6,000-character budget while retaining both
@@ -1104,8 +1130,9 @@ reconstructing platform/version strings independently.
 
 ### 12.35 Heirloom-role redesign and current-save migration
 
-The required set remains exactly thirteen and keeps the same 195-point deposit
-total. Three roles move one-for-one: the retired BAT SIGHT MIRROR'S +20 role
+The original thirteen-role redesign keeps its 195-point deposit total. Lane 10
+adds eleven ratified treasures for a 330-point, twenty-four-heirloom total.
+Three roles move one-for-one: the retired BAT SIGHT MIRROR'S +20 role
 moves to the restored BLACKWOOD FAMILY RING, the former required watch's +12
 role moves to the BLACKWOOD HAMMER, and the silver CANDLESTICK'S +10 role moves
 to the restored CANDELABRA. The XRAY GOGGLES remain non-heirloom EYES equipment.
@@ -1125,3 +1152,218 @@ hammer and candelabra migrations remain one-for-one, and score flags are
 transferred rather than re-awarded so restored games cannot double-score.
 Saves with an already-restored candelabra receive the new +20 completion credit
 once and persist its progress flag on the next save.
+
+### 12.36 The Upside Down realm hub and content-module seam
+
+The UPSIDE DOWN is registered through `js/upsidedown/index.js`; its portal and
+atlas live in `realm.js`, while its puzzle modules own their rooms, items,
+prose, hints, hooks, awards, and cycling flavor. `js/manor/index.js` registers
+the matching manor modules. Every module exports the same content shape:
+`{ rooms, items, content, shortNames, progressAwards, hints, roomHooks,
+flavorPools }`. ``world.js` merges those fields once, chains room hooks without
+discarding existing handlers, and exposes progress awards and flavor cycling to
+content handlers.
+
+The final switch makes all six realm heirlooms and all five manor-quintet
+heirlooms `treasure: true`, raising `REQUIRED_FAMILY_ITEM_COUNT` to 24.
+The RELIQUARY holds 36 items but has twenty-four fitted recesses arranged as a
+clock face; its bell ritual requires every treasure and produces the
+DOOMSDAY CLOCK.
+
+The fixed MINERS' LOCKER in the MINING GALLERY opens onto WAYLAMP CLEARING.
+`IN` enters the realm and `OUT` returns to the gallery; first discovery is a
+persisted +20 award. The hub's open walking paths reach the CHEESE GROTTO, AV
+CLUB DEN, PLANETARIUM, MAP ROOM, SHACK, and OAK UNDERCROFT. The map and 2D
+layouts render this as a separate floor. Named flight uses the same generic
+flight path as every other room, so it can enter and leave the realm without a
+realm-specific flight exception. The parser supplies generic fallback verbs
+for future puzzle modules; the engine contains no realm puzzle rules.
+
+#### 12.36.1 Fridge and Demogorgonzola
+
+The KITCHEN's fixed, closed FRIDGE starts with the existing MILK, an EMPTY MILK
+JUG, LIMBURGER, ÉPOISSES, and MUNSTER. Existing saves gain the new FRIDGE and
+its new contents, while MILK moves inside only when it remains at its original
+KITCHEN location. The three cheeses remain intact when eaten and are the only
+safe gifts for DEMOGORGONZOLA in the CHEESE GROTTO.
+
+DEMOGORGONZOLA's visible creature and grotto text warn that physical or
+directed interactions cause an intact-inventory ejection to the FRONT GATE.
+LOOK, EXAMINE, and SMELL remain safe. Each distinct cheese is consumed once;
+the third grants its persisted +10 progress award and leaves the 15-point
+treasure DEMOGORGONZOLA RIND on the grotto floor. The RIND has normal portable
+pickup and use awards.
+
+#### 12.36.2 Cabinet radio quiz
+
+The AV CLUB DEN's fixed CABINET RADIO starts a name-that-tune round with TURN
+ON, LISTEN, or USE. `radio.js` persists the current unsigned 32-bit LCG state,
+round, streak, and previous answer song under the `realm:radio*` seam keys.
+Each draw selects a non-adjacent answer, one of that answer's five canonical
+original clues, four without-replacement distractors, then Fisher-Yates
+shuffles the displayed choices. ANSWER 1 through 5 and a normalized full SAY
+title are accepted without puzzle knowledge in the engine.
+
+Three consecutive right answers award `radioWon` +10 once and open the cabinet
+onto the 15-point PORTABLE TRANSISTOR RADIO treasure. Wrong answers reset the
+persisted streak and describe a cracking falsetto without printing lyrics;
+save/restore retains active rounds exactly.
+
+#### 12.36.3 Planetarium
+
+The PLANETARIUM's brass PROJECTOR always asks for a number from 1 to 5. Its
+three safe fixed settings light BIG DIPPER OF RANCH, ORION'S WEDGIE, or URANUS
+MAJOR; the first safe selection awards +10 once and drops the 15-point GOLD
+EYEPIECE. The MAP ROOM's 10-point STELLAR MAP records every
+setting, including the BLACK BUNGHOLE's inventory-preserving FRONT GATE
+ejection and the burning SERIOUS-SIRIUS ejection. The latter uses the existing
+`onFire`/`burnTurns` countdown, so going EAST from the gate to light the
+GARDEN BRAZIER remains the existing +30 body-fire solution.
+
+#### 12.36.4 Shack alphabet wall
+
+The run-down SHACK's ALPHABET WALL is a typed-word puzzle, never a color
+mechanic: `SPELL` or `TYPE` FART, STINK, or CHEESE (including space-separated
+letters) produces the PURPLE CRAYON once. Other words reset the bulbs with a
+rude raspberry. The KID'S DRAWING on the door depicts DEMOGORGONZOLA farting
+under a blizzard of arrows, is independently takeable, and is the fair clue.
+Both it and the 15-point PURPLE CRAYON are treasures; their pickup and first
+use awards, plus the wall's persisted `realm:shackSpelled` progress award,
+cannot be farmed. The KID'S DRAWING carries its ratified 10-point deposit.
+
+#### 12.36.5 Shared high and hidden sight
+
+`beginHigh(ctx, { opening, turns })` is the single high source API. It stacks
+the persisted `high` turns, grants the source command its grace turn, retains
+the existing one-time `mushroomVisionOpened` award, and prints the source
+opening followed by cycling source-neutral revelation and reaction pools plus
+fixed flight, dark-sight, and third-eye instructions. `highReactions` has
+twelve entries and persists through `flavorCycle:highReactions`; the historical
+`mushroomHigh` and `mushroomRevelations` keys remain for save compatibility.
+
+An item opts in with `highSource: { opening, turns, doses, whenEmpty }`. Its
+declared EAT, SNIFF/SMELL, USE, or DRINK action runs the common source handler.
+Sources without doses are consumed; a positive dose count decrements in saved
+item state and either remains empty or is destroyed according to `whenEmpty`.
+The fresh and dried MUSHROOMS are 12-turn consumed sources. Lane 8 can use the
+same hook for three 6-turn SNUFFBOX pinches and four 10-turn WINE sips without
+importing this world module. The HUD needs no source-specific state: any
+positive `high` keeps its existing `🍄` indicator.
+
+P7:HiddenSightIsSearch is generic engine plumbing backed by room content.
+`core.js` invokes a room's hidden-sight hook while describing a lit room and
+before movement; content modules add compatible hooks through
+`hiddenSightHooks`. Thus all high, worn XRAY GOGGLES, and worn OBSIDIAN EYE
+users receive the same SEARCH-only discoveries and their persisted awards once.
+The ATTIC sets `vaultFound`; the NURSERY reveals and opens its wallpaper gap;
+the LIBRARY displays its still-latched stair and names the LEVER in the
+movement refusal. A visible physical obstruction remains blocked until its
+content puzzle resolves it.
+
+#### 12.36.6 Campfire, lower panel, and the oak lift
+
+WAYLAMP CLEARING's UPSIDE-DOWN CAMPFIRE accepts WINE, MILK, a filled reusable
+MILK JUG, STOMP, or SMOTHER. Its first extinction persists
+`realm:campfireOut`, awards +5 once, and reveals the CYAN GEM; the nearby
+STREAM fills and refills the carried jug without creating a water item.
+
+The OAK UNDERCROFT's LOWER PANEL persists its MAGENTA-top and YELLOW-bottom
+starting slots in `oak:lowerPanelSlots`. CYAN, MAGENTA, and YELLOW must occupy
+BOTTOM, MIDDLE, and TOP respectively; wrong full arrangements eject every gem,
+while bulk transfers are refused. Alignment awards +10 once, sets
+`oak:lowerPanelAligned`, and activates BELOW immediately without a realm-wide
+puzzle gate or an in-game order hint.
+
+Before that alignment, the upper oak's GROUND/ABOVE lift remains unchanged.
+Afterward, `oak:liftBeat` drives GROUND, ABOVE, GROUND, BELOW one turn at a
+time. Riders remain aboard through every stop until OUT, so either the realm
+or the GREAT OAK supports repeat round trips. LOOK UP and WAIT at BELOW report
+the current cycle, and the existing upper-panel award never resets an active
+lower-panel lift.
+
+### 12.37 Manor quintet
+
+#### 12.37.1 Blackwood Diamond and DIAL
+
+The PARLOR COAL STACK supplies a single portable COAL LUMP at a time. Its
+state-aware room text, SEARCH text, and hidden-sight description all make that
+limit visible. In the KITCHEN, the fixed MICROWAVE and its visible DIAL hold
+the only labels `1 · 100 · M · B · T`; the module owns every setting result,
+the one-time `diamondMade` progress award, and the 15-point BLACKWOOD DIAMOND
+treasure.
+
+`dialable` is generic data. `commands.js` selects a visible item that declares
+it and invokes that item's content-local `on.dial` handler for DIAL, TURN
+DIAL, SET DIAL, and SPIN DIAL. Explicit DIAL GARY, DIAL PHONE, DIAL HOTLINE,
+or DIAL without a visible dial still reaches Gary. The MICROWAVE and the
+existing SAFE therefore remain separate content handlers; the generic parser
+and command engine contain no setting, combination, or puzzle knowledge.
+
+#### 12.37.2 Silver Weathercock
+
+The ROOF gains four fixed gargoyles around the 10-point SILVER
+WEATHERCOCK: BURPER north, FARTER east, SHITTER south, and HORIZON-GAZER west.
+`TURN WEATHERCOCK TO FACE <gargoyle or direction>` accepts their canonical
+aliases and directions; bare `TURN WEATHERCOCK <direction>` works too. Each
+of the first three directions uses its own twelve-line persisted
+`flavorCycle:<gargoyle>` pool and awards its one-time +2 progress value. The
+first successful turn also spends the weathercock's standard one-time +5 use
+award.
+
+Turning west invokes the HORIZON-GAZER's exact release line, sets
+`manor:weathercockFreed`, grants its one-time +5 progress award, and clears
+the post's fixed restraint. The release is irreversible: the remaining
+gargoyle pools cannot then be heard, but `TAKE SILVER WEATHERCOCK` earns the
+normal pickup award and the freed vane remains a treasure. ROOF prose, SEARCH
+text, item descriptions, and Gary's roof, gargoyle, and weathercock hints all
+warn of that ordering.
+
+#### 12.37.3 Snuffbox
+
+The LANDING's MARBLE BUST of Great-Grandpa Blackwood has a visible silver glint
+in its left nostril, made explicit by EXAMINE and hidden sight. PICK NOSE (or
+PICK BUST'S NOSE) retrieves the 10-point SNUFFBOX treasure once and awards the
+finding and pickup ledgers separately. Its three SNIFF, SMELL, or USE pinches
+each use the shared `highSource` API for six stacking turns; the normal first
+use award applies once. An exhausted box remains an EMPTY heirloom, and the
+existing 🍄 HUD follows the shared `high` flag without source-specific state.
+
+#### 12.37.4 Baroness Photograph
+
+The existing MAILBOX LETTER is PHOTO PIECE A: it keeps its id, warning text,
+pickup ledger, and one-time `letterRead` progress award while gaining the
+piece's torn-photo description and aliases. PHOTO PIECES B and C lie openly in
+the HEDGE MAZE LOOP and on the PRIVY wall. A fixed ROTTING BOOK in the LIBRARY
+releases PIECE D through READ BOOK or SEARCH BOOKS; hidden sight uses the same
+release hook and leaves the piece loose for normal pickup.
+
+COMBINE or ASSEMBLE PIECES requires all four carried pieces, consumes them into
+the 15-point BARONESS PHOTOGRAPH treasure, and awards its one-time
+`photoCombined` progress. The portrait shows THE BARONESS beside a GRANDFATHER
+CLOCK at 1:30, a future hook only. Its back retains the unchanged letter: READ
+PHOTOGRAPH or READ LETTER after combination awards any missing letter-read
+credit and the photograph's normal first use, with neither award repeatable.
+
+#### 12.37.5 Corkscrew and wine bottle
+
+The WINE CELLAR holds the 5-point CORKSCREW treasure beside the CRYSTAL
+DECANTER and one dusty, non-heirloom WINE BOTTLE on its rack. The corkscrew has
+no puzzle award: its normal one-time use reward comes only from OPEN BOTTLE
+WITH CORKSCREW. A bottle's broken cork refuses every other opener; DRINK WINE
+while it is corked tells the player to open it first.
+
+The rack supplies one offered bottle at a time. Taking it immediately creates
+the next saved instance (`wineBottle`, then `wineBottle:2`, and so on) with a
+unique `winebtl` short name, while bottles dropped elsewhere remain where they
+were left. `manor:wineSerial` is monotonic and `manor:wineSips` stores each
+instance's zero-through-four sip count through save/restore. Every instance
+shares the `wineBottle` pickup and use ledger identities, so a refill cannot
+farm either reward and derived maximum score counts the template exactly once.
+
+An opened bottle declares the shared `highSource` API: each of its four DRINK
+actions gives ten stacking high turns and the canonical wine opening. The last
+sip destroys that physical bottle after the shared-high output; its rack
+replacement is already waiting. Bare BOTTLE remains MILK except for the cellar
+TAKE BOTTLE and OPEN BOTTLE WITH CORKSCREW collision rules.
+
+

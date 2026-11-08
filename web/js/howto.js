@@ -21,6 +21,17 @@ const HEIRLOOMS = [
   ["crystalDecanter", "crystal decanter"],
   ["ancestralPortrait", "ancestral portrait"],
   ["blackwoodHammer", "blackwood hammer"],
+  ["demogorgonzolaRind", "Demogorgonzola rind"],
+  ["portableTransistorRadio", "portable transistor radio"],
+  ["goldEyepiece", "gold eyepiece"],
+  ["purpleCrayon", "purple crayon"],
+  ["stellarMap", "stellar map"],
+  ["kidsDrawing", "kid's drawing"],
+  ["blackwoodDiamond", "Blackwood diamond"],
+  ["baronessPhotograph", "Baroness photograph"],
+  ["silverWeathercock", "silver weathercock"],
+  ["snuffbox", "snuffbox"],
+  ["corkscrew", "corkscrew"],
 ];
 
 const HEIRLOOM_LORE = {
@@ -37,6 +48,17 @@ const HEIRLOOM_LORE = {
   crystalDecanter: "A cut-crystal decanter, still full, throwing splinters of colour even in the manor's deepest gloom.",
   ancestralPortrait: "A miniature portrait of a woman who looks unsettlingly like the garden statue. Her painted gaze follows you across the room.",
   blackwoodHammer: "A compact iron hammer found in sawdust between exposed beams, with the Blackwood BM insignia branded deep into its ash handle.",
+  demogorgonzolaRind: "A terrible cheese rind coughed up by a flower-faced monster after it devours three kinds of stink.",
+  portableTransistorRadio: "A scuffed portable radio won from the AV Club's ruthless quiz show.",
+  goldEyepiece: "A gold eyepiece shaken loose by a safe constellation in the planetarium.",
+  purpleCrayon: "A purple crayon spat out by an alphabet wall after the correct rude spell.",
+  stellarMap: "A star chart whose constellations make very little astronomical sense and perfect puzzle sense.",
+  kidsDrawing: "A kid's drawing where every arrow points to one enormous fart.",
+  blackwoodDiamond: "A diamond made by giving coal exactly the wrong amount of microwave time.",
+  baronessPhotograph: "Four torn photo pieces joined into the Baroness beside a grandfather clock set to 1:30.",
+  silverWeathercock: "A silver rooster freed from the roof after it faces the horizon-gazer.",
+  snuffbox: "A silver snuffbox recovered from Great-Grandpa Blackwood's left nostril.",
+  corkscrew: "A plain iron corkscrew that opens the cellar's endless supply of stubborn wine bottles.",
 };
 
 const SEEN_KEY = "blackwood-howto-seen-v1";
@@ -68,23 +90,23 @@ export function initHowto(opts = {}) {
         <img class="gary" src="${ib}gary.png" alt="Gary the ghost" />
         <div class="cap">
           <h2>BLACKWOOD MANOR</h2>
-          <p>Thirteen heirlooms. One cursed clock. One restless ghost.</p>
+          <p>Twenty-four heirlooms. One Doomsday Clock. One restless ghost.</p>
         </div>
       </div>
       <div class="howto-body">
         <p>You've come to <b>Blackwood Manor</b> \u2014 and the manor does not
-        intend to let you leave. Explore its fog-drowned halls, where <b>thirteen lost
+        intend to let you leave. Explore its fog-drowned halls, where <b>twenty-four lost
         Blackwood heirlooms</b> still wait in the dark. Find them. Carry them home.
         Make the house whole again\u2026 or the manor keeps you, and you take
         <b>Gary\u2019s</b> place among its restless dead.</p>
 
         <div class="howto-goal">
-          <span class="g-ic"><img src="${ib}clockTalisman.png" alt="Countdown clock" /></span>
+          <span class="g-ic"><img src="${ib}clockTalisman.png" alt="Doomsday Clock" /></span>
           <div>
-            <p style="margin:0"><b>Your quest:</b> enshrine all thirteen relics in the
+            <p style="margin:0"><b>Your quest:</b> enshrine all twenty-four relics in the
             Reliquary's recesses, close its doors, and ring the bell. The completed rite
-            fuses them into the <b>Countdown Clock</b> \u2014 and the manor tolls its
-            <b>thirteenth hour</b>.</p>
+            fuses them into the <b>Doomsday Clock</b> \u2014 and the manor tolls its
+            <b>twenty-fourth hour</b>.</p>
           </div>
         </div>
 
@@ -105,7 +127,7 @@ export function initHowto(opts = {}) {
           </div>
         </div>
 
-        <h3>The thirteen heirlooms</h3>
+        <h3>The twenty-four heirlooms</h3>
         <p>Hunt down every one. They ride in your <b>Carrying</b> satchel, then slide
         into the Reliquary the moment they're enshrined. <b>Hover (or tap) any relic for its story.</b></p>
         <div class="howto-gallery-wrap">
@@ -125,7 +147,7 @@ export function initHowto(opts = {}) {
             the manor simply <i>adores</i> him. Rescue, he'll tell you, is for people who
             dislike their walls. He is the house's happiest prisoner. Find the crawl-gap and
             he'll regale you with a fresh tall tale every time \u2014 and, as often as not, let
-            slip exactly where one of the thirteen heirlooms is hidden. Keep him talking.</p>
+            slip exactly where one of the twenty-four heirlooms is hidden. Keep him talking.</p>
           </div>
         </div>
 
@@ -134,17 +156,17 @@ export function initHowto(opts = {}) {
           <div class="howto-shrine">
             <img src="${ib}reliquary.png" alt="Reliquary, closed" />
             <span class="nm">Reliquary</span>
-            <span class="sub">Thirteen empty recesses await</span>
+            <span class="sub">Twenty-four empty recesses await</span>
           </div>
           <div class="howto-shrine">
             <img src="${ib}reliquary_open.png" alt="Reliquary, open" />
-            <span class="nm">All 13 enshrined</span>
+            <span class="nm">All 24 enshrined</span>
             <span class="sub">The cabinet groans open</span>
           </div>
           <div class="howto-shrine reward">
-            <img src="${ib}clockTalisman.png" alt="Countdown clock" />
-            <span class="nm">Countdown Clock</span>
-            <span class="sub">The fused reward \u00B7 one hand on XIII</span>
+            <img src="${ib}clockTalisman.png" alt="Doomsday Clock" />
+            <span class="nm">Doomsday Clock</span>
+            <span class="sub">The fused reward \u00B7 one hand on XXIV</span>
           </div>
         </div>
 

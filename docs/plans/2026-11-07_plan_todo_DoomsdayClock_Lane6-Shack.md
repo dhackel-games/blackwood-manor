@@ -2,7 +2,7 @@
 
 # Lane 6: Shack
 
-Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
+Status: done (filename flips to _done_ in a separate post-merge commit per plan_organization). Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_todo_DoomsdayClock.md).
 
 * mod:c40+s85='copilot:gpt-5.6-terra:1M:xhigh'
 * Produces: `web/js/upsidedown/shack.js` and `web/tests/features/upsidedown-shack.feature`.
@@ -13,12 +13,12 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Tasks
 
-* [ ] SHACK: a small rundown room whose wall has letters A to Z painted under bulbs; text-only, no color mechanic.
-* [ ] KID'S DRAWING on the door (DEMOGORGONZOLA farting, many arrows pointing at the fart): takeable, `pendingHeirloom: true`.
-* [ ] Spelling per Lane 1 grammar accepts FART, STINK, or CHEESE; any other word flickers and resets.
-* [ ] Success makes the wall spit out the PURPLE CRAYON (`pendingHeirloom: true`), sets `realm:shackSpelled`, and awards +10 once; later spellings only flicker.
-* [ ] Gary hint entries for the wall, drawing, and crayon.
-* [ ] Feature covers each accepted word, a rejected word, drawing pickup, award once, and replay without farming.
+* [x] SHACK: a small rundown room whose wall has letters A to Z painted under bulbs; text-only, no color mechanic.
+* [x] KID'S DRAWING on the door (DEMOGORGONZOLA farting, many arrows pointing at the fart): takeable, `pendingHeirloom: true`.
+* [x] Spelling per Lane 1 grammar accepts FART, STINK, or CHEESE; any other word flickers and resets.
+* [x] Success makes the wall spit out the PURPLE CRAYON (`pendingHeirloom: true`), sets `realm:shackSpelled`, and awards +10 once; later spellings only flicker.
+* [x] Gary hint entries for the wall, drawing, and crayon.
+* [x] Feature covers each accepted word, a rejected word, drawing pickup, award once, and replay without farming.
 
 ## Acceptance
 
@@ -27,6 +27,8 @@ Status: todo. Master: [2026-11-07_plan_todo_DoomsdayClock.md](2026-11-07_plan_to
 
 ## Decisions
 
-* None yet.
+* D-L6-01: The generic parser removes article `A` from space-separated `F A R T`.
+  The SHACK content hook restores its normalized `F R T` form to `FART`, preserving
+  the canonical spelling grammar without adding realm knowledge to the parser.
 
 <!-- end 2026-11-07_plan_todo_DoomsdayClock_Lane6-Shack.md -->

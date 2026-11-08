@@ -18,11 +18,33 @@ import { MAP_MARK, renderMap } from "./map.js?v=source";
 import { composeWorld } from "./compose.js?v=source";
 import { content } from "./world.content.js?v=source";
 import { pathToRoom } from "./sysop-menu.js?v=source";
+import upsideDown from "./upsidedown/index.js?v=source";
+import manor from "./manor/index.js?v=source";
+
+const CONTENT_MODULES = [upsideDown, manor];
+
+function moduleRecords(key) {
+  return CONTENT_MODULES.reduce((merged, module) => ({ ...merged, ...(module[key] || {}) }), {});
+}
+
+const MODULE_SHORT_NAMES = CONTENT_MODULES.reduce((merged, module) => ({
+  rooms: { ...merged.rooms, ...(module.shortNames?.rooms || {}) },
+  items: { ...merged.items, ...(module.shortNames?.items || {}) },
+}), { rooms: {}, items: {} });
+const MODULE_PROGRESS_AWARDS = moduleRecords("progressAwards");
+const MODULE_FLAVOR_POOLS = moduleRecords("flavorPools");
+const MODULE_NAVIGATION_LINKS = CONTENT_MODULES.flatMap((module) => module.navigationLinks || []);
+
+function moduleHints(ctx) {
+  return CONTENT_MODULES.flatMap((module) => module.hints || [])
+    .flatMap((entry) => typeof entry === "function" ? entry(ctx) : entry)
+    .filter(Boolean);
+}
 
 // ---- helpers used by handlers ------------------------------------------------
-export const REQUIRED_FAMILY_ITEM_COUNT = 13;
+export const REQUIRED_FAMILY_ITEM_COUNT = 24;
 
-export const ITEM_SHORT_NAMES = Object.freeze({
+const BASE_ITEM_SHORT_NAMES = {
   reliquary: "rq",
   bell: "bell",
   belfryBellRope: "bellrope",
@@ -105,9 +127,14 @@ export const ITEM_SHORT_NAMES = Object.freeze({
   emeraldOfTheQueen: "qemerald",
   queenPetrified: "medusa",
   gardenPool: "gpool",
+};
+
+export const ITEM_SHORT_NAMES = Object.freeze({
+  ...BASE_ITEM_SHORT_NAMES,
+  ...MODULE_SHORT_NAMES.items,
 });
 
-export const ROOM_SHORT_NAMES = Object.freeze({
+const BASE_ROOM_SHORT_NAMES = {
   gate: "gate",
   garden: "garden",
   hedgeMazeGate: "yewgate",
@@ -143,7 +170,12 @@ export const ROOM_SHORT_NAMES = Object.freeze({
   garysLair: "gary",
   betweenWalls: "between",
   p2_awakening: "nowhere",
-  t13_medusaGarden: "hour13",
+  t13_medusaGarden: "hour24",
+};
+
+export const ROOM_SHORT_NAMES = Object.freeze({
+  ...BASE_ROOM_SHORT_NAMES,
+  ...MODULE_SHORT_NAMES.rooms,
 });
 
 function depositedFamilyItemCount(ctx) {
@@ -221,24 +253,22 @@ function transformHeirloomsIntoClock(ctx) {
 function inspectReliquary(ctx) {
   if (ctx.getFlag("heirloomsTransformed")) {
     if (ctx.roomOf("clockTalisman") === "reliquary") {
-      return "The thirteen fitted recesses are empty. The heirlooms have not merely disappeared: in their " +
-        "place sits a beautiful COUNTDOWN CLOCK with thirteen numbers and one hand resting on XIII. Somehow, " +
-        "all thirteen heirlooms have become this single clock. Open the RELIQUARY and TAKE it.";
+      return "The twenty-four fitted recesses stand empty. In their place rests a DOOMSDAY CLOCK with twenty-four " +
+        "numbers and one slender hand on XXIV. All twenty-four heirlooms are inside it. OPEN the RELIQUARY and TAKE the CLOCK.";
     }
-    return "All thirteen fitted recesses are empty. The heirlooms became the COUNTDOWN CLOCK you now carry.";
+    return "The twenty-four recesses stand empty. The heirlooms became the DOOMSDAY CLOCK you now carry.";
   }
-  return "A tall, glass-fronted RELIQUARY set into the stone wall, with thirteen fitted recesses for the " +
-    `Blackwood heirlooms.\n\n${reliquaryCountLine(ctx)}`;
+  return "Twenty-four fitted recesses ring the RELIQUARY like a clock face.\n\n" + reliquaryCountLine(ctx);
 }
 
-function takeCountdownClock(ctx) {
+function takeDoomsdayClock(ctx) {
   if (ctx.roomOf("clockTalisman") !== "reliquary") {
-    return ctx.has("clockTalisman") ? "You already carry the COUNTDOWN CLOCK." : null;
+    return ctx.has("clockTalisman") ? "You already carry the DOOMSDAY CLOCK." : null;
   }
   if (ctx.inventoryLoad() >= ctx.inventoryCapacity())
-    return "Your hands are full. You'll have to drop something before taking the COUNTDOWN CLOCK.";
+    return "Your hands are full. You'll have to drop something before taking the DOOMSDAY CLOCK.";
   ctx.moveItem("clockTalisman", "inventory");
-  return "You lift the COUNTDOWN CLOCK from the RELIQUARY. It is lighter than thirteen heirlooms should be. " +
+  return "You lift the DOOMSDAY CLOCK from the RELIQUARY. It is lighter than twenty-four heirlooms should be. " +
     "The open trapdoor waits beside you, its narrow STAIRCASE descending into the dark.";
 }
 
@@ -541,7 +571,7 @@ function garyEnding(ctx) {
     "GARY sits at a battered desk beside an avocado-green ROTARY PHONE. The receiver rests silently in " +
     "its cradle. No caller. No ringing. Just Gary, a cold BURRITO, a heap of MUSHROOMS, and a sweating " +
     "carton of MILK beside the humming mini-FRIDGE.\n\n" +
-    "He looks up. Surprise holds him still for one heartbeat. Then he sees the COUNTDOWN CLOCK in your " +
+    "He looks up. Surprise holds him still for one heartbeat. Then he sees the DOOMSDAY CLOCK in your " +
     "hands, and his whole face breaks open with excitement.\n\n" +
     "\"{{player_name}},\" he says. \"You rang the bell. You brought the clock. You actually did it.\"\n\n" +
     "He snatches the heavy receiver from its cradle and rises. \"Do you have any idea what that means for me?\"\n\n" +
@@ -557,27 +587,29 @@ function garyEnding(ctx) {
 }
 
 // =============================================================================
-// BLACKWOOD MANOR II — THE THIRTEEN-HOUR CLOCK  (Part II: one continuous game)
+// BLACKWOOD MANOR II — THE DOOMSDAY CLOCK  (Part II: one continuous game)
 // -----------------------------------------------------------------------------
 // Gary's blow knocks you OUT of your body. You wake as a ghost with the clock,
 // but its purpose is not revealed until you EXAMINE it. Part II reuses the SAME
 // manor as Part I (you walk the real rooms as a ghost); only the time-scenes
-// are new. This BUILD SLICE implements the thirteenth hour: recover the QUEEN'S
+// are new. This BUILD SLICE implements the twenty-fourth hour: recover the QUEEN'S
 // EMERALD from the petrifying queen, then return it to the present-day GARDEN.
-// Placing it ticks the clock 13 -> 12. (Hours XII..I and the closing of the
+// Placing it ticks the clock XXIV -> XXIII. (Hours XXIII..I and the closing of the
 // ouroboros are still to be built.)
 // =============================================================================
-const P2_ROMAN = { 13: "XIII", 12: "XII", 11: "XI", 10: "X", 9: "IX", 8: "VIII",
+const P2_ROMAN = { 24: "XXIV", 23: "XXIII", 22: "XXII", 21: "XXI", 20: "XX",
+  19: "XIX", 18: "XVIII", 17: "XVII", 16: "XVI", 15: "XV", 14: "XIV", 13: "XIII",
+  12: "XII", 11: "XI", 10: "X", 9: "IX", 8: "VIII",
   7: "VII", 6: "VI", 5: "V", 4: "IV", 3: "III", 2: "II", 1: "I", 0: "—" };
 function p2Roman(n) { return P2_ROMAN[n] || String(n); }
-function p2Hour(ctx) { const h = ctx.getFlag("clockHour"); return h == null ? 13 : h; }
+function p2Hour(ctx) { const h = ctx.getFlag("clockHour"); return h == null ? 24 : h; }
 
 // The hinge: called from garyEnding. Become the ghost and drop into "Nowhere."
 // The game stays ALIVE (never finish/kill).
 function beginPartII(ctx) {
   ctx.setFlag("partII", true);
   ctx.setFlag("clockExplained", false);
-  if (ctx.getFlag("clockHour") == null) ctx.setFlag("clockHour", 13);
+  if (ctx.getFlag("clockHour") == null) ctx.setFlag("clockHour", 24);
   ctx.moveItem("clockTalisman", "inventory");
   ctx.state.room = "p2_awakening";
   const awakening = describeAwakening(ctx);
@@ -589,7 +621,7 @@ function describeAwakening(ctx) {
   return "· · · · ·\n\n" +
     "...and then you wake somewhere cold, lightless, and NOWHERE.\n\n" +
     "There is no body beneath you. Your hands are translucent. You are a ghost, {{player_name}}, and the " +
-    "COUNTDOWN CLOCK is still cradled in your see-through fingers.\n\n" +
+    "DOOMSDAY CLOCK is still cradled in your see-through fingers.\n\n" +
     "Gary is gone. The clock remains.\n\n" +
     "EXAMINE the CLOCK.";
 }
@@ -602,31 +634,31 @@ function afterPlayerNamed(ctx) {
 
 function clockTalismanText(ctx) {
   if (!ctx.getFlag("partII")) {
-    return "A beautiful grand clock small enough to cradle in both hands. It has THIRTEEN numbers instead of " +
-      "twelve, and one slender hand resting on XIII. There is no maker's mark and no instruction." +
+    return "A grand DOOMSDAY CLOCK small enough to cradle in both hands. Twenty-four numbers ring its face, " +
+      "and one slender hand rests on XXIV. There is no maker's mark and no instruction." +
       (ctx.has("clockTalisman") ? ctx.awardUse(ctx.item("clockTalisman")) : "");
   }
   ctx.setFlag("clockExplained", true);
   return "The moment your ghostly fingers trace the clock's face, its purpose enters your mind whole.\n\n" +
-    "The thirteen Blackwood heirlooms are inside it, scattered through thirteen hours of the manor's past. " +
-    "The hand will count backward only when you recover each heirloom and return it to the place where you " +
+    "The twenty-four Blackwood heirlooms are inside it, scattered through twenty-four hours of the manor's past. " +
+    "The hand counts backward when you recover each heirloom and return it to the place where you " +
     "first found it. USE the CLOCK to enter the next hour; USE it again to come home with what you recover.\n\n" +
-    `The hand rests on ${p2Roman(p2Hour(ctx))}. Thirteen hours remain, {{player_name}}.` +
+    `The hand rests on ${p2Roman(p2Hour(ctx))}. ${p2Hour(ctx) === 24 ? "Twenty-four" : "Twenty-three"} hours remain, {{player_name}}.` +
     ctx.awardUse(ctx.item("clockTalisman"));
 }
 
 // The clock is the only way in or out of an hour.
-//   * Nowhere / present-day manor, not holding the emerald -> FALL into hour XIII.
-//   * Inside hour XIII holding the emerald -> SURFACE in the present-day hall.
+//   * Nowhere / present-day manor, not holding the emerald -> FALL into hour XXIV.
+//   * Inside hour XXIV holding the emerald -> SURFACE in the present-day hall.
 //   * Present-day manor, already holding it -> nudge you to walk it to the garden.
 function useClockTalisman(ctx) {
   if (!ctx.getFlag("partII")) {
     return "The clock ticks once in your hands. Beneath it, the open stair waits in the floor.";
   }
   const room = ctx.state.room;
-  if (p2Hour(ctx) <= 12) {
-    return "The clock's hand has slipped past the thirteenth hour and rests on XII. Beyond here the road through " +
-      "time isn't built yet — this is the end of the current slice. (Hours XII..I are still to come.)";
+  if (p2Hour(ctx) <= 23) {
+    return "The clock's hand rests on XXIII. Beyond here the road through time is not built yet. " +
+      "Hours XXIII to I are still to come.";
   }
   if (room === "p2_awakening") {
     if (!ctx.getFlag("clockExplained")) {
@@ -657,11 +689,11 @@ function useClockTalisman(ctx) {
 
 function describeMedusaGarden(ctx) {
   if (ctx.getFlag("emeraldFreed")) {
-    return "THE THIRTEENTH HOUR — after.\n\n" +
+    return "THE TWENTY-FOURTH HOUR, after.\n\n" +
       "The garden of centuries past, gone silent. Where the queen stood there is now only a grey STATUE, caught " +
       "mid-turn, an empty setting at its throat. There is nothing left to do here. USE the CLOCK to return.";
   }
-  return "THE THIRTEENTH HOUR.\n\n" +
+  return "THE TWENTY-FOURTH HOUR.\n\n" +
     "You stand where the manor GARDEN will be — drenched in the green-gold light of an afternoon centuries gone. " +
     "At the garden's heart, where in your own time a marble STATUE of a woman keeps its vigil, the roses are " +
     "already greying and hardening to STONE, inch by creeping inch. Whatever casts that curse is near — and if it " +
@@ -705,15 +737,15 @@ function placeEmeraldInGarden(ctx, cmd) {
       "very stone the queen became. Make your way there, then PUT it.";
   }
   ctx.moveItem("emeraldOfTheQueen", "garden");
-  ctx.setFlag("clockHour", 12);
+  ctx.setFlag("clockHour", 23);
   ctx.setFlag("hour13Done", true);
   ctx.addScore(25);
   return "You press the QUEEN'S EMERALD deep into the bush beneath the leaning STATUE — the petrified queen " +
     "herself, you understand now — where, centuries on, a treasure-hunter will dig it out by lantern-light and " +
     "carry it inside. The circle draws that much tighter.\n\n" +
-    "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XIII to XII.\n\n" +
-    MAP_MARK + " HOUR XIII CLOSED — the emerald is home. Twelve hours remain. " + MAP_MARK + "\n\n" +
-    "(End of the current build slice: Hours XII..I and the closing of the loop are still to come.)" +
+    "Far off and everywhere at once, the great BELL tolls once. The clock's slender hand slips from XXIV to XXIII.\n\n" +
+    MAP_MARK + " HOUR XXIV CLOSED: the emerald is home. Twenty-three hours remain. " + MAP_MARK + "\n\n" +
+    "(End of the current build slice: Hours XXIII to I and the closing of the loop are still to come.)" +
     ctx.awardUse(ctx.item("emeraldOfTheQueen"));
 }
 
@@ -816,6 +848,8 @@ const PROGRESS_AWARDS = Object.freeze({
   bellRung: 5,
   burritoSurvived: 25,
   selfFireSurvived: 10,
+  oneTrip: 25,
+  ...MODULE_PROGRESS_AWARDS,
 });
 const STANDALONE_MAX_AWARDS = Object.freeze({
   milk: 5,
@@ -824,8 +858,13 @@ const STANDALONE_MAX_AWARDS = Object.freeze({
   dreadmaw: 10,
 });
 
+function progressPoints(id) {
+  const award = PROGRESS_AWARDS[id];
+  return typeof award === "number" ? award : award?.points || 0;
+}
+
 function awardProgress(ctx, id) {
-  const points = PROGRESS_AWARDS[id];
+  const points = progressPoints(id);
   const flag = `progressAward:${id}`;
   if (!points || ctx.getFlag(flag)) return 0;
   ctx.setFlag(flag);
@@ -835,6 +874,20 @@ function awardProgress(ctx, id) {
 
 function awardSuffix(points) {
   return points ? ` (+${points})` : "";
+}
+
+function oneTripBonus(ctx, cmd) {
+  if (!cmd?.bulkTransfer) return "";
+  const hadSeatedHeirloom = (cmd.bulkTransferStartItems || [])
+    .some((id) => ctx.world.items[id]?.treasure);
+  if (allTreasuresDeposited(ctx) && !hadSeatedHeirloom && !ctx.getFlag("oneTripForfeited")) {
+    const points = awardProgress(ctx, "oneTrip");
+    if (points) {
+      return "One trip. Twenty-four heirlooms take their places in a single breath." + awardSuffix(points);
+    }
+  }
+  if (depositedFamilyItemCount(ctx) > 0) ctx.setFlag("oneTripForfeited");
+  return "";
 }
 
 function maximumScore(ctx) {
@@ -848,7 +901,9 @@ function maximumScore(ctx) {
     .filter((item) => item.takeable && item.phase !== 2).length
     * ctx.world.config.portableRewards.use;
   const progressionPoints = Object.values(PROGRESS_AWARDS)
-    .reduce((total, points) => total + points, 0);
+    .reduce((total, award) => total + (award?.maximumScore === false
+      ? 0
+      : (typeof award === "number" ? award : award?.points || 0)), 0);
   const standalonePoints = Object.values(STANDALONE_MAX_AWARDS)
     .reduce((total, points) => total + points, 0);
   return itemPoints + pickupPoints + usePoints + progressionPoints + standalonePoints;
@@ -1088,7 +1143,7 @@ function hintEntries(ctx) {
     ? "The BM WATCH is inside the STUDY'S DESK DRAWER beneath the DIARY. OPEN the drawer and wear the watch on your WRIST; SHOW a room or ROUTE TO an object and its empty face will guide you."
     : "The BM WATCH can SHOW any Part-I room and prepare a ROUTE to any known room or object.";
 
-  return [
+  const entries = [
     { topics: ["front", "door", "key", "statue", "garden", "porch"], done: inside, text: frontDoorHint },
     { topics: ["light", "dark", "candle", "candlestick", "match", "matches"], done: !!lit, text: lightHint },
     { topics: ["ravenblood", "ring", "jewelry", "tiny", "key"], done: dep("rubyRing"),
@@ -1098,7 +1153,7 @@ function hintEntries(ctx) {
     { topics: ["coin", "well", "rope", "garden"], done: dep("ancientCoin"), text: coinHint },
     { topics: ["grimoire", "library", "lever", "bookcase", "chamber"], done: dep("grimoire"),
       text: "In the LIBRARY there's a brass LEVER where a book should be. PULL it — a bookcase swings open onto a stair DOWN to a hidden chamber. The grimoire's there. Bring your lit candle; it's black as pitch." },
-    { topics: ["decanter", "wine", "cellar", "trapdoor"], done: dep("crystalDecanter"),
+    { topics: ["decanter", "cellar", "trapdoor"], done: dep("crystalDecanter"),
       text: "Crystal decanter's in the WINE CELLAR. OPEN the CELLAR trap-door in the KITCHEN, go DOWN. Pitch dark — candle had better be lit or you're a grue's dinner. Unlike me, who has eaten NOTHING." },
     { topics: ["portrait", "attic", "ladder", "cord", "landing"], done: dep("ancestralPortrait"),
       text: "There's an ANCESTRAL PORTRAIT in the ATTIC. PULL the CORD on the LANDING to drop the ladder. But that ladder's rotten — climb it carrying more than a couple things and you crash through and DIE. DROP your junk on the landing first." },
@@ -1119,10 +1174,13 @@ function hintEntries(ctx) {
     { topics: ["watch", "bm", "scry", "show", "route", "guide"],
       done: ctx.roomOf("backwardsWatch") !== "studyDrawer", optional: true, text: watchHint },
     { topics: ["loot", "treasure", "heirloom", "collection", "reliquary"], done: allTreasuresDeposited(ctx),
-      text: "You've FOUND the loot — now actually PUT each heirloom in the RELIQUARY in the ROYAL HALL. They're worth nothing rattling around in your pockets." },
+      text: "The RELIQUARY needs 24 Blackwood heirlooms. Its recesses form a clock face; CLOSE the doors and PULL the BELL ROPE only when all 24 are seated." },
     { topics: ["finish", "ending", "escape", "bell", "reliquary"], done: false,
-      text: "Everything's in the reliquary. CLOSE RELIQUARY, OPEN the BELL CLOSET beside the FRONT DOOR, then PULL the ROPE. And then — I mean this warmly — never call me again." },
+      text: "The RELIQUARY needs 24 Blackwood heirlooms. Its recesses form a clock face; CLOSE the doors and PULL the BELL ROPE only when all 24 are seated." },
+    { topics: ["clock", "doomsday", "countdown", "time"], done: false,
+      text: "Take the DOOMSDAY CLOCK after the bell. In Part II, EXAMINE it, then USE it to enter the next hour." },
   ];
+  return [...entries, ...moduleHints(ctx)];
 }
 
 // Returns the single most relevant next-step hint for the current game state.
@@ -1686,21 +1744,6 @@ function readLetter(ctx, cmd) {
   return (letter?.text || "It's blank.") + awardSuffix(points) + ctx.awardUse(letter);
 }
 
-// Burning the letter (Zork's leaflet, but arson).
-function burnLetter(ctx, cmd) {
-  if (ctx.find(cmd.dobj)?.id !== "letter") return null;
-  const l = ctx.item("letter");
-  if (!l || l.loc == null) return "There's no letter to burn — you've already reduced it to ash.";
-  const use = ctx.awardUse(l);
-  ctx.destroy("letter");
-  ctx.setFlag("letterBurned", true);
-  return (
-    "You don't remember striking a match, but the water-stained letter is suddenly alight. It curls " +
-    "into black flakes and crumbles away — warning, curse, crypt and all.\n\n" +
-    "Somewhere, the house seems to take note. That felt unwise. It felt GREAT, but unwise." + use
-  );
-}
-
 // --- Burn-up timer: being on fire will consume you if you don't act ----------
 const BURN_LINES = [
   "You are on fire. It remains, technically, fine.",
@@ -2037,20 +2080,48 @@ const HIGH_LINES = [
   "You can hear the color purple humming from somewhere behind your teeth.",
   "For one radiant moment, you understand the architecture. It is mostly anxiety with stairs.",
 ];
-const MUSHROOM_REVELATIONS = [
+export const HIGH_SOURCE_OPENINGS = Object.freeze({
+  freshMushrooms:
+    "You eat the fresh MUSHROOMS from the TOILET HOLE. They are slick with actual crap and piss, and you know exactly where they grew. Your bravery is not contagious.",
+  driedMushrooms:
+    "You chew through the dried KITCHEN MUSHROOMS. They taste like a dusty cellar and bad judgment; the trip is already catching up.",
+  snuff:
+    "You sniff a pinch from the SNUFFBOX. Your nose fires a sneeze large enough to rattle a portrait, and the world answers by going sideways.",
+  wine:
+    "You take a sip of WINE. It tastes like old plums and a badly kept promise; then the room decides it has elbows.",
+});
+export const MUSHROOM_REVELATIONS = [
   "...oh. OH. Colours have SOUNDS now. The wallpaper is humming directly into your teeth.",
-  "The mushrooms arrive all at once. Every shadow acquires a personality and most seem supportive.",
+  "The trip arrives all at once. Every shadow acquires a personality and most seem supportive.",
   "A purple chord rings behind your eyes. The manor unfolds like a diagram drawn by an anxious wizard.",
   "The floor exhales beneath you, the ceiling leans closer, and perspective becomes an optional courtesy.",
   "Your thoughts grow feathers. Gravity looks embarrassed to have taken itself so seriously.",
   "The room separates into light, sound, and several new categories for which language has not prepared you.",
   "Every edge glows with private meaning. Even the dust seems to know where it is going.",
-  "The mushrooms kick open a door behind your forehead and leave the hinges spinning.",
+  "The trip kicks open a door behind your forehead and leaves the hinges spinning.",
   "Colour pours through the silence. For one lucid second, the entire house makes terrible sense.",
   "Your pulse becomes visible, your shadow becomes opinionated, and the walls begin breathing in rounds.",
   "A warm violet buzz climbs your spine. Reality loosens its collar and stops enforcing the dress code.",
   "The manor turns translucent around you, less a building now than a nervous system with wallpaper.",
 ];
+export const HIGH_REACTIONS = [
+  "You are high. The ceiling has adopted an accent, and it is not from here.",
+  "You are high enough to hear two floorboards debating whether they are load-bearing.",
+  "The trip makes your shadow look like it has been elected to local office.",
+  "You are high. A staircase waves hello with the confidence of an old friend.",
+  "The trip informs you that your elbows have been quietly doing excellent work.",
+  "You are high enough to suspect every locked door is practicing its poker face.",
+  "The wallpaper breathes so politely that you almost thank it for waiting.",
+  "You are high. Time has pulled up a chair and is refusing to explain its schedule.",
+  "The trip makes a dust mote look like the mayor of a very small galaxy.",
+  "You are high enough to feel the floor negotiate a truce with gravity.",
+  "The old house looks briefly like a diagram drawn by a worried octopus.",
+  "You are high. Your third eye blinks at a wall and the wall looks away first.",
+];
+export const SHARED_HIGH_CAPABILITY_TEXT =
+  "Your body feels so light you can FLY TO or FLOAT TO any room you can name. An astral eye opens between your brows. " +
+  "The dark becomes legible grey, and a SECRET DOOR shows itself in the ATTIC's north gable. " +
+  "(Your THIRD EYE is open: hidden details and dark rooms are visible while the trip lasts.)";
 const SICK_DURATION = 40;
 const SICK_BURP_LINES = [
   "A blast of stomach acid climbs your throat and escapes as a burp hot enough to tarnish silver.",
@@ -2138,25 +2209,41 @@ const DIARRHEA_ART = [
   "         _||_   ( pants )  . ° tiny embers ° .",
 ].join("\n");
 const SICK_EVENT_ART = [BURP_ART, BARF_ART, FART_ART, DIARRHEA_ART];
-function eatMushrooms(ctx, cmd) {
-  const mushrooms = ctx.find(cmd.dobj);
-  const use = ctx.awardUse(mushrooms);
-  if (mushrooms) ctx.destroy(mushrooms.id);
-  ctx.setFlag("high", (ctx.getFlag("high") || 0) + (mushrooms?.highTurns || 12));
+export function beginHigh(ctx, { opening, turns }) {
+  ctx.setFlag("high", (ctx.getFlag("high") || 0) + turns);
   ctx.setFlag("highGrace", true);
-  ctx.setFlag("vaultFound", true); // the trip SHOWS you the hidden attic door — permanently
   const points = awardProgress(ctx, "mushroomVisionOpened");
-  const origin = mushrooms?.fresh
-    ? "You eat the fresh mushrooms. They are slick with literal crap and piss from the TOILET HOLE — " +
-      "not metaphorical filth, not spooky swamp water: actual human waste. You swallow anyway."
-    : "You chew through the dried kitchen mushrooms. They are dusty and bitter, but the trip hits just the same.";
-  return origin + "\n\n" + cycleFlavor(ctx, "mushroomRevelations") + "\n\n" +
-    "The house isn't haunted, man — it's just misunderstood. You feel amazing, invincible, and deeply unqualified to be here. " +
-    "Your body feels so light you could FLY TO any room you can name.\n\n" +
-    "Something else opens too: between your brows, an astral eye blinks awake. The dark of the house turns " +
-    "to legible grey, and in your mind's eye a SECRET DOOR blooms in the ATTIC's north gable, behind it " +
-    "something that wants to be found.\n\n(Your THIRD EYE is open: you can see in the dark, and hidden " +
-    "detail keeps revealing itself while the trip lasts.)" + awardSuffix(points) + use;
+  return opening + "\n\n" + cycleFlavor(ctx, "mushroomRevelations") + "\n\n" +
+    cycleFlavor(ctx, "highReactions") + "\n\n" + SHARED_HIGH_CAPABILITY_TEXT + awardSuffix(points);
+}
+
+function highSourceActions(item) {
+  const declared = item.highSource?.actions;
+  if (declared) return declared;
+  return [
+    ...(item.edible ? ["eat"] : []),
+    ...(item.drinkable ? ["drink"] : []),
+    ...(item.sniffable ? ["smell"] : []),
+    ...(item.usable ? ["use"] : []),
+  ];
+}
+
+function useHighSource(ctx, item, cmd) {
+  const source = item?.highSource;
+  if (!source || !highSourceActions(item).includes(cmd.verb)) return null;
+  const doses = Number.isFinite(source.doses) ? source.doses : null;
+  if (doses !== null && doses <= 0) {
+    return source.emptyMessage || `The ${item.names[0].toUpperCase()} is empty.`;
+  }
+
+  const use = ctx.awardUse(item);
+  if (doses === null) {
+    ctx.destroy(item.id);
+  } else {
+    source.doses -= 1;
+    if (source.doses === 0 && source.whenEmpty === "destroy") ctx.destroy(item.id);
+  }
+  return beginHigh(ctx, source) + use;
 }
 
 function capabilityStatus(ctx, equipmentFlag) {
@@ -2185,6 +2272,10 @@ function hasMushroomVision(ctx) {
     || ctx.inventory().some((item) =>
       item.worn && (item.grantsMushroomVision || item.grantsHiddenSight));
 }
+function revealHiddenSight(ctx) {
+  const hook = ctx.room()?.hiddenSight;
+  return typeof hook === "function" ? hook(ctx) : null;
+}
 function hasDarkVision(ctx) {
   return (ctx.getFlag("high") || 0) > 0
     || !!ctx.getFlag("__suSight")
@@ -2205,6 +2296,9 @@ function floatToRoom(ctx, roomId) {
       "through its inset PANEL first, there is nowhere safe to land.";
   }
   ctx.state.room = roomId;
+  const entry = typeof destination.onEnter === "function"
+    ? destination.onEnter(ctx, { via: "flight" })
+    : null;
   const betweenWallsPoints = roomId === "betweenWalls" ? discoverBetweenWalls(ctx) : 0;
   if (roomId === "betweenWalls") ctx.setFlag("seen:betweenWalls", true);
   if (roomId === "crypt") {
@@ -2216,10 +2310,12 @@ function floatToRoom(ctx, roomId) {
       );
     }
     const points = awardProgress(ctx, "wraithPassed");
-    return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+    return `You rise weightless and drift through the manor to the ${destinationName}.\n\n` +
+      (entry ? `${entry}\n\n` : "") + `${ctx.describeRoom()}` +
       awardSuffix(points);
   }
-  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n${ctx.describeRoom()}` +
+  return `You rise weightless and drift through the manor to the ${destinationName}.\n\n` +
+    (entry ? `${entry}\n\n` : "") + `${ctx.describeRoom()}` +
     awardSuffix(betweenWallsPoints);
 }
 function eatBurrito(ctx) {
@@ -2439,16 +2535,73 @@ function putOakGem(ctx, cmd) {
     return `${placement} Sunlight passes through the gem, but the separate beams fail to converge.` + use;
   }
   ctx.setFlag("oakLightAligned");
-  ctx.setFlag("oakLiftGrace");
-  ctx.moveItem("oakPlatform", "greatOak");
+  if (!ctx.getFlag("oak:lowerPanelAligned")) {
+    ctx.setFlag("oakLiftGrace");
+    ctx.moveItem("oakPlatform", "greatOak");
+  }
   const points = awardProgress(ctx, "oakPanelAligned");
+  const liftText = ctx.getFlag("oak:lowerPanelAligned")
+    ? "brilliant white shaft. High above, the pulley CLUNKS awake without disturbing the moving PLATFORM."
+    : "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots.";
   return `${placement}\n\nSunlight passes through all three gems and the mirrored beams converge into a ` +
-    "brilliant white shaft. High above, the pulley CLUNKS awake and lowers a wooden PLATFORM to the roots." +
+    liftText +
     awardSuffix(points) + use;
 }
 
+const OAK_LIFT_STOPS = Object.freeze(["greatOak", "treeFort", "greatOak", "below"]);
+
+function oakLiftStopName(room) {
+  return ({ greatOak: "GROUND", treeFort: "ABOVE", below: "BELOW" })[room];
+}
+
+function oakLiftMotion(from, to) {
+  if (from === "greatOak" && to === "treeFort") {
+    return "The pulley catches the white beam. The PLATFORM rises through the branches and settles beside the TREE FORT.";
+  }
+  if (from === "treeFort" && to === "greatOak") {
+    return "The beam shifts. The PLATFORM descends through the leaves and settles among the GREAT OAK'S roots.";
+  }
+  if (from === "greatOak" && to === "below") {
+    return "The PLATFORM slips under the GREAT OAK'S roots and settles in the OAK UNDERCROFT.";
+  }
+  return "The ropes tug the PLATFORM up through the roots until it settles beside the GREAT OAK.";
+}
+
+function leaveOakPlatform(ctx, cmd) {
+  if (cmd.dobj !== "out" || !ctx.getFlag("oak:lowerPanelAligned")
+      || !ctx.getFlag("oakLiftRiding") || ctx.roomOf("oakPlatform") !== ctx.state.room) {
+    return null;
+  }
+  ctx.setFlag("oakLiftRiding", false);
+  ctx.setFlag("oakLiftGrace");
+  return ctx.state.room === "greatOak"
+    ? "You step off at the GREAT OAK'S roots."
+    : "You step off inside the TREE FORT.";
+}
+
+function oakNavigation(ctx, cmd) {
+  if (cmd.dobj === "in" && ctx.state.room === "greatOak") return enterOakPlatform(ctx);
+  const disembark = leaveOakPlatform(ctx, cmd);
+  if (disembark) return disembark;
+  if (cmd.dobj !== "out") return null;
+  if (ctx.state.room === "greatOak") {
+    ctx.state.room = "privy";
+    return ctx.describeRoom();
+  }
+  if (ctx.state.room === "treeFort") return enterOakPlatform(ctx);
+  return null;
+}
+
 function enterOakPlatform(ctx) {
-  if (ctx.roomOf("oakPlatform") !== ctx.state.room) return "The PLATFORM is currently at the other end of the pulley.";
+  if (ctx.roomOf("oakPlatform") !== ctx.state.room) {
+    if (ctx.state.room === "below" && !ctx.getFlag("oak:lowerPanelAligned")) {
+      return "No PLATFORM stops BELOW yet. The LOWER PANEL has not been aligned.";
+    }
+    if (ctx.getFlag("oak:lowerPanelAligned")) {
+      return `The PLATFORM is at ${oakLiftStopName(ctx.roomOf("oakPlatform"))}, not here. WAIT for it.`;
+    }
+    return "The PLATFORM is currently at the other end of the pulley.";
+  }
   if (ctx.getFlag("oakLiftRiding")) return "You are already standing on the PLATFORM.";
   ctx.setFlag("oakLiftRiding");
   ctx.setFlag("oakLiftGrace");
@@ -2478,6 +2631,33 @@ function takeSpyglass(ctx) {
 }
 
 function oakLiftTick(ctx) {
+  if (ctx.getFlag("oakLiftRiding") && ctx.state.room !== ctx.roomOf("oakPlatform")) {
+    ctx.setFlag("oakLiftRiding", false);
+  }
+  if (ctx.getFlag("oak:lowerPanelAligned")) {
+    if (ctx.getFlag("oakLiftGrace")) {
+      ctx.setFlag("oakLiftGrace", false);
+      return null;
+    }
+    const from = ctx.roomOf("oakPlatform");
+    let beat = Number(ctx.getFlag("oak:liftBeat"));
+    if (!Number.isInteger(beat) || beat < 0 || beat >= OAK_LIFT_STOPS.length) {
+      beat = from === "treeFort" ? 1 : from === "below" ? 3 : 0;
+    }
+    const nextBeat = (beat + 1) % OAK_LIFT_STOPS.length;
+    const to = OAK_LIFT_STOPS[nextBeat];
+    ctx.setFlag("oak:liftBeat", nextBeat);
+    ctx.moveItem("oakPlatform", to);
+    const riding = ctx.getFlag("oakLiftRiding") && ctx.state.room === from;
+    if (riding) {
+      ctx.state.room = to;
+      return oakLiftMotion(from, to) + "\n\n" + ctx.describeRoom();
+    }
+    if (ctx.state.room === from) {
+      return oakLiftMotion(from, to).replace("The PLATFORM", "The empty PLATFORM");
+    }
+    return null;
+  }
   if (!ctx.getFlag("oakLightAligned")) return null;
   if (ctx.getFlag("oakLiftGrace")) {
     ctx.setFlag("oakLiftGrace", false);
@@ -2724,6 +2904,7 @@ function teleportRandom(ctx, flavor, exclude) {
   const ids = Object.keys(ctx.world.rooms).filter(
     (id) => id !== ctx.state.room && !(exclude && exclude.has(id))
       && ctx.world.rooms[id].phase !== 2 // Part II hours are reachable only via the clock
+      && ctx.world.rooms[id].randomTeleport !== false
   );
   const roomId = ids[Math.floor(Math.random() * ids.length)];
   ctx.state.room = roomId;
@@ -3071,6 +3252,14 @@ function enterSafeCode(ctx, cmd) {
   if (safeCode(cmd) !== SAFE_CODE) return "You dial that combination. The safe remains locked.";
   return finishOpeningSafe(ctx, "You dial seven left, three right, nine left.");
 }
+function dialSafe(ctx, cmd) {
+  const setting = String(cmd.setting || "").trim();
+  if (!setting) return "The DIAL needs a setting.";
+  if (safeCode({ dobj: setting }) !== SAFE_CODE) {
+    return `The SAFE dial accepts its own numbers, not ${setting.toUpperCase()}.`;
+  }
+  return enterSafeCode(ctx, { dobj: setting, iobj: null });
+}
 function openSafe(ctx, cmd) {
   const safe = ctx.item("safe");
   if (safe.open) return "The safe already stands open.";
@@ -3179,6 +3368,7 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   waterOffers: WATER_OFFERS,
   mushroomHigh: HIGH_LINES,
   mushroomRevelations: MUSHROOM_REVELATIONS,
+  highReactions: HIGH_REACTIONS,
   sickBurp: SICK_BURP_LINES,
   sickBarf: SICK_BARF_LINES,
   sickFart: SICK_FART_LINES,
@@ -3191,6 +3381,7 @@ export const CYCLING_FLAVOR_POOLS = defineCyclingFlavorPools({
   packageOpenings: PACKAGE_OPENINGS,
   mushroomRegrowth: MUSHROOM_REGROW_LINES,
   dragonRebukes: DRAGON_REBUKES,
+  ...MODULE_FLAVOR_POOLS,
 });
 
 function dragonFire(ctx) {
@@ -3389,7 +3580,7 @@ export const END_AWARDS = Object.freeze([
     points: 15,
     qualifies: (ctx) =>
       !ctx.getFlag("usedMap") && !ctx.getFlag("usedGaryHelp") && !ctx.getFlag("usedHelp"),
-    text: "🆘 BADGE: \"Helpless\" — you escaped without MAP, Gary's hint line, or HELP. (+15)",
+    text: "🆘 BADGE: \"Helpless\" — you escaped without MAP, Gary's hint line, or INFO. (+15)",
   }),
   Object.freeze({
     id: "extraSuperDuperHelpless",
@@ -3662,6 +3853,7 @@ const logicWorld = {
   reliquaryStatus,   // required and non-contributing RELIQUARY deposit counts
   reliquaryStatusValue, // HUD-compatible RELIQUARY count text
   routeWithMirror: routeWithBmWatch,
+  navigationLinks: MODULE_NAVIGATION_LINKS,
   headlampStatus,    // remaining wearable HEADLAMP turns for the HUD
   lightStatus,       // remaining wearable HEADLAMP turns for the HUD
   visionStatus,      // temporary mushroom sight or permanent worn eye equipment
@@ -3669,7 +3861,11 @@ const logicWorld = {
   canFly,            // temporary mushroom flight or worn WINGED SHOES
   hasMushroomVision, // temporary mushroom sight or worn hidden-sight equipment
   hasDarkVision,     // temporary mushroom sight or worn XRAY GOGGLES
+  revealHiddenSight,
+  useHighSource,
   flavorPools: CYCLING_FLAVOR_POOLS,
+  cycleFlavor,
+  awardProgress,
   itemShortNames: ITEM_SHORT_NAMES,
   roomShortNames: ROOM_SHORT_NAMES,
   maximumScore,
@@ -3683,7 +3879,19 @@ const logicWorld = {
       state.flags.playerName = state.flags.ghostName;
     }
     delete state.flags.ghostName;
+    if (savedItems?.milk?.loc === "kitchen") state.items.milk.loc = "fridge";
+    if (savedItems?.milkJug && "filled" in savedItems.milkJug) {
+      state.items.milkJug.filled = savedItems.milkJug.filled;
+    }
+    if (state.flags.letterBurned && state.items.letter?.loc == null) {
+      state.items.letter.loc = "mailbox";
+    }
     if (state.flags.partII) state.flags.bellRung = true;
+    if (state.flags.partII || state.flags.bellRung || state.flags.heirloomsTransformed) {
+      const completedTwentyFourthHour = state.flags.hour13Done
+        || Number(state.flags.clockHour) <= 12;
+      state.flags.clockHour = completedTwentyFourthHour ? 23 : 24;
+    }
     if (state.room === "hollowPassage" || state.room === "hollowSanctum") {
       state.room = "grandHall";
     }
@@ -3860,6 +4068,14 @@ const logicWorld = {
     if (state.flags.candelabraRestored) {
       state.items.candelabra.lit = true;
     }
+    const preservesCompletedRitual = state.flags.bellRung
+      || state.flags.heirloomsTransformed || state.flags.partII;
+    const seatedTreasureCount = Object.entries(world.items)
+      .filter(([, definition]) => definition.treasure)
+      .filter(([id]) => state.items[id]?.loc === "reliquary").length;
+    if (!preservesCompletedRitual && seatedTreasureCount < REQUIRED_FAMILY_ITEM_COUNT) {
+      delete state.flags.curseLiftable;
+    }
     const collectionComplete = Object.entries(world.items)
       .filter(([, definition]) => definition.treasure)
       .every(([id]) => state.items[id]?.loc === "reliquary");
@@ -3869,8 +4085,7 @@ const logicWorld = {
     }
     for (const [id, definition] of Object.entries(world.items)) {
       if (!definition.treasure) continue;
-      if (["reliquary", "clockTalisman"].includes(state.items[id]?.loc)
-          || state.flags.heirloomsTransformed) {
+      if (["reliquary", "clockTalisman"].includes(state.items[id]?.loc)) {
         state.flags[definition.depositScoreFlag || `heirloomScore:${id}`] = true;
       }
     }
@@ -3884,6 +4099,14 @@ const logicWorld = {
       state.items.frontDoor.locked = false;
       state.items.frontDoor.open = true;
       state.flags.floorDoorOpen = true;
+    }
+    if (state.flags.heirloomsTransformed) {
+      for (const [id, definition] of Object.entries(world.items)) {
+        if (definition.treasure) state.items[id].loc = "clockTalisman";
+      }
+      state.items.clockTalisman.loc = state.flags.partII || state.items.clockTalisman.loc === "inventory"
+        ? "inventory"
+        : "reliquary";
     }
 
     const completedProgress = {
@@ -3916,7 +4139,7 @@ const logicWorld = {
       const flag = `progressAward:${id}`;
       if (!completed || state.flags[flag]) continue;
       state.flags[flag] = true;
-      state.score = (state.score || 0) + PROGRESS_AWARDS[id];
+      state.score = (state.score || 0) + progressPoints(id);
     }
 
     if (state.flags["seen:betweenWalls"]) state.flags["progressAward:betweenWalls"] = true;
@@ -4142,8 +4365,17 @@ const logicWorld = {
           : ctx.getFlag("oakLightAligned")
             ? " The PLATFORM is currently somewhere above the branches."
             : " The overhead PULLEY hangs far beyond reach.";
-        return describeOakPanel(ctx) + platform;
+        const thirdStop = ctx.getFlag("oak:lowerPanelAligned")
+          ? " The PLATFORM'S ropes now vanish beneath the roots to a third stop."
+          : "";
+        return describeOakPanel(ctx) + platform + thirdStop;
       },
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "The PLATFORM'S ropes now vanish beneath the roots to a third stop."
+          : undefined;
+      },
+      interceptImplicitNavigation: true,
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "greatOak" ? ["in"] : [],
       exits: { west: "privy" },
       on: {
@@ -4154,6 +4386,7 @@ const logicWorld = {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
         put: putOakGem,
+        go: oakNavigation,
       },
     },
 
@@ -4166,6 +4399,12 @@ const logicWorld = {
         "    | [___]  |  |",
         "    |___||___|__|",
       ].join("\n"),
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "The PLATFORM now visits a chamber under the roots as well."
+          : undefined;
+      },
+      interceptImplicitNavigation: true,
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "treeFort" ? ["out"] : [],
       exits: {},
       on: {
@@ -4175,6 +4414,7 @@ const logicWorld = {
         climb(ctx, cmd) {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
+        go: oakNavigation,
       },
     },
 
@@ -4208,10 +4448,10 @@ const logicWorld = {
           return ctx.has("clockTalisman")
             ? "The FRONT DOOR stands wide open, and the floor TRAPDOOR exposes a narrow STAIRCASE DOWN."
             : "The FRONT DOOR stands wide open. The floor TRAPDOOR is open, and the RELIQUARY no longer holds " +
-                "thirteen separate heirlooms.";
+                "twenty-four separate heirlooms.";
         }
         if (ctx.getFlag("curseLiftable")) {
-          return "All thirteen fitted recesses in the RELIQUARY are filled. CLOSE its glass doors, OPEN the " +
+          return "All twenty-four fitted recesses in the RELIQUARY are filled. CLOSE its glass doors, OPEN the " +
             "BELL CLOSET beside the FRONT DOOR, and PULL the ROPE.";
         }
         return `The RELIQUARY contains ${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses. Beside the FRONT ` +
@@ -4245,8 +4485,8 @@ const logicWorld = {
           if (!dest || dest.id !== "reliquary") return null; // let generic put handle other containers
           if (!dest.open) return "The RELIQUARY'S glass doors are closed.";
           if (["all", "everything"].includes(cmd.dobj)) return null;
-          const it = ctx.find(cmd.dobj, ctx.inventory());
-          if (!it) return "You aren't carrying that.";
+          const it = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj, ctx.inventory());
+          if (!it || ctx.roomOf(it.id) !== "inventory") return "You aren't carrying that.";
           if (it.worn) return `Remove the ${it.names[0]} before putting it anywhere.`;
           if (it.id === "talisman" && ctx.roomOf("goldLocket") === "crypt") {
             return "The BM crest on the TALISMAN warms against your palm, but the RELIQUARY refuses it. This " +
@@ -4256,6 +4496,7 @@ const logicWorld = {
           ctx.moveItem(it.id, "reliquary");
           const use = it.treasure ? ctx.awardUse(it) : "";
           if (it.treasure) {
+            if (!cmd.bulkTransfer) ctx.setFlag("oneTripForfeited");
             const scoreFlag = it.depositScoreFlag || `heirloomScore:${it.id}`;
             if (!ctx.getFlag(scoreFlag)) {
               ctx.addScore(it.points || 0);
@@ -4266,7 +4507,7 @@ const logicWorld = {
           if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
-            msg += "\n\nAll thirteen heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
+            msg += "\n\nAll 24 heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
               "the FRONT DOOR, then PULL the ROPE.";
           }
           return msg;
@@ -4288,7 +4529,7 @@ const logicWorld = {
             return "The floor TRAPDOOR stands open, but whatever replaced the heirlooms pulls you back toward " +
               "the RELIQUARY. EXAMINE it and take it before descending.";
           }
-          if (!ctx.getFlag("floorDoorOpen")) return "The COUNTDOWN CLOCK ticks, but the floor remains shut.";
+          if (!ctx.getFlag("floorDoorOpen")) return "The DOOMSDAY CLOCK ticks, but the floor remains shut.";
           ctx.state.room = "garysLair";
           return garyEnding(ctx);
         },
@@ -4320,7 +4561,11 @@ const logicWorld = {
       exits: {
         north: "parlor",
         down: { to: "secretChamber", via: "leverPulled", revealedBy: "leverPulled",
-          lockedMsg: "The shelves stand solid and shut." },
+          lockedMsg(ctx) {
+            return hasMushroomVision(ctx)
+              ? "You can see the stair behind the shelves, but the bookcase is still shut. PULL the LEVER to open it."
+              : "The shelves stand solid and shut.";
+          } },
       },
     },
 
@@ -4412,6 +4657,9 @@ const logicWorld = {
 
     nursery: {
       art: ROOM_ART.nursery,
+      hiddenSight(ctx) {
+        return ctx.getFlag("wallGapFound") ? null : revealWallGap(ctx);
+      },
       exits: {
         east: "landing",
         // A crawl-gap into the space between the walls — the one deliberate,
@@ -4454,6 +4702,10 @@ const logicWorld = {
     attic: {
       art: ROOM_ART.attic,
       extraDirections: (ctx) => canFly(ctx) ? ["up"] : [],
+      hiddenSight(ctx) {
+        if (!ctx.getFlag("vaultFound")) ctx.setFlag("vaultFound", true);
+        return null;
+      },
       exits: {
         down: "landing",
         // The astral door in the north gable — hidden and impassable until the
@@ -4536,7 +4788,7 @@ const logicWorld = {
       exits: { out: "grandHall" },
     },
 
-    // ===== BLACKWOOD MANOR II — the thirteen-hour clock (Part II) =============
+    // ===== BLACKWOOD MANOR II — the Doomsday Clock (Part II) =================
     // "Nowhere": the ghost's staging point. You leave only by USING the clock.
     p2_awakening: {
       name: "Nowhere",
@@ -4544,7 +4796,7 @@ const logicWorld = {
       phase: 2,
       art: [
         "    .------.",
-        "   / 13  12 \\",
+        "   / 24  23 \\",
         "  |    ||    |",
         "   \\ backward/",
         "    '------'",
@@ -4555,9 +4807,10 @@ const logicWorld = {
         look: (ctx) => describeAwakening(ctx),
       },
     },
-    // HOUR XIII time-scene: the manor garden long ago, the queen still alive.
+    // HOUR XXIV time-scene: the manor garden long ago, the queen still alive.
     t13_medusaGarden: {
-      name: "The Thirteenth Hour",
+      name: "The Twenty-Fourth Hour",
+      aliases: ["hour13"],
       desc: "The manor garden, drenched in the green-gold afternoon light of centuries past.",
       phase: 2,
       art: [
@@ -4581,11 +4834,11 @@ const logicWorld = {
     // --- reliquary and the lower bell pull (royal hall) ---
     reliquary: {
       names: ["reliquary", "cabinet", "case"], adjectives: ["glass", "glass-fronted", "heirloom", "trophy"],
-      loc: "grandHall", fixed: true, container: true, capacity: 20,
+      loc: "grandHall", fixed: true, container: true, capacity: 36,
       openable: true, open: false, autoOpenOnAccess: true,
-      bulkTransferSummary: (ctx) => reliquaryCountLine(ctx),
-      desc: `A tall, glass-fronted RELIQUARY cabinet set into the stone wall. Its shelves hold ` +
-        `${REQUIRED_FAMILY_ITEM_COUNT} heirloom-shaped recesses behind a pair of carved doors.`,
+      bulkTransferSummary: (ctx, cmd) => [oneTripBonus(ctx, cmd), reliquaryCountLine(ctx)]
+        .filter(Boolean).join("\n\n"),
+      desc: "A tall glass-fronted RELIQUARY set into the stone wall. Twenty-four fitted recesses form a clock face behind carved doors.",
       on: {
         examine: (ctx) => inspectReliquary(ctx),
         search: (ctx) => inspectReliquary(ctx),
@@ -4679,7 +4932,7 @@ const logicWorld = {
     },
     letter: {
       names: ["letter"], loc: "mailbox", takeable: true, readable: true,
-      on: { read: readLetter, burn: burnLetter },
+      on: { read: readLetter },
     },
 
     // --- the ceremonial brazier + its reward (garden) ---
@@ -4719,6 +4972,11 @@ const logicWorld = {
     oakPlatform: {
       names: ["platform", "lift"], adjectives: ["wooden", "oak", "pulley"],
       loc: null, fixed: true, scenery: true,
+      desc(ctx) {
+        return ctx.getFlag("oak:lowerPanelAligned")
+          ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It visits the GREAT OAK'S roots, the TREE FORT, and the OAK UNDERCROFT below."
+          : undefined;
+      },
       on: { enter: enterOakPlatform, climb: enterOakPlatform },
     },
     signalFlags: {
@@ -4746,14 +5004,19 @@ const logicWorld = {
     // --- kitchen edibles: high / sick / help ---
     mushrooms: {
       names: ["mushrooms", "mushroom", "fungus"], adjectives: ["dried", "shriveled", "purple"],
-      loc: "kitchen", takeable: true, edible: true, highTurns: 12,
-      on: { eat: eatMushrooms },
+      loc: "kitchen", takeable: true, edible: true,
+      highSource: {
+        opening: HIGH_SOURCE_OPENINGS.driedMushrooms, turns: 12, whenEmpty: "destroy",
+      },
     },
     outhouseMushrooms: {
       names: ["mushrooms", "mushroom", "fungus"],
       adjectives: ["fresh", "crap-fueled", "purple", "toilet"],
-      loc: null, takeable: true, edible: true, fresh: true, highTurns: 12,
-      on: { take: takeToiletMushrooms, eat: eatMushrooms },
+      loc: null, takeable: true, edible: true, fresh: true,
+      highSource: {
+        opening: HIGH_SOURCE_OPENINGS.freshMushrooms, turns: 12, whenEmpty: "destroy",
+      },
+      on: { take: takeToiletMushrooms },
     },
     burrito: {
       names: ["burrito", "wrap"], adjectives: ["aged", "super", "spicy", "death-wish", "questionable"],
@@ -4820,7 +5083,7 @@ const logicWorld = {
     backpack: {
       names: ["backpack", "pack", "rucksack"], adjectives: ["sturdy", "canvas", "mining"],
       loc: "deepShaft", takeable: true, wearable: true, worn: false,
-      wearSlot: "back", autoWearOnTake: true, carryCapacity: 20,
+      wearSlot: "back", autoWearOnTake: true, carryCapacity: 36,
       progressPoints: 5, progressFlag: "progressItem:backpack",
     },
     headlamp: {
@@ -5007,9 +5270,10 @@ const logicWorld = {
     },
     safe: {
       names: ["safe"], adjectives: ["iron"], loc: null, fixed: true, container: true, openable: true,
-      open: false, locked: true, capacity: 3,
+      open: false, locked: true, capacity: 3, dialable: true,
       on: {
         open: openSafe,
+        dial: dialSafe,
       },
     },
     talisman: {
@@ -5147,12 +5411,13 @@ const logicWorld = {
       },
     },
 
-    // ===== BLACKWOOD MANOR II — Part II items (the thirteen-hour clock) =======
+    // ===== BLACKWOOD MANOR II — Part II items (the Doomsday Clock) ============
     // The carried talisman. Hidden ("__void") until Gary's blow makes you a
     // ghost; from then on it rides in your hands and USE-ing it moves you in time.
     clockTalisman: {
-      names: ["clock", "grand clock", "thirteen-hour clock", "thirteen hour clock", "time clock"],
-      adjectives: ["grand", "thirteen-hour", "backward", "ghostly"],
+      names: ["doomsday clock", "clock", "grand clock", "countdown clock", "time clock",
+        "thirteen-hour clock", "thirteen hour clock"],
+      adjectives: ["doomsday", "grand", "countdown", "thirteen-hour", "backward", "ghostly"],
       loc: "__void", takeable: true,
       on: {
         examine: (ctx, cmd) =>
@@ -5161,10 +5426,10 @@ const logicWorld = {
           ctx.find(cmd.dobj)?.id === "clockTalisman" ? clockTalismanText(ctx) : null,
         use: (ctx) => useClockTalisman(ctx),
         enter: (ctx) => useClockTalisman(ctx),
-        take: (ctx) => takeCountdownClock(ctx),
+        take: (ctx) => takeDoomsdayClock(ctx),
       },
     },
-    // Recovered in hour XIII; PUT/DROP it only in the present-day GARDEN.
+    // Recovered in hour XXIV; PUT/DROP it only in the present-day GARDEN.
     emeraldOfTheQueen: {
       names: ["emerald", "queen's emerald", "queens emerald", "gem"],
       adjectives: ["great", "vast", "green", "queen's"],
@@ -5209,7 +5474,87 @@ const logicWorld = {
   },
 };
 
-export const world = composeWorld(logicWorld, content);
+function mergeContentModules(baseWorld) {
+  const merged = {
+    ...baseWorld,
+    rooms: { ...baseWorld.rooms },
+    items: { ...baseWorld.items },
+  };
+  for (const module of CONTENT_MODULES) {
+    for (const [id, definition] of Object.entries(module.rooms || {})) {
+      merged.rooms[id] = { ...merged.rooms[id], ...definition };
+    }
+    for (const [id, definition] of Object.entries(module.items || {})) {
+      merged.items[id] = { ...merged.items[id], ...definition };
+    }
+    for (const [id, prose] of Object.entries(module.content?.rooms || {})) {
+      const existing = merged.rooms[id] || {};
+      merged.rooms[id] = { ...existing, ...prose };
+      for (const key of ["desc", "roomDesc", "searchDesc", "highDesc"]) {
+        if (typeof existing[key] === "function" && typeof prose[key] !== "function") {
+          const dynamic = existing[key];
+          merged.rooms[id][key] = (ctx) => dynamic(ctx) ?? prose[key];
+        }
+      }
+    }
+    for (const [id, prose] of Object.entries(module.content?.items || {})) {
+      const existing = merged.items[id] || {};
+      merged.items[id] = { ...existing, ...prose };
+      for (const key of ["desc", "roomDesc", "searchDesc", "highDesc"]) {
+        if (typeof existing[key] === "function" && typeof prose[key] !== "function") {
+          const dynamic = existing[key];
+          merged.items[id][key] = (ctx) => dynamic(ctx) ?? prose[key];
+        }
+      }
+    }
+  }
+  for (const module of CONTENT_MODULES) {
+    for (const [roomId, handlers] of Object.entries(module.roomHooks || {})) {
+      const room = merged.rooms[roomId];
+      if (!room) throw new Error(`Content module hook targets unknown room "${roomId}".`);
+      room.on = { ...(room.on || {}) };
+      for (const [verb, hook] of Object.entries(handlers)) {
+        const existing = room.on[verb];
+        const hooks = Array.isArray(hook) ? hook : [hook];
+        room.on[verb] = (ctx, cmd) => {
+          const prior = existing?.(ctx, cmd);
+          if (prior != null) return prior;
+          for (const next of hooks) {
+            const result = next(ctx, cmd);
+            if (result != null) return result;
+          }
+          return null;
+        };
+      }
+    }
+  }
+  for (const module of CONTENT_MODULES) {
+    for (const [roomId, hooks] of Object.entries(module.hiddenSightHooks || {})) {
+      const room = merged.rooms[roomId];
+      if (!room) throw new Error(`Content module hidden-sight hook targets unknown room "${roomId}".`);
+      const existing = room.hiddenSight;
+      const additions = Array.isArray(hooks) ? hooks : [hooks];
+      room.hiddenSight = (ctx) => {
+        const results = [existing?.(ctx), ...additions.map((hook) => hook(ctx))].filter(Boolean);
+        return results.length ? results.join("\n\n") : null;
+      };
+    }
+  }
+  for (const item of Object.values(merged.items)) {
+    if (!item.highSource) continue;
+    item.on = { ...(item.on || {}) };
+    for (const verb of highSourceActions(item)) {
+      const existing = item.on[verb];
+      item.on[verb] = (ctx, cmd) => {
+        const result = existing?.(ctx, cmd);
+        return result ?? useHighSource(ctx, ctx.find(cmd.dobj), cmd) ?? null;
+      };
+    }
+  }
+  return merged;
+}
+
+export const world = mergeContentModules(composeWorld(logicWorld, content));
 
 // ---- handler function definitions referenced above --------------------------
 function inspectBmWatch(ctx) {

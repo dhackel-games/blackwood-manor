@@ -7,7 +7,7 @@ drop straight into web/view2d/icons/.
 WHY THIS EXISTS
   The 2D collection tray (web/view2d/tilemap.html) shows an emoji for each
   heirloom until a matching PNG exists at:
-      web/view2d/icons/heirlooms/<id>.png     (13 heirlooms)
+      web/view2d/icons/heirlooms/<id>.png     (24 heirlooms)
       web/view2d/icons/equipment/<id>.png     (non-heirloom equipment)
       web/view2d/icons/reliquary.png           (the cabinet)
   This script produces exactly those files. The tray auto-swaps emoji -> PNG.
@@ -88,8 +88,19 @@ ICONS = [
     ("crystalDecanter",   "heirlooms/crystalDecanter.png",   "a faceted cut-crystal decanter full of dark red wine"),
     ("ancestralPortrait", "heirlooms/ancestralPortrait.png", "a small oval portrait miniature of a pale woman in an ornate gilt frame"),
     ("blackwoodHammer",   "heirlooms/blackwoodHammer.png",   "a compact antique iron hammer with a dark ash handle branded with a B M insignia"),
+    ("demogorgonzolaRind", "heirlooms/demogorgonzolaRind.png", "a ragged pale cheese rind with grotesque flower-petal bite marks"),
+    ("portableTransistorRadio", "heirlooms/portableTransistorRadio.png", "a scuffed 1980s portable transistor radio with a leather case, strap, and telescoping antenna"),
+    ("goldEyepiece",      "heirlooms/goldEyepiece.png",      "a polished brass-and-gold circular telescope eyepiece with a dark glass lens"),
+    ("purpleCrayon",      "heirlooms/purpleCrayon.png",      "a short waxy purple crayon with a torn paper wrapper"),
+    ("stellarMap",        "heirlooms/stellarMap.png",        "a folded parchment star map marked with strange constellation diagrams"),
+    ("kidsDrawing",       "heirlooms/kidsDrawing.png",       "a childish crayon drawing on white paper with messy arrows and a purple fart cloud"),
+    ("blackwoodDiamond",  "heirlooms/blackwoodDiamond.png",  "a faceted black diamond with a tiny B M glint in its center"),
+    ("baronessPhotograph", "heirlooms/baronessPhotograph.png", "a sepia photograph of an elegant baroness beside a grandfather clock"),
+    ("silverWeathercock", "heirlooms/silverWeathercock.png", "a small silver rooster weather vane with a pointed cardinal-direction arrow"),
+    ("snuffbox",          "heirlooms/snuffbox.png",          "a small ornate silver snuffbox with a hinged lid and a B M monogram"),
+    ("corkscrew",         "heirlooms/corkscrew.png",         "a plain antique iron corkscrew with a dark wooden handle stamped B M"),
     ("xrayGoggles",       "equipment/xrayGoggles.png",       "antique blackened-brass x-ray goggles with smoked crystal lenses and a small B M monogram on the bridge"),
-    ("reliquary",         "reliquary.png",                   "a tall glass-fronted gothic stone cabinet with carved doors and thirteen small recessed shelves"),
+    ("reliquary",         "reliquary.png",                   "a tall glass-fronted gothic stone cabinet with carved doors and twenty-four clock-face recesses"),
 ]
 
 

@@ -94,6 +94,9 @@ export function bugReportBody({
   userName = null,
   hud = "",
   inventory = [],
+  realmRoom = null,
+  liftStop = null,
+  puzzleFlags = null,
 } = {}) {
   const reportDescription = String(description || "").trim() || DEFAULT_ISSUE_DESCRIPTION;
   const turnLabel = `${turns} turn${turns === 1 ? "" : "s"}`;
@@ -104,6 +107,11 @@ export function bugReportBody({
     "",
     `${turnLabel} from ${origin}: ${formatCommandHistory(commands)}`,
     ...(dialogueText ? ["", "Gary dialogue:", dialogueText] : []),
+    ...(realmRoom ? [`Realm room: ${realmRoom}`] : []),
+    ...(liftStop ? [`Lift stop: ${liftStop}`] : []),
+    ...(puzzleFlags ? [`Puzzle flags: ${Object.entries(puzzleFlags)
+      .map(([flag, value]) => `${flag}=${Boolean(value)}`)
+      .join("; ")}`] : []),
     `HUD: ${hud || "(unavailable)"}`,
     `Inv: ${inventory.length ? inventory.join(", ") : "(empty)"}`,
   ].join("\n");

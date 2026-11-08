@@ -292,10 +292,10 @@ Then("the turn count is {int}", function (turns) {
   assert.equal(this.game.state.turns, turns);
 });
 
-Then("HELP is one alphabetized command-per-line data block", function () {
+Then("INFO is one alphabetized command-per-line data block", function () {
   const source = readFileSync(new URL("../../js/commands.js", import.meta.url), "utf8");
   assert.match(source, /export const HELP_TEXT = `COMMANDS[\s\S]+`;/);
-  assert.match(source, /help\(ctx\)\s*\{[\s\S]*?return HELP_TEXT;\s*\}/);
+  assert.match(source, /info\(ctx\)\s*\{[\s\S]*?return HELP_TEXT;\s*\}/);
   const commandLines = HELP_TEXT.split("\n").slice(2, HELP_TEXT.indexOf("\n\n") > -1
     ? HELP_TEXT.slice(0, HELP_TEXT.indexOf("\n\n")).split("\n").length
     : undefined);
@@ -306,7 +306,8 @@ Then("HELP is one alphabetized command-per-line data block", function () {
     line.slice(0, line.indexOf(" | ")).replace(/[()]/g, "").split(/[\/,]/)[0].toLowerCase());
   const sorted = [...labels].sort((a, b) => a.localeCompare(b));
   assert.deepEqual(labels, sorted);
-  assert.match(HELP_TEXT, /help\/\? \| Help \//);
+  assert.match(HELP_TEXT, /info\/\? \| Info \//);
+  assert.match(HELP_TEXT, /help\/call\/hint \| Gary \//);
   assert.match(HELP_TEXT, /\(l\)ook\/e\(x\)amine\/search \| Inspect \//);
   assert.match(HELP_TEXT,
     /\(n\)orth, \(s\)outh, \(e\)ast, \(w\)est, northeast \(ne\), northwest \(nw\), southeast \(se\), southwest \(sw\), \(u\)p, \(d\)own, in, out \| Directions \/ Go that direction\./);
@@ -713,11 +714,11 @@ Then("the page has a {string} prefill control", function (value) {
   assert.match(html, new RegExp(`data-prefill=["']${value}["']`));
 });
 
-Then("the shortcut strip keeps Look, Call, and question-mark Help without Examine or Hint", function () {
+Then("the shortcut strip keeps Look, Call, and question-mark Info without Examine or Hint", function () {
   const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
   assert.match(html, /<button[^>]+data-cmd=["']look["'][^>]*>\s*Look\s*<\/button>/);
   assert.match(html, /<button[^>]+data-cmd=["']call["'][^>]*>\s*Call\s*<\/button>/);
-  assert.match(html, /<button[^>]+data-cmd=["']help["'][^>]+aria-label=["']help["'][^>]*>\s*\?\s*<\/button>/);
+  assert.match(html, /<button[^>]+data-cmd=["']info["'][^>]+aria-label=["']info["'][^>]*>\s*\?\s*<\/button>/);
   assert.doesNotMatch(html, /<button[^>]+data-prefill=["']examine /);
   assert.doesNotMatch(html, /<button[^>]+data-cmd=["']hint["']/);
 });
@@ -777,10 +778,16 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
     commands: trace.commands,
     hud,
     inventory: ["BRASS KEY", "CANDLE (WORN)"],
+    realmRoom: "Waylamp Clearing (waylampClearing)",
+    liftStop: "below",
+    puzzleFlags: { "realm:radioWon": true, "oak:lowerPanelAligned": false },
   });
   assert.match(body,
     /^Copyright test 1\.2\.3\nthe mirror shows two of me\n\n2 turns from page reload: east; take rope; again; bug the mirror shows two of me/m);
   assert.match(body, /\nHUD: Score\/turns: 🏆 0\/0;/);
+  assert.match(body, /\nRealm room: Waylamp Clearing \(waylampClearing\)/);
+  assert.match(body, /\nLift stop: below/);
+  assert.match(body, /\nPuzzle flags: realm:radioWon=true; oak:lowerPanelAligned=false/);
   assert.match(body, /\nInv: BRASS KEY, CANDLE \(WORN\)$/);
   const decoded = new URL(bugReportUrl("Hall Bedroom", body)).searchParams.get("body");
   assert.equal(decoded, body);
@@ -797,6 +804,7 @@ Then("bug reports include the full session trail, HUD state, and inventory", fun
   assert.match(ui, /bugTrace\.turns \+= Math\.max\(0, game\.state\.turns - turnsBefore\)/);
   assert.match(ui, /hudStateSummary\(\{ game, world \}\)/);
   assert.match(ui, /inventoryForBugReport\(\)/);
+  assert.match(ui, /realmStateForBugReport\(\)/);
   assert.match(ui, /version: Native\.version\(\)/);
   assert.doesNotMatch(ui, /`Version: \$\{Native\.version\(\)\}`/);
 });

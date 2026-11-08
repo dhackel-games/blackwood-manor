@@ -7,6 +7,26 @@
 import { renderMap } from "./map.js?v=source";
 
 const normalizeRoomName = (name) => String(name || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+const DIAL_HOTLINE_TARGETS = new Set(["gary", "phone", "hotline"]);
+
+function visibleDial(ctx) {
+  return ctx.visibleItems().find((item) =>
+    item.dialable && typeof ctx.world.items[item.id]?.on?.dial === "function") || null;
+}
+
+function runDial(ctx, dial, cmd, setting) {
+  return ctx.world.items[dial.id].on.dial(ctx, {
+    ...cmd,
+    dialId: dial.id,
+    setting,
+  });
+}
+
+function routeVisibleDial(ctx, cmd) {
+  if (normalizeRoomName(cmd.dobj) !== "dial") return null;
+  const dial = visibleDial(ctx);
+  return dial ? runDial(ctx, dial, cmd, cmd.iobj) : null;
+}
 
 function resolveRoom(ctx, phrase) {
   const wanted = normalizeRoomName(phrase);
@@ -79,16 +99,20 @@ ai | AI status / Report whether Gary is scripted or using an on-device model.
 attack <thing> | Attack / Attack a visible target.
 brief | Brief mode / Shorten room descriptions after the first visit.
 bug <description> | Report bug / Open a GitHub issue with session diagnostics.
-call/hint | Gary / Call Gary's paid hint line.
 clear | Clear / Erase the entire scrollback and redisplay the basic prompt for the current room.
 (c)lose/shut <thing> | Close / Close an open door or container.
+combine/assemble <things> | Combine / Join puzzle pieces when their content supports it.
 drop <thing>/all [in <container>] | Drop / Drop carried items here, or deposit all unworn items in a container.
 extinguish <thing> | Extinguish / Put out a light or flame.
+fight/brawl <thing> | Fight / Pick a fight when content makes one meaningful.
+fill/refill <container> | Fill / Fill a container from a local source.
 get/(t)ake/grab <thing>/all [from <container>] | Take / Take one item, everything visible, or everything in a container.
 give <thing> to <character> | Give / Hand over an item.
 (g)o <room> | Go / Go to a named room when movement or flight allows; bare g repeats AGAIN.
-help/? | Help / Show this command reference.
+help/call/hint | Gary / Call Gary's paid hint line.
+info/? | Info / Show this command reference.
 (i)nventory | Inventory / List everything you carry and wear.
+kick/boot <thing> | Kick / Kick an object when content makes that useful.
 light <thing> | Light / Ignite a usable light source.
 lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 (l)ook/e(x)amine/search | Inspect / Inspect the room or a visible thing more closely.
@@ -96,6 +120,7 @@ lock/(lk) <thing> with <key> | Lock / Lock something with a matching key.
 move <thing> | Move / Shift or jostle something.
 (n)orth, (s)outh, (e)ast, (w)est, northeast (ne), northwest (nw), southeast (se), southwest (sw), (u)p, (d)own, in, out | Directions / Go that direction.
 (o)pen <thing> [w/<key>] | Open / Unlock with a supplied key, then open.
+pour/tip <thing> on <target> | Pour / Pour something where content supports it.
 pull <thing> | Pull / Pull something.
 push <thing> | Push / Push something.
 put/place <thing>/all in <container/slot> | Put / Place one carried item or every unworn carried item inside a container.
@@ -111,9 +136,15 @@ route/guide/path to <room/object> | Route / Use the BM Watch to prepare, but not
 save | Save / Save the current game in this browser.
 say/talk <words/person> | Speak / Say words aloud or talk to a visible character.
 score | Score / Show points, turns, and rank.
+set/adjust <thing> | Set / Set an object when content gives it a setting.
 show/scry <room/object> [in watch] | Scry / Reveal its containing room and prepare the route.
+smother/suffocate <thing> | Smother / Smother something when content allows it.
+spell/type <word> | Spell / Spell or type a word where content accepts one.
+start/run/activate <thing> | Start / Start an object when content supports it.
+stomp/stamp <thing> | Stomp / Stomp something when content makes it useful.
 throw <thing> at <target> | Throw / Throw a carried item.
 top | Top / Scroll to the top of the page.
+turn/rotate/spin <thing> | Turn / Turn an object when content gives it a position.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.
 (u)se/wear/don/eat/drink <thing> | Use / Use an item; equipment is worn and food or drink is consumed.
 verbose | Verbose mode / Always print full room descriptions.
@@ -129,7 +160,7 @@ TOUCH CONTROLS
 The on-screen buttons mirror typed commands.
 Compass pad: the eight arrows are compass directions - up-left northwest, up north, up-right northeast, left west, right east, down-left southwest, down south, down-right southeast. The center star is decorative.
 Up/down column: the two chevrons are UP and DOWN; the two door icons are IN and OUT.
-Verbs: Look inspects the room; Take, Use, and Say fill the input box so you can type a target; Inv lists inventory; Map shows Gary's map; Call rings Gary; ? opens this help; the beetle reports a bug.
+Verbs: Look inspects the room; Take, Use, and Say fill the input box so you can type a target; Inv lists inventory; Map shows Gary's map; Call rings Gary; ? opens this reference; the beetle reports a bug.
 
 CHAINING
 Separate commands with ".", ";", ",", or THEN.
@@ -140,8 +171,8 @@ WITH may be shortened to w/ with or without a following space: unlock frontd w/i
 In object names, d means DOOR and br means BEDROOM: open front d; fly grand br.
 
 GARY'S HINT LINE
-CALL or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
-Say HANG UP to end the call. HELP only prints this reference; it never calls Gary.`;
+HELP, CALL, or HINT opens Gary's paid 99-cent-per-minute line and immediately gives a clue.
+Say HANG UP to end the call. INFO (or ?) only prints this reference; it never calls Gary.`;
 
 function pickupAward(ctx, item) {
   return ctx.awardPickup?.(item) || "";
@@ -184,10 +215,10 @@ function runBulkItemHandler(ctx, verb, item, cmd) {
   return handled;
 }
 
-function appendBulkTransferSummary(ctx, container, results) {
+function appendBulkTransferSummary(ctx, container, results, cmd) {
   const summarize = ctx.world.items[container.id]?.bulkTransferSummary;
   if (typeof summarize !== "function") return;
-  const summary = summarize(ctx);
+  const summary = summarize(ctx, cmd);
   if (summary) results.push(summary);
 }
 
@@ -267,13 +298,17 @@ function putAll(ctx, cmd) {
   const worn = inventory.filter((item) => item.worn);
   const results = [];
   const leftBehind = [];
+  const bulkTransferStartItems = ctx.itemsIn(dest.id).map((item) => item.id);
 
   for (const item of candidates) {
     if (ctx.itemsIn(dest.id).length >= (dest.capacity ?? 99)) {
       leftBehind.push(item.names[0]);
       continue;
     }
-    const handled = runBulkItemHandler(ctx, "put", item, cmd);
+    const handled = runBulkItemHandler(ctx, "put", item, {
+      ...cmd,
+      bulkTransferStartItems,
+    });
     if (handled != null) {
       results.push(`${item.names[0]}: ${handled}`);
       continue;
@@ -289,7 +324,11 @@ function putAll(ctx, cmd) {
   if (worn.length) {
     results.push("Still worn:", ...worn.map((item) => `  ${item.names[0].toUpperCase()}`));
   }
-  appendBulkTransferSummary(ctx, dest, results);
+  appendBulkTransferSummary(ctx, dest, results, {
+    ...cmd,
+    bulkTransfer: true,
+    bulkTransferStartItems,
+  });
   return results.join("\n");
 }
 
@@ -297,6 +336,8 @@ export const commands = {
   go(ctx, cmd) {
     const dir = cmd.dobj;
     const room = ctx.room();
+    const discovery = ctx.revealHiddenSight?.();
+    const withDiscovery = (text) => discovery ? `${discovery}\n\n${text}` : text;
     let exit = room.exits && room.exits[dir];
     const canFly = (ctx.getFlag("high") || 0) > 0
       || (typeof ctx.world.canFly === "function" && ctx.world.canFly(ctx));
@@ -304,19 +345,20 @@ export const commands = {
       const destination = resolveRoom(ctx, dir);
       if (destination) {
         const [roomId, roomDef] = destination;
-        if (typeof ctx.world.floatTo === "function") return ctx.world.floatTo(ctx, roomId);
+        if (typeof ctx.world.floatTo === "function") return withDiscovery(ctx.world.floatTo(ctx, roomId));
         ctx.state.room = roomId;
-        return `You float weightlessly to ${roomDef.name}.\n\n${ctx.describeRoom()}`;
+        return withDiscovery(`You float weightlessly to ${roomDef.name}.\n\n${ctx.describeRoom()}`);
       }
     }
-    if (!exit) return "You can't go that way.";
+    if (!exit) return withDiscovery("You can't go that way.");
     if (typeof exit === "object") {
-      if (exit.locked) return exit.lockedMsg || "That way is locked.";
-      if (exit.via && !ctx.getFlag(exit.via)) return exit.lockedMsg || "You can't go that way.";
+      const lockedMsg = typeof exit.lockedMsg === "function" ? exit.lockedMsg(ctx) : exit.lockedMsg;
+      if (exit.locked) return withDiscovery(lockedMsg || "That way is locked.");
+      if (exit.via && !ctx.getFlag(exit.via)) return withDiscovery(lockedMsg || "You can't go that way.");
       exit = exit.to;
     }
     ctx.state.room = exit;
-    return ctx.describeRoom();
+    return withDiscovery(ctx.describeRoom());
   },
 
   look(ctx, cmd) {
@@ -331,7 +373,8 @@ export const commands = {
     if (!ctx.isLit()) return "It's too dark to see anything.";
     const it = ctx.find(cmd.dobj);
     if (!it) return `You can't see any ${cmd.dobj} here.`;
-    let out = it.desc || `You see nothing special about the ${it.names[0]}.`;
+    const description = ctx.itemText?.(it, "desc") ?? (typeof it.desc === "function" ? it.desc(ctx) : it.desc);
+    let out = description || `You see nothing special about the ${it.names[0]}.`;
     if (it.container && it.openable) out += it.open ? " It is open." : " It is closed.";
     if (it.container && it.open) {
       const inside = ctx.itemsIn(it.id);
@@ -537,6 +580,21 @@ export const commands = {
   },
 
   // Verbs that are meaningful only via content handlers get a gentle default.
+  combine() { return "Those pieces do not fit together."; },
+  spell() { return "There is nothing here to spell on."; },
+  kick() { return "Kicking that would not help."; },
+  fight() { return "There is no fight to pick here."; },
+  turn(ctx, cmd) {
+    return routeVisibleDial(ctx, cmd) ?? "Nothing here turns.";
+  },
+  set(ctx, cmd) {
+    return routeVisibleDial(ctx, cmd) ?? "There is nothing here to set.";
+  },
+  start() { return "Nothing here starts."; },
+  pour() { return "You have nothing suitable to pour there."; },
+  fill() { return "There is nothing here to fill that with."; },
+  stomp() { return "Stomping changes nothing."; },
+  smother() { return "There is nothing here to smother."; },
   move(ctx, cmd) { return `You shove the ${cmd.dobj || "thing"}, but nothing happens.`; },
   push(ctx, cmd) { return `Pushing the ${cmd.dobj || "thing"} accomplishes nothing.`; },
   pull(ctx, cmd) { return `You pull the ${cmd.dobj || "thing"}, to no effect.`; },
@@ -618,6 +676,14 @@ export const commands = {
     return ctx.world.hotline(ctx);
   },
 
+  dial(ctx, cmd) {
+    const target = normalizeRoomName(cmd.dobj);
+    if (!target || DIAL_HOTLINE_TARGETS.has(target)) return commands.hotline(ctx, cmd);
+    const dial = visibleDial(ctx);
+    if (!dial) return commands.hotline(ctx, cmd);
+    return runDial(ctx, dial, cmd, cmd.dobj);
+  },
+
   score(ctx) {
     let s = `Your score is ${ctx.state.score} in ${ctx.state.turns} turns.\nRank: ${ctx.rank()}`;
     const bill = ctx.getFlag("phoneBill");
@@ -634,7 +700,7 @@ export const commands = {
   verbose(ctx) { ctx.setFlag("__verbose", true); return "Maximum verbosity."; },
   brief(ctx) { ctx.setFlag("__verbose", false); return "Brief descriptions."; },
   again() { return null; }, // handled by core before dispatch
-  help(ctx) {
+  info(ctx) {
     ctx.setFlag("usedHelp", true);
     return HELP_TEXT;
   },

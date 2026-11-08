@@ -49,7 +49,7 @@ Feature: Blackwood X-ray goggles
     When I send "put goggles in reliquary"
     Then item "xrayGoggles" is in "reliquary"
     And item "xrayGoggles" is not a required family heirloom
-    And the output contains line "HEIRLOOMS: 0/13 +1"
+    And the output contains line "HEIRLOOMS: 0/24 +1"
     And the game score is 0
 
   Scenario: PUT ALL leaves worn goggles available as equipment

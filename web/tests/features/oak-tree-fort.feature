@@ -122,6 +122,71 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the current room is "privy"
     And flag "oakLiftRiding" is false
 
+  Scenario: Flying away after boarding always disembarks
+    Given flag "high" is 3
+    When I send "place emerald in panel"
+    And I send "enter platform"
+    And I send "fly garden"
+    Then the current room is "garden"
+    And flag "oakLiftRiding" is false
+
+  Scenario: Aligned lift descriptions override only the obsolete two-stop prose
+    Given flag "oak:lowerPanelAligned" is set
+    And item "oakPlatform" rests in room "greatOak"
+    When I send "examine platform"
+    Then the output contains "OAK UNDERCROFT"
+    And the output does not contain "shuttles between the roots and the TREE FORT"
+    When I send "look"
+    Then the output contains "third stop"
+    Given the player is in room "treeFort"
+    When I send "look"
+    Then the output contains "chamber under the roots"
+
+  Scenario: Runtime navigation uses the declared aligned lift links
+    Given the player is in room "below"
+    And the aligned lower lift is at "below"
+    Then the path from the current room to "GREAT OAK" is "in platform; z; out"
+
+  Scenario: The lower panel adds the four-beat return lift and repeated oak round trips
+    Given the player is in room "below"
+    And item "cyanGem" is carried
+    When I send "take magenta gem"
+    And I send "take yellow gem"
+    And I send "put yellow gem in top slot"
+    And I send "put magenta gem in middle slot"
+    And I send "put cyan gem in bottom slot"
+    Then item "oakPlatform" is in "below"
+    And flag "oak:liftBeat" equals 3
+    When I send "enter platform"
+    And I send "wait"
+    Then the current room is "greatOak"
+    And flag "oakLiftRiding" is true
+    And flag "oak:liftBeat" equals 0
+    When I send "wait"
+    Then the current room is "treeFort"
+    And flag "oak:liftBeat" equals 1
+    When I send "wait"
+    Then the current room is "greatOak"
+    And flag "oak:liftBeat" equals 2
+    When I send "wait"
+    Then the current room is "below"
+    And flag "oak:liftBeat" equals 3
+    When I send "out"
+    Then the output contains "You step off into the OAK UNDERCROFT."
+    And flag "oakLiftRiding" is false
+    When I send "enter platform"
+    And I send "wait"
+    Then the current room is "greatOak"
+    When I send "out"
+    Then the output contains "You step off at the GREAT OAK'S roots."
+    And flag "oakLiftRiding" is false
+    When I send "enter platform"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    Then the current room is "below"
+    And flag "oak:liftBeat" equals 3
+
   Scenario: Hidden shortcuts can route down from the tree fort
     When I send "place emerald in panel"
     And I send "enter platform"
@@ -145,13 +210,13 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And the output contains "BM"
     Given the player is in room "grandHall"
     When I send "put spyglass in reliquary"
-    Then the output contains line "HEIRLOOMS: 1/13 +0"
+    Then the output contains line "HEIRLOOMS: 1/24 +0"
     And the game score is 18
 
   Scenario: The emerald gem does not contribute to the family collection
     Given the player is in room "grandHall"
     When I send "place emerald gem in reliquary"
-    Then the output contains line "HEIRLOOMS: 0/13 +1"
+    Then the output contains line "HEIRLOOMS: 0/24 +1"
     When I send "take emerald gem from reliquary"
     Then item "emberStone" is carried
     And the output contains "take the emerald gem from the RELIQUARY"
@@ -197,12 +262,12 @@ Feature: The mirrored gem panel and Blackwood tree fort
     And flag "floorDoorOpen" is set
     And item "talisman" is in "reliquary"
 
-  Scenario: A completed pre-watch collection gains the replacement hammer
+  Scenario: A completed pre-watch collection gains the replacement hammer but not a new ritual
     Given a completed pre-watch save is restored
     Then item "blackwoodHammer" is in "reliquary"
     And item "backwardsWatch" is in "studyDrawer"
-    And the required family item count is 13
-    And flag "curseLiftable" is set
+    And the required family item count is 24
+    And flag "curseLiftable" is unset
     And flag "floorDoorOpen" is set
     And flag "progressAward:candelabraRestored" is set
     And the game score is 32

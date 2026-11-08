@@ -38,9 +38,9 @@ Feature: Heirloom correction save migration
     When I round-trip the game snapshot
     Then the game score is 17
 
-  Scenario: Pre-redesign transformed mirror progress stays inside the countdown clock
+  Scenario: Pre-redesign transformed mirror progress stays inside the Doomsday Clock
     Given a pre-redesign transformed heirloom save is restored
-    Then every required family item is inside the countdown clock
+    Then every required family item is inside the Doomsday Clock
     And item "familyRing" is in "clockTalisman"
     And item "blackwoodHammer" is in "clockTalisman"
     And item "candelabra" is in "clockTalisman"
@@ -88,9 +88,9 @@ Feature: Heirloom correction save migration
     And flag "curseLiftable" is set
     And the game score is 220
 
-  Scenario: Preceding-redesign transformed goggles transfer into the countdown clock
+  Scenario: Preceding-redesign transformed goggles transfer into the Doomsday Clock
     Given a preceding-redesign transformed heirloom save is restored
-    Then every required family item is inside the countdown clock
+    Then every required family item is inside the Doomsday Clock
     And item "familyRing" is in "clockTalisman"
     And item "xrayGoggles" is carried
     And item "backwardsWatch" is worn in slot "wrist"
@@ -161,5 +161,49 @@ Feature: Heirloom correction save migration
     When I round-trip the game snapshot
     Then item "oakPlatform" is in "greatOak"
     And the game score is 5
+
+  Scenario: A legacy thirteen-deposit save loses only its now-incomplete ritual readiness
+    Given a legacy thirteen-deposit save is restored
+    Then flag "curseLiftable" is unset
+    And flag "reliquarySealed" is set
+    And flag "heirloomScore:familyCrest" is set
+    And flag "heirloomScore:demogorgonzolaRind" is unset
+    And the game score is 195
+
+  Scenario: A legacy bell-rung save retains its ritual without new deposit awards
+    Given a legacy bell-rung save is restored
+    Then flag "bellRung" is set
+    And flag "heirloomsTransformed" is set
+    And item "clockTalisman" is in "reliquary"
+    And every required family item is inside the Doomsday Clock
+    And flag "heirloomScore:demogorgonzolaRind" is unset
+    And the game score is 200
+
+  Scenario: A Part II save upgrades its clock hour without replaying ritual awards
+    Given a legacy Part II save after the old scene is restored
+    Then flag "partII" is set
+    And flag "bellRung" is set
+    And flag "hour13Done" is set
+    And flag "clockHour" equals 23
+    And item "clockTalisman" is carried
+    And the game score is 225
+
+  Scenario: A collected letter becomes PHOTO PIECE A without losing its history
+    Given a legacy collected PHOTO PIECE A save is restored
+    Then item "letter" is carried
+    And item "letter" recognizes name "photo piece a"
+    And flag "letterRead" is set
+    And flag "progressAward:letterRead" is set
+    And flag "progressItem:letter" is set
+    And the game score is 15
+
+  Scenario: A destroyed legacy letter returns as PHOTO PIECE A without an award
+    Given a legacy burned-letter save is restored
+    Then item "letter" is in "mailbox"
+    And item "letter" recognizes name "photo piece a"
+    And flag "letterBurned" is set
+    And flag "progressAward:letterRead" is set
+    And flag "progressItem:letter" is set
+    And the game score is 15
 
 # end heirloom-migration.feature

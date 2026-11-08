@@ -17,11 +17,15 @@ Feature: Maintained sysop shortcuts
     And every hidden compound prompt uses shortest command forms
     And every hidden prompt uses globally unique one-word targets
     And hidden shortcuts replace the editable command prompt without executing
-    And public HELP does not reveal sysop commands
+    And public INFO does not reveal sysop commands
     And no sysop command uses the removed su command
 
   Scenario: Dynamic path tokens resolve from the current room
     Then the path from the current room to "PRIVY" is "e; e"
+
+  Scenario: Dynamic paths wait through the four-beat oak lift
+    Given the four-beat oak lift is below while I wait at the fort
+    Then the path from the current room to "PRIVY" is "z; z; out; z; w"
 
   Scenario: Compound prompts use the shortest safe command aliases
     Then long commands shorten as:
@@ -39,14 +43,15 @@ Feature: Maintained sysop shortcuts
       | place ruby gem in panel           | put ruby gem in panel    |
       | unlock front door with iron key   | un front door w/iron key |
       | use mushrooms                     | u mushrooms              |
-      | drink milk                        | u milk                   |
+      | drink milk                        | drink milk               |
       | fly kitchen                       | g kitchen                |
       | enter platform                    | in platform              |
       | wait                              | z                        |
 
   Scenario: The single win prompt starts with the backpack and walks the remaining map
-    Then sysop command "::win" contains sequence "e; e; u fresh; g shaft; u backpack; u; u headlamp"
-    And sysop command "::win" contains sequence "u spyglass; t spyglass; in platform; z"
+    Then sysop command "::win" contains sequence "e; e; look in toilet; t fresh; t all; u fresh; g shaft; t all; u; t all; u headlamp"
+    And sysop command "::win" contains sequence "g garden; move statue; t all"
+    And sysop command "::win" contains sequence "u spyglass; t spyglass"
     And sysop command "::win" includes "pull bellrope"
     And sysop command "::win" includes "u goggles"
     And sysop command "::win" includes "read package"
@@ -59,6 +64,10 @@ Feature: Maintained sysop shortcuts
     And sysop command "::win" omits "g belfry"
     And sysop command "::win" omits "open package"
     And every hidden prompt avoids an explicit take immediately before direct use
+
+  Scenario: The win prompt derives its radio answers from the persisted LCG seed
+    Given the radio seed is 1
+    Then sysop command "::win" contains sequence "turn on cabinet radio; answer 4; answer 2; answer 5"
 
   Scenario: Powerup still equips the current reusable gear
     Then sysop command "::powerup" contains sequence "g shaft; u backpack; g gallery; u headlamp; g dreadvault; u shoes"
@@ -105,12 +114,16 @@ Feature: Maintained sysop shortcuts
     And the game is not won
     And the game score is 120
 
-  Scenario: Every physical win step executes, every portable has two rewards, and the clock remains in hand
+  @win @maxscore
+  Scenario: Every physical win step executes, with planner route metrics, and the clock remains in hand
     When I trace sysop command "::win"
     Then the game is alive
     And the game is not won
     And the current room is "grandHall"
-    And the win route used at most one named flight
+    And the win route used at most two named flights
+    And the win route used exactly one bulk RQ deposit
+    And the win route used zero single-item RQ deposits
+    And the win route uses fewer than 5.9 transitions per heirloom
     And the score equals the derived Part I maximum
     And every Part I portable has its pickup and use rewards
     And flag "reliquarySealed" is false
@@ -129,7 +142,7 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:atticLadderLowered" is set
     And flag "progressAward:letterRead" is set
     And item "mysteryPackage" is carried
-    And every required family item is inside the countdown clock
+    And every required family item is inside the Doomsday Clock
     And item "familyRing" is in "clockTalisman"
     And item "blackwoodHammer" is in "clockTalisman"
     And item "candelabra" is in "clockTalisman"
@@ -138,15 +151,16 @@ Feature: Maintained sysop shortcuts
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
     And flag "progressAward:candelabraRestored" is set
-    And the game score is 825
+    And the game score is 1316
 
+  @win @maxscore
   Scenario: Repeating the completed prompt cannot choose the front-door ending
     When I execute sysop command "::win"
     Then the game is alive
     And the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1316
     And both endings remain independently available
     Then sysop command "::win" includes "read gclock"
     And sysop command "::win" omits "s"
@@ -155,20 +169,21 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1316
     And both endings remain independently available
     When I send "use clock"
     Then the current room is "grandHall"
     And flag "partII" is unset
-    And the game score is 825
+    And the game score is 1316
 
+  @win @maxscore
   Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
     When I execute sysop command "::win" through "pull closetrope"
     Then the current room is "grandHall"
     And flag "bellRung" is set
     And item "clockTalisman" is in "reliquary"
     And item "reliquary" is closed
-    And the game score is 815
+    And the game score is 1306
     And sysop command "::win" contains sequence "o rq; t gclock; read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
@@ -176,9 +191,10 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1316
     And both endings remain independently available
 
+  @win @maxscore
   Scenario: After the bell, the prompt takes the clock from an already open reliquary
     When I execute sysop command "::win" through "pull closetrope"
     And I send "open reliquary"
@@ -190,9 +206,10 @@ Feature: Maintained sysop shortcuts
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
-    And the game score is 825
+    And the game score is 1316
     And both endings remain independently available
 
+  @win
   Scenario: The complete route recovers physically when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
     And item "outhouseMushrooms" has been destroyed
@@ -201,13 +218,13 @@ Feature: Maintained sysop shortcuts
     Then item "wingedShoes" is worn in slot "feet"
     And item "backwardsWatch" is worn in slot "wrist"
     And item "xrayGoggles" is worn in slot "eyes"
-    And the win route used at most one named flight
+    And the win route used at most two named flights
     And the current room is "grandHall"
     And the game is alive
     And flag "bellRung" is set
     And item "clockTalisman" is carried
-    And every required family item is inside the countdown clock
-    And the game score is 795
+    And every required family item is inside the Doomsday Clock
+    And the game score is 1271
 
   Scenario: Powerup still recovers with shoes when both mushroom batches are gone
     Given flag "outhouseMushroomsFound" is set
@@ -220,9 +237,11 @@ Feature: Maintained sysop shortcuts
     And the current room is "hiddenVault"
     And the game is alive
 
+  @win
   Scenario: An already-solved oak uses its physical platform instead of flying to the fort
     Given an already-solved oak has its platform at the roots
-    Then sysop command "::win" contains sequence "z; in platform; z; u spyglass; t spyglass; in platform; z"
+    Then sysop command "::win" contains sequence "put cyan in bottom slot; z; z; in platform; z; out"
+    And sysop command "::win" contains sequence "z; z; z; in platform; z; out; u spyglass; t spyglass"
     And sysop command "::win" omits "g fort"
     When I trace sysop command "::win"
     Then the game is alive
@@ -231,6 +250,6 @@ Feature: Maintained sysop shortcuts
     And flag "bellRung" is set
     And flag "progressItem:spyglass" is set
     And flag "useItem:spyglass" is set
-    And the win route used at most one named flight
+    And the win route used at most two named flights
 
 # end sysop-menu.feature

@@ -181,6 +181,8 @@ export const content = {
       desc:
         "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
         "LEVER where a book should be. The PARLOR lies NORTH.",
+      highDesc:
+        "A DOWN stair waits behind the bookcase. The shelves are still latched; PULL the LEVER to open them.",
     },
 
     secretChamber: {
@@ -249,8 +251,7 @@ export const content = {
         "A tiny spring catch has scratched the shelf's varnish. One curling tongue of WALLPAPER, " +
         "low near the baseboard, looks looser than the rest.",
       highDesc:
-        "A TINY KEY-shaped scuff cuts across the shelf, while the WALLPAPER turns transparent " +
-        "to show lath over a narrow gap.",
+        "The WALLPAPER hides a narrow opening. IN leads BETWEEN THE WALLS.",
     },
 
     masterBedroom: {
@@ -291,6 +292,7 @@ export const content = {
       searchDesc:
         "A small gilt frame could fit the dust outline among the lumber. The ladder flexes ominously " +
         "even before you add the weight of a full inventory.",
+      highDesc: "A SECRET DOOR stands in the NORTH gable. NORTH leads to the HIDDEN VAULT.",
     },
 
     roof: {
@@ -331,7 +333,7 @@ export const content = {
         "A cramped, foul basement office beneath the ROYAL HALL: a battered desk, a green ROTARY PHONE, " +
         "cold burrito wrappers, a jar of MUSHROOMS, and a humming mini-FRIDGE. The stair climbs back UP.",
       searchDesc:
-        "Gary left in a violent hurry. The ROTARY PHONE hangs silent, and the COUNTDOWN CLOCK remains with you.",
+        "Gary left in a violent hurry. The ROTARY PHONE hangs silent, and the DOOMSDAY CLOCK remains with you.",
     },
 
     betweenWalls: {
@@ -395,7 +397,7 @@ export const content = {
       desc: "A dented brass mailbox bolted to the PORCH rail.",
     },
     letter: {
-      desc: "A single sheet of good paper, water-stained.",
+      desc: "PHOTO PIECE A: a single water-stained sheet of good paper, torn along three edges.",
       text:
         "The letter reads: \"To {{player_name}}, whoever inherits this cursed MANOR — the family's heirlooms must be returned " +
         "to the RELIQUARY in the ROYAL HALL, all of them, its doors CLOSED, and the BELL rung, or the curse will never lift. " +

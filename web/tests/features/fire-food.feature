@@ -8,7 +8,7 @@ Feature: Fire and food consequences
   Background:
     Given a fresh manor game
 
-  Scenario: Burn the letter, confirm the match, and ask Gary for rescue
+  Scenario: The letter cannot be burned, confirm the match, and ask Gary for rescue
     When I send "north"
     And I send "open mailbox"
     Then the output contains "letter"
@@ -16,8 +16,8 @@ Feature: Fire and food consequences
     Then the output equals "Taken. (+5)"
     And the letter has no hard line breaks
     When I send "burn letter"
-    Then the output matches "alight|ash|flakes"
-    And item "letter" is destroyed
+    Then the output contains "can't quite bring yourself to set fire to the letter"
+    And item "letter" is in "inventory"
     When I send "light self on fire"
     Then the output contains "source of ignition"
     And flag "onFire" is unset
@@ -122,7 +122,23 @@ Feature: Fire and food consequences
     And I send "place emerald gem in reliquary"
     Then item "emberStone" is in "reliquary"
     And the game score is 50
-    And the output contains line "HEIRLOOMS: 0/13 +1"
+    And the output contains line "HEIRLOOMS: 0/24 +1"
+
+  Scenario: Body fire still pays 30 after several turns en route to the brazier
+    Given the player is in room "gate"
+    And item "matches" is carried
+    When I send "light self on fire with match"
+    And I send "wait"
+    And I send "wait"
+    And I send "wait"
+    And I send "east"
+    Then the current room is "garden"
+    And fire status has 2 turns
+    When I send "light brazier"
+    Then the output contains "(+30)"
+    And the output contains "set yourself on fire and survived"
+    And flag "onFire" is false
+    And the game score is 45
 
   Scenario: The lit portable candle can patiently ignite the garden brazier
     Given the player is in room "garden"

@@ -38,7 +38,13 @@
   "hedgeMazeLoop": {
     "name": "Hedge Maze: Crooked Loop",
     "desc": "The hedge bends back on itself with malicious precision. Every opening resembles the one you just used.",
-    "items": []
+    "items": [
+      {
+        "id": "photoPieceB",
+        "label": "photo piece b",
+        "kind": "takeable"
+      }
+    ]
   },
   "dragonCaveMouth": {
     "name": "Dreadmaw's Cave Mouth",
@@ -58,12 +64,17 @@
   },
   "mineGallery": {
     "name": "Mining Gallery",
-    "desc": "A timber-braced MINING GALLERY follows a rusted rail line. A battered HEADLAMP hangs from a support post. The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
+    "desc": "A timber-braced MINING GALLERY follows a rusted rail line. A dented MINERS' LOCKER stands against one timber support. The DRAGON CAVE ANTECHAMBER is WEST; a ladder descends DOWN into a DEEP MINING SHAFT.",
     "items": [
       {
         "id": "headlamp",
         "label": "headlamp",
         "kind": "takeable"
+      },
+      {
+        "id": "minersLocker",
+        "label": "miners' locker",
+        "kind": "scenery"
       }
     ]
   },
@@ -119,6 +130,11 @@
     "name": "Ivy-Choked Privy",
     "desc": "A cramped brick OUTHOUSE strangled in ivy. Its only fixture is a rough wooden seat over a dark TOILET HOLE in the earth. Fresh purple MUSHROOMS grow from the filth inside. The GARDEN lies WEST; a narrow path continues EAST toward an enormous OAK.",
     "items": [
+      {
+        "id": "photoPieceC",
+        "label": "photo piece c",
+        "kind": "takeable"
+      },
       {
         "id": "toilet",
         "label": "toilet",
@@ -230,6 +246,16 @@
     "desc": "A mouldering PARLOR of draped furniture. Above the cold fireplace hangs a huge, grim PROFILE PAINTING of a bearded patriarch, whose eyes seem to track you. An archway returns WEST to the ROYAL HALL; a low door leads SOUTH to the LIBRARY.",
     "items": [
       {
+        "id": "baronMunchhausen",
+        "label": "baron",
+        "kind": "scenery"
+      },
+      {
+        "id": "coalStack",
+        "label": "coal",
+        "kind": "scenery"
+      },
+      {
         "id": "portrait",
         "label": "painting",
         "kind": "scenery"
@@ -244,6 +270,11 @@
         "id": "lever",
         "label": "lever",
         "kind": "scenery"
+      },
+      {
+        "id": "rottingBook",
+        "label": "rotting book",
+        "kind": "fixture"
       }
     ]
   },
@@ -269,8 +300,8 @@
       },
       {
         "id": "candelabraFrame",
-        "label": "incomplete candelabra",
-        "kind": "scenery"
+        "label": "candelabra",
+        "kind": "container"
       }
     ]
   },
@@ -289,6 +320,21 @@
         "kind": "takeable"
       },
       {
+        "id": "milkJug",
+        "label": "empty milk jug",
+        "kind": "takeable"
+      },
+      {
+        "id": "epoissesCheese",
+        "label": "époisses",
+        "kind": "takeable"
+      },
+      {
+        "id": "limburgerCheese",
+        "label": "limburger",
+        "kind": "takeable"
+      },
+      {
         "id": "matches",
         "label": "matches",
         "kind": "takeable"
@@ -296,6 +342,11 @@
       {
         "id": "milk",
         "label": "milk",
+        "kind": "takeable"
+      },
+      {
+        "id": "munsterCheese",
+        "label": "munster",
         "kind": "takeable"
       },
       {
@@ -309,8 +360,23 @@
         "kind": "takeable"
       },
       {
+        "id": "fridge",
+        "label": "fridge",
+        "kind": "container"
+      },
+      {
+        "id": "microwave",
+        "label": "microwave",
+        "kind": "container"
+      },
+      {
         "id": "cellarDoor",
         "label": "cellar",
+        "kind": "scenery"
+      },
+      {
+        "id": "microwaveDial",
+        "label": "microwave dial",
         "kind": "scenery"
       }
     ]
@@ -320,8 +386,18 @@
     "desc": "Racks of burst and blackened bottles line the dripping WINE CELLAR. One survivor gleams: a CRYSTAL DECANTER of something that still catches the light. Stone steps climb UP to the KITCHEN; an arch leads SOUTH, deeper, into a cold that raises the hairs on your neck.",
     "items": [
       {
+        "id": "corkscrew",
+        "label": "corkscrew",
+        "kind": "takeable"
+      },
+      {
         "id": "crystalDecanter",
         "label": "decanter",
+        "kind": "takeable"
+      },
+      {
+        "id": "wineBottle",
+        "label": "wine bottle",
         "kind": "takeable"
       }
     ]
@@ -349,6 +425,16 @@
       {
         "id": "cord",
         "label": "cord",
+        "kind": "scenery"
+      },
+      {
+        "id": "marbleBust",
+        "label": "marble bust",
+        "kind": "scenery"
+      },
+      {
+        "id": "bustNose",
+        "label": "nose",
         "kind": "scenery"
       }
     ]
@@ -471,12 +557,43 @@
   "roof": {
     "name": "Manor Roof",
     "desc": "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; a narrow ridge runs EAST to the BELFRY.",
-    "items": []
+    "items": [
+      {
+        "id": "silverWeathercock",
+        "label": "silver weathercock",
+        "kind": "takeable"
+      },
+      {
+        "id": "gargoyleBurper",
+        "label": "burper",
+        "kind": "fixture"
+      },
+      {
+        "id": "gargoyleFarter",
+        "label": "farter",
+        "kind": "fixture"
+      },
+      {
+        "id": "gargoyleHorizonGazer",
+        "label": "horizon-gazer",
+        "kind": "fixture"
+      },
+      {
+        "id": "gargoyleShitter",
+        "label": "shitter",
+        "kind": "fixture"
+      }
+    ]
   },
   "belfry": {
     "name": "Belfry",
     "desc": "The BELFRY crouches above the roofline around a weather-blackened BELL. The rafters vanish into layers of restless shadow. A thick ROPE hangs from the bell's wheel and passes through a fitted HOLE in the floor, continuing down through the house. The MANOR ROOF is WEST. A narrow maintenance hatch descends DOWN into the ASTRAL CHAMBER.",
     "items": [
+      {
+        "id": "xrayGoggles",
+        "label": "xray goggles",
+        "kind": "takeable"
+      },
       {
         "id": "belfryBats",
         "label": "bats",
@@ -539,6 +656,108 @@
         "id": "queenPetrified",
         "label": "queen",
         "kind": "scenery"
+      }
+    ]
+  },
+  "waylampClearing": {
+    "name": "Waylamp Clearing",
+    "desc": "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH beneath the GREAT OAK.",
+    "items": [
+      {
+        "id": "stream",
+        "label": "stream",
+        "kind": "scenery"
+      },
+      {
+        "id": "upsideDownCampfire",
+        "label": "upside-down campfire",
+        "kind": "scenery"
+      }
+    ]
+  },
+  "cheeseGrotto": {
+    "name": "Cheese Grotto",
+    "desc": "The CHEESE GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
+    "items": [
+      {
+        "id": "demogorgonzola",
+        "label": "demogorgonzola",
+        "kind": "fixture"
+      }
+    ]
+  },
+  "avClubDen": {
+    "name": "AV Club Den",
+    "desc": "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. Its dial points to a quiz show that refuses to end. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
+    "items": [
+      {
+        "id": "portableTransistorRadio",
+        "label": "portable transistor radio",
+        "kind": "takeable"
+      },
+      {
+        "id": "cabinetRadio",
+        "label": "cabinet radio",
+        "kind": "container"
+      }
+    ]
+  },
+  "planetarium": {
+    "name": "Planetarium",
+    "desc": "A plain PLANETARIUM dome looms above a single brass PROJECTOR. The ceiling is marked with five groups of stars; one patch looks like a drain and another has scorched the plaster. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+    "items": [
+      {
+        "id": "projector",
+        "label": "projector",
+        "kind": "scenery"
+      }
+    ]
+  },
+  "mapRoom": {
+    "name": "Map Room",
+    "desc": "A tiny MAP ROOM is wallpapered in star charts with more confidence than scientific merit. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
+    "items": [
+      {
+        "id": "stellarMap",
+        "label": "stellar map",
+        "kind": "takeable"
+      }
+    ]
+  },
+  "shack": {
+    "name": "Shack",
+    "desc": "A run-down SHACK leans against the trees. The ALPHABET WALL carries letters A through Z, each beneath a tiny bulb. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.",
+    "items": [
+      {
+        "id": "kidsDrawing",
+        "label": "kid's drawing",
+        "kind": "takeable"
+      },
+      {
+        "id": "alphabetWall",
+        "label": "alphabet wall",
+        "kind": "scenery"
+      }
+    ]
+  },
+  "below": {
+    "name": "Oak Undercroft",
+    "desc": "The OAK UNDERCROFT is a chamber hollowed among roots as thick as bridge cables. A LOWER PANEL holds three vertical slots beneath a dangling PLATFORM shaft. NORTH returns to the WAYLAMP CLEARING. The shaft continues UP, but no lift stops here yet.",
+    "items": [
+      {
+        "id": "magentaGem",
+        "label": "magenta gem",
+        "kind": "takeable"
+      },
+      {
+        "id": "yellowGem",
+        "label": "yellow gem",
+        "kind": "takeable"
+      },
+      {
+        "id": "lowerPanel",
+        "label": "lower panel",
+        "kind": "container"
       }
     ]
   }

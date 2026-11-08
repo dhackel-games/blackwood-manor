@@ -73,10 +73,12 @@ function cloneData(def, id) {
   return copy;
 }
 
-const MUTABLE_ITEM_STATE = ["loc", "open", "locked", "lit", "fuel", "worn", "lightGrace"];
+const MUTABLE_ITEM_STATE = [
+  "loc", "open", "locked", "lit", "fuel", "worn", "lightGrace", "setting", "highSource",
+];
 
 function restoreItems(worldItems, savedItems = {}) {
-  return Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
+  const restoredItems = Object.fromEntries(Object.entries(worldItems).map(([id, definition]) => {
     const restored = cloneData(definition, id);
     const saved = savedItems[id];
     if (saved) {
@@ -86,6 +88,11 @@ function restoreItems(worldItems, savedItems = {}) {
     }
     return [id, restored];
   }));
+  for (const [id, saved] of Object.entries(savedItems)) {
+    if (restoredItems[id] || !saved?.templateId || !worldItems[saved.templateId]) continue;
+    restoredItems[id] = { ...cloneData(worldItems[saved.templateId], id), ...saved, id };
+  }
+  return restoredItems;
 }
 
 export function createGame(world) {
@@ -190,7 +197,7 @@ export function createGame(world) {
     const adjs = words.slice(0, -1);
     const candidates = scope || game.visibleItems();
     const canonical = candidates.filter((it) =>
-      world.itemShortNames?.[it.id]?.toLowerCase() === normalized);
+      (it.shortName || world.itemShortNames?.[it.id])?.toLowerCase() === normalized);
     if (canonical.length) return canonical;
     return candidates.filter((it) => {
       const names = (it.names || []).map((s) => s.toLowerCase());
@@ -200,6 +207,21 @@ export function createGame(world) {
   };
   game.findItem = (phrase, scope) => game.findItems(phrase, scope)?.[0] || null;
   game.find = (phrase, scope) => game.findItem(phrase, scope);
+  const itemDefinition = (item) => item && (world.items[item.id] || world.items[item.templateId]);
+  game.itemText = (item, key) => {
+    const text = item?.[key] ?? itemDefinition(item)?.[key];
+    return typeof text === "function" ? text(game) : text;
+  };
+  game.resolveRoomId = (phrase) => {
+    const normalize = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const wanted = normalize(phrase);
+    if (!wanted) return null;
+    const matches = Object.entries(world.rooms).filter(([id, room]) =>
+      [world.roomShortNames?.[id], id, room.name, ...(room.aliases || [])]
+        .filter(Boolean)
+        .some((name) => normalize(name) === wanted || normalize(name).endsWith(wanted)));
+    return matches.length === 1 ? matches[0][0] : null;
+  };
 
   function itemTitle(item) {
     const primary = item.names[0];
@@ -271,11 +293,18 @@ export function createGame(world) {
   };
   game.awardUse = (item) => {
     const points = item?.takeable ? cfg.portableRewards?.use : 0;
-    if (!points || game.getFlag(`useItem:${item.id}`)) return "";
-    game.setFlag(`useItem:${item.id}`);
+    const flag = item?.useFlag || `useItem:${item.id}`;
+    if (!points || game.getFlag(flag)) return "";
+    game.setFlag(flag);
     game.addScore(points);
     return ` (+${points})`;
   };
+  game.awardProgress = (id) => typeof world.awardProgress === "function"
+    ? world.awardProgress(game, id)
+    : 0;
+  game.cycleFlavor = (poolName) => typeof world.cycleFlavor === "function"
+    ? world.cycleFlavor(game, poolName)
+    : "";
   const phoneBillLine = () => {
     const b = state.flags.phoneBill;
     if (!b) return "";
@@ -345,14 +374,19 @@ export function createGame(world) {
       || !!state.flags.onFire
       || darkVision;
   };
+  game.hasHiddenSight = () => (state.flags.high || 0) > 0
+    || (typeof world.hasMushroomVision === "function" && world.hasMushroomVision(game));
+  game.revealHiddenSight = () => game.hasHiddenSight()
+    && typeof world.revealHiddenSight === "function"
+    ? world.revealHiddenSight(game)
+    : null;
 
   game.availableDirections = () => {
     const room = world.rooms[state.room];
     const directions = Object.entries(room.exits || {})
       .filter(([, exit]) => {
         if (typeof exit === "string") return true;
-        const enhancedVision = (state.flags.high || 0) > 0
-          || (typeof world.hasMushroomVision === "function" && world.hasMushroomVision(game));
+        const enhancedVision = game.hasHiddenSight();
         return enhancedVision || !exit.revealedBy || !!state.flags[exit.revealedBy];
       })
       .map(([direction]) => direction);
@@ -376,13 +410,14 @@ export function createGame(world) {
     const extended = force || first || verbose;
     let out = r.name.toUpperCase() + "\n";
     if ((force || first) && r.art) out += r.art + "\n";
-    if (extended) out += r.desc + "\n";
+    if (extended) {
+      const desc = typeof r.desc === "function" ? r.desc(game) : r.desc;
+      out += desc + "\n";
+    }
     // Mushroom and XRAY vision share one status heading and hidden-detail view.
-    const highOn = (state.flags.high || 0) > 0;
-    const enhancedVision = typeof world.hasMushroomVision === "function"
-      ? world.hasMushroomVision(game)
-      : highOn;
+    const enhancedVision = game.hasHiddenSight();
     if (enhancedVision) {
+      const discovery = game.revealHiddenSight();
       const visionSource = r.highDesc || r.searchDesc;
       const vision = typeof visionSource === "function" ? visionSource(game) : visionSource;
       const status = typeof world.visionStatus === "function"
@@ -395,6 +430,7 @@ export function createGame(world) {
         ? "∞"
         : `${displayTurns} turn${displayTurns === 1 ? "" : "s"} left`;
       if (vision) out += `THIRD EYE (👁️ ${remaining})\n${vision}\n`;
+      if (discovery) out += `${discovery}\n`;
     }
     const directions = game.availableDirections();
     out += extended
@@ -402,7 +438,8 @@ export function createGame(world) {
       : `${directions.map((direction) => DIRECTION_SHORT[direction] || direction).join(", ") || "-"}\n`;
     const here = game.itemsIn(state.room).filter((i) => !i.scenery || i.takeable);
     for (const it of here) {
-      out += (it.roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
+      const roomDesc = game.itemText(it, "roomDesc");
+      out += (roomDesc || `There is a ${it.names[0].toUpperCase()} here.`) + "\n";
       if (it.container && it.open) {
         const inside = game.itemsIn(it.id);
         if (inside.length) {
@@ -467,9 +504,16 @@ export function createGame(world) {
   function runHandlers(cmd) {
     const direct = cmd.dobj ? game.find(cmd.dobj) : null;
     const indirect = cmd.iobj ? game.find(cmd.iobj) : null;
+    const directDefinition = itemDefinition(direct);
+    const indirectDefinition = itemDefinition(indirect);
     const targets = [];
-    if (direct) targets.push(world.items[direct.id]);
-    if (indirect && indirect.id !== direct?.id) targets.push(world.items[indirect.id]);
+    if (direct && !directDefinition?.on?.[cmd.verb]
+        && typeof world.useHighSource === "function") {
+      const highSourceResult = world.useHighSource(game, direct, cmd);
+      if (highSourceResult != null) return highSourceResult;
+    }
+    if (direct) targets.push(directDefinition);
+    if (indirect && indirect.id !== direct?.id) targets.push(indirectDefinition);
     targets.push(world.rooms[state.room]);
     for (const t of targets) {
       const h = t && t.on && t.on[cmd.verb];
@@ -490,7 +534,7 @@ export function createGame(world) {
     if (cmd.verb !== "enter" || !cmd.dobj) return null;
     const target = game.find(cmd.dobj);
     if (!target || !target.enterTo) return null;
-    const definition = world.items[target.id];
+    const definition = itemDefinition(target);
     const canOpen = target.openable || !!definition?.on?.open;
     if (!canOpen || target.open) return null;
 
@@ -558,7 +602,7 @@ export function createGame(world) {
       iobj: null,
       itemId: item.id,
     };
-    const itemHandler = world.items[item.id]?.on?.take;
+    const itemHandler = itemDefinition(item)?.on?.take;
     let result = itemHandler ? itemHandler(game, takeCommand) : null;
     const roomHandler = world.rooms[state.room]?.on?.take;
     if (result == null && roomHandler) result = roomHandler(game, takeCommand);
@@ -597,6 +641,15 @@ export function createGame(world) {
     if (!target?.enterTo) return null;
     cmd.verb = "enter";
     return `enter ${itemTitle(target)}`;
+  }
+
+  function inferStartNavigation(cmd) {
+    if (cmd.verb !== "start" || !cmd.dobj || game.find(cmd.dobj)) return null;
+    const roomId = game.resolveRoomId(cmd.dobj);
+    if (!roomId) return null;
+    cmd.verb = "go";
+    cmd.dobj = roomId;
+    return `go ${world.rooms[roomId].name}`;
   }
 
   function inferUseAction(cmd) {
@@ -687,11 +740,15 @@ export function createGame(world) {
     const previouslyCarried = new Set(game.inventory().map((item) => item.id));
 
     const roomNavigation = world.implicitNavigation?.[state.room];
-    const implicitNavigation = cmd.verb === "go" && cmd.dobj === "in" ? roomNavigation?.in
-      : cmd.verb === "go" && cmd.dobj === "out" ? roomNavigation?.out
+    const interceptsNavigation = !!world.rooms[state.room]?.interceptImplicitNavigation;
+    const implicitNavigation = !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "in"
+      ? roomNavigation?.in
+      : !interceptsNavigation && cmd.verb === "go" && cmd.dobj === "out"
+        ? roomNavigation?.out
       : null;
     if (implicitNavigation) cmd = parse(implicitNavigation);
     const implicitEntry = inferGoEntryTarget(cmd);
+    const implicitStartNavigation = inferStartNavigation(cmd);
     const implicitTalk = inferSoleTalkTarget(cmd);
     const derivedSteps = typeof world.deriveCommand === "function"
       ? (world.deriveCommand(game, cmd) || []).map(displayDerivedStep)
@@ -738,7 +795,7 @@ export function createGame(world) {
       if (derivedSteps.includes(executionLabel)) finalStep = null;
       const sequence = acquisitionBlocked || !finalStep ? derivedSteps : [...derivedSteps, finalStep];
       text = `(${sequence.join("; ")})\n\n${text}`;
-    } else if (implicitNavigation || implicitEntry || implicitTalk || implicitUse) {
+    } else if (implicitNavigation || implicitEntry || implicitStartNavigation || implicitTalk || implicitUse) {
       text = `(${executionLabel})\n\n${text}`;
     }
     let result = text + suffix();

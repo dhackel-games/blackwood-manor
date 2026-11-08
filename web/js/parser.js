@@ -11,7 +11,7 @@ const DIRECTIONS = {
 
 // canonical verb -> synonyms
 const VERBS = {
-  go: ["go", "g", "walk", "run", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
+  go: ["go", "g", "walk", "float", "fly", "leave", "exit"], look: ["look", "l"], examine: ["examine", "ex", "x", "inspect"],
   take: ["take", "t", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open", "o", "pry", "force"], close: ["close", "c", "shut"],
   lock: ["lock", "lk"], unlock: ["unlock", "un"],
@@ -23,18 +23,23 @@ const VERBS = {
   throw: ["throw", "toss"], put: ["put", "place", "insert"], enter: ["enter", "in", "board", "ride", "step"],
   climb: ["climb", "descend"], reach: ["reach"], ring: ["ring"], touch: ["touch"], listen: ["listen"],
   smell: ["smell", "sniff"], give: ["give", "offer", "feed"],
+  combine: ["combine", "assemble"], spell: ["spell", "type"], kick: ["kick", "boot"],
+  fight: ["fight", "brawl"], turn: ["turn", "rotate", "spin"], set: ["set", "adjust"],
+  start: ["start", "run", "activate"], pour: ["pour", "tip"], fill: ["fill", "refill"],
+  stomp: ["stomp", "stamp"], smother: ["smother", "suffocate"],
   show: ["show", "scry"], route: ["route", "guide", "path"],
   talk: ["talk", "speak", "chat"], say: ["say", "yell", "shout", "answer", "recite"],
   wake: ["wake", "awaken", "rouse"],
   pray: ["pray", "perform"],
   sit: ["sit"], use: ["use", "u"], flush: ["flush"],
-  hotline: ["hotline", "call", "dial", "phone", "telephone", "hint", "hints"],
+  hotline: ["hotline", "help", "call", "phone", "telephone", "hint", "hints"],
+  dial: ["dial"],
   inventory: ["inventory", "i", "inv"], wait: ["wait", "z"], again: ["again"],
   map: ["map", "m", "chart", "floorplan"],
   code: ["code", "combination"],
   yes: ["yes", "y", "yeah", "yep"], no: ["no", "nope", "nah"],
   score: ["score"], save: ["save"], restore: ["restore", "load"], restart: ["restart"],
-  verbose: ["verbose"], brief: ["brief"], help: ["help", "?", "commands"], quit: ["quit", "q"],
+  verbose: ["verbose"], brief: ["brief"], info: ["info", "?", "commands"], quit: ["quit", "q"],
 };
 const SYN = {};
 for (const [canon, list] of Object.entries(VERBS)) {
@@ -143,7 +148,8 @@ export function parse(input) {
     words = [words[1], ...words.slice(2)];
   }
 
-  let verb = SYN[words[0].value];
+  const sourceVerb = words[0].value;
+  let verb = SYN[sourceVerb];
   if (!verb) {
     return {
       verb: null,
@@ -175,7 +181,7 @@ export function parse(input) {
   if (verb === "go" && !rest[0]?.quoted && rest[0]?.value === "to") rest = rest.slice(1);
 
   // "go north" / "go n" / "climb up"
-  if ((verb === "go" || verb === "climb") && rest.length &&
+  if ((verb === "go" || verb === "climb" || sourceVerb === "run") && rest.length &&
       !rest[0].quoted && DIRECTIONS[rest[0].value]) {
     return { verb: "go", dobj: DIRECTIONS[rest[0].value], prep: null, iobj: null };
   }
@@ -216,5 +222,7 @@ export function parse(input) {
     prep = null;
     iobj = null;
   }
-  return { verb, dobj, prep, iobj };
+  const parsed = { verb, dobj, prep, iobj };
+  if (sourceVerb === "spin") parsed.dialAction = "spin";
+  return parsed;
 }

@@ -56,13 +56,16 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   brief revisits show their abbreviations on a separate line.
   `go <visible door/object>` infers `enter <object>`, including obvious unlock
   and open steps; named-room GO remains available while flying.
-- **Mushroom powers:** while high, hidden clues appear on first entry, vertical
+- **Shared high powers:** every declared high source uses the same stacking
+  `high` counter. While high, hidden clues appear on first entry, vertical
   movement needs no rope or ladder, and `go to <room>`, `float to <room>`, or
-  `fly to <room>` carries you directly there. Eating another mushroom cluster
-  adds its full duration to the remaining high. The trip's third eye reveals
-  hidden clues and lets you see in dark rooms. The HUD tracks the trip itself
-  as `🍄`, vision as `👁️`, and flight as `🪽`, allowing those capabilities to
-  diverge. Supernatural hazards still apply.
+  `fly to <room>` carries you directly there. The fresh and dried MUSHROOMS
+  each add 12 turns; the source's opening is distinct, but the reaction,
+  capabilities, trip indicator (`🍄`), and end-of-trip text are shared. The
+  trip's third eye reveals what `SEARCH` would find and lets you see in dark
+  rooms. Vision and flight remain separately visible as `👁️` and `🪽`, so
+  permanent equipment can diverge from the trip. Supernatural hazards still
+  apply.
 - **Equipment:** wearable items occupy HEAD, FOREHEAD, EYES, FEET, FINGER, WRIST, or NECK.
   Worn gear is marked in INVENTORY and does not consume carrying capacity. A
   HEADLAMP provides 200 turns of light with a `💡` HUD countdown; the antique
@@ -103,27 +106,27 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
 - **Sound effects:** the leftmost HUD `🔇`/`🔊` button controls environmental
   burp, barf, fart, and mushroom sounds; the icon shows the current state.
 - **Score:** the HUD's `🏆 score/turns` readout keeps points and elapsed turns in
-  one compact slot. Each of the 39 obtainable Part-I portable items earns +5
+  one compact slot. Each of the 62 obtainable Part-I portable items earns +5
   once on acquisition and +5 once on successful use, including benign objects
   (which can be handled harmlessly), generated items, equipment, and the
-  COUNTDOWN CLOCK. Existing +5 key/gear pickup awards are the same pickup
+  DOOMSDAY CLOCK. Existing +5 key/gear pickup awards are the same pickup
   credit, never an extra one. Failed or inaccessible actions do not award use
   points, and saved flags prevent drop/re-take, repeat-use, and mushroom-regrowth
   farming. Older saves reconcile only proven missing pickup credits once;
   new saves carry a ledger version so restoration does not invent credits.
   The queen's emerald is obtainable only in Part II: its +5 pickup and +5
   use on placement still apply, alongside the separate +25 hour award; only
-  the Part-I maximum excludes it. Puzzle breakthroughs and all thirteen heirloom
-  deposits keep their existing separate rewards, including +195 total for
+  the Part-I maximum excludes it. Puzzle breakthroughs and all twenty-four
+  heirloom deposits keep their existing separate rewards, including +330 total
   deposits, +20 for restoring the candelabra, and +5 for reading the letter.
-  `::win` walks the manor after one opening flight to the mining shaft for the
-  backpack: cave/troll, front door and kitchen, apple for Dreadmaw, rope and
-  self-fire at the garden well/brazier, the oak's physical pulley platform,
-  library/bedrooms/nursery, attic/roof/belfry, cellar/crypt, then the reliquary.
-  It rings the closet bell, **takes and reads the clock**, and stops alive in
-  the ROYAL HALL with both SOUTH (front door) and DOWN (Gary) still available.
-  The derived deterministic Part-I maximum is 825 there; SOUTH adds the
-  existing 45 end-badge points for 870, while DOWN enters Part II at 825.
+  The integrated `::win` route walks the manor after flying to the mining shaft
+  for the backpack, headlamp, and winged shoes, then makes its only other named
+  flight to the garden. It completes the cave, realm, oak lift, manor, and
+  reliquary routes, rings the closet bell, **takes and reads the DOOMSDAY CLOCK**,
+  and stops alive in the ROYAL HALL with both SOUTH (front door) and DOWN (Gary)
+  still available. The derived deterministic Part-I maximum is 1316 there;
+  SOUTH adds the existing 25 end-badge points for 1341, while DOWN enters Part II
+  at 1316.
   Repeating `::win` after the bell safely takes the clock if it is still in
   the reliquary, or rereads it without choosing an ending. The route reads
   but never opens the random MYSTERY PACKAGE; opening it yourself earns its
@@ -138,9 +141,9 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   unworn item can be deposited. DROP/PLACE/PUT ALL auto-opens it, as does
   GET/TAKE ALL FROM it; the completed cabinet must be explicitly CLOSED before
   the lower BELL ROPE will complete the ritual. Text reports
-  `HEIRLOOMS: required/13 +extra`, matching the `💎` HUD value. Pulling the
+  `HEIRLOOMS: required/24 +extra`, matching the `💎` HUD value. Pulling the
   prepared closet rope rings the remote belfry bell, flashes magical light,
-  transforms the thirteen heirlooms into the COUNTDOWN CLOCK, slams the FRONT
+  transforms the twenty-four heirlooms into the DOOMSDAY CLOCK, slams the FRONT
   DOOR shut and then wide open, and opens the floor trapdoor. EXAMINE the
   RELIQUARY to discover the clock. Leaving ends the game; carrying the clock is
   required before descending to Gary.
@@ -174,11 +177,14 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   the player's wrist during `PUT ALL`.
   The HALL BEDROOM keeps the broken fixed MIRROR and removable non-heirloom
   SHARD; its NIGHT TABLE DRAWER contains the required +20 BLACKWOOD FAMILY RING.
-- **Thirteen heirlooms:** the required set is the ANCESTRAL PORTRAIT, ANCIENT
-  COIN, BLACKWOOD HAMMER, restored CANDELABRA, CRYSTAL DECANTER, BLACKWOOD
-  FAMILY CREST, BLACKWOOD FAMILY RING, GOLD LOCKET, GRIMOIRE, JEWELED MUSIC
-  BOX, RAVENBLOOD RING, BM SPYGLASS, and TALISMAN. The HALL BEDROOM has exactly
-  one required heirloom, the family ring; the MUSIC BOX remains in the NURSERY.
+- **Twenty-four heirlooms:** the required set is the ANCESTRAL PORTRAIT,
+  ANCIENT COIN, BARONESS PHOTOGRAPH, BLACKWOOD DIAMOND, BLACKWOOD HAMMER,
+  restored CANDELABRA, CORKSCREW, CRYSTAL DECANTER, DEMOGORGONZOLA RIND,
+  BLACKWOOD FAMILY CREST, BLACKWOOD FAMILY RING, GOLD EYEPIECE, GOLD LOCKET,
+  GRIMOIRE, KID'S DRAWING, JEWELED MUSIC BOX, PORTABLE TRANSISTOR RADIO, PURPLE
+  CRAYON, RAVENBLOOD RING, SILVER WEATHERCOCK, SNUFFBOX, BM SPYGLASS, STELLAR
+  MAP, and TALISMAN. The HALL BEDROOM has exactly one required heirloom, the
+  family ring; the MUSIC BOX remains in the NURSERY.
 - **Carrying capacity:** the HUD shows `👤 used/6` initially. The BACKPACK in the
   DEEP MINING SHAFT is worn automatically when taken, raises capacity to 20,
   and changes that indicator to `👜 used/20`.
@@ -202,8 +208,18 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   as `offer apple to dragon`, `give apple with dragon`, or `put apple on dragon`.
   Beyond her, a MINING GALLERY and DEEP SHAFT lead to the TROLL GATE and
   DREADMAW'S VAULT.
+- **The Upside Down:** after DREADMAW has moved, the MINING GALLERY's
+  MINERS' LOCKER opens onto WAYLAMP CLEARING. `OPEN LOCKER`, then `IN` (or
+  `ENTER LOCKER`) enters the realm; `OUT` from WAYLAMP CLEARING returns to the
+  gallery. The hub's paths reach the CHEESE GROTTO, AV CLUB DEN, PLANETARIUM,
+  MAP ROOM, SHACK, and the OAK UNDERCROFT. WINGED SHOES and a high can use
+  named `FLY TO` or `FLOAT TO` travel there just as they can anywhere else.
+  `COMBINE`, `SPELL`, `KICK`, `FIGHT`, `TURN`, `SET`, `START`, `POUR`, `FILL`,
+  `STOMP`, and `SMOTHER` are available generic puzzle verbs; their effects
+  depend on the objects in the current room.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
-  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `help`, `quit`.
+  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
+  INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
   TOP scrolls to the top of the page; CLEAR erases the entire scrollback and redisplays the basic prompt for the current room.
   In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
@@ -229,7 +245,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   item titles, such as `(unlock FRONT DOOR; open FRONT DOOR)`.
 - **`again` / `g`** repeats your last command; **↑ / ↓** scroll command history.
 - **Self-reliance awards:** successful runs earn HELPLESS (+15) without
-  MAP/CALL/HINT/HELP, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
+  MAP/HELP/CALL/HINT/INFO, EXTRA SUPER DUPER HELPLESS (+20 more) if they also avoid
   LOOK/EXAMINE/SEARCH, and NO TAKEBACKS (+10) without explicit SAVE/RESTORE.
 
 ### Survival tips (it is a *cruel* game)
@@ -250,6 +266,8 @@ js/parser.js          input -> { verb, dobj, prep, iobj }
 js/commands.js        generic verb handlers
 js/world.js           world structure, handlers, and dynamic prose
 js/world.content.js   static player-facing room and item prose
+js/upsidedown/*.js    registered Upside Down content modules
+js/manor/*.js         registered manor content modules
 js/hud.js             declarative HudSlot definitions and renderer
 js/native.js          native bridge detection, messaging, and version formatting
 js/ui.js              browser terminal adapter
@@ -270,6 +288,48 @@ npm run test:walkthrough  # gameplay-tagged scenarios only
 All test behavior is executable Gherkin. The gameplay-tagged scenarios play the
 entire game to victory, check its final score, and cover each death trap. Run the
 complete local suite after any change to the world.
+
+### Development-only route planning
+
+Run `node tools/route-plan.mjs` from `web/` to print the complete Part I command
+list and JSON metrics. This Node-only tool imports the actual merged `world`;
+game code never imports the tool. It plans 24 heirlooms, portable-item uses,
+puzzle prerequisites, bulk TAKE ALL, one PUT ALL IN RQ, and the ONE TRIP bonus.
+It executes every planned command against a fresh game and requires the derived
+maximum score, all 24 treasures inside the clock, and a live player in the
+ROYAL HALL. The simulation requires the 36-item BACKPACK.
+
+The opening flight goes to SHAFT for gear. A bounded branch-and-bound search
+(72 states per layer, at most 18,000 expansions per refined start) evaluates
+no second flight and 29 legal second-flight starting rooms; it chooses a
+second flight only when it reduces non-flight room changes. All subsequent
+travel is physical walking or the moving oak platform. The search honors
+gated `via` exits, locker access, the upper lift's original two beats, the
+aligned lower lift's four beats, and the planetarium's forced ejection to GATE.
+The fire route ignites in the ROYAL HALL, reaches the BRAZIER on turn four,
+and lights it while extinguishing the player.
+
+`transitions` and `transitionsPerHeirloom` count directional walking steps,
+matching the win trace's 77/13 = 5.9 baseline. Named flights, lift moves, and
+the involuntary ejection are listed separately; `roomChangesIncludingLiftAndEjection`
+is the search objective, excluding named flights. Revisits count entries
+after a room's first visit. The dev fixture uses radio seed `0x1a2b3c4d` and
+disables random chaos for repeatable output. Its three printed ANSWER numbers
+are **not** universal: an in-game route must read the persisted
+`realm:radioRound.correctOption` after starting the radio and after each
+correct answer (the LCG draws a new round), then send that answer.
+
+The exported `shortestWalk(from, to, options)` computes gated walking paths
+through lift beats; `solveSmallProblem` exactly orders up to twelve tasks
+with prerequisites. For example:
+
+```
+node --input-type=module -e 'import {shortestWalk} from "./tools/route-plan.mjs"; console.log(shortestWalk("gate", "privy"))'
+```
+
+Run `npx cucumber-js tests/features/route-planner.feature --import 'tests/steps/**/*.js'`
+to check the route-planner feature, or `npm test -- --tags "not @win"` for all
+non-win scenarios.
 
 ## Expanding the game (the whole point)
 

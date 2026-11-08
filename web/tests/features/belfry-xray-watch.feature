@@ -123,7 +123,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     When I send "show library in watch"
     Then the output contains "BM WATCH — LIBRARY"
     And the output contains "THIRD EYE"
-    And the output contains "brass LEVER is polished"
+    And the output contains "A DOWN stair waits behind the bookcase"
     And the output contains "ROUTE READY"
     And the output contains "w; dn; dn; dn; e; s"
     And flag "mirrorRoutePrefill" equals "w; dn; dn; dn; e; s"
@@ -261,17 +261,17 @@ Feature: Belfry goggles, the family ring, and the BM Watch
       | path to kitchen  |
       | route to kitchen |
 
-  Scenario: The redesigned required set contains exactly thirteen heirlooms
-    Then the required family item count is 13
-    And the required family items are exactly "ancestralPortrait,ancientCoin,blackwoodHammer,candelabra,crystalDecanter,familyCrest,familyRing,goldLocket,grimoire,musicBox,rubyRing,spyglass,talisman"
-    And the required heirloom deposit total is 195
+  Scenario: The redesigned required set contains exactly twenty-four heirlooms
+    Then the required family item count is 24
+    And the required family items are exactly "ancestralPortrait,ancientCoin,baronessPhotograph,blackwoodDiamond,blackwoodHammer,candelabra,corkscrew,crystalDecanter,demogorgonzolaRind,familyCrest,familyRing,goldEyepiece,goldLocket,grimoire,kidsDrawing,musicBox,portableTransistorRadio,purpleCrayon,rubyRing,silverWeathercock,snuffbox,spyglass,stellarMap,talisman"
+    And the required heirloom deposit total is 330
     And item "familyRing" has heirloom deposit value 20
     And item "blackwoodHammer" has heirloom deposit value 12
     And item "candelabra" has heirloom deposit value 10
     And item "xrayGoggles" is not a required family heirloom
     And item "batSightMirror" is absent from game state
     And the player-facing heirloom catalogs and icons match the required set
-    And the static 2D rooms show the redesigned item placements
+    And the static 2D rooms show the redesigned and Lane 8 item placements
 
   Scenario: The lower rope transforms a full closed reliquary
     Given every treasure but the "familyRing" is already in the reliquary
@@ -292,9 +292,9 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     And flag "floorDoorOpen" is set
     And item "frontDoor" is open
     And item "clockTalisman" is in "reliquary"
-    And every required family item is inside the countdown clock
+    And every required family item is inside the Doomsday Clock
     When I send "examine reliquary"
-    Then the output contains "COUNTDOWN CLOCK"
+    Then the output contains "DOOMSDAY CLOCK"
 
   Scenario: Pulling the lower rope before the ritual is ready only rings the bell
     Given the player is in room "grandHall"
@@ -304,7 +304,7 @@ Feature: Belfry goggles, the family ring, and the BM Watch
     And the output contains "remote"
     And the output contains "CLUNK"
     And the output contains "Nothing changes in the RELIQUARY"
-    And the output contains line "HEIRLOOMS: 0/13 +0"
+    And the output contains line "HEIRLOOMS: 0/24 +0"
     And flag "bellRung" is unset
     And flag "floorDoorOpen" is unset
     And item "xrayGoggles" is in "belfry"

@@ -19,6 +19,14 @@ Feature: Gary's hint line
     And the output contains "WALLPAPER"
     And the output contains "BLACKWOOD HAMMER"
 
+  Scenario: HELP calls Gary's hint line while INFO only prints the reference
+    When I send "help"
+    Then flag "onCall" is true
+    When I send "hang up"
+    And I send "info"
+    Then the output contains "INFO (or ?) only prints this reference"
+    And flag "onCall" is false
+
   Scenario: Gary identifies the restored family ring heirloom
     When I send "call"
     And I send "give me a hint about the family ring"
