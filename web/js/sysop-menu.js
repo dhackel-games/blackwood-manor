@@ -148,7 +148,7 @@ const WIN = [
   "wear bmwatch", "north", "east", "open jewelry with tiny", "take ravenblood",
   "west", "north", "take shard", "open drawer", "take family",
   "south", "down", "west", "put candle in fixture", "put shard in fixture", "take candelabra",
-  "east", "east", "south", "pull lever", "read book", "take pieced",
+  "east", "east", "south", "pull lever", "take pieced",
   "combine pieces", "read baronessphoto", "down", "read grimoire", "up", "north", "west",
   "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
   "open rq", "read gclock",

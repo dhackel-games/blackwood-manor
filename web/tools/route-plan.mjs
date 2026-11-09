@@ -212,7 +212,7 @@ const TASKS = [
   { id: "diningCandle", room: "diningRoom", dependsOn: ["kitchenBasics"],
     commands: ["take candlestick", "light candle"] },
   { id: "library", room: "library",
-    commands: ["pull lever", "read book", "take pieced"],
+    commands: ["pull lever", "take pieced"],
     grants: { leverPulled: true } },
   { id: "secretChamber", room: "secretChamber", dependsOn: ["library"],
     commands: ["read grimoire"] },

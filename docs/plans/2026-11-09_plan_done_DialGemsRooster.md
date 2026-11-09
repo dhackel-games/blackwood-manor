@@ -18,6 +18,6 @@ Status: done on branch `fix/dial-gems-rooster`.
 * [x] T2: removed next-step text (photo piece D, snuffbox PICK NOSE, bookcase LEVER, radio "yours to take", weathervane "for you to TAKE").
 * [x] T3: roof description and search deduped; rooster wording; dedicated freeing text; east pool reworded.
 * [x] T4: `web/js/gem-slots.js` shared by both panels; gem-order commas kept in `splitCommands`.
-* [x] T5: `::win` 192 steps / 1236; planner; tests; DESIGN; stamp; triad; PR; merge.
+* [x] T5: `::win` drops the zero-point READ BOOK; 191 steps / 1236; planner; tests; DESIGN; stamp; triad; PR; merge.
 
 <!-- end 2026-11-09_plan_done_DialGemsRooster.md -->

@@ -331,12 +331,12 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 192 commands,
+For reference, the deterministic fresh `::win` expansion has 191 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
 GARDEN; the evaluated permanent-sight third flights to the HIDDEN VAULT and
-BELFRY take 199/74 and 200/75 steps/transitions respectively, so neither beats
+BELFRY take 198/74 and 199/75 steps/transitions respectively, so neither beats
 the selected two-flight route. Peak load is 32 against the BACKPACK's 36
 places; and exactly one
 `PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
