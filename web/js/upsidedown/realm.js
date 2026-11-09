@@ -1,4 +1,4 @@
-// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
 
 function enterRealm(ctx) {
   const locker = ctx.item("minersLocker");
@@ -147,9 +147,9 @@ const content = {
     shack: {
       name: "Shack",
       desc:
-        "A run-down SHACK leans against the trees. The ALPHABET WALL carries letters A through Z, each beneath a tiny bulb. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.",
+        "A run-down SHACK leans against the trees. The ALPHABET WALL has a light for every letter A through Z, with a switch below each light so you can spell out a word. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.",
       searchDesc:
-        "The drawing has enough arrows to turn a single rude noise into a road map. The wall's bulbs twitch when someone spells on it; their colors mean nothing.",
+        "The KID'S DRAWING shows a MONSTER with STINK FUMES pouring out of its rear end, and arrows everywhere pointing at the fumes. Flip the ALPHABET WALL's switches to SPELL a word; the light over each letter turns on as you go.",
     },
     below: {
       name: "Oak Undercroft",
