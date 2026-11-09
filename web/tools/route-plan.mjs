@@ -1,4 +1,4 @@
-// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven.
 import { pathToFileURL } from "node:url";
 import { createGame } from "../js/core.js";
 import { world } from "../js/world.js";
@@ -267,7 +267,7 @@ const TASKS = [
     commands: ["give limburger to dg", "give epoisses to dg",
       "give munster to dg", "take rind"] },
   { id: "shack", room: "shack",
-    commands: ["spell fart", "take all", "read drawing"] },
+    commands: ["spell fart", "take all"] },
   { id: "radio", room: "avClubDen",
     commands: ["turn on cabinet radio", "@answer", "@answer", "@answer",
       "take transistor"] },

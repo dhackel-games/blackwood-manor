@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -331,12 +331,12 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 201 commands,
+For reference, the deterministic fresh `::win` expansion has 200 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
 GARDEN; the evaluated permanent-sight third flights to the HIDDEN VAULT and
-BELFRY take 208/74 and 209/75 steps/transitions respectively, so neither beats
+BELFRY take 207/74 and 208/75 steps/transitions respectively, so neither beats
 the selected two-flight route. Peak load is 32 against the BACKPACK's 36
 places; and exactly one
 `PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
