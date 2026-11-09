@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1289,7 +1289,11 @@ starting slots in `oak:lowerPanelSlots`. CYAN, MAGENTA, and YELLOW must occupy
 BOTTOM, MIDDLE, and TOP respectively; wrong full arrangements eject every gem,
 while bulk transfers are refused. Alignment awards +10 once, sets
 `oak:lowerPanelAligned`, and activates BELOW immediately without a realm-wide
-puzzle gate or an in-game order hint.
+puzzle gate or an in-game order hint. Both the GREAT OAK and the OAK UNDERCROFT
+room descriptions state what each of their slots holds. The UNDERCROFT is the
+level directly beneath the GREAT OAK: the trunk ends in a STUMP-like base with
+deep roots, and one PLATFORM shaft runs from the TREE FORT (ABOVE) through the
+GROUND stop down between the roots to BELOW.
 
 Before that alignment, the upper oak's GROUND/ABOVE lift remains unchanged.
 Afterward, `oak:liftBeat` drives GROUND, ABOVE, GROUND, BELOW one turn at a

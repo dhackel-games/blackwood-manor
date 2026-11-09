@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.107:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -137,10 +137,19 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the output contains "OAK UNDERCROFT"
     And the output does not contain "shuttles between the roots and the TREE FORT"
     When I send "look"
-    Then the output contains "third stop"
+    Then the output contains "An immense GREAT OAK towers"
+    And the output contains "In the PANEL, the TOP SLOT holds the RUBY GEM"
+    And the output contains "deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to the OAK UNDERCROFT, one level BELOW."
     Given the player is in room "treeFort"
     When I send "look"
-    Then the output contains "chamber under the roots"
+    Then the output contains "A weathered TREE FORT fills the GREAT OAK'S crown."
+    And the output contains "sinks past the GREAT OAK'S roots to the OAK UNDERCROFT, one level BELOW."
+
+  Scenario: The undercroft lists what each LOWER PANEL slot holds
+    Given the player is in room "below"
+    When I send "look"
+    Then the output contains "directly beneath the GREAT OAK"
+    And the output contains "In the LOWER PANEL, the TOP SLOT holds the MAGENTA GEM, the MIDDLE SLOT is EMPTY, and the BOTTOM SLOT holds the YELLOW GEM."
 
   Scenario: Runtime navigation uses the declared aligned lift links
     Given the player is in room "below"
