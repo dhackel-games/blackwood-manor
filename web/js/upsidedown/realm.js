@@ -1,4 +1,4 @@
-// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
+// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 function enterRealm(ctx) {
   const locker = ctx.item("minersLocker");
@@ -52,7 +52,7 @@ const rooms = {
   },
   cheeseGrotto: {
     ...realmRoom({ south: "waylampClearing" }),
-    aliases: ["cheese grotto", "grotto"],
+    aliases: ["livarot grotto", "livarot", "cheese grotto", "grotto"],
   },
   avClubDen: {
     ...realmRoom({ west: "waylampClearing", north: "planetarium" }),
@@ -117,9 +117,9 @@ const content = {
         "Heat keeps you back from a hard shape in the ashes. The STREAM is close enough to fill a JUG; you could also risk your shoes on that fire.",
     },
     cheeseGrotto: {
-      name: "Cheese Grotto",
+      name: "Livarot Grotto",
       desc:
-        "The CHEESE GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
+        "The LIVAROT GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
       searchDesc:
         "The creature sniffs at your pockets. Its jaws snap on a falling pebble; a stain on the stone suggests anyone poking it will be gulped whole. It looks hungry for something even smellier than itself.",
     },

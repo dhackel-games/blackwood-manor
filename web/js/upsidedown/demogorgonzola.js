@@ -113,12 +113,12 @@ const items = {
 const content = {
   rooms: {
     cheeseGrotto: {
-      name: "Cheese Grotto",
+      name: "Livarot Grotto",
       desc(ctx) {
         const creature = ctx.getFlag("realm:demoFed")
           ? "DEMOGORGONZOLA squats beneath the stalactites, its face open like a very rude flower."
           : "DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud.";
-        return `The CHEESE GROTTO smells like a locker room built inside another locker room. ${creature} The only path leads SOUTH to the WAYLAMP.`;
+        return `The LIVAROT GROTTO smells like a locker room built inside another locker room. ${creature} The only path leads SOUTH to the WAYLAMP.`;
       },
       searchDesc:
         "The creature sniffs at your pockets. Its jaws snap on a falling pebble; a stain on the stone suggests anyone poking it will be gulped whole. It looks hungry for something even smellier than itself.",
@@ -150,7 +150,7 @@ const progressAwards = {
 };
 const hints = [
   (ctx) => ({
-    topics: ["demogorgonzola", "monster", "creature", "cave", "grotto"],
+    topics: ["demogorgonzola", "monster", "creature", "cave", "grotto", "livarot"],
     done: !!ctx.getFlag("realm:demoFed"),
     text: "LOOK or SMELL, but do not touch the thing. FEED it LIMBURGER, ÉPOISSES, and MUNSTER in any order.",
   }),
@@ -158,7 +158,7 @@ const hints = [
     topics: ["rind", "demogorgonzola rind"],
     done: ctx.roomOf("demogorgonzolaRind") === "inventory"
       || ctx.roomOf("demogorgonzolaRind") === "reliquary",
-    text: "When its face opens, check the CHEESE GROTTO floor for the RIND.",
+    text: "When its face opens, check the LIVAROT GROTTO floor for the RIND.",
   }),
 ];
 const roomHooks = {

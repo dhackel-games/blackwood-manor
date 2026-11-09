@@ -1186,7 +1186,7 @@ DOOMSDAY CLOCK.
 
 The fixed MINERS' LOCKER in the MINING GALLERY opens onto WAYLAMP CLEARING.
 `IN` enters the realm and `OUT` returns to the gallery; first discovery is a
-persisted +20 award. The hub's open walking paths reach the CHEESE GROTTO, AV
+persisted +20 award. The hub's open walking paths reach the LIVAROT GROTTO, AV
 CLUB DEN, PLANETARIUM, MAP ROOM, SHACK, and OAK UNDERCROFT. The map and 2D
 layouts render this as a separate floor. Named flight uses the same generic
 flight path as every other room, so it can enter and leave the realm without a
@@ -1199,7 +1199,7 @@ The KITCHEN's fixed, closed FRIDGE starts with the existing MILK, an EMPTY MILK
 JUG, LIMBURGER, ÉPOISSES, and MUNSTER. Existing saves gain the new FRIDGE and
 its new contents, while MILK moves inside only when it remains at its original
 KITCHEN location. The three cheeses remain intact when eaten and are the only
-safe gifts for DEMOGORGONZOLA in the CHEESE GROTTO.
+safe gifts for DEMOGORGONZOLA in the LIVAROT GROTTO.
 
 DEMOGORGONZOLA's visible creature and grotto text warn that physical or
 directed interactions cause an intact-inventory ejection to the FRONT GATE.

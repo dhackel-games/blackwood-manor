@@ -32,7 +32,7 @@ export const LABELS = {
   treeFort: "Tree Fort",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
   betweenWalls: "The Walls",
-  waylampClearing: "Waylamp", cheeseGrotto: "Cheese Grotto", avClubDen: "AV Club",
+  waylampClearing: "Waylamp", cheeseGrotto: "Livarot Grotto", avClubDen: "AV Club",
   planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 

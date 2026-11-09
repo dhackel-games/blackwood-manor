@@ -13,7 +13,7 @@ Status: in progress on branch `fix/give-all-cheeses`.
 
 * [x] T1: `web/js/upsidedown/demogorgonzola.js` CHEESE/CHEESES handling; scenario in `upsidedown-demogorgonzola.feature`.
 * [x] T2: `::win` and planner use `give cheeses to dg` (198 steps, 1236/1236); DESIGN updated.
-* [ ] T3: grotto rename.
-* [ ] T4: stamp, suite, triad, PR, merge.
+* [x] T3: CHEESE GROTTO is now LIVAROT GROTTO (display name, text, hints, docs, 2D roomdata); room id `cheeseGrotto` and the "cheese grotto" alias remain.
+* [x] T4: stamp, suite, triad, PR, merge.
 
 <!-- end 2026-11-08_plan_inProgress_GiveCheeses.md -->

@@ -28,7 +28,7 @@ const LABELS = {
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
   roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
   treeFort: "Tree Fort", secretChamber: "Hidden Rm",
-  waylampClearing: "Waylamp", cheeseGrotto: "Cheese Grotto", avClubDen: "AV Club",
+  waylampClearing: "Waylamp", cheeseGrotto: "Livarot Grotto", avClubDen: "AV Club",
   planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 

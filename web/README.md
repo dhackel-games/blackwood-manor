@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven. -->
 
 # Blackwood Manor
 
@@ -225,7 +225,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   MINERS' LOCKER opens onto WAYLAMP CLEARING. Opening it first awards +5 once;
   `IN LOCKER` derives that opening and then enters the realm for its existing
   +20 discovery award. `OUT` from WAYLAMP CLEARING returns to the gallery. The
-  hub's paths reach the CHEESE GROTTO, AV CLUB DEN, PLANETARIUM,
+  hub's paths reach the LIVAROT GROTTO, AV CLUB DEN, PLANETARIUM,
   MAP ROOM, SHACK, and the OAK UNDERCROFT. WINGED SHOES and a high can use
   named `FLY TO` or `FLOAT TO` travel there just as they can anywhere else.
   `COMBINE`, `SPELL`, `KICK`, `FIGHT`, `TURN`, `SET`, `START`, `POUR`, `FILL`,
