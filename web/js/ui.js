@@ -1,4 +1,4 @@
-// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// ui.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven.
 // Browser adapter. Ties core.js to the DOM terminal, handles meta-verbs
 // (save/restore/restart/quit), command history, autosave, and the "phone
 // call" screen used while you're on Gary's hint line.
@@ -42,12 +42,16 @@ let transcriptPinnedToTop = false;
 let phoneTranscriptPinnedToTop = false;
 const SYSOP_MENU_UNLOCK_KEY = "blackwood-sysop-menu-unlocked-v1";
 const LEGACY_MAGIC_MENU_UNLOCK_KEY = "blackwood-magic-menu-unlocked-v1";
+// Sysop access lasts only for this page session: every reload and every RESTART
+// asks for the password again. Older builds remembered it in localStorage, so
+// those keys are wiped on boot. The saved `sysopMenuUnlocked` game flag only
+// sizes the BACKPACK; it never grants menu access.
 let sysopMenuUnlocked = false;
 try {
-  sysopMenuUnlocked = localStorage.getItem(SYSOP_MENU_UNLOCK_KEY) === "true"
-    || localStorage.getItem(LEGACY_MAGIC_MENU_UNLOCK_KEY) === "true";
+  localStorage.removeItem(SYSOP_MENU_UNLOCK_KEY);
+  localStorage.removeItem(LEGACY_MAGIC_MENU_UNLOCK_KEY);
 } catch (error) {
-  console.warn("[sysop-menu] could not read unlock state", error);
+  console.warn("[sysop-menu] could not clear legacy unlock state", error);
 }
 
 // Mode-switch continuity: the 2D tile-map view (view2d/tilemap.html) is a
@@ -60,7 +64,7 @@ let resumedFromMode = false;
 function saveModeHandoff() {
   try {
     localStorage.setItem(MODE_HANDOFF_KEY,
-      JSON.stringify({ snapshot: game.snapshot(), history }));
+      JSON.stringify({ snapshot: game.snapshot(), history, sysopUnlocked: sysopMenuUnlocked }));
   } catch (error) {
     console.warn("[mode-switch] could not save handoff", error);
   }
@@ -110,7 +114,6 @@ const hudElement = document.getElementById("hud");
 if (Native.isMobileApp()) Native.post("content", { action: "version-banner" });
 
 let game = createGame(world);
-if (sysopMenuUnlocked) game.setFlag("sysopMenuUnlocked");
 let bugTrace = createBugTrace("page reload");
 const history = [];
 let hi = 0;
@@ -935,7 +938,7 @@ window.__contentStatus = (message) => {
 
 function newGame(origin = "restart") {
   game = createGame(world);
-  if (sysopMenuUnlocked) game.setFlag("sysopMenuUnlocked");
+  sysopMenuUnlocked = false;
   bugTrace = createBugTrace(origin);
   history.length = 0;
   hi = 0;
@@ -950,6 +953,7 @@ function restartPartTwo() {
   }
   delete game.state.flags.playerName;
   delete game.state.flags.playerNameDefaulted;
+  sysopMenuUnlocked = false;
   bugTrace = createBugTrace("Part II restart");
   history.length = 0;
   hi = 0;
@@ -1174,17 +1178,10 @@ function handle(raw) {
 
 function applySysopCommand(raw) {
   const command = String(raw || "").trim();
-  const action = sysopMenuAction(command, sysopMenuUnlocked || game.getFlag("sysopMenuUnlocked"));
+  const action = sysopMenuAction(command, sysopMenuUnlocked);
   if (!action.handled) return false;
   recordBugCommand(bugTrace, command);
   const persistedUnlock = persistSysopMenuUnlock(game, action);
-  if (action.unlocked && !sysopMenuUnlocked) {
-    try {
-      localStorage.setItem(SYSOP_MENU_UNLOCK_KEY, "true");
-    } catch (error) {
-      console.warn("[sysop-menu] could not save unlock state", error);
-    }
-  }
   sysopMenuUnlocked = action.unlocked;
   if (persistedUnlock) {
     saveGame(game);
@@ -1386,6 +1383,7 @@ if (modeHandoff && modeHandoff.snapshot) {
   try { game.restore(modeHandoff.snapshot); } catch (error) {
     console.warn("[mode-switch] restore failed", error);
   }
+  sysopMenuUnlocked = modeHandoff.sysopUnlocked === true;
   if (Array.isArray(modeHandoff.history)) {
     history.length = 0;
     history.push(...modeHandoff.history);
@@ -1460,3 +1458,5 @@ function refreshIntroBanner() {
 }
 
 // Demo/testing helper: index.html?call auto-dials Gary after naming.
+
+// end ui.js

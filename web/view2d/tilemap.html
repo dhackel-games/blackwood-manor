@@ -1,4 +1,4 @@
-<!-- tilemap.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.109:acoven. -->
+<!-- tilemap.html. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -830,13 +830,15 @@
   function playerName() { return (game && game.state.flags && game.state.flags.playerName) || null; }
   function playerLabel() { return playerName() || "You"; }
   // Sysop "::" menu — the same back-office shortcuts the text game exposes.
-  // Loaded live (like the engine) so a failure degrades gracefully. The unlock
-  // state is shared with the text game via the same localStorage key.
+  // Loaded live (like the engine) so a failure degrades gracefully. Access lasts
+  // only for this page session (reload and RESTART re-lock it); a mode switch
+  // carries it across in the one-shot handoff. Legacy stored unlocks are wiped.
   let sysop = null;
-  const SYSOP_UNLOCK_KEY = "blackwood-sysop-menu-unlocked-v1";
   let sysopUnlocked = false;
-  try { sysopUnlocked = localStorage.getItem(SYSOP_UNLOCK_KEY) === "true"; }
-  catch (e) { /* private mode — stay locked */ }
+  try {
+    localStorage.removeItem("blackwood-sysop-menu-unlocked-v1");
+    localStorage.removeItem("blackwood-magic-menu-unlocked-v1");
+  } catch (e) { /* private mode */ }
   (async () => {
     try {
       const [{ world }, core, sysopMod, { parse }, saveMod] = await Promise.all([
@@ -854,6 +856,7 @@
       const handoff = takeModeHandoff();
       if (handoff && handoff.snapshot) {
         try { game.restore(handoff.snapshot); } catch (e) { console.warn("restore failed", e); }
+        sysopUnlocked = handoff.sysopUnlocked === true;
         history = Array.isArray(handoff.history) ? handoff.history.slice() : [];
         gary = (game.state.room && graph.home.has(game.state.room)) ? game.state.room : START;
         seen.add(gary); focusId = gary; recenter = true;
@@ -879,7 +882,7 @@
       if (!game) return;
       game.state.room = gary;   // resume the text game right where Gary stands
       localStorage.setItem(MODE_HANDOFF_KEY,
-        JSON.stringify({ snapshot: game.snapshot(), history }));
+        JSON.stringify({ snapshot: game.snapshot(), history, sysopUnlocked }));
     } catch (e) { console.warn("could not save handoff", e); }
   }
   function takeModeHandoff() {
@@ -1852,9 +1855,6 @@
     if (!sysop) { msg = "The back-office menu isn't loaded yet — try again in a moment."; render(); return; }
     const action = sysop.sysopMenuAction(command, sysopUnlocked);
     if (!action.handled) { msg = `You don't know how to "${command}".`; render(); return; }
-    if (action.unlocked && !sysopUnlocked) {
-      try { localStorage.setItem(SYSOP_UNLOCK_KEY, "true"); } catch (e) { /* private mode */ }
-    }
     sysopUnlocked = action.unlocked;
     if (action.showMenu) {
       msg = sysop.renderSysopMenu() + "\n\nType a ::command to watch it auto-run here in 2D.";
@@ -1957,6 +1957,7 @@
     stopTour(); stopAuto();
     if (!createGameRef || !worldRef) { reset(); return; }
     game = createGameRef(worldRef);
+    sysopUnlocked = false;
     knownCarried = null;
     if (part === 2 && game.restoreCheckpoint) {
       try { game.restoreCheckpoint("partII"); } catch (e) { /* no checkpoint yet */ }
@@ -2531,3 +2532,5 @@
 </script>
 </body>
 </html>
+
+<!-- end tilemap.html -->

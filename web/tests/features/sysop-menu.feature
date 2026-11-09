@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -20,7 +20,10 @@ Feature: Maintained sysop shortcuts
     And public INFO does not reveal sysop commands
     And no sysop command uses the removed su command
 
-  Scenario Outline: Any sysop password expands a worn backpack and survives restore
+  Scenario: Sysop access never survives a reload or restart
+    Then sysop access is session-only in the text game and the 2D view
+
+  Scenario Outline: Any sysop password expands a worn backpack, and the expansion survives restore
     Given the backpack is worn
     Then the inventory capacity is 36
     And the inventory HUD shows "🎒" with "0/36"

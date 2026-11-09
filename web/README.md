@@ -1,4 +1,4 @@
-<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot. -->
+<!-- README.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Blackwood Manor
 
@@ -192,8 +192,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   DEEP MINING SHAFT counts as one carried item and leaves capacity at 6 until
   worn. `WEAR BACKPACK` or `USE BACKPACK` raises capacity to 36 and changes the
   indicator to `🎒 used/36`. Unlocking the sysop menu with `::werdna`, `::evad`,
-  or `::divad` is saved with the game; from then on a worn BACKPACK holds 100
-  and the HUD reads `🎒 used/100`. Without a worn BACKPACK, capacity remains 6.
+  or `::divad` expands the BACKPACK for that saved game; from then on a worn
+  BACKPACK holds 100 and the HUD reads `🎒 used/100`. Menu access itself lasts
+  only for the current page session: every reload or RESTART asks for the
+  password again (switching between text and 2D keeps it). Without a worn BACKPACK, capacity remains 6.
 - **Implicit actions:** if a visible portable item must be held to `read`, `eat`,
   `drink`, `wear`, or `use` it, the game runs the normal TAKE pipeline first,
   including content handlers, capacity checks, and its one-time pickup reward,
@@ -406,3 +408,5 @@ Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
 
 After any change, **run `npm test`** — and update the gameplay feature and steps
 if you changed the solution path.
+
+<!-- end README.md -->
