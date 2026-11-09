@@ -1,8 +1,8 @@
-<!-- 2026-11-08_plan_inProgress_GargoylePayoffs.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
+<!-- 2026-11-08_plan_done_GargoylePayoffs.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
 
 # Gargoyle Payoffs: master orchestration
 
-Status: in progress on branch `fix/gargoyle-payoffs`.
+Status: done. Merged as PR #11 (cbb64de); Pages serves CONTENT_VERSION 20261108003.
 
 ## Stated goals
 
@@ -16,6 +16,6 @@ Status: in progress on branch `fix/gargoyle-payoffs`.
 * [x] T3: feature assertions plus a pool-wide scenario that every line comes to life, acts, apologizes, and returns to stone.
 * [x] T4: DESIGN §12.37.2.
 * [x] T5: content stamp, full suite, ARCH/QUALITY/PROCESS triad plus one fix pass.
-* [ ] T6: PR (reviewer `none`), CI `web-tests`, merge, Pages verify, reload notice.
+* [x] T6: PR (reviewer `none`), CI `web-tests`, merge, Pages verify, reload notice.
 
-<!-- end 2026-11-08_plan_inProgress_GargoylePayoffs.md -->
+<!-- end 2026-11-08_plan_done_GargoylePayoffs.md -->
