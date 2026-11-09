@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -1300,9 +1300,8 @@ Then("every hidden prompt uses globally unique one-word targets", function () {
 
 Then("hidden shortcuts replace the editable command prompt without executing", function () {
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked \|\| game\.getFlag\("sysopMenuUnlocked"\)\)/);
+  assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked\)/);
   assert.match(ui, /persistSysopMenuUnlock\(game, action\)/);
-  assert.match(ui, /localStorage\.setItem\(SYSOP_MENU_UNLOCK_KEY, "true"\)/);
   assert.match(ui, /if \(action\.showMenu\)/);
   assert.match(ui, /mainEntry\.setValue\(expandSysopCommand\(action\.shortcut, game\)\)/);
   assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
@@ -1354,6 +1353,24 @@ Then("item {string} is absent from game state", function (item) {
 
 Then("item {string} recognizes name {string}", function (item, name) {
   assert.ok(this.game.item(item)?.names?.includes(name), `${item} does not recognize ${name}`);
+});
+
+Then("sysop access is session-only in the text game and the 2D view", function () {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  const map = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
+  for (const [name, src] of [["ui.js", ui], ["tilemap.html", map]]) {
+    assert.doesNotMatch(src, /localStorage\.setItem\([^)]*(SYSOP|sysop|magic-menu)/, `${name} must not remember the unlock`);
+    assert.doesNotMatch(src, /localStorage\.getItem\([^)]*(SYSOP|sysop|MAGIC|magic-menu)/, `${name} must not read a remembered unlock`);
+    assert.doesNotMatch(src, /sysopMenuAction\([^;]*getFlag/, `${name}: the saved game flag must not open the menu`);
+    assert.match(src, /removeItem\((SYSOP_MENU_UNLOCK_KEY|"blackwood-sysop-menu-unlocked-v1")\)/, `${name} wipes the legacy unlock`);
+    assert.match(src, /removeItem\((LEGACY_MAGIC_MENU_UNLOCK_KEY|"blackwood-magic-menu-unlocked-v1")\)/, `${name} wipes the older unlock`);
+  }
+  const fnBody = (src, name) => src.slice(src.indexOf(`function ${name}(`), src.indexOf("\n}", src.indexOf(`function ${name}(`)));
+  assert.match(fnBody(ui, "newGame"), /sysopMenuUnlocked = false;/);
+  assert.match(fnBody(ui, "restartPartTwo"), /sysopMenuUnlocked = false;/);
+  assert.match(map.slice(map.indexOf("function restartGame("), map.indexOf("function restartGame(") + 600), /sysopUnlocked = false;/);
+  assert.match(ui, /sysopMenuUnlocked = modeHandoff\.sysopUnlocked === true;/);
+  assert.match(map, /sysopUnlocked = handoff\.sysopUnlocked === true;/);
 });
 
 Then("public INFO does not reveal sysop commands", function () {

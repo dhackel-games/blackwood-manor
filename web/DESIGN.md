@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -281,7 +281,9 @@ heirloom deposit persists the forfeit, so neither partial seating nor a later
 bulk transfer can farm the award. The BACKPACK normally carries 36 items, the
 measured all-in delivery peak: twenty-four heirlooms plus twelve required tools.
 After `::werdna`, `::evad`, or `::divad` unlocks the sysop menu, a worn BACKPACK
-carries 100; that unlock is saved in game state. The RELIQUARY's 36 places leave
+carries 100; that expansion is saved in game state. Sysop menu access is
+session-only: reload and RESTART re-lock it, the saved flag never opens the
+menu, and only the one-shot text/2D mode handoff carries it across. The RELIQUARY's 36 places leave
 those tools room beside its twenty-four fitted recesses. The existing single MATCH already lights the CANDLE (verified in
 `fire-food.feature`); no behavior changed. Body fire remains the BRAZIER's
 highest-paying method at +30 versus +10 for a candle or candelabra, including
