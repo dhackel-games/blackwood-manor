@@ -1,4 +1,4 @@
-// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
 
 const LOWER_GEMS = Object.freeze({
   magentaGem: { label: "MAGENTA GEM", slot: "middle" },
@@ -47,6 +47,14 @@ function slotContents(ctx) {
   const slots = lowerPanelSlots(ctx);
   return ["top", "middle", "bottom"].map((slot) =>
     `${slot.toUpperCase()} SLOT: ${slots[slot] ? LOWER_GEMS[slots[slot]].label : "EMPTY"}`).join("\n");
+}
+
+function lowerSlotSummary(ctx) {
+  const slots = lowerPanelSlots(ctx);
+  const parts = ["top", "middle", "bottom"].map((slot) => slots[slot]
+    ? `the ${slot.toUpperCase()} SLOT holds the ${LOWER_GEMS[slots[slot]].label}`
+    : `the ${slot.toUpperCase()} SLOT is EMPTY`);
+  return `In the LOWER PANEL, ${parts[0]}, ${parts[1]}, and ${parts[2]}.`;
 }
 
 function describeLowerPanel(ctx) {
@@ -261,16 +269,17 @@ const content = {
     below: {
       desc(ctx) {
         const shaft = ctx.getFlag("oak:lowerPanelAligned")
-          ? "The shaft continues UP, and a PLATFORM now visits this BELOW stop."
-          : "The shaft continues UP, but no lift stops here yet.";
-        return "The OAK UNDERCROFT is a chamber hollowed among roots as thick as bridge cables. A LOWER PANEL holds three vertical slots beneath a dangling PLATFORM shaft. NORTH returns to the WAYLAMP CLEARING. " +
+          ? "The PLATFORM now stops here on its way between the GROUND and the TREE FORT ABOVE."
+          : "No PLATFORM stops here yet; its ropes hang far above.";
+        return "The OAK UNDERCROFT is the level directly beneath the GREAT OAK, a chamber hollowed among the deep roots under its massive STUMP-like base. The PLATFORM shaft runs straight UP through the roots to the GREAT OAK and on to the TREE FORT. " +
+          `A LOWER PANEL with three vertical slots stands beside the shaft. ${lowerSlotSummary(ctx)} NORTH returns to the WAYLAMP CLEARING. ` +
           shaft;
       },
     },
   },
   items: {
     lowerPanel: {
-      roomDesc: "A LOWER PANEL with three vertical slots stands among the roots.",
+      roomDesc: (ctx) => lowerSlotSummary(ctx),
       desc: describeLowerPanel,
     },
     magentaGem: {

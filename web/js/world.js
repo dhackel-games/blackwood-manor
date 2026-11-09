@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
 // Blackwood Manor content and rules. Shared portable-reward dispatch lives in
 // core.js and commands.js. See README.md for the "how to add a room" guide.
 //
@@ -2583,6 +2583,20 @@ function describeOakPanel(ctx) {
       : "The gems can be TAKEN and PLACED into the TOP, MIDDLE, or BOTTOM SLOT.");
 }
 
+function oakSlotSummary(ctx) {
+  const slots = oakGemSlots(ctx);
+  const parts = ["top", "middle", "bottom"].map((slot) => slots[slot]
+    ? `the ${slot.toUpperCase()} SLOT holds the ${OAK_GEMS[slots[slot]].label}`
+    : `the ${slot.toUpperCase()} SLOT is EMPTY`);
+  return `In the PANEL, ${parts[0]}, ${parts[1]}, and ${parts[2]}.`;
+}
+
+function greatOakRoots(ctx) {
+  return ctx.getFlag("oak:lowerPanelAligned")
+    ? "The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to the OAK UNDERCROFT, one level BELOW."
+    : "The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth around a dark shaft that drops one level BELOW.";
+}
+
 function takeOakGem(ctx, cmd) {
   if (ctx.getFlag("oakLightAligned")) return "The focused sunlight has fused all three gems into their slots.";
   const gem = cmd.itemId ? ctx.item(cmd.itemId) : ctx.find(cmd.dobj);
@@ -2656,9 +2670,9 @@ function oakLiftMotion(from, to) {
     return "The beam shifts. The PLATFORM descends through the leaves and settles among the GREAT OAK'S roots.";
   }
   if (from === "greatOak" && to === "below") {
-    return "The PLATFORM slips under the GREAT OAK'S roots and settles in the OAK UNDERCROFT.";
+    return "The PLATFORM sinks between the GREAT OAK'S deep roots, down the root shaft, and settles one level BELOW in the OAK UNDERCROFT.";
   }
-  return "The ropes tug the PLATFORM up through the roots until it settles beside the GREAT OAK.";
+  return "The ropes haul the PLATFORM up the root shaft until it settles at the base of the GREAT OAK.";
 }
 
 function leaveOakPlatform(ctx, cmd) {
@@ -4496,15 +4510,10 @@ const logicWorld = {
           : ctx.getFlag("oakLightAligned")
             ? " The PLATFORM is currently somewhere above the branches."
             : " The overhead PULLEY hangs far beyond reach.";
-        const thirdStop = ctx.getFlag("oak:lowerPanelAligned")
-          ? " The PLATFORM'S ropes now vanish beneath the roots to a third stop."
-          : "";
-        return describeOakPanel(ctx) + platform + thirdStop;
+        return describeOakPanel(ctx) + platform;
       },
       desc(ctx) {
-        return ctx.getFlag("oak:lowerPanelAligned")
-          ? "The PLATFORM'S ropes now vanish beneath the roots to a third stop."
-          : undefined;
+        return `${content.rooms.greatOak.desc} ${oakSlotSummary(ctx)} ${greatOakRoots(ctx)}`;
       },
       interceptImplicitNavigation: true,
       extraDirections: (ctx) => ctx.roomOf("oakPlatform") === "greatOak" ? ["in"] : [],
@@ -4532,7 +4541,7 @@ const logicWorld = {
       ].join("\n"),
       desc(ctx) {
         return ctx.getFlag("oak:lowerPanelAligned")
-          ? "The PLATFORM now visits a chamber under the roots as well."
+          ? `${content.rooms.treeFort.desc} The PLATFORM now also sinks past the GREAT OAK'S roots to the OAK UNDERCROFT, one level BELOW.`
           : undefined;
       },
       interceptImplicitNavigation: true,
@@ -5109,7 +5118,7 @@ const logicWorld = {
       loc: null, fixed: true, scenery: true,
       desc(ctx) {
         return ctx.getFlag("oak:lowerPanelAligned")
-          ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It visits the GREAT OAK'S roots, the TREE FORT, and the OAK UNDERCROFT below."
+          ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and the OAK UNDERCROFT one level BELOW among the deep roots."
           : undefined;
       },
       on: { enter: enterOakPlatform, climb: enterOakPlatform },
