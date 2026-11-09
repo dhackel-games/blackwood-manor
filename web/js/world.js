@@ -5126,7 +5126,11 @@ const logicWorld = {
       loc: null, fixed: true, scenery: true,
       desc(ctx) {
         return ctx.getFlag("oak:lowerPanelAligned")
-          ? `A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and ${oakLevelsKnown(ctx) ? "the OAK UNDERCROFT" : "a third stop"} BELOW among the deep roots.`
+          ? (oakLevelsKnown(ctx)
+            ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and the OAK UNDERCROFT BELOW among the deep roots."
+            : ctx.state.room === "below"
+              ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It rises out of the shaft, stops here, and drops DOWN again to somewhere you can't quite make out."
+              : "A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and a third stop BELOW that you can't quite make out.")
           : undefined;
       },
       on: { enter: enterOakPlatform, climb: enterOakPlatform },

@@ -159,6 +159,12 @@ Feature: The mirrored gem panel and Blackwood tree fort
     Then the output contains "as if a giant oak had been planted upside down"
     And the output does not contain "GREAT OAK"
     And the output does not contain "TREE FORT"
+    Given flag "oak:lowerPanelAligned" is set
+    And item "oakPlatform" rests in room "below"
+    When I send "examine platform"
+    Then the output contains "drops DOWN again to somewhere you can't quite make out"
+    And the output does not contain "GREAT OAK"
+    And the output does not contain "TREE FORT"
 
   Scenario: The undercroft lists what each LOWER PANEL slot holds
     Given the player is in room "below"
