@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -1523,7 +1523,7 @@ Then("the static 2D rooms show the redesigned and Lane 8 item placements", funct
     { id: "stream", label: "stream", kind: "scenery" },
     { id: "upsideDownCampfire", label: "upside-down campfire", kind: "scenery" },
   ]);
-  entries("cheeseGrotto", [
+  entries("grotto", [
     { id: "demogorgonzola", label: "demogorgonzola", kind: "fixture" },
   ]);
   entries("avClubDen", [

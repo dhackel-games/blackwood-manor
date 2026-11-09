@@ -1,4 +1,4 @@
-// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven.
+// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 import { pathToFileURL } from "node:url";
 import { createGame } from "../js/core.js";
 import { world } from "../js/world.js";
@@ -263,9 +263,8 @@ const TASKS = [
     commands: ["take magenta", "take yellow", "put yellow in top slot",
       "put magenta in middle slot", "put cyan in bottom slot"],
     grants: { "oak:lowerPanelAligned": true } },
-  { id: "grotto", room: "cheeseGrotto", dependsOn: ["kitchenBasics"],
-    commands: ["give limburger to dg", "give epoisses to dg",
-      "give munster to dg", "take rind"] },
+  { id: "grotto", room: "grotto", dependsOn: ["kitchenBasics"],
+    commands: ["give cheeses to dg", "take rind"] },
   { id: "shack", room: "shack",
     commands: ["spell fart", "take all"] },
   { id: "radio", room: "avClubDen",

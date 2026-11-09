@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 import { RADIO_SONGS } from "./upsidedown/radio-clues.js?v=source";
 
@@ -141,7 +141,7 @@ const WIN = [
   "take pieceb", "east", "south", "give apple to dragon", "east", "east", "in locker",
   "fill jug", "pour jug on fire", "take cyan", "west", "spell fart", "take all",
   "east", "north",
-  "give limburger to dg", "give epoisses to dg", "give munster to dg", "take rind",
+  "give cheeses to dg", "take rind",
   "south", "south", "{{winoak}}", "north", "east", "turn on cabinet radio", "{{winradio}}", "take transistor", "north",
   "say 1", "take eyepiece", "east", "read starmap", "west", "say 4",
   "ext self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",

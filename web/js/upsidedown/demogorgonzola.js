@@ -1,4 +1,4 @@
-// demogorgonzola.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// demogorgonzola.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 const CHEESE_IDS = ["limburgerCheese", "epoissesCheese", "munsterCheese"];
 const UNSAFE_VERBS = [
@@ -32,20 +32,35 @@ function swallow(ctx) {
     ctx.describeRoom();
 }
 
+const ONE_CHEESE = new Set(["cheese", "acheese", "onecheese", "stinkycheese"]);
+const ALL_CHEESES = new Set(["cheeses", "allcheese", "allcheeses", "allthecheeses", "stinkycheeses"]);
+
+function fedMessage(ctx) {
+  return ctx.roomOf("demogorgonzolaRind") === "grotto"
+    ? "All three cheeses have done their work. The RIND is on the grotto floor."
+    : "All three cheeses have done their work. The RIND has already been claimed.";
+}
+
 function feedDemogorgonzola(ctx, cmd) {
+  const phrase = normalized(cmd.dobj);
+  if (ONE_CHEESE.has(phrase) || ALL_CHEESES.has(phrase)) {
+    if (ctx.getFlag("realm:demoFed")) return fedMessage(ctx);
+    const held = CHEESE_IDS.filter((id) => ctx.roomOf(id) !== null && ctx.has(id));
+    if (!held.length) return "Bring the CHEESE here in your own hands first.";
+    const batch = ALL_CHEESES.has(phrase) ? held : held.slice(0, 1);
+    return batch.map((id) => feedCheese(ctx, id)).join("\n");
+  }
   const id = cheeseId(ctx, cmd.dobj);
   if (!id) return swallow(ctx);
-  if (ctx.getFlag("realm:demoFed")) {
-    const rindOnFloor = ctx.roomOf("demogorgonzolaRind") === "cheeseGrotto";
-    return rindOnFloor
-      ? "All three cheeses have done their work. The RIND is on the grotto floor."
-      : "All three cheeses have done their work. The RIND has already been claimed.";
-  }
+  if (ctx.getFlag("realm:demoFed")) return fedMessage(ctx);
   if (ctx.roomOf(id) === null) {
     return "That cheese is already in its stomach. The beast wants a different stink.";
   }
   if (!ctx.has(id)) return "Bring the CHEESE here in your own hands first.";
+  return feedCheese(ctx, id);
+}
 
+function feedCheese(ctx, id) {
   const cheese = ctx.item(id);
   const use = ctx.awardUse(cheese);
   ctx.destroy(id);
@@ -55,7 +70,7 @@ function feedDemogorgonzola(ctx, cmd) {
   }
 
   ctx.setFlag("realm:demoFed");
-  ctx.moveItem("demogorgonzolaRind", "cheeseGrotto");
+  ctx.moveItem("demogorgonzolaRind", "grotto");
   const points = ctx.awardProgress("demoFed");
   return "The last cheese disappears. DEMOGORGONZOLA'S face opens petal by petal like a ghastly flower; it spits out a DEMOGORGONZOLA RIND, bows with its entire throat, and waits for more." +
     (points ? ` (+${points})` : "") + use;
@@ -73,7 +88,7 @@ const rooms = {};
 const items = {
   demogorgonzola: {
     names: ["demogorgonzola", "demo", "monster", "cheese monster", "creature"],
-    loc: "cheeseGrotto",
+    loc: "grotto",
     fixed: true,
     on: {
       give: feedDemogorgonzola,
@@ -97,13 +112,13 @@ const items = {
 };
 const content = {
   rooms: {
-    cheeseGrotto: {
-      name: "Cheese Grotto",
+    grotto: {
+      name: "Livarot Grotto",
       desc(ctx) {
         const creature = ctx.getFlag("realm:demoFed")
           ? "DEMOGORGONZOLA squats beneath the stalactites, its face open like a very rude flower."
           : "DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud.";
-        return `The CHEESE GROTTO smells like a locker room built inside another locker room. ${creature} The only path leads SOUTH to the WAYLAMP.`;
+        return `The LIVAROT GROTTO smells like a locker room built inside another locker room. ${creature} The only path leads SOUTH to the WAYLAMP.`;
       },
       searchDesc:
         "The creature sniffs at your pockets. Its jaws snap on a falling pebble; a stain on the stone suggests anyone poking it will be gulped whole. It looks hungry for something even smellier than itself.",
@@ -135,7 +150,7 @@ const progressAwards = {
 };
 const hints = [
   (ctx) => ({
-    topics: ["demogorgonzola", "monster", "creature", "cave", "grotto"],
+    topics: ["demogorgonzola", "monster", "creature", "cave", "grotto", "livarot"],
     done: !!ctx.getFlag("realm:demoFed"),
     text: "LOOK or SMELL, but do not touch the thing. FEED it LIMBURGER, ÉPOISSES, and MUNSTER in any order.",
   }),
@@ -143,11 +158,11 @@ const hints = [
     topics: ["rind", "demogorgonzola rind"],
     done: ctx.roomOf("demogorgonzolaRind") === "inventory"
       || ctx.roomOf("demogorgonzolaRind") === "reliquary",
-    text: "When its face opens, check the CHEESE GROTTO floor for the RIND.",
+    text: "When its face opens, check the LIVAROT GROTTO floor for the RIND.",
   }),
 ];
 const roomHooks = {
-  cheeseGrotto: {
+  grotto: {
     give(ctx, cmd) {
       return cmd.iobj ? null : feedDemogorgonzola(ctx, cmd);
     },

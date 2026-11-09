@@ -1,4 +1,4 @@
-# upsidedown-demogorgonzola.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# upsidedown-demogorgonzola.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 @lane3
 Feature: The kitchen fridge and Demogorgonzola
@@ -56,7 +56,7 @@ Feature: The kitchen fridge and Demogorgonzola
     And the game score is 5
 
   Scenario: Feeding the cheeses in one order opens the creature and awards once
-    Given the player is in room "cheeseGrotto"
+    Given the player is in room "grotto"
     And item "limburgerCheese" is carried
     And item "epoissesCheese" is carried
     And item "munsterCheese" is carried
@@ -67,14 +67,14 @@ Feature: The kitchen fridge and Demogorgonzola
     When I send "give munster to creature"
     Then the output contains "The last cheese disappears. DEMOGORGONZOLA'S face opens petal by petal like a ghastly flower"
     And flag "realm:demoFed" is true
-    And item "demogorgonzolaRind" is in "cheeseGrotto"
+    And item "demogorgonzolaRind" is in "grotto"
     And the game score is 25
     When I send "feed limburger"
     Then the output contains "All three cheeses have done their work. The RIND is on the grotto floor."
     And the game score is 25
 
   Scenario: Feeding the cheeses in another order also works
-    Given the player is in room "cheeseGrotto"
+    Given the player is in room "grotto"
     And item "limburgerCheese" is carried
     And item "epoissesCheese" is carried
     And item "munsterCheese" is carried
@@ -82,10 +82,10 @@ Feature: The kitchen fridge and Demogorgonzola
     And I send "feed limburger"
     And I send "feed epoisses"
     Then flag "realm:demoFed" is true
-    And item "demogorgonzolaRind" is in "cheeseGrotto"
+    And item "demogorgonzolaRind" is in "grotto"
 
   Scenario: DG is the canonical short name and legacy names remain accepted
-    Given the player is in room "cheeseGrotto"
+    Given the player is in room "grotto"
     And item "limburgerCheese" is carried
     And item "epoissesCheese" is carried
     And item "munsterCheese" is carried
@@ -95,8 +95,24 @@ Feature: The kitchen fridge and Demogorgonzola
     Then flag "realm:demoFed" is true
     And the game score is 25
 
+  Scenario: CHEESE feeds one held cheese at a time and CHEESES feeds them all
+    Given the player is in room "grotto"
+    And item "limburgerCheese" is carried
+    And item "epoissesCheese" is carried
+    And item "munsterCheese" is carried
+    When I send "give cheese to dg"
+    Then the output contains "(1/3)"
+    And the output does not contain "(2/3)"
+    And flag "realm:demoFed" is unset
+    When I send "give cheeses to dg"
+    Then the output contains "(2/3)"
+    And the output contains "The last cheese disappears."
+    And flag "realm:demoFed" is true
+    And the game score is 25
+    And the current room is "grotto"
+
   Scenario: The rind is a treasure heirloom with normal pickup and use rewards
-    Given the player is in room "cheeseGrotto"
+    Given the player is in room "grotto"
     And item "limburgerCheese" is carried
     And item "epoissesCheese" is carried
     And item "munsterCheese" is carried
@@ -114,7 +130,7 @@ Feature: The kitchen fridge and Demogorgonzola
     And the game score is 30
 
   Scenario Outline: Every unsafe directed interaction ejects the player with possessions intact
-    Given the player is in room "cheeseGrotto"
+    Given the player is in room "grotto"
     And item "apple" is carried
     When I send "<command>"
     Then the current room is "gate"

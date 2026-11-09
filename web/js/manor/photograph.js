@@ -1,4 +1,4 @@
-// photograph.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// photograph.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 const ROOM_IDS = [
   "gate", "garden", "hedgeMazeGate", "hedgeMazeKnot", "hedgeMazeLoop", "dragonCaveMouth",
@@ -6,7 +6,7 @@ const ROOM_IDS = [
   "greatOak", "treeFort", "porch", "grandHall", "parlor", "library", "secretChamber",
   "diningRoom", "kitchen", "wineCellar", "crypt", "landing", "nursery", "masterBedroom",
   "study", "hallBedroom", "attic", "roof", "belfry", "hiddenVault", "garysLair",
-  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "cheeseGrotto",
+  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "grotto",
   "avClubDen", "planetarium", "mapRoom", "shack", "below",
 ];
 const PIECE_IDS = ["letter", "photoPieceB", "photoPieceC", "photoPieceD"];

@@ -675,9 +675,9 @@
       }
     ]
   },
-  "cheeseGrotto": {
-    "name": "Cheese Grotto",
-    "desc": "The CHEESE GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
+  "grotto": {
+    "name": "Livarot Grotto",
+    "desc": "The LIVAROT GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
     "items": [
       {
         "id": "demogorgonzola",

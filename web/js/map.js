@@ -28,7 +28,7 @@ const LABELS = {
   attic: "Attic", wineCellar: "Cellar", crypt: "Crypt",
   roof: "Roof", belfry: "Belfry", hiddenVault: "Astral Chamber",
   treeFort: "Tree Fort", secretChamber: "Hidden Rm",
-  waylampClearing: "Waylamp", cheeseGrotto: "Cheese Grotto", avClubDen: "AV Club",
+  waylampClearing: "Waylamp", grotto: "Livarot Grotto", avClubDen: "AV Club",
   planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 
@@ -162,7 +162,7 @@ const FLOORS = [
   {
     title: "THE UPSIDE DOWN",
     rooms: [
-      { id: "cheeseGrotto", col: 1, row: 0 },
+      { id: "grotto", col: 1, row: 0 },
       { id: "planetarium", col: 2, row: 0 },
       { id: "mapRoom", col: 3, row: 0 },
       { id: "shack", col: 0, row: 1 },
@@ -171,7 +171,7 @@ const FLOORS = [
       { id: "below", col: 1, row: 2 },
     ],
     links: [
-      { a: "cheeseGrotto", b: "waylampClearing" },
+      { a: "grotto", b: "waylampClearing" },
       { a: "waylampClearing", b: "avClubDen" },
       { a: "waylampClearing", b: "shack" },
       { a: "avClubDen", b: "planetarium" },
