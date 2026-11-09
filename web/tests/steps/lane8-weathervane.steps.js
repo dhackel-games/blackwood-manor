@@ -1,4 +1,4 @@
-// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
+// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";
@@ -41,7 +41,7 @@ Given("a legacy vane save is restored", function () {
 
 Then("the migrated weathervane keeps its current identity and mutable runtime state", function () {
   const vane = this.game.item("rustedWeathervane");
-  assert.deepEqual(vane.names, ["rusted weathervane", "weathervane", "vane"]);
+  assert.deepEqual(vane.names, ["rusted weathervane", "weathervane", "vane", "rooster", "iron rooster"]);
   assert.deepEqual(vane.adjectives, ["rusted", "iron"]);
   assert.equal(vane.fixed, false);
   assert.equal(vane.takeable, true);

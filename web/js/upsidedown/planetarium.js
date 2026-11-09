@@ -1,7 +1,8 @@
-// planetarium.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+// planetarium.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
-const PROJECTOR_PROMPT = "Enter a number from 1 to 5 to pick that projection.";
-const INVALID_SELECTION = "Enter a number from 1 to 5 to pick that projection.";
+const DIAL_FLAG = "realm:projectorDial";
+const PROJECTOR_PROMPT = "Set the PROJECTOR's DIAL to a number from 1 to 5, then flick its bulb SWITCH.";
+const INVALID_SELECTION = "The DIAL only goes from 1 to 5.";
 
 const SAFE_CONSTELLATIONS = {
   1: "The dome draws a giant ladle over a tiny celery moon. Somehow the stars manage to look refrigerated.",
@@ -13,16 +14,28 @@ function projectorPrompt() {
   return PROJECTOR_PROMPT;
 }
 
-function selectionFrom(cmd) {
-  if (["say", "code", "enter"].includes(cmd.verb)) return cmd.dobj || cmd.iobj || "";
-  return cmd.iobj || "";
+function setDial(ctx, cmd) {
+  const selection = String(cmd.iobj || cmd.dobj || "").match(/\d+/)?.[0];
+  if (!selection) return PROJECTOR_PROMPT;
+  if (!/^[1-5]$/.test(selection)) return INVALID_SELECTION;
+  ctx.setFlag(DIAL_FLAG, Number(selection));
+  return `You click the DIAL to ${selection}.`;
 }
 
-function selectConstellation(ctx, cmd) {
-  const selection = selectionFrom(cmd).trim();
-  if (!/^[1-5]$/.test(selection)) return INVALID_SELECTION;
+function describeDial(ctx) {
+  const setting = ctx.getFlag(DIAL_FLAG);
+  return setting
+    ? `The PROJECTOR's DIAL is numbered 1 to 5 and set to ${setting}.`
+    : "The PROJECTOR's DIAL is numbered 1 to 5; its pointer rests between numbers.";
+}
 
-  const number = Number(selection);
+function flickSwitch(ctx) {
+  const setting = ctx.getFlag(DIAL_FLAG);
+  if (!setting) return "You flick the bulb SWITCH. The bulb flickers, but the DIAL isn't set to a number, so nothing projects.";
+  return `You flick the bulb SWITCH and the PROJECTOR blazes on.\n\n${project(ctx, setting)}`;
+}
+
+function project(ctx, number) {
   if (SAFE_CONSTELLATIONS[number]) {
     let result = SAFE_CONSTELLATIONS[number];
     if (!ctx.getFlag("realm:eyepieceDropped")) {
@@ -49,12 +62,13 @@ function selectConstellation(ctx, cmd) {
   ctx.setFlag("burnGrace", true);
   ctx.setFlag("selfFireAwaitingSurvival", false);
   return "A furious white star flares. Its heat lights your clothes like a badly planned torch and hurls you through the dome. " +
-    "You hit the FRONT GATE still ON FIRE with all your possessions. The GARDEN BRAZIER is one step EAST; move before the existing burn timer wins." +
+    "You hit the FRONT GATE still ON FIRE with all your possessions." +
     `\n\n${ctx.describeRoom()}`;
 }
 
 function useProjector(ctx, cmd) {
-  return cmd.iobj ? selectConstellation(ctx, cmd) : projectorPrompt();
+  if (cmd.iobj && /\d/.test(cmd.iobj)) return setDial(ctx, cmd);
+  return ctx.getFlag(DIAL_FLAG) ? flickSwitch(ctx) : projectorPrompt();
 }
 
 function useEyepiece(ctx) {
@@ -72,12 +86,28 @@ const items = {
     fixed: true,
     scenery: true,
     on: {
-      examine: projectorPrompt,
       use: useProjector,
-      start: projectorPrompt,
-      set: selectConstellation,
-      turn: selectConstellation,
+      start: useProjector,
+      on: flickSwitch,
+      set: setDial,
+      turn: setDial,
     },
+  },
+  projectorDial: {
+    names: ["dial", "projector dial", "knob"],
+    adjectives: ["projector", "numbered", "brass"],
+    loc: "planetarium",
+    fixed: true,
+    scenery: true,
+    on: { set: setDial, turn: setDial, move: setDial, examine: describeDial },
+  },
+  projectorSwitch: {
+    names: ["switch", "bulb switch", "button", "bulb button", "bulb"],
+    adjectives: ["bulb", "projector"],
+    loc: "planetarium",
+    fixed: true,
+    scenery: true,
+    on: { push: flickSwitch, on: flickSwitch, use: flickSwitch, turn: flickSwitch },
   },
   stellarMap: {
     names: ["stellar map", "star map", "chart", "map"],
@@ -109,7 +139,13 @@ const content = {
   items: {
     projector: {
       roomDesc: "A brass PROJECTOR points at the dome.",
-      desc: "A brass star PROJECTOR with a dial numbered 1 to 5. Enter a number from 1 to 5 to pick that projection.",
+      desc: (ctx) => `A brass star PROJECTOR with a numbered DIAL and a bulb SWITCH. ${describeDial(ctx)}`,
+    },
+    projectorDial: {
+      desc: describeDial,
+    },
+    projectorSwitch: {
+      desc: "A stubby bulb SWITCH on the PROJECTOR's side, waiting to be flicked.",
     },
     stellarMap: {
       roomDesc: "A STELLAR MAP rests on the lectern.",
@@ -126,6 +162,8 @@ const content = {
 const shortNames = {
   items: {
     projector: "projector",
+    projectorDial: "dial",
+    projectorSwitch: "switch",
     stellarMap: "starmap",
     goldEyepiece: "eyepiece",
   },
@@ -139,7 +177,7 @@ const hints = [
   {
     topics: ["projector", "planetarium", "dome", "number"],
     done: false,
-    text: "Enter a number from 1 to 5 to pick a projection. READ the STELLAR MAP next door to see what each number shows.",
+    text: "SET the PROJECTOR's DIAL to a number from 1 to 5, then FLICK the SWITCH. READ the STELLAR MAP next door to see what each number shows.",
   },
   {
     topics: ["stellar", "map", "chart", "map room"],
@@ -158,15 +196,7 @@ const hints = [
   }),
 ];
 
-const roomHooks = {
-  planetarium: {
-    say: selectConstellation,
-    code: selectConstellation,
-    enter(ctx, cmd) {
-      return /^\d+$/.test(String(cmd.dobj || "").trim()) ? selectConstellation(ctx, cmd) : null;
-    },
-  },
-};
+const roomHooks = {};
 
 const flavorPools = {};
 

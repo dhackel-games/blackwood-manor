@@ -1,4 +1,4 @@
-# hidden-sight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# hidden-sight.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @walkthrough @lane9
 Feature: Hidden sight parity
@@ -61,7 +61,7 @@ Feature: Hidden sight parity
     Then the output contains "A DOWN stair waits behind the bookcase"
     When I send "down"
     Then the output contains "You can see the stair behind the shelves, but the bookcase is still shut"
-    And the output contains "PULL the LEVER to open it"
+    And the output contains "the bookcase is still shut."
     When I send "pull lever"
     And I send "down"
     Then the current room is "secretChamber"

@@ -1,4 +1,4 @@
-// lane12.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// lane12.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 import assert from "node:assert/strict";
 import { Given, Then, When } from "@cucumber/cucumber";
 import { planRoute, shortestWalk, solveSmallProblem } from "../../tools/route-plan.mjs";
@@ -66,8 +66,8 @@ When("I order the safe constellation and burning ejection", function () {
     start: "planetarium", end: "gate",
     tasks: [
       { id: "eject", room: "planetarium", dependsOn: ["safe"], movesTo: "gate",
-        commands: ["say 4", "ext self"] },
-      { id: "safe", room: "planetarium", commands: ["say 1"] },
+        commands: ["set dial to 4", "push button", "ext self"] },
+      { id: "safe", room: "planetarium", commands: ["set dial to 1", "push button"] },
     ],
   });
 });

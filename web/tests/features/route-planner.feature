@@ -1,4 +1,4 @@
-# route-planner.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# route-planner.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @unit
 Feature: Development-only route planner
@@ -77,7 +77,7 @@ Feature: Development-only route planner
     When I order the safe constellation and burning ejection
     Then the planned task order is "safe, eject"
     And the planned task route has 1 room transition
-    And the planned task commands are "say 1; say 4; ext self"
+    And the planned task commands are "set dial to 1; push button; set dial to 4; push button; ext self"
 
   Scenario: The full sweep scores every portable and deposits every heirloom at once
     When I plan the complete Part I sweep

@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 // Blackwood Manor content and rules. Shared portable-reward dispatch lives in
 // core.js and commands.js. See README.md for the "how to add a room" guide.
 //
@@ -16,6 +16,7 @@
 
 import { MAP_MARK, renderMap } from "./map.js?v=source";
 import { composeWorld } from "./compose.js?v=source";
+import { fillGemSlots, fillOrderText, isTakeGems, takeAllGems } from "./gem-slots.js?v=source";
 import { content } from "./world.content.js?v=source";
 import { pathToRoom } from "./sysop-menu.js?v=source";
 import upsideDown from "./upsidedown/index.js?v=source";
@@ -2619,7 +2620,38 @@ function takeOakGem(ctx, cmd) {
   return `You lift the ${OAK_GEMS[gem.id].label} from the ${slot.toUpperCase()} SLOT.`;
 }
 
+function oakPanel(ctx) {
+  return {
+    codes: {
+      greenGlassStone: ["ruby", "red", "r"],
+      emberStone: ["emerald", "green", "e", "g"],
+      blueGlassStone: ["sapphire", "blue", "s", "b"],
+    },
+    labels: Object.fromEntries(Object.entries(OAK_GEMS).map(([id, gem]) => [id, gem.label])),
+    alignedMessage: () => ctx.getFlag("oakLightAligned")
+      ? "The focused sunlight has fused all three gems into their slots."
+      : null,
+    seatedIds: () => {
+      const slots = oakGemSlots(ctx);
+      return ["top", "middle", "bottom"].map((slot) => slots[slot]).filter(Boolean);
+    },
+    take: (id) => takeOakGem(ctx, { itemId: id }),
+    put: (id, slot) => putOakGem(ctx, { dobj: ctx.item(id).names[0], iobj: `${slot} slot` }),
+  };
+}
+
+function oakBulkFill(ctx, cmd) {
+  const order = fillOrderText(cmd);
+  return order === null ? null : fillGemSlots(ctx, oakPanel(ctx), order);
+}
+
+function oakTakeGems(ctx, cmd) {
+  return isTakeGems(cmd) ? takeAllGems(ctx, oakPanel(ctx)) : null;
+}
+
 function putOakGem(ctx, cmd) {
+  const bulk = oakBulkFill(ctx, cmd);
+  if (bulk) return bulk;
   const target = String(cmd.iobj || "").toLowerCase();
   const explicitSlot = /\b(top|middle|bottom)(?:\s+(?:slot|hole))?\b/.exec(target)?.[1];
   const targetsPanel = /\b(panel|mechanism|slots?|holes?|oak)\b/.test(target);
@@ -4534,6 +4566,8 @@ const logicWorld = {
           return /\b(platform|lift)\b/i.test(cmd.dobj || "") ? enterOakPlatform(ctx) : null;
         },
         put: putOakGem,
+        fill: oakBulkFill,
+        take: oakTakeGems,
         go: oakNavigation,
       },
     },
@@ -4714,7 +4748,7 @@ const logicWorld = {
         down: { to: "secretChamber", via: "leverPulled", revealedBy: "leverPulled",
           lockedMsg(ctx) {
             return hasMushroomVision(ctx)
-              ? "You can see the stair behind the shelves, but the bookcase is still shut. PULL the LEVER to open it."
+              ? "You can see the stair behind the shelves, but the bookcase is still shut."
               : "The shelves stand solid and shut.";
           } },
       },

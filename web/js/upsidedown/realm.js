@@ -1,4 +1,4 @@
-// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 function enterRealm(ctx) {
   const locker = ctx.item("minersLocker");
@@ -134,7 +134,7 @@ const content = {
     planetarium: {
       name: "Planetarium",
       desc:
-        "A PLANETARIUM dome arches over a single brass PROJECTOR. Enter a number from 1 to 5 to pick a projection. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+        "A PLANETARIUM dome arches over a single brass PROJECTOR with a numbered DIAL and a bulb SWITCH. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
       searchDesc:
         "The PROJECTOR's dial is numbered 1 to 5.",
     },

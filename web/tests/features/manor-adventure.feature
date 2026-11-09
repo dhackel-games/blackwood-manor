@@ -1,4 +1,4 @@
-# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+# manor-adventure.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @walkthrough
 Feature: Blackwood Manor adventure
@@ -111,7 +111,8 @@ Feature: Blackwood Manor adventure
       east
       take stellar map
       west
-      say 1
+      set dial to 1
+      push button
       take eyepiece
       south
       west

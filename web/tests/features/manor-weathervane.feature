@@ -1,4 +1,4 @@
-# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
+# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @walkthrough
 Feature: Rusted weathervane and roof gargoyles
@@ -11,7 +11,7 @@ Feature: Rusted weathervane and roof gargoyles
 
   Scenario: The roof describes the fixed gargoyles and their release cost
     When I send "look"
-    Then the output contains "Four fixed GARGOYLES crouch around a RUSTED WEATHERVANE."
+    Then the output contains "Four stone GARGOYLES crouch around a RUSTED WEATHERVANE."
     And the output contains "The PUFF-CHEEKED GARGOYLE faces NORTH"
     And the output contains "The FAR-GAZING GARGOYLE faces EAST"
     And the output contains "SOUTHEAST toward the TREE FORT"
@@ -92,8 +92,9 @@ Feature: Rusted weathervane and roof gargoyles
     Then the output equals "The WEATHERVANE is bolted to its post. Face it toward the gargoyles first."
     When I send "turn vane e"
     Then the output contains "The far-gazing gargoyle grinds to life without turning around."
-    And the output contains "The vane, at least, I could set free."
-    And the output contains "its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE. (+5) (+5)"
+    And the output contains "You, little rooster, I can set free."
+    And the output contains "the WEATHERVANE breaks off and clatters onto the slates, iron ROOSTER and all. Then the gargoyle turns back to stone, arm still pointing SOUTHEAST. (+5) (+5)"
+    And the output does not contain "TAKE"
     And flag "manor:weathervaneFreed" is set
     And flag "progressAward:weathervaneFreed" is set
     And flag "useItem:rustedWeathervane" is set

@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -331,12 +331,12 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 198 commands,
+For reference, the deterministic fresh `::win` expansion has 192 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
 GARDEN; the evaluated permanent-sight third flights to the HIDDEN VAULT and
-BELFRY take 205/74 and 206/75 steps/transitions respectively, so neither beats
+BELFRY take 199/74 and 200/75 steps/transitions respectively, so neither beats
 the selected two-flight route. Peak load is 32 against the BACKPACK's 36
 places; and exactly one
 `PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
@@ -1226,7 +1226,9 @@ save/restore retains active rounds exactly.
 
 #### 12.36.3 Planetarium
 
-The PLANETARIUM's brass PROJECTOR always asks for a number from 1 to 5. Its
+The PLANETARIUM's brass PROJECTOR has a DIAL numbered 1 to 5 and a bulb SWITCH:
+SET/TURN the DIAL, then PUSH/PRESS/FLICK/FLIP the SWITCH (or TURN ON or USE
+the PROJECTOR) to project the dialed setting. Speaking numbers does nothing. Its
 three safe fixed settings light BIG DIPPER OF RANCH, ORION'S WEDGIE, or URANUS
 MAJOR; the first safe selection awards +10 once and drops the 15-point GOLD
 EYEPIECE. The MAP ROOM's 10-point STELLAR MAP records every
@@ -1298,6 +1300,14 @@ STUMP looms overhead and the shaft drops DOWN. Neither room names the other (nor
 the TREE FORT from below) until the player has visited both; until then each
 describes only what can be seen: a shaft to a level you can't quite make out.
 
+Both gem panels share `js/gem-slots.js`: TAKE GEMS (or TAKE ALL) pulls every
+seated gem, and FILL SLOTS <order> or PUT GEMS IN SLOTS <order> seats three
+named gems TOP, MIDDLE, BOTTOM, first pulling seated gems and picking up any
+on the floor. Orders accept color words or initials with any separator
+("yellow, magenta, cyan", "y m c", "y/m/c", "y-m-c", "ymc"; RUBY/RED,
+EMERALD/GREEN, SAPPHIRE/BLUE for the oak); commas inside such an order list
+gems rather than separating commands.
+
 Before that alignment, the upper oak's GROUND/ABOVE lift remains unchanged.
 Afterward, `oak:liftBeat` drives GROUND, ABOVE, GROUND, BELOW one turn at a
 time. Riders remain aboard through every stop until OUT, so either the realm
@@ -1325,7 +1335,9 @@ and command engine contain no setting, combination, or puzzle knowledge.
 
 #### 12.37.2 Rusted Weathervane
 
-The ROOF gains four fixed gargoyles around the 10-point RUSTED WEATHERVANE.
+The ROOF gains four fixed gargoyles around the 10-point RUSTED WEATHERVANE,
+which is topped with an iron ROOSTER. The room description names them once;
+each gargoyle's own line carries its detail, and SEARCH does not repeat it.
 The puff-cheeked NORTH, nose-pinching WEST, and rear-guarding SOUTH gargoyles
 each grip its center post with one hand. Their descriptions foreshadow the
 payoff (about to burp; dreading the fart it is about to let rip; trying to hold
@@ -1336,11 +1348,11 @@ from the vane with its curled stone tail on the post and one arm pointing
 SOUTHEAST at the TREE FORT's SPYGLASS. `TURN VANE <direction>` and descriptive
 gargoyle names select a direction. Turning EAST releases the vane, grants the
 one-time +5 `weathervaneFreed` progress award, and irreversibly ends further
-turns; TAKE then earns its normal pickup award. The far-gazing gargoyle has
-its own twelve-line pool: it comes to life, muses about the lookout in the trees
-by the PRIVY or about freeing the vane, and turns back to stone. Its first line
-frees the vane; pointing the freed vane EAST on the ROOF keeps cycling the pool
-with no further award.
+turns: the gargoyle comes to life, vows to set the little rooster free, breaks
+the vane off its post with its tail, and turns back to stone. TAKE then earns
+its normal pickup award. Afterward, pointing the freed vane EAST on the ROOF
+cycles the far-gazing gargoyle's own twelve-line pool (the lookout in the trees
+by the PRIVY, the freed rooster, the horizon) with no further award.
 
 #### 12.37.3 Snuffbox
 

@@ -1,4 +1,4 @@
-// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
+// world.content.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 //
 // PLAYER-FACING PROSE for Blackwood Manor (content/logic split — backlog #9).
 //   - This file holds ONLY static text: room names, descriptions, search text,
@@ -182,7 +182,7 @@ export const content = {
         "Floor-to-ceiling shelves sag under rotting books. One shelf bears a curious brass " +
         "LEVER where a book should be. The PARLOR lies NORTH.",
       highDesc:
-        "A DOWN stair waits behind the bookcase. The shelves are still latched; PULL the LEVER to open them.",
+        "A DOWN stair waits behind the bookcase. The shelves are still latched.",
     },
 
     secretChamber: {

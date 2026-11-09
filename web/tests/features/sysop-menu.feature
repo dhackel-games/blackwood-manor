@@ -1,4 +1,4 @@
-# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven.
+# sysop-menu.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @unit
 Feature: Maintained sysop shortcuts
@@ -273,7 +273,7 @@ Feature: Maintained sysop shortcuts
   @win
   Scenario: An already-solved oak uses its physical platform instead of flying to the fort
     Given an already-solved oak has its platform at the roots
-    Then sysop command "::win" contains sequence "put cyan in bottom slot; z; z; in platform; z; out"
+    Then sysop command "::win" contains sequence "fill slots ymc; z; z; in platform; z; out"
     And sysop command "::win" contains sequence "z; z; z; in platform; z; out; t spyglass; z; z; z"
     And sysop command "::win" omits "g fort"
     When I trace sysop command "::win"
