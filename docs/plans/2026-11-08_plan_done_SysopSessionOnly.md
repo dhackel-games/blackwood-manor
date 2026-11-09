@@ -1,8 +1,8 @@
-<!-- 2026-11-08_plan_inProgress_SysopSessionOnly.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- 2026-11-08_plan_done_SysopSessionOnly.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
 
 # Sysop Session Only: master orchestration
 
-Status: in progress on branch `fix/sysop-session-only`.
+Status: done. Merged as PR #12.
 
 ## Stated goals
 
@@ -18,6 +18,6 @@ Status: in progress on branch `fix/sysop-session-only`.
 * [x] T2: the one-shot text/2D mode handoff carries the unlock so switching modes is not a reload.
 * [x] T3: regression scenario in `sysop-menu.feature`; README and DESIGN wording.
 * [x] T4: content stamp, full suite, headless reload check, ARCH/QUALITY/PROCESS triad plus one fix pass.
-* [ ] T5: PR (reviewer `none`), CI `web-tests`, merge, Pages verify, reload notice.
+* [x] T5: PR (reviewer `none`), CI `web-tests`, merge, Pages verify, reload notice.
 
-<!-- end 2026-11-08_plan_inProgress_SysopSessionOnly.md -->
+<!-- end 2026-11-08_plan_done_SysopSessionOnly.md -->
