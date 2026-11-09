@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1326,7 +1326,11 @@ from the vane with its curled stone tail on the post and one arm pointing
 SOUTHEAST at the TREE FORT's SPYGLASS. `TURN VANE <direction>` and descriptive
 gargoyle names select a direction. Turning EAST releases the vane, grants the
 one-time +5 `weathervaneFreed` progress award, and irreversibly ends further
-turns; TAKE then earns its normal pickup award.
+turns; TAKE then earns its normal pickup award. The far-gazing gargoyle has
+its own twelve-line pool: it comes to life, muses about the lookout in the trees
+by the PRIVY or about freeing the vane, and turns back to stone. Its first line
+frees the vane; pointing the freed vane EAST on the ROOF keeps cycling the pool
+with no further award.
 
 #### 12.37.3 Snuffbox
 

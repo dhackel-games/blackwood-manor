@@ -1,4 +1,4 @@
-# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
+# manor-weathervane.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
 
 @walkthrough
 Feature: Rusted weathervane and roof gargoyles
@@ -91,8 +91,9 @@ Feature: Rusted weathervane and roof gargoyles
     When I send "take vane"
     Then the output equals "The WEATHERVANE is bolted to its post. Face it toward the gargoyles first."
     When I send "turn vane e"
-    Then the output contains "For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. You, vane, I can set free."
-    And the output contains "Its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE. (+5) (+5)"
+    Then the output contains "The far-gazing gargoyle grinds to life without turning around."
+    And the output contains "The vane, at least, I could set free."
+    And the output contains "its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE. (+5) (+5)"
     And flag "manor:weathervaneFreed" is set
     And flag "progressAward:weathervaneFreed" is set
     And flag "useItem:rustedWeathervane" is set
@@ -100,6 +101,9 @@ Feature: Rusted weathervane and roof gargoyles
     And item "rustedWeathervane" is a treasure heirloom
     When I send "turn vane n"
     Then the output equals "The WEATHERVANE is free of its post. It can no longer be turned."
+    When I send "turn vane e"
+    Then the output contains "little wooden house up in the trees by the PRIVY"
+    And the game score is 10
     When I send "take rusted weathervane"
     Then the output contains "Taken. (+5)"
     And item "rustedWeathervane" is in room "inventory"

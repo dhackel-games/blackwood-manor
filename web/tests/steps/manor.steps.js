@@ -1,4 +1,4 @@
-// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven.
+// manor.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
 import assert from "node:assert";
 import { existsSync, readFileSync } from "node:fs";
 import { After, Given, Then, When } from "@cucumber/cucumber";
@@ -1622,7 +1622,7 @@ Then("every recurring flavor pool has twelve distinct entries and cycles without
     "foreshadowEarly", "foreshadowMid", "foreshadowOpen",
     "lightning", "lightningInvitations", "packageOpenings",
     "mushroomRegrowth", "dragonRebukes",
-    "gargoylePuffCheeks", "gargoyleNosePinch", "gargoyleRearGuard",
+    "gargoylePuffCheeks", "gargoyleNosePinch", "gargoyleRearGuard", "gargoyleFarGazing",
   ]);
   for (const [name, pool] of Object.entries(CYCLING_FLAVOR_POOLS)) {
     assert.equal(pool.length, 12, `${name} must have exactly twelve entries`);

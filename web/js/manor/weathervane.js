@@ -1,4 +1,4 @@
-// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
+// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
 
 const WEATHERVANE_FREED = "manor:weathervaneFreed";
 
@@ -20,6 +20,7 @@ const DESTINATIONS = {
   },
   farGazing: {
     direction: "east",
+    eastPool: "gargoyleFarGazing",
     aliases: ["far-gazing gargoyle", "east gargoyle", "east", "horizon-gazer", "horizon gazer", "gazer"],
   },
 };
@@ -57,10 +58,13 @@ function weathervaneRoomDescription(ctx) {
 }
 
 function turnWeathervane(ctx, cmd, bareDestination = null) {
-  if (ctx.getFlag(WEATHERVANE_FREED)) {
-    return "The WEATHERVANE is free of its post. It can no longer be turned.";
-  }
   const requested = bareDestination || destinationFrom(cmd.iobj);
+  if (ctx.getFlag(WEATHERVANE_FREED)) {
+    // Pointing the freed vane back at the far-gazing gargoyle keeps its pool turning.
+    return requested?.eastPool && ctx.state.room === "roof"
+      ? ctx.cycleFlavor(requested.eastPool)
+      : "The WEATHERVANE is free of its post. It can no longer be turned.";
+  }
   if (!requested) {
     return cmd.iobj
       ? "The vane has four directions: NORTH, EAST, SOUTH, WEST."
@@ -72,8 +76,8 @@ function turnWeathervane(ctx, cmd, bareDestination = null) {
     ctx.setFlag(WEATHERVANE_FREED);
     weathervane.fixed = false;
     const points = ctx.awardProgress("weathervaneFreed");
-    return "For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. You, vane, I can set free.\n\n" +
-      "Its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE." +
+    return ctx.cycleFlavor(requested.eastPool) + "\n\n" +
+      "With its last living twitch, its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE." +
       (points ? ` (+${points})` : "") + ctx.awardUse(weathervane);
   }
 
@@ -263,6 +267,20 @@ const flavorPools = {
     "It comes alive, does a frantic little dance, then SHARTS spectacularly, splattering you, the WEATHERVANE, and a passing moth. It apologizes and turns back to stone.",
     "The gargoyle wakes, releases three centuries of pressure in one brown BLAST that SPLATTERS you, then wipes your face with its free claw as an apology. It did not help. It turns back to stone.",
     "It animates, SHARTS with operatic volume, splattering you thoroughly, then bows, apologizes, and returns to solid stone with its hand clamped back over its rear.",
+  ],
+  gargoyleFarGazing: [
+    "The far-gazing gargoyle grinds to life without turning around. \"For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. The vane, at least, I could set free.\" Then it turns back to stone, arm still pointing SOUTHEAST.",
+    "Its stone shoulders crack awake. \"See that little wooden house up in the trees by the PRIVY? Somebody built a lookout there. I would give my tail to climb it.\" Its shoulders settle, and it turns back to stone.",
+    "The gargoyle stirs to life, still facing away. \"A vane should point wherever the wind wants, not where a bolt says. Go on, little vane, be free.\" It hardens back into stone.",
+    "It wakes with a sigh of gravel. \"There is a fort in the trees beyond the PRIVY. Someone up there has a SPYGLASS, and I swear they look back at me.\" The sigh trails off as it turns back to stone.",
+    "The far-gazing gargoyle comes to life just long enough to say, \"My neighbors burp, fart, and worse. I only point, and somehow I am the weird one.\" Then it turns back to stone.",
+    "It creaks to life and keeps pointing. \"Follow my arm. SOUTHEAST, past the PRIVY, up into the trees. Things are seen from there that cannot be seen from here.\" It turns back to stone mid-point.",
+    "The gargoyle wakes. \"I set the vane free so at least one of us could travel. Carry it somewhere with a better view than this gutter.\" Its voice fades as it turns back to stone.",
+    "Granite grinds as it comes to life. \"Some nights a lantern glows in that tree house near the PRIVY. I count the flickers. It is the only show in town.\" It settles back into stone.",
+    "It wakes and flicks its curled tail at the empty post. \"Even rusted, a vane belongs to the wind, not to a roof. Freedom suits it.\" Then it turns back to stone.",
+    "The far-gazing gargoyle twitches to life. \"I would turn around and say hello properly, but my neck has been stone since the Tudors.\" It turns back to stone, still facing away.",
+    "It comes to life and whispers, \"The trees by the PRIVY hide a fort, and the fort hides an eye. Climb, look, and you will see what I cannot.\" It turns back to stone.",
+    "Stone flakes from its brow as it wakes. \"One day the curse will break and I will walk SOUTHEAST until the horizon runs out. Until then, I point.\" It turns back to stone.",
   ],
 };
 
