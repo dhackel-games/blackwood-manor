@@ -1,4 +1,4 @@
-# upsidedown-shack.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# upsidedown-shack.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
 
 @walkthrough
 Feature: The Shack alphabet wall
@@ -42,17 +42,17 @@ Feature: The Shack alphabet wall
 
   Scenario: The drawing is a separately rewarded heirloom and updates SEARCH
     When I send "search"
-    Then the output contains "The drawing has enough arrows to turn a single rude noise into a road map. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
+    Then the output contains "The KID'S DRAWING shows a MONSTER with STINK FUMES pouring out of its rear end, and arrows everywhere pointing at the fumes. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
     When I send "take kid's drawing"
     Then the game score is 5
     And item "kidsDrawing" is a treasure heirloom
     When I send "search"
-    Then the output contains "The door's nail remembers a drawing covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
+    Then the output contains "The door's nail remembers a drawing of a farting monster covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
     When I send "read drawing"
-    Then the output contains "There are no written words. The arrows all accuse the same enormous fart."
+    Then the output contains "There are no written words, just the MONSTER, the green STINK FUMES blasting out of its rear end, and a swarm of arrows all pointing at the fumes."
     And the game score is 5
     When I send "use drawing"
-    Then the output contains "There are no written words. The arrows all accuse the same enormous fart."
+    Then the output contains "There are no written words, just the MONSTER, the green STINK FUMES blasting out of its rear end, and a swarm of arrows all pointing at the fumes."
     And the output does not contain "(+5)"
     And the game score is 5
 

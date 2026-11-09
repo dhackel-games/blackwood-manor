@@ -1,4 +1,4 @@
-// shack.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// shack.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
 
 const ACCEPTED_WORDS = new Set(["FART", "STINK", "CHEESE"]);
 const WALL_NAMES = new Set(["alphabet wall", "wall", "letters", "bulbs"]);
@@ -60,11 +60,11 @@ const items = {
     points: 10,
     on: {
       read(ctx) {
-        return "There are no written words. The arrows all accuse the same enormous fart." +
+        return "There are no written words, just the MONSTER, the green STINK FUMES blasting out of its rear end, and a swarm of arrows all pointing at the fumes." +
           ctx.awardUse(ctx.item("kidsDrawing"));
       },
       use(ctx) {
-        return "There are no written words. The arrows all accuse the same enormous fart." +
+        return "There are no written words, just the MONSTER, the green STINK FUMES blasting out of its rear end, and a swarm of arrows all pointing at the fumes." +
           ctx.awardUse(ctx.item("kidsDrawing"));
       },
     },
@@ -95,8 +95,8 @@ const content = {
       },
       searchDesc(ctx) {
         return drawingTaken(ctx)
-          ? "The door's nail remembers a drawing covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
-          : "The drawing has enough arrows to turn a single rude noise into a road map. The wall's bulbs twitch when someone spells on it; their colors mean nothing.";
+          ? "The door's nail remembers a drawing of a farting monster covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
+          : "The KID'S DRAWING shows a MONSTER with STINK FUMES pouring out of its rear end, and arrows everywhere pointing at the fumes. The wall's bulbs twitch when someone spells on it; their colors mean nothing.";
       },
     },
   },
@@ -106,8 +106,8 @@ const content = {
       desc: "Letters A through Z are painted on the ALPHABET WALL, one bulb per letter. No bulb color matters; the door's KID'S DRAWING is the clue.",
     },
     kidsDrawing: {
-      roomDesc: "A KID'S DRAWING hangs on the door.",
-      desc: "A crayon picture shows DEMOGORGONZOLA farting. At least nineteen arrows point at the fart, with one extra arrow pointing at an arrow. A small BM signature is squeezed into a corner.",
+      roomDesc: "A KID'S DRAWING of a MONSTER with STINK FUMES coming out of its rear end hangs on the door.",
+      desc: "A crayon drawing of a big lumpy MONSTER (it looks a lot like DEMOGORGONZOLA) bent over, with wavy green STINK FUMES pouring out of its rear end. Dozens of arrows drawn from every corner of the page all point straight at the fumes, and one extra arrow points at another arrow just to be sure. There are no words, only a small BM signature squeezed into a corner.",
     },
     purpleCrayon: {
       roomDesc: "A PURPLE CRAYON lies where the wall spat it.",
