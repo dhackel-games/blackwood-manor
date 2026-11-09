@@ -92,7 +92,7 @@ Feature: Rusted weathervane and roof gargoyles
     Then the output equals "The WEATHERVANE is bolted to its post. Face it toward the gargoyles first."
     When I send "turn vane e"
     Then the output contains "The far-gazing gargoyle grinds to life without turning around."
-    And the output contains "You, vane, I can set free."
+    And the output contains "The vane, at least, I could set free."
     And the output contains "its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE. (+5) (+5)"
     And flag "manor:weathervaneFreed" is set
     And flag "progressAward:weathervaneFreed" is set

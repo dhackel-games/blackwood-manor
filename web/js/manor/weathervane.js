@@ -269,11 +269,11 @@ const flavorPools = {
     "It animates, SHARTS with operatic volume, splattering you thoroughly, then bows, apologizes, and returns to solid stone with its hand clamped back over its rear.",
   ],
   gargoyleFarGazing: [
-    "The far-gazing gargoyle grinds to life without turning around. \"For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. You, vane, I can set free.\" Then it turns back to stone, arm still pointing SOUTHEAST.",
+    "The far-gazing gargoyle grinds to life without turning around. \"For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. The vane, at least, I could set free.\" Then it turns back to stone, arm still pointing SOUTHEAST.",
     "Its stone shoulders crack awake. \"See that little wooden house up in the trees by the PRIVY? Somebody built a lookout there. I would give my tail to climb it.\" Its shoulders settle, and it turns back to stone.",
     "The gargoyle stirs to life, still facing away. \"A vane should point wherever the wind wants, not where a bolt says. Go on, little vane, be free.\" It hardens back into stone.",
     "It wakes with a sigh of gravel. \"There is a fort in the trees beyond the PRIVY. Someone up there has a SPYGLASS, and I swear they look back at me.\" The sigh trails off as it turns back to stone.",
-    "The far-gazing gargoyle comes to life just long enough to say, \"Three of us burped, farted, and sharted at you, and somehow I am the weird one.\" Then it turns back to stone.",
+    "The far-gazing gargoyle comes to life just long enough to say, \"My neighbors burp, fart, and worse. I only point, and somehow I am the weird one.\" Then it turns back to stone.",
     "It creaks to life and keeps pointing. \"Follow my arm. SOUTHEAST, past the PRIVY, up into the trees. Things are seen from there that cannot be seen from here.\" It turns back to stone mid-point.",
     "The gargoyle wakes. \"I set the vane free so at least one of us could travel. Carry it somewhere with a better view than this gutter.\" Its voice fades as it turns back to stone.",
     "Granite grinds as it comes to life. \"Some nights a lantern glows in that tree house near the PRIVY. I count the flickers. It is the only show in town.\" It settles back into stone.",
