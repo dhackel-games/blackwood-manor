@@ -1,4 +1,4 @@
-// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
+// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
 
 const LOWER_GEMS = Object.freeze({
   magentaGem: { label: "MAGENTA GEM", slot: "middle" },
@@ -57,8 +57,12 @@ function lowerSlotSummary(ctx) {
   return `In the LOWER PANEL, ${parts[0]}, ${parts[1]}, and ${parts[2]}.`;
 }
 
+function oakLevelsKnown(ctx) {
+  return !!(ctx.getFlag("seen:greatOak") && ctx.getFlag("seen:below"));
+}
+
 function describeLowerPanel(ctx) {
-  return "An iron LOWER PANEL is set among the roots beneath the GREAT OAK. Three vertical slots face the lift shaft.\n\n" +
+  return "An iron LOWER PANEL is set among the roots beside the shaft. Three vertical slots face it.\n\n" +
     `${slotContents(ctx)}\n\n` +
     (ctx.getFlag("oak:lowerPanelAligned")
       ? "The slots hold fast; the lift now includes BELOW."
@@ -176,7 +180,7 @@ function platformAtBelow(ctx, cmd) {
 }
 
 function lookUp(ctx, cmd) {
-  if (normalized(cmd.dobj) !== "up") return null;
+  if (!["up", "down"].includes(normalized(cmd.dobj))) return null;
   if (!ctx.getFlag("oak:lowerPanelAligned")) {
     return ctx.getFlag("oakLightAligned")
       ? "The PLATFORM travels between GROUND and ABOVE, but it does not stop BELOW. The LOWER PANEL has not been aligned."
@@ -268,10 +272,16 @@ const content = {
   rooms: {
     below: {
       desc(ctx) {
+        const known = oakLevelsKnown(ctx);
         const shaft = ctx.getFlag("oak:lowerPanelAligned")
-          ? "The PLATFORM now stops here on its way between the GROUND and the TREE FORT ABOVE."
-          : "No PLATFORM stops here yet; its ropes hang far above.";
-        return "The OAK UNDERCROFT is the level directly beneath the GREAT OAK, a chamber hollowed among the deep roots under its massive STUMP-like base. The PLATFORM shaft runs straight UP through the roots to the GREAT OAK and on to the TREE FORT. " +
+          ? (known
+            ? "A PLATFORM now rises out of the shaft and stops here on its rounds to the GREAT OAK and its TREE FORT."
+            : "A PLATFORM now rises out of the shaft and stops here on its rounds.")
+          : "No PLATFORM stops here yet; its ropes disappear down the shaft.";
+        const view = known
+          ? "The OAK UNDERCROFT hangs among the exposed roots of the GREAT OAK, turned upside down in this world: its colossal STUMP looms overhead, and the shaft between the roots drops DOWN to the GREAT OAK and, past its crown, the TREE FORT. "
+          : "The OAK UNDERCROFT is a chamber among enormous exposed roots fanning out from a colossal STUMP overhead, as if a giant oak had been planted upside down. A shaft drops DOWN between the roots to somewhere you can't quite make out. ";
+        return view +
           `A LOWER PANEL with three vertical slots stands beside the shaft. ${lowerSlotSummary(ctx)} NORTH returns to the WAYLAMP CLEARING. ` +
           shaft;
       },

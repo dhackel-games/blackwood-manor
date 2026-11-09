@@ -1,4 +1,4 @@
-// campfire.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
+// campfire.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
 
 function normalized(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -37,7 +37,7 @@ function roomDescription(ctx) {
     : "An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it.";
   return "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. " +
     `${fire} The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, ` +
-    "WEST to a rickety SHACK, and SOUTH beneath the GREAT OAK.";
+    "WEST to a rickety SHACK, and SOUTH down among enormous exposed roots.";
 }
 
 function roomSearchDescription(ctx) {

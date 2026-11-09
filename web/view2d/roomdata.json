@@ -661,7 +661,7 @@
   },
   "waylampClearing": {
     "name": "Waylamp Clearing",
-    "desc": "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH beneath the GREAT OAK.",
+    "desc": "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH down among enormous exposed roots.",
     "items": [
       {
         "id": "stream",
@@ -742,7 +742,7 @@
   },
   "below": {
     "name": "Oak Undercroft",
-    "desc": "The OAK UNDERCROFT is a chamber hollowed among roots as thick as bridge cables. A LOWER PANEL holds three vertical slots beneath a dangling PLATFORM shaft. NORTH returns to the WAYLAMP CLEARING. The shaft continues UP, but no lift stops here yet.",
+    "desc": "The OAK UNDERCROFT is a chamber among enormous exposed roots fanning out from a colossal STUMP overhead, as if a giant oak had been planted upside down. A shaft drops DOWN between the roots to somewhere you can't quite make out. A LOWER PANEL with three vertical slots stands beside the shaft. NORTH returns to the WAYLAMP CLEARING.",
     "items": [
       {
         "id": "magentaGem",

@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1291,9 +1291,12 @@ while bulk transfers are refused. Alignment awards +10 once, sets
 `oak:lowerPanelAligned`, and activates BELOW immediately without a realm-wide
 puzzle gate or an in-game order hint. Both the GREAT OAK and the OAK UNDERCROFT
 room descriptions state what each of their slots holds. The UNDERCROFT is the
-level directly beneath the GREAT OAK: the trunk ends in a STUMP-like base with
-deep roots, and one PLATFORM shaft runs from the TREE FORT (ABOVE) through the
-GROUND stop down between the roots to BELOW.
+level beneath the GREAT OAK: the trunk ends in a STUMP-like base with deep
+roots, and one PLATFORM shaft runs from the TREE FORT (ABOVE) through the GROUND
+stop down between the roots to BELOW. Seen from the upside-down UNDERCROFT, the
+STUMP looms overhead and the shaft drops DOWN. Neither room names the other (nor
+the TREE FORT from below) until the player has visited both; until then each
+describes only what can be seen: a shaft to a level you can't quite make out.
 
 Before that alignment, the upper oak's GROUND/ABOVE lift remains unchanged.
 Afterward, `oak:liftBeat` drives GROUND, ABOVE, GROUND, BELOW one turn at a

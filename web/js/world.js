@@ -1,4 +1,4 @@
-// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
+// world.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
 // Blackwood Manor content and rules. Shared portable-reward dispatch lives in
 // core.js and commands.js. See README.md for the "how to add a room" guide.
 //
@@ -2591,10 +2591,18 @@ function oakSlotSummary(ctx) {
   return `In the PANEL, ${parts[0]}, ${parts[1]}, and ${parts[2]}.`;
 }
 
+// The GREAT OAK and the OAK UNDERCROFT name each other only after both are visited.
+export function oakLevelsKnown(ctx) {
+  return !!(ctx.getFlag("seen:greatOak") && ctx.getFlag("seen:below"));
+}
+
 function greatOakRoots(ctx) {
+  const destination = oakLevelsKnown(ctx)
+    ? "the OAK UNDERCROFT, where up and down trade places"
+    : "some level below that you can't quite make out";
   return ctx.getFlag("oak:lowerPanelAligned")
-    ? "The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to the OAK UNDERCROFT, one level BELOW."
-    : "The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth around a dark shaft that drops one level BELOW.";
+    ? `The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to ${destination}.`
+    : `The trunk ends in a vast STUMP-like base whose deep roots plunge into the earth around a dark shaft that drops to ${destination}.`;
 }
 
 function takeOakGem(ctx, cmd) {
@@ -2670,9 +2678,9 @@ function oakLiftMotion(from, to) {
     return "The beam shifts. The PLATFORM descends through the leaves and settles among the GREAT OAK'S roots.";
   }
   if (from === "greatOak" && to === "below") {
-    return "The PLATFORM sinks between the GREAT OAK'S deep roots, down the root shaft, and settles one level BELOW in the OAK UNDERCROFT.";
+    return "The PLATFORM sinks between the deep roots and down the shaft into the dark. Somewhere along the way, up and down quietly trade places.";
   }
-  return "The ropes haul the PLATFORM up the root shaft until it settles at the base of the GREAT OAK.";
+  return "The PLATFORM drops down the root shaft into the dark. Somewhere along the way, up and down quietly trade places.";
 }
 
 function leaveOakPlatform(ctx, cmd) {
@@ -4541,7 +4549,7 @@ const logicWorld = {
       ].join("\n"),
       desc(ctx) {
         return ctx.getFlag("oak:lowerPanelAligned")
-          ? `${content.rooms.treeFort.desc} The PLATFORM now also sinks past the GREAT OAK'S roots to the OAK UNDERCROFT, one level BELOW.`
+          ? `${content.rooms.treeFort.desc} The PLATFORM now also sinks past the GREAT OAK'S roots to ${oakLevelsKnown(ctx) ? "the OAK UNDERCROFT" : "some level below that you can't quite make out"}.`
           : undefined;
       },
       interceptImplicitNavigation: true,
@@ -5118,7 +5126,7 @@ const logicWorld = {
       loc: null, fixed: true, scenery: true,
       desc(ctx) {
         return ctx.getFlag("oak:lowerPanelAligned")
-          ? "A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and the OAK UNDERCROFT one level BELOW among the deep roots."
+          ? `A broad wooden PLATFORM hanging from old but sturdy ropes. It rides one shaft through the whole tree: the TREE FORT ABOVE, the GREAT OAK'S base on the GROUND, and ${oakLevelsKnown(ctx) ? "the OAK UNDERCROFT" : "a third stop"} BELOW among the deep roots.`
           : undefined;
       },
       on: { enter: enterOakPlatform, climb: enterOakPlatform },

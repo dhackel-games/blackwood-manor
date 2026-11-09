@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.009:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -132,6 +132,8 @@ Feature: The mirrored gem panel and Blackwood tree fort
 
   Scenario: Aligned lift descriptions override only the obsolete two-stop prose
     Given flag "oak:lowerPanelAligned" is set
+    And flag "seen:greatOak" is set
+    And flag "seen:below" is set
     And item "oakPlatform" rests in room "greatOak"
     When I send "examine platform"
     Then the output contains "OAK UNDERCROFT"
@@ -139,16 +141,28 @@ Feature: The mirrored gem panel and Blackwood tree fort
     When I send "look"
     Then the output contains "An immense GREAT OAK towers"
     And the output contains "In the PANEL, the TOP SLOT holds the RUBY GEM"
-    And the output contains "deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to the OAK UNDERCROFT, one level BELOW."
+    And the output contains "deep roots plunge into the earth; the PLATFORM'S ropes run down a shaft between them to the OAK UNDERCROFT, where up and down trade places."
     Given the player is in room "treeFort"
     When I send "look"
     Then the output contains "A weathered TREE FORT fills the GREAT OAK'S crown."
-    And the output contains "sinks past the GREAT OAK'S roots to the OAK UNDERCROFT, one level BELOW."
+    And the output contains "sinks past the GREAT OAK'S roots to the OAK UNDERCROFT."
+
+  Scenario: The oak and undercroft name each other only after both are visited
+    Given the player is in room "greatOak"
+    When I send "look"
+    Then the output contains "a dark shaft that drops to some level below that you can't quite make out."
+    And the output does not contain "UNDERCROFT"
+
+  Scenario: The undercroft does not name the oak before the oak is visited
+    Given the player is in room "below"
+    When I send "look"
+    Then the output contains "as if a giant oak had been planted upside down"
+    And the output does not contain "GREAT OAK"
+    And the output does not contain "TREE FORT"
 
   Scenario: The undercroft lists what each LOWER PANEL slot holds
     Given the player is in room "below"
     When I send "look"
-    Then the output contains "directly beneath the GREAT OAK"
     And the output contains "In the LOWER PANEL, the TOP SLOT holds the MAGENTA GEM, the MIDDLE SLOT is EMPTY, and the BOTTOM SLOT holds the YELLOW GEM."
 
   Scenario: Runtime navigation uses the declared aligned lift links

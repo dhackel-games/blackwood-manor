@@ -1,4 +1,4 @@
-// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
+// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
 
 function enterRealm(ctx) {
   const locker = ctx.item("minersLocker");
@@ -112,7 +112,7 @@ const content = {
     waylampClearing: {
       name: "Waylamp Clearing",
       desc:
-        "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH beneath the GREAT OAK.",
+        "A lonely WAYLAMP shines beside a wood that appears to have failed an inspection of reality. An UPSIDE-DOWN CAMPFIRE burns with its flames pointing into the dirt, and a STREAM gurgles beside it. The MINERS' LOCKER stands behind you. Paths lead NORTH to a cheesy cave, EAST to a club den, WEST to a rickety SHACK, and SOUTH down among enormous exposed roots.",
       searchDesc:
         "Heat keeps you back from a hard shape in the ashes. The STREAM is close enough to fill a JUG; you could also risk your shoes on that fire.",
     },
