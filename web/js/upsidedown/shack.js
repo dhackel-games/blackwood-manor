@@ -1,7 +1,7 @@
 // shack.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
 
 const ACCEPTED_WORDS = new Set(["FART", "STINK", "CHEESE"]);
-const WALL_NAMES = new Set(["alphabet wall", "wall", "letters", "bulbs"]);
+const WALL_NAMES = new Set(["alphabet wall", "wall", "letters", "bulbs", "lights", "switches", "switch"]);
 const CRAYON_NAMES = new Set(["purple crayon", "crayon", "wax stick"]);
 
 function spelledWord(value) {
@@ -19,7 +19,7 @@ function spellAlphabetWall(ctx, cmd) {
 
   const word = spelledWord(cmd.dobj);
   if (!ACCEPTED_WORDS.has(word)) {
-    return "The bulbs blink through your word, make a rude raspberry, and go dark. Try another word.";
+    return "The lights blink through your word, make a rude raspberry, and go dark. Try another word.";
   }
   if (ctx.getFlag("realm:shackSpelled")) {
     return "The wall gives one sleepy blink. It has no second CRAYON.";
@@ -28,7 +28,7 @@ function spellAlphabetWall(ctx, cmd) {
   ctx.setFlag("realm:shackSpelled");
   ctx.moveItem("purpleCrayon", "shack");
   const points = ctx.awardProgress("shackSpelled");
-  return `The bulbs spell ${word} back at you. The wall hiccups and spits out a PURPLE CRAYON with a tiny BM stamped on its wrapper. (+${points})`;
+  return `The lights spell ${word} back at you. The wall hiccups and spits out a PURPLE CRAYON with a tiny BM stamped on its wrapper. (+${points})`;
 }
 
 function inspectUnspawnedCrayon(ctx, cmd) {
@@ -45,7 +45,7 @@ function drawingTaken(ctx) {
 const rooms = {};
 const items = {
   alphabetWall: {
-    names: ["alphabet wall", "wall", "letters", "bulbs"],
+    names: ["alphabet wall", "wall", "letters", "bulbs", "lights", "switches", "switch"],
     adjectives: ["alphabet"],
     loc: "shack",
     fixed: true,
@@ -90,20 +90,20 @@ const content = {
       name: "Shack",
       desc(ctx) {
         return drawingTaken(ctx)
-          ? "A run-down SHACK leans against the trees. The ALPHABET WALL carries letters A through Z, each beneath a tiny bulb. The door has one lonely nail where a KID'S DRAWING once hung, and the path EAST returns to the WAYLAMP."
-          : "A run-down SHACK leans against the trees. The ALPHABET WALL carries letters A through Z, each beneath a tiny bulb. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.";
+          ? "A run-down SHACK leans against the trees. The ALPHABET WALL has a light for every letter A through Z, with a switch below each light so you can spell out a word. The door has one lonely nail where a KID'S DRAWING once hung, and the path EAST returns to the WAYLAMP."
+          : "A run-down SHACK leans against the trees. The ALPHABET WALL has a light for every letter A through Z, with a switch below each light so you can spell out a word. A KID'S DRAWING hangs on the door, and the path EAST returns to the WAYLAMP.";
       },
       searchDesc(ctx) {
         return drawingTaken(ctx)
-          ? "The door's nail remembers a drawing of a farting monster covered in arrows. The wall's bulbs twitch when someone spells on it; their colors mean nothing."
-          : "The KID'S DRAWING shows a MONSTER with STINK FUMES pouring out of its rear end, and arrows everywhere pointing at the fumes. The wall's bulbs twitch when someone spells on it; their colors mean nothing.";
+          ? "The door's nail remembers a drawing of a farting monster covered in arrows. Flip the ALPHABET WALL's switches to SPELL a word; the light over each letter turns on as you go."
+          : "The KID'S DRAWING shows a MONSTER with STINK FUMES pouring out of its rear end, and arrows everywhere pointing at the fumes. Flip the ALPHABET WALL's switches to SPELL a word; the light over each letter turns on as you go.";
       },
     },
   },
   items: {
     alphabetWall: {
-      roomDesc: "The ALPHABET WALL has a tiny bulb under each letter.",
-      desc: "Letters A through Z are painted on the ALPHABET WALL, one bulb per letter. No bulb color matters; the door's KID'S DRAWING is the clue.",
+      roomDesc: "The ALPHABET WALL has a light and a switch for every letter.",
+      desc: "The ALPHABET WALL has a light for each letter A through Z and a switch below each light. Flip the switches to SPELL out a word. The KID'S DRAWING on the door is the clue.",
     },
     kidsDrawing: {
       roomDesc: "A KID'S DRAWING of a MONSTER with STINK FUMES coming out of its rear end hangs on the door.",
@@ -127,9 +127,9 @@ const progressAwards = {
 };
 const hints = [
   (ctx) => ({
-    topics: ["alphabet", "wall", "letters", "bulbs"],
+    topics: ["alphabet", "wall", "letters", "bulbs", "lights", "switches"],
     done: !!ctx.getFlag("realm:shackSpelled"),
-    text: "Those bulbs answer to SPELL, not SAY. Look closely at the KID'S DRAWING on the door.",
+    text: "Those switches answer to SPELL, not SAY. Look closely at the KID'S DRAWING on the door.",
   }),
   (ctx) => ({
     topics: ["kid", "kids", "drawing", "picture", "arrows", "fart"],

@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -1236,11 +1236,13 @@ GARDEN BRAZIER remains the existing +30 body-fire solution.
 
 #### 12.36.4 Shack alphabet wall
 
-The run-down SHACK's ALPHABET WALL is a typed-word puzzle, never a color
-mechanic: `SPELL` or `TYPE` FART, STINK, or CHEESE (including space-separated
-letters) produces the PURPLE CRAYON once. Other words reset the bulbs with a
-rude raspberry. The KID'S DRAWING on the door depicts DEMOGORGONZOLA farting
-under a blizzard of arrows, is independently takeable, and is the fair clue.
+The run-down SHACK's ALPHABET WALL has a light for every letter and a switch
+below each light, and is a typed-word puzzle, never a color mechanic: `SPELL` or
+`TYPE` FART, STINK, or CHEESE (including space-separated letters) produces the
+PURPLE CRAYON once. Other words reset the lights with a rude raspberry. The KID'S
+DRAWING on the door plainly shows a MONSTER with STINK FUMES pouring from its
+rear end and dozens of arrows pointing at the fumes; it is independently
+takeable and is the fair clue.
 Both it and the 15-point PURPLE CRAYON are treasures; their pickup and first
 use awards, plus the wall's persisted `realm:shackSpelled` progress award,
 cannot be farmed. The KID'S DRAWING carries its ratified 10-point deposit.
