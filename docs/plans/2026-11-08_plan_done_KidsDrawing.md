@@ -2,7 +2,7 @@
 
 # Kid's Drawing: master orchestration
 
-Status: done on branch `fix/kids-drawing` (PR to follow in the same session).
+Status: done. Merged as PR #14.
 
 ## Stated goals
 
