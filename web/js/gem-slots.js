@@ -5,10 +5,21 @@
 // seats three named gems TOP, MIDDLE, BOTTOM. Orders accept words or initials with
 // any separator: "yellow, magenta, cyan", "y m c", "y/m/c", "y-m-c", or "ymc".
 
+import { registerCommaListRule } from "./parser.js?v=source";
+
 const SLOT_WORDS = /^(?:the\s+)?(?:lower\s+)?(?:slots?|panel|holes?)\b/;
 const GEM_WORDS = new Set(["gems", "gem", "stones", "all", "all gems", "all the gems", "all stones", "the gems", "jewels"]);
 const FILLER = /\b(?:and|then|in|order|from|top|to|bottom|with|gems?|stones?|the|slots?)\b/g;
 export const SLOT_ORDER_TOP_DOWN = Object.freeze(["top", "middle", "bottom"]);
+const GEM_ORDER_PREFIX = /^(?:fill\s+(?:the\s+)?(?:lower\s+)?(?:slots?|panel)|put\s+(?:all\s+)?(?:the\s+)?(?:gems|stones)\s+(?:in|into)\s+(?:the\s+)?(?:lower\s+)?(?:slots?|panel))\b/i;
+const GEM_TOKENS = new Set([
+  "r", "e", "g", "s", "b", "c", "m", "y",
+  "ruby", "red", "emerald", "green", "sapphire", "blue", "cyan", "magenta", "yellow",
+]);
+
+// "fill slots yellow, magenta, cyan": a comma followed by another gem lists gems.
+registerCommaListRule((current, rest) => GEM_ORDER_PREFIX.test(current)
+  && GEM_TOKENS.has((rest.trim().match(/^[a-z]+/i)?.[0] || "").toLowerCase()));
 
 function clean(value) {
   return String(value || "").toLowerCase().trim();
@@ -54,13 +65,30 @@ function firstSentence(text) {
   return String(text).split(/(?<=\.)\s/)[0] + awards;
 }
 
+function floorGems(ctx, panel) {
+  return Object.keys(panel.codes).filter((id) => ctx.roomOf(id) === ctx.state.room);
+}
+
 // panel: { codes, labels, seatedIds(), take(id), put(id, slot), alignedMessage() }
-export function takeAllGems(ctx, panel) {
+// Pulls seated gems and picks up this panel's gems lying here. Returns null when
+// there is nothing of the panel's to take, so the normal TAKE handles the command.
+export function takeAllGems(ctx, panel, cmd) {
   const aligned = panel.alignedMessage();
-  if (aligned) return aligned;
-  const seated = panel.seatedIds();
-  if (!seated.length) return "The slots are already empty.";
+  const seated = aligned ? [] : panel.seatedIds();
+  const floor = floorGems(ctx, panel);
+  if (!seated.length && !floor.length) {
+    if (aligned) return aligned;
+    return SLOT_WORDS.test(clean(cmd?.iobj)) ? "The slots are already empty." : null;
+  }
   const out = [];
+  for (const id of floor) {
+    if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
+      out.push(`Your hands are full. You'll have to drop something before picking up the ${panel.labels[id]}.`);
+      return out.join("\n");
+    }
+    ctx.moveItem(id, "inventory");
+    out.push(`You pick up the ${panel.labels[id]}.${ctx.awardPickup(ctx.item(id))}`);
+  }
   for (const id of seated) {
     const result = panel.take(id);
     if (!/^You lift/.test(result)) return [...out, result].join("\n");
@@ -77,13 +105,14 @@ export function fillGemSlots(ctx, panel, orderText) {
   if (!order) return "Name each of the three gems once, in order from top to bottom.";
 
   const seated = new Set(panel.seatedIds());
+  const pickups = order.filter((id) => !ctx.has(id) && !seated.has(id));
+  const missing = pickups.find((id) => ctx.roomOf(id) !== ctx.state.room);
+  if (missing) return `You don't have the ${panel.labels[missing]}.`;
+  if (ctx.inventoryLoad() + pickups.length + seated.size > ctx.inventoryCapacity()) {
+    return "Your hands are too full to juggle all three gems. Drop something first.";
+  }
   const out = [];
-  for (const id of order) {
-    if (ctx.has(id) || seated.has(id)) continue;
-    if (ctx.roomOf(id) !== ctx.state.room) return `You don't have the ${panel.labels[id]}.`;
-    if (ctx.inventoryLoad() >= ctx.inventoryCapacity()) {
-      return `Your hands are full. You'll have to drop something before picking up the ${panel.labels[id]}.`;
-    }
+  for (const id of pickups) {
     ctx.moveItem(id, "inventory");
     out.push(`You pick up the ${panel.labels[id]}.${ctx.awardPickup(ctx.item(id))}`);
   }

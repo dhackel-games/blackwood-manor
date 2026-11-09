@@ -1,4 +1,4 @@
-// shack.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.006:acoven.
+// shack.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 const ACCEPTED_WORDS = new Set(["FART", "STINK", "CHEESE"]);
 const WALL_NAMES = new Set(["alphabet wall", "wall", "letters", "bulbs", "lights", "switches", "switch"]);
@@ -50,6 +50,9 @@ const items = {
     loc: "shack",
     fixed: true,
     scenery: true,
+    on: {
+      push: () => "The switches click in sequence when you SPELL a word on the wall.",
+    },
   },
   kidsDrawing: {
     names: ["kid's drawing", "kids drawing", "drawing", "picture"],

@@ -2646,7 +2646,7 @@ function oakBulkFill(ctx, cmd) {
 }
 
 function oakTakeGems(ctx, cmd) {
-  return isTakeGems(cmd) ? takeAllGems(ctx, oakPanel(ctx)) : null;
+  return isTakeGems(cmd) ? takeAllGems(ctx, oakPanel(ctx), cmd) : null;
 }
 
 function putOakGem(ctx, cmd) {
@@ -4692,8 +4692,7 @@ const logicWorld = {
           if (!cmd.bulkTransfer) msg += `\n\n${reliquaryCountLine(ctx)}`;
           if (allTreasuresDeposited(ctx) && !alreadyLiftable) {
             ctx.setFlag("curseLiftable");
-            msg += "\n\nAll 24 heirlooms are in place. CLOSE the RELIQUARY, OPEN the BELL CLOSET beside " +
-              "the FRONT DOOR, then PULL the ROPE.";
+            msg += "\n\nAll 24 heirlooms are in place.";
           }
           return msg;
         },

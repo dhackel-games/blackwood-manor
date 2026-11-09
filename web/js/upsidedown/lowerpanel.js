@@ -109,7 +109,10 @@ function lowerBulkFill(ctx, cmd) {
 }
 
 function takeFromLowerPanel(ctx, cmd) {
-  if (isTakeGems(cmd)) return takeAllGems(ctx, lowerPanel(ctx));
+  if (isTakeGems(cmd)) {
+    const taken = takeAllGems(ctx, lowerPanel(ctx), cmd);
+    if (taken) return taken;
+  }
   if (cmd.dobj === "all" || cmd.dobj === "everything") return null;
   const slot = namedSlot(cmd.dobj);
   if (!slot || (!panelTarget(cmd.iobj) && !/slot/i.test(String(cmd.dobj)))) return null;

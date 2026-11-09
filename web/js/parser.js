@@ -85,8 +85,13 @@ function tokenize(input) {
 // Split a raw input line into separate commands.
 // Classic-parser separators: "." ";" "," and the word "then".
 // Used by core.send so "n. open mailbox. read letter" runs as three turns.
-// Commas inside a gem order ("fill slots yellow, magenta, cyan") list gems, not commands.
-const GEM_ORDER_PREFIX = /^(?:fill\s+(?:the\s+)?(?:lower\s+)?(?:slots?|panel)|put\s+(?:all\s+)?(?:the\s+)?(?:gems|stones)\s+(?:in|into)\s+(?:the\s+)?(?:lower\s+)?(?:slots?|panel))\b/i;
+// Games may register rules that keep a comma inside one command when it lists
+// items rather than separating commands. Each rule gets (current, rest) and
+// returns true to keep the comma.
+const commaListRules = [];
+export function registerCommaListRule(rule) {
+  commaListRules.push(rule);
+}
 
 export function splitCommands(input) {
   const raw = (input || "").trim();
@@ -111,7 +116,7 @@ export function splitCommands(input) {
       current += char;
       continue;
     }
-    if (char === "," && GEM_ORDER_PREFIX.test(current.trim())) {
+    if (char === "," && commaListRules.some((rule) => rule(current.trim(), raw.slice(index + 1)))) {
       current += " ";
       continue;
     }
