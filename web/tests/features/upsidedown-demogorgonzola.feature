@@ -1,4 +1,4 @@
-# upsidedown-demogorgonzola.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# upsidedown-demogorgonzola.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 @lane3
 Feature: The kitchen fridge and Demogorgonzola
@@ -94,6 +94,22 @@ Feature: The kitchen fridge and Demogorgonzola
     And I send "give munster to demogorgonzola"
     Then flag "realm:demoFed" is true
     And the game score is 25
+
+  Scenario: CHEESE feeds one held cheese at a time and CHEESES feeds them all
+    Given the player is in room "cheeseGrotto"
+    And item "limburgerCheese" is carried
+    And item "epoissesCheese" is carried
+    And item "munsterCheese" is carried
+    When I send "give cheese to dg"
+    Then the output contains "(1/3)"
+    And the output does not contain "(2/3)"
+    And flag "realm:demoFed" is unset
+    When I send "give cheeses to dg"
+    Then the output contains "(2/3)"
+    And the output contains "The last cheese disappears."
+    And flag "realm:demoFed" is true
+    And the game score is 25
+    And the current room is "cheeseGrotto"
 
   Scenario: The rind is a treasure heirloom with normal pickup and use rewards
     Given the player is in room "cheeseGrotto"

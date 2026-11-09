@@ -1,4 +1,4 @@
-<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.007:acoven. -->
+<!-- DESIGN.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven. -->
 
 # Blackwood Manor — Design
 
@@ -331,12 +331,12 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
-For reference, the deterministic fresh `::win` expansion has 200 commands,
+For reference, the deterministic fresh `::win` expansion has 198 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
 per heirloom is below the 5.9 baseline. The two named flights are SHAFT and
 GARDEN; the evaluated permanent-sight third flights to the HIDDEN VAULT and
-BELFRY take 207/74 and 208/75 steps/transitions respectively, so neither beats
+BELFRY take 205/74 and 206/75 steps/transitions respectively, so neither beats
 the selected two-flight route. Peak load is 32 against the BACKPACK's 36
 places; and exactly one
 `PUT ALL IN RQ` slips off and seats every worn heirloom, earns ONE TRIP, and
@@ -1205,8 +1205,9 @@ DEMOGORGONZOLA's visible creature and grotto text warn that physical or
 directed interactions cause an intact-inventory ejection to the FRONT GATE.
 LOOK, EXAMINE, and SMELL remain safe. Each distinct cheese is consumed once;
 the third grants its persisted +10 progress award and leaves the 15-point
-treasure DEMOGORGONZOLA RIND on the grotto floor. The RIND has normal portable
-pickup and use awards.
+treasure DEMOGORGONZOLA RIND on the grotto floor. `GIVE CHEESE` feeds the next
+held cheese; `GIVE CHEESES` feeds every held cheese in one command, with the
+same per-cheese awards. The RIND has normal portable pickup and use awards.
 
 #### 12.36.2 Cabinet radio quiz
 

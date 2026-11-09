@@ -1,4 +1,4 @@
-// demogorgonzola.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// demogorgonzola.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 const CHEESE_IDS = ["limburgerCheese", "epoissesCheese", "munsterCheese"];
 const UNSAFE_VERBS = [
@@ -32,20 +32,35 @@ function swallow(ctx) {
     ctx.describeRoom();
 }
 
+const ONE_CHEESE = new Set(["cheese", "acheese", "onecheese", "stinkycheese"]);
+const ALL_CHEESES = new Set(["cheeses", "allcheese", "allcheeses", "allthecheeses", "stinkycheeses"]);
+
+function fedMessage(ctx) {
+  return ctx.roomOf("demogorgonzolaRind") === "cheeseGrotto"
+    ? "All three cheeses have done their work. The RIND is on the grotto floor."
+    : "All three cheeses have done their work. The RIND has already been claimed.";
+}
+
 function feedDemogorgonzola(ctx, cmd) {
+  const phrase = normalized(cmd.dobj);
+  if (ONE_CHEESE.has(phrase) || ALL_CHEESES.has(phrase)) {
+    if (ctx.getFlag("realm:demoFed")) return fedMessage(ctx);
+    const held = CHEESE_IDS.filter((id) => ctx.roomOf(id) !== null && ctx.has(id));
+    if (!held.length) return "Bring the CHEESE here in your own hands first.";
+    const batch = ALL_CHEESES.has(phrase) ? held : held.slice(0, 1);
+    return batch.map((id) => feedCheese(ctx, id)).join("\n");
+  }
   const id = cheeseId(ctx, cmd.dobj);
   if (!id) return swallow(ctx);
-  if (ctx.getFlag("realm:demoFed")) {
-    const rindOnFloor = ctx.roomOf("demogorgonzolaRind") === "cheeseGrotto";
-    return rindOnFloor
-      ? "All three cheeses have done their work. The RIND is on the grotto floor."
-      : "All three cheeses have done their work. The RIND has already been claimed.";
-  }
+  if (ctx.getFlag("realm:demoFed")) return fedMessage(ctx);
   if (ctx.roomOf(id) === null) {
     return "That cheese is already in its stomach. The beast wants a different stink.";
   }
   if (!ctx.has(id)) return "Bring the CHEESE here in your own hands first.";
+  return feedCheese(ctx, id);
+}
 
+function feedCheese(ctx, id) {
   const cheese = ctx.item(id);
   const use = ctx.awardUse(cheese);
   ctx.destroy(id);
