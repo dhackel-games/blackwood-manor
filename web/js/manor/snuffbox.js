@@ -1,4 +1,4 @@
-// snuffbox.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+// snuffbox.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 function takeBustNose(ctx) {
   if (ctx.getFlag("manor:snuffboxFound")) return "You already picked that nostril clean.";
@@ -92,7 +92,7 @@ const content = {
       highDesc(ctx) {
         return ctx.getFlag("manor:snuffboxFound")
           ? landingLadder(ctx)
-          : "Hidden sight picks out a silver box lodged in the bust's left nostril. You can PICK NOSE to retrieve it.";
+          : "Hidden sight picks out a silver box lodged in the bust's left nostril.";
       },
     },
   },

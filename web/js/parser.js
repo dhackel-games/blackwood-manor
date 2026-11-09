@@ -1,4 +1,4 @@
-// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-09-21.108:acoven.
+// parser.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 // Turns raw input into { verb, dobj, prep, iobj } (or { error }).
 // Generic engine: contains no mansion-specific content.
 
@@ -15,7 +15,7 @@ const VERBS = {
   take: ["take", "t", "get", "grab", "pick", "carry"], drop: ["drop", "discard"],
   open: ["open", "o", "pry", "force"], close: ["close", "c", "shut"],
   lock: ["lock", "lk"], unlock: ["unlock", "un"],
-  read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press"],
+  read: ["read"], search: ["search"], move: ["move", "shift", "jostle", "shake", "nudge"], push: ["push", "press", "flick", "flip"],
   pull: ["pull", "lift", "yank", "peel"], on: ["on"], off: ["off"], light: ["light", "ignite"],
   burn: ["burn", "incinerate", "torch", "immolate", "combust"],
   extinguish: ["extinguish", "ext", "douse", "blow"], attack: ["attack", "kill", "hit", "strike", "stab"],
@@ -85,6 +85,14 @@ function tokenize(input) {
 // Split a raw input line into separate commands.
 // Classic-parser separators: "." ";" "," and the word "then".
 // Used by core.send so "n. open mailbox. read letter" runs as three turns.
+// Games may register rules that keep a comma inside one command when it lists
+// items rather than separating commands. Each rule gets (current, rest) and
+// returns true to keep the comma.
+const commaListRules = [];
+export function registerCommaListRule(rule) {
+  commaListRules.push(rule);
+}
+
 export function splitCommands(input) {
   const raw = (input || "").trim();
   if (!raw) return [];
@@ -106,6 +114,10 @@ export function splitCommands(input) {
     if (QUOTE_CHARS.has(char) && (index === 0 || /\s/.test(raw[index - 1]))) {
       quote = char;
       current += char;
+      continue;
+    }
+    if (char === "," && commaListRules.some((rule) => rule(current.trim(), raw.slice(index + 1)))) {
+      current += " ";
       continue;
     }
     if (char === "." || char === ";" || char === ",") {

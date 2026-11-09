@@ -1,4 +1,4 @@
-// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
+// sysop-menu.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 import { RADIO_SONGS } from "./upsidedown/radio-clues.js?v=source";
 
@@ -143,21 +143,19 @@ const WIN = [
   "east", "north",
   "give cheeses to dg", "take rind",
   "south", "south", "{{winoak}}", "north", "east", "turn on cabinet radio", "{{winradio}}", "take transistor", "north",
-  "say 1", "take eyepiece", "east", "read starmap", "west", "say 4",
+  "set dial to 1", "push button", "take eyepiece", "east", "read starmap", "west", "set dial to 4", "push button",
   "ext self", "north", "north", "up", "south", "open studrawer", "take all", "read diary",
   "wear bmwatch", "north", "east", "open jewelry with tiny", "take ravenblood",
   "west", "north", "take shard", "open drawer", "take family",
   "south", "down", "west", "put candle in fixture", "put shard in fixture", "take candelabra",
-  "east", "east", "south", "pull lever", "read book", "take pieced",
+  "east", "east", "south", "pull lever", "take pieced",
   "combine pieces", "read baronessphoto", "down", "read grimoire", "up", "north", "west",
   "open rq", "put all in rq", "close rq", "open bellcloset", "pull closetrope",
   "open rq", "read gclock",
 ];
 
 const WIN_OAK_ROUTE = [
-  "take magenta", "take yellow", "put yellow in top slot", "put magenta in middle slot",
-  "put cyan in bottom slot", "enter platform", "wait", "out", "take ruby", "take sapphire",
-  "put ruby in top", "put emerald in middle", "put sapphire in bottom", "wait", "wait", "wait",
+  "fill slots ymc", "enter platform", "wait", "out", "fill slots res", "wait", "wait", "wait",
   "enter platform", "wait", "out", "take spyglass", "wait", "wait", "wait",
   "enter platform", "wait", "wait", "out",
 ];
@@ -473,9 +471,9 @@ export function expandSysopCommand(shortcut, game) {
     }
     const beat = platform === "treeFort" ? 1 : platform === "greatOak" ? 0 : 3;
     oakRoute = [
-      ...WIN_OAK_ROUTE.slice(0, 5),
+      ...WIN_OAK_ROUTE.slice(0, 1),
       ...Array.from({ length: (3 - beat + 4) % 4 }, () => "wait"),
-      ...WIN_OAK_ROUTE.slice(5),
+      ...WIN_OAK_ROUTE.slice(1),
     ];
   }
   return filterCommands(expanded.replace("{{winoak}}", join(oakRoute))).join("; ");

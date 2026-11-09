@@ -704,7 +704,7 @@
   },
   "planetarium": {
     "name": "Planetarium",
-    "desc": "A PLANETARIUM dome arches over a single brass PROJECTOR. Enter a number from 1 to 5 to pick a projection. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+    "desc": "A PLANETARIUM dome arches over a single brass PROJECTOR with a numbered DIAL and a bulb SWITCH. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
     "items": [
       {
         "id": "projector",

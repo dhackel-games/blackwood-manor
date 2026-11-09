@@ -1,4 +1,4 @@
-// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
+// route-plan.mjs. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 import { pathToFileURL } from "node:url";
 import { createGame } from "../js/core.js";
 import { world } from "../js/world.js";
@@ -212,7 +212,7 @@ const TASKS = [
   { id: "diningCandle", room: "diningRoom", dependsOn: ["kitchenBasics"],
     commands: ["take candlestick", "light candle"] },
   { id: "library", room: "library",
-    commands: ["pull lever", "read book", "take pieced"],
+    commands: ["pull lever", "take pieced"],
     grants: { leverPulled: true } },
   { id: "secretChamber", room: "secretChamber", dependsOn: ["library"],
     commands: ["read grimoire"] },
@@ -252,16 +252,14 @@ const TASKS = [
   { id: "gardenWell", room: "garden", dependsOn: ["bodyFire"],
     commands: ["down", "take all"] },
   { id: "oakPanel", room: "greatOak", dependsOn: ["gardenWell"],
-    commands: ["take ruby", "take sapphire", "put ruby in top",
-      "put emerald in middle", "put sapphire in bottom"],
+    commands: ["fill slots res"],
     grants: { oakLightAligned: true } },
   { id: "treeFort", room: "treeFort", dependsOn: ["lowerPanel"],
     commands: ["take spyglass", "wait"] },
   { id: "realmCampfire", room: "waylampClearing", dependsOn: ["kitchenBasics"],
     commands: ["fill jug", "pour jug on fire", "take cyan"] },
   { id: "lowerPanel", room: "below", dependsOn: ["realmCampfire"],
-    commands: ["take magenta", "take yellow", "put yellow in top slot",
-      "put magenta in middle slot", "put cyan in bottom slot"],
+    commands: ["fill slots ymc"],
     grants: { "oak:lowerPanelAligned": true } },
   { id: "grotto", room: "grotto", dependsOn: ["kitchenBasics"],
     commands: ["give cheeses to dg", "take rind"] },
@@ -273,11 +271,11 @@ const TASKS = [
   { id: "mapRoom", room: "mapRoom",
     commands: ["read starmap"] },
   { id: "planetariumSafe", room: "planetarium",
-    commands: ["say 1", "take eyepiece"] },
+    commands: ["set dial to 1", "push button", "take eyepiece"] },
   { id: "planetariumEject", room: "planetarium",
     dependsOn: ["realmCampfire", "lowerPanel", "grotto", "shack", "radio",
       "mapRoom", "planetariumSafe"],
-    commands: ["say 4", "ext self"], movesTo: "gate", movesCost: 1 },
+    commands: ["set dial to 4", "push button", "ext self"], movesTo: "gate", movesCost: 1 },
   { id: "combinePhoto", room: null, dependsOn: ["mazePiece", "porchDoor", "library"],
     commands: ["combine pieces", "read baronessphoto"] },
   { id: "diningRestore", room: "diningRoom",
@@ -515,7 +513,7 @@ function realize(order, secondFlight, earlySight = null) {
     visits.set(afterRoom, (visits.get(afterRoom) || 0) + 1);
     if (command.startsWith("fly ")) {
       namedFlights.push(command.slice(4));
-    } else if (command === "say 4" && beforeRoom === "planetarium" && afterRoom === "gate") {
+    } else if (command === "push button" && beforeRoom === "planetarium" && afterRoom === "gate") {
       changes.ejection++;
     } else if (command === "z" && ["below", "greatOak", "treeFort"].includes(beforeRoom)) {
       changes.lift++;

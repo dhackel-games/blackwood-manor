@@ -1,4 +1,4 @@
-// photograph.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
+// photograph.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 const ROOM_IDS = [
   "gate", "garden", "hedgeMazeGate", "hedgeMazeKnot", "hedgeMazeLoop", "dragonCaveMouth",
@@ -40,7 +40,7 @@ function revealPhotoPieceDWithHiddenSight(ctx) {
   if (photoPieceDFound(ctx)) return null;
   ctx.setFlag("manor:photoPieceDFound");
   ctx.moveItem("photoPieceD", "library");
-  return "Hidden sight shows a folded PHOTO PIECE D inside the ROTTING BOOK; it slips free where you can TAKE it.";
+  return "Hidden sight shows a folded PHOTO PIECE D tucked inside the ROTTING BOOK.";
 }
 
 function readPhotographBack(ctx) {

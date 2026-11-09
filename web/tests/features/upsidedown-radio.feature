@@ -1,4 +1,4 @@
-# upsidedown-radio.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+# upsidedown-radio.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @walkthrough
 Feature: Cabinet radio quiz
@@ -50,7 +50,7 @@ Feature: Cabinet radio quiz
     And the portable transistor radio is revealed
     And the radio quiz score is 10
     When I replay the opened cabinet radio
-    Then the output contains "The cabinet has already opened. The PORTABLE TRANSISTOR RADIO is yours to take."
+    Then the output contains "The cabinet has already opened."
     And the radio quiz score is 10
     When I take and use the portable transistor radio twice
     Then the portable transistor radio earns pickup without a keepsake-use award

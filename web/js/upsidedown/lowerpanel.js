@@ -1,4 +1,6 @@
-// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
+// lowerpanel.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
+
+import { fillGemSlots, fillOrderText, isTakeGems, takeAllGems } from "../gem-slots.js?v=source";
 
 const LOWER_GEMS = Object.freeze({
   magentaGem: { label: "MAGENTA GEM", slot: "middle" },
@@ -85,13 +87,33 @@ function takeLowerGem(ctx, cmd) {
   return `You lift the ${LOWER_GEMS[gem.id].label} from the ${slot.toUpperCase()} SLOT.`;
 }
 
+function lowerPanel(ctx) {
+  return {
+    codes: { cyanGem: ["cyan", "c"], magentaGem: ["magenta", "m"], yellowGem: ["yellow", "y"] },
+    labels: Object.fromEntries(Object.entries(LOWER_GEMS).map(([id, gem]) => [id, gem.label])),
+    alignedMessage: () => ctx.getFlag("oak:lowerPanelAligned")
+      ? "The LOWER PANEL is already aligned. Its gems are seated for good."
+      : null,
+    seatedIds: () => {
+      const slots = lowerPanelSlots(ctx);
+      return ["top", "middle", "bottom"].map((slot) => slots[slot]).filter(Boolean);
+    },
+    take: (id) => takeLowerGem(ctx, { itemId: id }),
+    put: (id, slot) => putLowerGem(ctx, { dobj: ctx.item(id).names[0], iobj: `${slot} slot` }),
+  };
+}
+
+function lowerBulkFill(ctx, cmd) {
+  const order = fillOrderText(cmd);
+  return order === null ? null : fillGemSlots(ctx, lowerPanel(ctx), order);
+}
+
 function takeFromLowerPanel(ctx, cmd) {
-  if (cmd.dobj === "all" || cmd.dobj === "everything") {
-    if (panelTarget(cmd.iobj)) {
-      return "The LOWER PANEL must be solved deliberately. Move one GEM at a time into a named SLOT.";
-    }
-    return null;
+  if (isTakeGems(cmd)) {
+    const taken = takeAllGems(ctx, lowerPanel(ctx), cmd);
+    if (taken) return taken;
   }
+  if (cmd.dobj === "all" || cmd.dobj === "everything") return null;
   const slot = namedSlot(cmd.dobj);
   if (!slot || (!panelTarget(cmd.iobj) && !/slot/i.test(String(cmd.dobj)))) return null;
   if (ctx.getFlag("oak:lowerPanelAligned")) {
@@ -116,6 +138,8 @@ function initializeLowerLift(ctx) {
 }
 
 function putLowerGem(ctx, cmd) {
+  const bulk = lowerBulkFill(ctx, cmd);
+  if (bulk) return bulk;
   const explicitSlot = namedSlot(cmd.iobj);
   if (!explicitSlot && !panelTarget(cmd.iobj)) return null;
   if (cmd.dobj === "all" || cmd.dobj === "everything") {
@@ -327,6 +351,7 @@ const hints = [
 const roomHooks = {
   below: {
     put: putLowerGem,
+    fill: lowerBulkFill,
     take: takeFromLowerPanel,
     enter: platformAtBelow,
     climb: platformAtBelow,

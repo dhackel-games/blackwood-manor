@@ -1,4 +1,4 @@
-# manor-snuffbox.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+# manor-snuffbox.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @lane8
 Feature: Great-Grandpa Blackwood's snuffbox
@@ -28,7 +28,7 @@ Feature: Great-Grandpa Blackwood's snuffbox
     Given flag "high" is 1
     When I send "look"
     Then the output contains "Hidden sight picks out a silver box"
-    And the output contains "PICK NOSE"
+    And the output does not contain "PICK NOSE"
 
   Scenario: Gary directs the player to the bust
     When I call Gary and say "hint bust"

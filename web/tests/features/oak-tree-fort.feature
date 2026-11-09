@@ -1,4 +1,4 @@
-# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
+# oak-tree-fort.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 @unit
 Feature: The mirrored gem panel and Blackwood tree fort
@@ -88,7 +88,7 @@ Feature: The mirrored gem panel and Blackwood tree fort
   Scenario: PUT ALL does not bypass the ordered gem puzzle
     When I send "take all"
     And I send "put all in panel"
-    Then the output contains "Place each GEM in its named SLOT"
+    Then the output contains "Name the three gems in order, top to bottom"
     And item "emberStone" is carried
     And item "greenGlassStone" is carried
     And item "blueGlassStone" is carried

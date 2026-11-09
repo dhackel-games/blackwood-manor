@@ -1,4 +1,4 @@
-// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
+// weathervane.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 const WEATHERVANE_FREED = "manor:weathervaneFreed";
 
@@ -25,7 +25,7 @@ const DESTINATIONS = {
   },
 };
 
-const WEATHERVANE_NAMES = ["rusted weathervane", "weathervane", "vane"];
+const WEATHERVANE_NAMES = ["rusted weathervane", "weathervane", "vane", "rooster", "iron rooster"];
 
 function normalized(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -47,14 +47,14 @@ function bareTurnDestination(cmd) {
 
 function weathervaneDescription(ctx) {
   return ctx.getFlag(WEATHERVANE_FREED)
-    ? "A RUSTED WEATHERVANE with a bent swivel and a BM stamped near its base. Its bolt is gone; it can no longer be turned."
-    : "A RUSTED IRON WEATHERVANE on an iron swivel. It can face NORTH, EAST, SOUTH, or WEST. The FAR-GAZING GARGOYLE braces the center post with its curled stone tail and points SOUTHEAST toward the TREE FORT; turn toward the other faces before that one if you want to hear them.";
+    ? "A RUSTED WEATHERVANE snapped off its post, an iron ROOSTER still crowing on top and a BM stamped near its base."
+    : "A RUSTED IRON WEATHERVANE topped with an iron ROOSTER, on a swivel that can face NORTH, EAST, SOUTH, or WEST. The FAR-GAZING GARGOYLE'S curled stone tail is wrapped around its post.";
 }
 
 function weathervaneRoomDescription(ctx) {
   return ctx.getFlag(WEATHERVANE_FREED)
-    ? "A loose RUSTED WEATHERVANE lies by the snapped post."
-    : "A RUSTED WEATHERVANE turns on a post between four stone gargoyles.";
+    ? "A RUSTED WEATHERVANE, iron ROOSTER and all, lies beside its snapped post."
+    : "A RUSTED WEATHERVANE topped with an iron ROOSTER turns on the post at their center.";
 }
 
 function turnWeathervane(ctx, cmd, bareDestination = null) {
@@ -76,8 +76,10 @@ function turnWeathervane(ctx, cmd, bareDestination = null) {
     ctx.setFlag(WEATHERVANE_FREED);
     weathervane.fixed = false;
     const points = ctx.awardProgress("weathervaneFreed");
-    return ctx.cycleFlavor(requested.eastPool) + "\n\n" +
-      "With its last living twitch, its curled stone tail snaps the post's bolt. The RUSTED WEATHERVANE drops free for you to TAKE." +
+    return "The far-gazing gargoyle grinds to life without turning around. \"For centuries I have longed to fly past that horizon, " +
+      "but this stone holds me fast. You, little rooster, I can set free.\" Its curled tail tightens and cracks the rusted post; " +
+      "the WEATHERVANE breaks off and clatters onto the slates, iron ROOSTER and all. Then the gargoyle turns back to stone, " +
+      "arm still pointing SOUTHEAST." +
       (points ? ` (+${points})` : "") + ctx.awardUse(weathervane);
   }
 
@@ -153,9 +155,9 @@ const content = {
     roof: {
       desc:
         "Slate ridges roll across the MANOR ROOF beneath the open sky. The broken ATTIC skylight is DOWN; " +
-        "a narrow ridge runs EAST to the BELFRY. Four fixed GARGOYLES crouch around a RUSTED WEATHERVANE. Each grips its center post with one hand, except the FAR-GAZING GARGOYLE EAST, which faces away and braces it with a curled stone tail while pointing SOUTHEAST toward the TREE FORT.",
+        "a narrow ridge runs EAST to the BELFRY. Four stone GARGOYLES crouch around a RUSTED WEATHERVANE.",
       searchDesc:
-        "The ridge from the BELFRY is solid enough to walk. The NORTH GARGOYLE has ballooned cheeks and a free fist against its chest, about to burp; the EAST GARGOYLE faces away, its curled stone tail bracing the WEATHERVANE post while one arm points SOUTHEAST at the TREE FORT; the SOUTH GARGOYLE clamps a hand over its backside, trying to hold back a poop explosion; the WEST GARGOYLE pinches its nose with watering eyes, dreading the fart it is about to let rip.",
+        "The ridge from the BELFRY is solid enough to walk. Pigeon feathers are stuck to the gutter.",
     },
   },
   items: {
@@ -269,18 +271,18 @@ const flavorPools = {
     "It animates, SHARTS with operatic volume, splattering you thoroughly, then bows, apologizes, and returns to solid stone with its hand clamped back over its rear.",
   ],
   gargoyleFarGazing: [
-    "The far-gazing gargoyle grinds to life without turning around. \"For centuries I have longed to wander past that horizon, but the curse of this stone holds me fast. The vane, at least, I could set free.\" Then it turns back to stone, arm still pointing SOUTHEAST.",
     "Its stone shoulders crack awake. \"See that little wooden house up in the trees by the PRIVY? Somebody built a lookout there. I would give my tail to climb it.\" Its shoulders settle, and it turns back to stone.",
-    "The gargoyle stirs to life, still facing away. \"A vane should point wherever the wind wants, not where a bolt says. Go on, little vane, be free.\" It hardens back into stone.",
+    "The gargoyle stirs to life, still facing away. \"A rooster should crow wherever the wind wants, not where a bolt says. Go on, little rooster, be free.\" It hardens back into stone.",
     "It wakes with a sigh of gravel. \"There is a fort in the trees beyond the PRIVY. Someone up there has a SPYGLASS, and I swear they look back at me.\" The sigh trails off as it turns back to stone.",
     "The far-gazing gargoyle comes to life just long enough to say, \"My neighbors burp, fart, and worse. I only point, and somehow I am the weird one.\" Then it turns back to stone.",
     "It creaks to life and keeps pointing. \"Follow my arm. SOUTHEAST, past the PRIVY, up into the trees. Things are seen from there that cannot be seen from here.\" It turns back to stone mid-point.",
-    "The gargoyle wakes. \"I set the vane free so at least one of us could travel. Carry it somewhere with a better view than this gutter.\" Its voice fades as it turns back to stone.",
+    "The gargoyle wakes. \"I set the rooster free so at least one of us could travel. Carry it somewhere with a better view than this gutter.\" Its voice fades as it turns back to stone.",
     "Granite grinds as it comes to life. \"Some nights a lantern glows in that tree house near the PRIVY. I count the flickers. It is the only show in town.\" It settles back into stone.",
-    "It wakes and flicks its curled tail at the empty post. \"Even rusted, a vane belongs to the wind, not to a roof. Freedom suits it.\" Then it turns back to stone.",
+    "It wakes and flicks its curled tail at the empty post. \"Even rusted, a rooster belongs to the wind, not to a roof. Freedom suits it.\" Then it turns back to stone.",
     "The far-gazing gargoyle twitches to life. \"I would turn around and say hello properly, but my neck has been stone since the Tudors.\" It turns back to stone, still facing away.",
     "It comes to life and whispers, \"The trees by the PRIVY hide a fort, and the fort hides an eye. Climb, look, and you will see what I cannot.\" It turns back to stone.",
     "Stone flakes from its brow as it wakes. \"One day the curse will break and I will walk SOUTHEAST until the horizon runs out. Until then, I point.\" It turns back to stone.",
+    "The far-gazing gargoyle creaks to life. \"Somewhere out there, my little iron rooster is crowing at a sunrise I will never see. Tell it I said hello.\" It turns back to stone.",
   ],
 };
 

@@ -1,4 +1,4 @@
-// radio.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
+// radio.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.002:acoven.
 
 import { RADIO_SONGS } from "./radio-clues.js?v=source";
 
@@ -75,7 +75,7 @@ function printRound(ctx, round) {
 
 function startQuiz(ctx) {
   if (ctx.getFlag(RADIO_WON)) {
-    return "The cabinet has already opened. The PORTABLE TRANSISTOR RADIO is yours to take.";
+    return "The cabinet has already opened.";
   }
   const round = activeRound(ctx) || drawRound(ctx);
   if (!ctx.getFlag("realm:radioIntro")) {
@@ -105,7 +105,7 @@ function spokenAnswer(cmd) {
 
 function answerQuiz(ctx, cmd) {
   if (ctx.getFlag(RADIO_WON)) {
-    return "The cabinet has already opened. The PORTABLE TRANSISTOR RADIO is yours to take.";
+    return "The cabinet has already opened.";
   }
   const round = activeRound(ctx);
   if (!round) return "Turn on the CABINET RADIO or LISTEN first.";
