@@ -1361,7 +1361,7 @@ Then("sysop access is session-only in the text game and the 2D view", function (
   for (const [name, src] of [["ui.js", ui], ["tilemap.html", map]]) {
     assert.doesNotMatch(src, /localStorage\.setItem\([^)]*(SYSOP|sysop|magic-menu)/, `${name} must not remember the unlock`);
     assert.doesNotMatch(src, /localStorage\.getItem\([^)]*(SYSOP|sysop|MAGIC|magic-menu)/, `${name} must not read a remembered unlock`);
-    assert.doesNotMatch(src, /sysopMenuAction\([^;]*getFlag/, `${name}: the saved game flag must not open the menu`);
+    assert.doesNotMatch(src, /getFlag\(\s*["']sysopMenuUnlocked/, `${name}: the saved game flag must not open the menu`);
     assert.match(src, /removeItem\((SYSOP_MENU_UNLOCK_KEY|"blackwood-sysop-menu-unlocked-v1")\)/, `${name} wipes the legacy unlock`);
     assert.match(src, /removeItem\((LEGACY_MAGIC_MENU_UNLOCK_KEY|"blackwood-magic-menu-unlocked-v1")\)/, `${name} wipes the older unlock`);
   }

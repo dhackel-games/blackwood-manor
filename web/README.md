@@ -408,3 +408,5 @@ Handler `ctx` API: `getFlag/setFlag`, `has(id)`, `here(id)`, `item(id)`,
 
 After any change, **run `npm test`** — and update the gameplay feature and steps
 if you changed the solution path.
+
+<!-- end README.md -->
