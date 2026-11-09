@@ -37,7 +37,7 @@ const rooms = {
   },
   waylampClearing: {
     ...realmRoom({
-      north: "cheeseGrotto",
+      north: "grotto",
       east: "avClubDen",
       west: "shack",
       south: "below",
@@ -50,7 +50,7 @@ const rooms = {
       },
     },
   },
-  cheeseGrotto: {
+  grotto: {
     ...realmRoom({ south: "waylampClearing" }),
     aliases: ["livarot grotto", "livarot", "cheese grotto", "grotto"],
   },
@@ -116,7 +116,7 @@ const content = {
       searchDesc:
         "Heat keeps you back from a hard shape in the ashes. The STREAM is close enough to fill a JUG; you could also risk your shoes on that fire.",
     },
-    cheeseGrotto: {
+    grotto: {
       name: "Livarot Grotto",
       desc:
         "The LIVAROT GROTTO smells like a locker room built inside another locker room. DEMOGORGONZOLA squats beneath a shelf of stalactites, its closed face puckered like a flower bud. The only path leads SOUTH to the WAYLAMP.",
@@ -170,7 +170,7 @@ const content = {
 const shortNames = {
   rooms: {
     waylampClearing: "waylamp",
-    cheeseGrotto: "grotto",
+    grotto: "grotto",
     avClubDen: "avden",
     planetarium: "planetarium",
     mapRoom: "maproom",

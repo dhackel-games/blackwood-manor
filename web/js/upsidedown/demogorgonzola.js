@@ -36,7 +36,7 @@ const ONE_CHEESE = new Set(["cheese", "acheese", "onecheese", "stinkycheese"]);
 const ALL_CHEESES = new Set(["cheeses", "allcheese", "allcheeses", "allthecheeses", "stinkycheeses"]);
 
 function fedMessage(ctx) {
-  return ctx.roomOf("demogorgonzolaRind") === "cheeseGrotto"
+  return ctx.roomOf("demogorgonzolaRind") === "grotto"
     ? "All three cheeses have done their work. The RIND is on the grotto floor."
     : "All three cheeses have done their work. The RIND has already been claimed.";
 }
@@ -70,7 +70,7 @@ function feedCheese(ctx, id) {
   }
 
   ctx.setFlag("realm:demoFed");
-  ctx.moveItem("demogorgonzolaRind", "cheeseGrotto");
+  ctx.moveItem("demogorgonzolaRind", "grotto");
   const points = ctx.awardProgress("demoFed");
   return "The last cheese disappears. DEMOGORGONZOLA'S face opens petal by petal like a ghastly flower; it spits out a DEMOGORGONZOLA RIND, bows with its entire throat, and waits for more." +
     (points ? ` (+${points})` : "") + use;
@@ -88,7 +88,7 @@ const rooms = {};
 const items = {
   demogorgonzola: {
     names: ["demogorgonzola", "demo", "monster", "cheese monster", "creature"],
-    loc: "cheeseGrotto",
+    loc: "grotto",
     fixed: true,
     on: {
       give: feedDemogorgonzola,
@@ -112,7 +112,7 @@ const items = {
 };
 const content = {
   rooms: {
-    cheeseGrotto: {
+    grotto: {
       name: "Livarot Grotto",
       desc(ctx) {
         const creature = ctx.getFlag("realm:demoFed")
@@ -162,7 +162,7 @@ const hints = [
   }),
 ];
 const roomHooks = {
-  cheeseGrotto: {
+  grotto: {
     give(ctx, cmd) {
       return cmd.iobj ? null : feedDemogorgonzola(ctx, cmd);
     },

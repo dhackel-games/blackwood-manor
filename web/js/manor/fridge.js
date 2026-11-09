@@ -1,4 +1,4 @@
-// fridge.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.002:copilot.
+// fridge.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 const FRIDGE_ITEM_IDS = ["milk", "milkJug", "limburgerCheese", "epoissesCheese", "munsterCheese"];
 const ROOM_IDS = [
@@ -7,7 +7,7 @@ const ROOM_IDS = [
   "greatOak", "treeFort", "porch", "grandHall", "parlor", "library", "secretChamber",
   "diningRoom", "kitchen", "wineCellar", "crypt", "landing", "nursery", "masterBedroom",
   "study", "hallBedroom", "attic", "roof", "belfry", "hiddenVault", "garysLair",
-  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "cheeseGrotto",
+  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "grotto",
   "avClubDen", "planetarium", "mapRoom", "shack", "below",
 ];
 

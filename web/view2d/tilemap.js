@@ -32,7 +32,7 @@ export const LABELS = {
   treeFort: "Tree Fort",
   secretChamber: "Hidden Rm", hollowPassage: "Passage", hollowSanctum: "Sanctum",
   betweenWalls: "The Walls",
-  waylampClearing: "Waylamp", cheeseGrotto: "Livarot Grotto", avClubDen: "AV Club",
+  waylampClearing: "Waylamp", grotto: "Livarot Grotto", avClubDen: "AV Club",
   planetarium: "Planetarium", mapRoom: "Map Room", shack: "Shack", below: "Undercroft",
 };
 
@@ -171,7 +171,7 @@ export const FLOORS = [
   {
     title: "THE UPSIDE DOWN",
     rooms: [
-      { id: "cheeseGrotto", col: 1, row: 0 },
+      { id: "grotto", col: 1, row: 0 },
       { id: "planetarium", col: 2, row: 0 },
       { id: "mapRoom", col: 3, row: 0 },
       { id: "shack", col: 0, row: 1 },
@@ -180,7 +180,7 @@ export const FLOORS = [
       { id: "below", col: 1, row: 2 },
     ],
     links: [
-      { a: "cheeseGrotto", b: "waylampClearing" },
+      { a: "grotto", b: "waylampClearing" },
       { a: "waylampClearing", b: "avClubDen" },
       { a: "waylampClearing", b: "shack" },
       { a: "avClubDen", b: "planetarium" },

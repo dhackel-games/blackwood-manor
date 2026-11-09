@@ -1,4 +1,4 @@
-// campfire.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// campfire.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven.
 
 function normalized(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -230,7 +230,7 @@ const ROOM_IDS = [
   "greatOak", "treeFort", "porch", "grandHall", "parlor", "library", "secretChamber",
   "diningRoom", "kitchen", "wineCellar", "crypt", "landing", "nursery", "masterBedroom",
   "study", "hallBedroom", "attic", "roof", "belfry", "hiddenVault", "garysLair",
-  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "cheeseGrotto",
+  "betweenWalls", "p2_awakening", "t13_medusaGarden", "waylampClearing", "grotto",
   "avClubDen", "planetarium", "mapRoom", "shack", "below",
 ];
 const roomHooks = Object.fromEntries(ROOM_IDS.map((id) => [id, { fill: fillJug }]));

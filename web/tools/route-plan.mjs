@@ -263,7 +263,7 @@ const TASKS = [
     commands: ["take magenta", "take yellow", "put yellow in top slot",
       "put magenta in middle slot", "put cyan in bottom slot"],
     grants: { "oak:lowerPanelAligned": true } },
-  { id: "grotto", room: "cheeseGrotto", dependsOn: ["kitchenBasics"],
+  { id: "grotto", room: "grotto", dependsOn: ["kitchenBasics"],
     commands: ["give cheeses to dg", "take rind"] },
   { id: "shack", room: "shack",
     commands: ["spell fart", "take all"] },
