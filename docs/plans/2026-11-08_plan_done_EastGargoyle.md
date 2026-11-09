@@ -1,8 +1,8 @@
-<!-- 2026-11-08_plan_inProgress_EastGargoyle.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven. -->
+<!-- 2026-11-08_plan_done_EastGargoyle.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven. -->
 
 # East Gargoyle: master orchestration
 
-Status: in progress on branch `fix/east-gargoyle`.
+Status: done. Merged as PR #13.
 
 ## Stated goals
 
@@ -14,4 +14,4 @@ Status: in progress on branch `fix/east-gargoyle`.
 * [x] T2: feature, step, and pool-registry tests; DESIGN §12.37.2.
 * [x] T3: content stamp, suite, triad plus fix pass, PR, merge.
 
-<!-- end 2026-11-08_plan_inProgress_EastGargoyle.md -->
+<!-- end 2026-11-08_plan_done_EastGargoyle.md -->
