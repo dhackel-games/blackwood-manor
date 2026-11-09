@@ -33,7 +33,6 @@ Feature: Planetarium projector and stellar map
       | hint projector | Enter a number from 1 to 5 to pick a projection. READ the STELLAR MAP next door to see what each number shows. |
       | hint map       | The STELLAR MAP in the MAP ROOM lists what each number projects. |
       | hint eyepiece  | A safe constellation can shake an EYEPIECE out of the projector. The first safe choice is enough. |
-      | hint burning   | If the dome sends you to the FRONT GATE on fire, go EAST and LIGHT the GARDEN BRAZIER before you burn out. |
 
   Scenario Outline: Every setting has the same result with or without the map
     Given the player is in room "planetarium"

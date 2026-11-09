@@ -14,7 +14,7 @@ function takeBustNose(ctx) {
 
 function describeBust(ctx) {
   return ctx.getFlag("manor:snuffboxFound")
-    ? "The MARBLE BUST's left nostril is empty. Great-Grandpa still looks smug."
+    ? "Great-Grandpa Blackwood has the nose of a man who considered breathing a competitive sport. He still looks smug."
     : "Great-Grandpa Blackwood has the nose of a man who considered breathing a competitive sport. A silver glint peeks up his LEFT NOSTRIL.";
 }
 

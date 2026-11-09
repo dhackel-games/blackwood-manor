@@ -22,6 +22,7 @@ Feature: Great-Grandpa Blackwood's snuffbox
     Then the output does not contain "nostril"
     When I send "examine bust"
     Then the output does not contain "glint"
+    And the output does not contain "nostril"
 
   Scenario: Hidden sight reveals the snuffbox before retrieval
     Given flag "high" is 1

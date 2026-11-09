@@ -212,8 +212,10 @@ const content = {
   items: {
     cabinetRadio: {
       roomDesc: "A massive CABINET RADIO waits beneath a tangle of cords.",
-      desc: "The CABINET RADIO has five numbered answer buttons and a locked door with something rattling behind it. " +
-        "A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. TURN ON the radio to play.",
+      desc: (ctx) => ctx.getFlag(RADIO_WON)
+        ? "The CABINET RADIO has five numbered answer buttons. Its door hangs open after your three-in-a-row win."
+        : "The CABINET RADIO has five numbered answer buttons and a locked door with something rattling behind it. " +
+          "A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. TURN ON the radio to play.",
     },
     portableTransistorRadio: {
       roomDesc: "A PORTABLE TRANSISTOR RADIO rests inside the opened cabinet.",

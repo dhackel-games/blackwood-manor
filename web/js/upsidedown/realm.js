@@ -127,8 +127,9 @@ const content = {
       name: "AV Club Den",
       desc:
         "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
-      searchDesc:
-        "The CABINET RADIO has five numbered answer buttons and a locked door. Something rattles inside the cabinet when you knock.",
+      searchDesc: (ctx) => ctx.getFlag("realm:radioWon")
+        ? "The CABINET RADIO's door hangs open."
+        : "The CABINET RADIO has five numbered answer buttons and a locked door. Something rattles inside the cabinet when you knock.",
     },
     planetarium: {
       name: "Planetarium",

@@ -43,6 +43,7 @@ function selectConstellation(ctx, cmd) {
   }
 
   ctx.state.room = "gate";
+  ctx.setFlag("realm:siriusFired");
   ctx.setFlag("onFire", true);
   ctx.setFlag("burnTurns", 0);
   ctx.setFlag("burnGrace", true);
@@ -150,11 +151,11 @@ const hints = [
     done: false,
     text: "A safe constellation can shake an EYEPIECE out of the projector. The first safe choice is enough.",
   },
-  {
+  (ctx) => ({
     topics: ["fire", "burning", "burn", "brazier", "front gate"],
-    done: false,
-    text: "If the dome sends you to the FRONT GATE on fire, go EAST and LIGHT the GARDEN BRAZIER before you burn out.",
-  },
+    done: !(ctx.getFlag("realm:siriusFired") && ctx.getFlag("onFire")),
+    text: "You're ON FIRE at the FRONT GATE: go EAST and LIGHT the GARDEN BRAZIER before you burn out.",
+  }),
 ];
 
 const roomHooks = {
