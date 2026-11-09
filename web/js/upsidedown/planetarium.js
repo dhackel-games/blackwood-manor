@@ -1,7 +1,7 @@
-// planetarium.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// planetarium.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
-const PROJECTOR_PROMPT = "The PROJECTOR asks: Choose a number from 1 to 5.";
-const INVALID_SELECTION = "The PROJECTOR asks for one number from 1 to 5.";
+const PROJECTOR_PROMPT = "Enter a number from 1 to 5 to pick that projection.";
+const INVALID_SELECTION = "Enter a number from 1 to 5 to pick that projection.";
 
 const SAFE_CONSTELLATIONS = {
   1: "The dome draws a giant ladle over a tiny celery moon. Somehow the stars manage to look refrigerated.",
@@ -14,7 +14,7 @@ function projectorPrompt() {
 }
 
 function selectionFrom(cmd) {
-  if (cmd.verb === "say" || cmd.verb === "code") return cmd.dobj || cmd.iobj || "";
+  if (["say", "code", "enter"].includes(cmd.verb)) return cmd.dobj || cmd.iobj || "";
   return cmd.iobj || "";
 }
 
@@ -31,8 +31,6 @@ function selectConstellation(ctx, cmd) {
       const points = ctx.awardProgress("eyepieceDropped");
       result += "\n\nA hatch in the PROJECTOR clicks open. A GOLD EYEPIECE rolls across the floor." +
         (points ? ` (+${points})` : "");
-    } else {
-      result += "\n\nThe projector hatch is empty.";
     }
     return result;
   }
@@ -45,6 +43,7 @@ function selectConstellation(ctx, cmd) {
   }
 
   ctx.state.room = "gate";
+  ctx.setFlag("realm:siriusFired");
   ctx.setFlag("onFire", true);
   ctx.setFlag("burnTurns", 0);
   ctx.setFlag("burnGrace", true);
@@ -110,13 +109,11 @@ const content = {
   items: {
     projector: {
       roomDesc: "A brass PROJECTOR points at the dome.",
-      desc: (ctx) =>
-        "The PROJECTOR has five numbered positions and asks only for a number from 1 to 5. On its housing, a stick figure is drawn thin as a noodle beside another figure outlined in scorch marks. BAD CHOICES SEND YOU TO THE FRONT GATE; the GARDEN BRAZIER is one step EAST of that gate." +
-        (ctx.getFlag("realm:eyepieceDropped") ? "" : "\n\nThe PROJECTOR hatch is still shut."),
+      desc: "A brass star PROJECTOR with a dial numbered 1 to 5. Enter a number from 1 to 5 to pick that projection.",
     },
     stellarMap: {
       roomDesc: "A STELLAR MAP rests on the lectern.",
-      desc: "A folded STELLAR MAP inked with five labeled patterns and their numbers. A BM seal sits beneath a grease mark shaped like a thumb.",
+      desc: "A folded STELLAR MAP listing five projections by number. A BM seal sits beneath a grease mark shaped like a thumb.",
       text: "STELLAR MAP\n1 BIG DIPPER OF RANCH\n2 BLACK BUNGHOLE\n3 ORION'S WEDGIE\n4 SERIOUS-SIRIUS\n5 URANUS MAJOR",
     },
     goldEyepiece: {
@@ -142,29 +139,32 @@ const hints = [
   {
     topics: ["projector", "planetarium", "dome", "number"],
     done: false,
-    text: "The brass PROJECTOR accepts only numbers 1 to 5. READ the STELLAR MAP next door before you pick one.",
+    text: "Enter a number from 1 to 5 to pick a projection. READ the STELLAR MAP next door to see what each number shows.",
   },
   {
     topics: ["stellar", "map", "chart", "map room"],
     done: false,
-    text: "The STELLAR MAP in the MAP ROOM fixes the order. The dome's drain and scorch marks warn that not every number is kind.",
+    text: "The STELLAR MAP in the MAP ROOM lists what each number projects.",
   },
   {
     topics: ["eyepiece", "ocular", "gold"],
     done: false,
     text: "A safe constellation can shake an EYEPIECE out of the projector. The first safe choice is enough.",
   },
-  {
+  (ctx) => ({
     topics: ["fire", "burning", "burn", "brazier", "front gate"],
-    done: false,
-    text: "If the dome sends you to the FRONT GATE on fire, go EAST and LIGHT the GARDEN BRAZIER before you burn out.",
-  },
+    done: !(ctx.getFlag("realm:siriusFired") && ctx.getFlag("onFire")),
+    text: "You're ON FIRE at the FRONT GATE: go EAST and LIGHT the GARDEN BRAZIER before you burn out.",
+  }),
 ];
 
 const roomHooks = {
   planetarium: {
     say: selectConstellation,
     code: selectConstellation,
+    enter(ctx, cmd) {
+      return /^\d+$/.test(String(cmd.dobj || "").trim()) ? selectConstellation(ctx, cmd) : null;
+    },
   },
 };
 

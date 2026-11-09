@@ -688,7 +688,7 @@
   },
   "avClubDen": {
     "name": "AV Club Den",
-    "desc": "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. Its dial points to a quiz show that refuses to end. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
+    "desc": "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
     "items": [
       {
         "id": "portableTransistorRadio",
@@ -704,7 +704,7 @@
   },
   "planetarium": {
     "name": "Planetarium",
-    "desc": "A plain PLANETARIUM dome looms above a single brass PROJECTOR. The ceiling is marked with five groups of stars; one patch looks like a drain and another has scorched the plaster. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+    "desc": "A PLANETARIUM dome arches over a single brass PROJECTOR. Enter a number from 1 to 5 to pick a projection. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
     "items": [
       {
         "id": "projector",
@@ -715,7 +715,7 @@
   },
   "mapRoom": {
     "name": "Map Room",
-    "desc": "A tiny MAP ROOM is wallpapered in star charts with more confidence than scientific merit. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
+    "desc": "A tiny MAP ROOM is wallpapered in star charts. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
     "items": [
       {
         "id": "stellarMap",

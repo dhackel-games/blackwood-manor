@@ -1,4 +1,4 @@
-# upsidedown-radio.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# upsidedown-radio.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 @walkthrough
 Feature: Cabinet radio quiz
@@ -8,7 +8,9 @@ Feature: Cabinet radio quiz
   Scenario: The song catalog and a seeded round follow the canonical draw
     Given a fresh radio quiz game seeded with 123456789
     When I start the cabinet radio
-    Then the radio catalog has twenty songs with five clues each
+    Then the output contains "Welcome to NAME THAT TUNE!"
+    And the output contains "Get THREE RIGHT IN A ROW and this cabinet opens to reveal your PRIZE."
+    And the radio catalog has twenty songs with five clues each
     And the active radio round matches the canonical LCG draw for seed 123456789
     And the active radio round lists its answer exactly once
 

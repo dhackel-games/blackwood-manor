@@ -1,4 +1,4 @@
-# upsidedown-planetarium.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# upsidedown-planetarium.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 @walkthrough
 Feature: Planetarium projector and stellar map
@@ -30,10 +30,9 @@ Feature: Planetarium projector and stellar map
 
     Examples:
       | topic     | hint                                                                                         |
-      | hint projector | The brass PROJECTOR accepts only numbers 1 to 5. READ the STELLAR MAP next door before you pick one. |
-      | hint map       | The STELLAR MAP in the MAP ROOM fixes the order. The dome's drain and scorch marks warn that not every number is kind. |
+      | hint projector | Enter a number from 1 to 5 to pick a projection. READ the STELLAR MAP next door to see what each number shows. |
+      | hint map       | The STELLAR MAP in the MAP ROOM lists what each number projects. |
       | hint eyepiece  | A safe constellation can shake an EYEPIECE out of the projector. The first safe choice is enough. |
-      | hint burning   | If the dome sends you to the FRONT GATE on fire, go EAST and LIGHT the GARDEN BRAZIER before you burn out. |
 
   Scenario Outline: Every setting has the same result with or without the map
     Given the player is in room "planetarium"
@@ -60,16 +59,17 @@ Feature: Planetarium projector and stellar map
   Scenario: The projector always asks the same question and drops one eyepiece
     Given the player is in room "planetarium"
     When I send "use projector"
-    Then the output equals "The PROJECTOR asks: Choose a number from 1 to 5."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
     When I send "say 1"
     Then flag "realm:eyepieceDropped" is set
     And flag "progressAward:eyepieceDropped" is set
     And item "goldEyepiece" is in "planetarium"
     And the game score is 10
     When I send "start projector"
-    Then the output equals "The PROJECTOR asks: Choose a number from 1 to 5."
-    When I send "say 3"
-    Then the output contains "The projector hatch is empty."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
+    When I send "enter 3"
+    Then the output contains "Orion reaches behind himself"
+    And the output does not contain "hatch"
     And item "goldEyepiece" is in "planetarium"
     And the game score is 10
 
@@ -80,7 +80,7 @@ Feature: Planetarium projector and stellar map
     And I send "say 3"
     Then flag "realm:eyepieceDropped" is set
     And item "goldEyepiece" is in "planetarium"
-    And the output contains "The projector hatch is empty."
+    And the output does not contain "EYEPIECE rolls"
     And the game score is 10
 
   Scenario: The eyepiece is usable and the Sirius fire lights the brazier
@@ -101,12 +101,12 @@ Feature: Planetarium projector and stellar map
   Scenario: Invalid projector selections are refused
     Given the player is in room "planetarium"
     When I send "say six"
-    Then the output equals "The PROJECTOR asks for one number from 1 to 5."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
     When I send "set projector to 0"
-    Then the output equals "The PROJECTOR asks for one number from 1 to 5."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
     When I send "use projector with 6"
-    Then the output equals "The PROJECTOR asks for one number from 1 to 5."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
     When I send "0"
-    Then the output equals "The PROJECTOR asks for one number from 1 to 5."
+    Then the output equals "Enter a number from 1 to 5 to pick that projection."
 
 # end upsidedown-planetarium.feature
