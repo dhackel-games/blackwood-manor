@@ -1,5 +1,5 @@
-<!-- _orch.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.004:acoven. -->
+<!-- _orch.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven. -->
 
-[docs/plans/2026-11-08_plan_done_SysopSessionOnly.md](docs/plans/2026-11-08_plan_done_SysopSessionOnly.md)
+[docs/plans/2026-11-08_plan_inProgress_EastGargoyle.md](docs/plans/2026-11-08_plan_inProgress_EastGargoyle.md)
 
 <!-- end _orch.md -->

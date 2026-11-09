@@ -1,4 +1,4 @@
-// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.003:acoven.
+// lane8-weathervane.steps.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.005:acoven.
 
 import assert from "node:assert";
 import { Given, Then, When } from "@cucumber/cucumber";
@@ -109,6 +109,11 @@ Then("every roof gargoyle reply comes to life, does its deed, apologizes, and tu
       assert.match(line, /\byou(r)?\b/i, `${key} must hit the player: ${line}`);
       assert.doesNotMatch(line, /silver|rooster|weathercock|BURPER|FARTER|SHITTER/i);
     }
+  }
+  const east = world.flavorPools.gargoyleFarGazing;
+  for (const line of east) {
+    assert.match(line, /(life|wak|stirs)/i, `east must come to life: ${line}`);
+    assert.match(line.split(/(?<=\.)\s+(?=[A-Z])/).pop(), /\bstone\b/i, `east must end back in stone: ${line}`);
   }
 });
 
