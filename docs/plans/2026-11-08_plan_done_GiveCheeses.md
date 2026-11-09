@@ -1,13 +1,13 @@
-<!-- 2026-11-08_plan_inProgress_GiveCheeses.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven. -->
+<!-- 2026-11-08_plan_done_GiveCheeses.md. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.008:acoven. -->
 
 # Give Cheeses: master orchestration
 
-Status: in progress on branch `fix/give-all-cheeses`.
+Status: done; merged via PR from `fix/give-all-cheeses`.
 
 ## Stated goals
 
 * G1:Plural: AndrewC: "give cheeses to dg" feeds all three; "give cheese to dg" feeds one at a time (previously both got you swallowed).
-* G2:GrottoName: rename the CHEESE GROTTO after a stinky cheese (awaiting AndrewC's pick).
+* G2:GrottoName: rename the CHEESE GROTTO after a stinky cheese (AndrewC picked LIVAROT GROTTO; internal id `grotto`).
 
 ## Todos
 
@@ -16,4 +16,4 @@ Status: in progress on branch `fix/give-all-cheeses`.
 * [x] T3: CHEESE GROTTO is now LIVAROT GROTTO (display name, text, hints, docs, 2D roomdata); internal room id is now `grotto` (no save migration, per AndrewC); the "cheese grotto" alias remains.
 * [x] T4: stamp, suite, triad, PR, merge.
 
-<!-- end 2026-11-08_plan_inProgress_GiveCheeses.md -->
+<!-- end 2026-11-08_plan_done_GiveCheeses.md -->
