@@ -1,4 +1,4 @@
-// radio.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// radio.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 import { RADIO_SONGS } from "./radio-clues.js?v=source";
 
@@ -78,7 +78,13 @@ function startQuiz(ctx) {
     return "The cabinet has already opened. The PORTABLE TRANSISTOR RADIO is yours to take.";
   }
   const round = activeRound(ctx) || drawRound(ctx);
-  return `The CABINET RADIO coughs awake.\n${printRound(ctx, round)}`;
+  if (!ctx.getFlag("realm:radioIntro")) {
+    ctx.setFlag("realm:radioIntro");
+    return "The CABINET RADIO crackles to life with a game-show fanfare. \"Welcome to NAME THAT TUNE! I read a clue, " +
+      "you pick the song from five titles. Get THREE RIGHT IN A ROW and this cabinet opens to reveal your PRIZE. " +
+      `A miss starts your streak over. Here we go!\"\n\n${printRound(ctx, round)}`;
+  }
+  return `The CABINET RADIO crackles back to life.\n${printRound(ctx, round)}`;
 }
 
 function normalizeTitle(title) {
@@ -206,8 +212,8 @@ const content = {
   items: {
     cabinetRadio: {
       roomDesc: "A massive CABINET RADIO waits beneath a tangle of cords.",
-      desc: "The CABINET RADIO has five numbered buttons and a door whose hinge points inward. " +
-        "A faded card reads: THREE RIGHT IN A ROW. Turn it ON or LISTEN for a clue.",
+      desc: "The CABINET RADIO has five numbered answer buttons and a locked door with something rattling behind it. " +
+        "A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. TURN ON the radio to play.",
     },
     portableTransistorRadio: {
       roomDesc: "A PORTABLE TRANSISTOR RADIO rests inside the opened cabinet.",

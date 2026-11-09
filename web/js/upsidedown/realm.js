@@ -1,4 +1,4 @@
-// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.010:acoven.
+// realm.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 function enterRealm(ctx) {
   const locker = ctx.item("minersLocker");
@@ -126,23 +126,23 @@ const content = {
     avClubDen: {
       name: "AV Club Den",
       desc:
-        "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. Its dial points to a quiz show that refuses to end. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
+        "A dusty AV CLUB DEN has three broken folding chairs, a heroic tangle of extension cords, and a CABINET RADIO the size of a disappointed refrigerator. A card taped to it reads: NAME THAT TUNE! THREE RIGHT IN A ROW OPENS THE CABINET. WEST leads to the WAYLAMP; NORTH leads to a domed PLANETARIUM.",
       searchDesc:
-        "The CABINET RADIO has five numbered buttons and a door with a hidden hinge. The hinge can open only after the quiz is won.",
+        "The CABINET RADIO has five numbered answer buttons and a locked door. Something rattles inside the cabinet when you knock.",
     },
     planetarium: {
       name: "Planetarium",
       desc:
-        "A plain PLANETARIUM dome looms above a single brass PROJECTOR. The ceiling is marked with five groups of stars; one patch looks like a drain and another has scorched the plaster. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
+        "A PLANETARIUM dome arches over a single brass PROJECTOR. Enter a number from 1 to 5 to pick a projection. SOUTH returns to the AV CLUB DEN; EAST opens into a MAP ROOM.",
       searchDesc:
-        "The PROJECTOR bears a number key and two safety sketches, a figure stretched into a noodle and another on fire. Bad selections can throw you to the FRONT GATE. If you arrive there burning, the GARDEN BRAZIER is one step EAST.",
+        "The PROJECTOR's dial is numbered 1 to 5.",
     },
     mapRoom: {
       name: "Map Room",
       desc:
-        "A tiny MAP ROOM is wallpapered in star charts with more confidence than scientific merit. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
+        "A tiny MAP ROOM is wallpapered in star charts. A STELLAR MAP rests on a lectern. WEST returns to the PLANETARIUM.",
       searchDesc:
-        "The STELLAR MAP numbers five patterns in a fixed order. The brass projector next door asks only for a number.",
+        "The STELLAR MAP lists five projections by number.",
     },
     shack: {
       name: "Shack",

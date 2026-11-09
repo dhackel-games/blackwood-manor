@@ -1,4 +1,4 @@
-// snuffbox.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+// snuffbox.js. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 function takeBustNose(ctx) {
   if (ctx.getFlag("manor:snuffboxFound")) return "You already picked that nostril clean.";
@@ -70,6 +70,12 @@ const items = {
     on: { examine: describeSnuffbox, smell: useSnuffbox, use: useSnuffbox },
   },
 };
+function landingLadder(ctx) {
+  return ctx.getFlag("ladderDown")
+    ? "The lowered ATTIC ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
+    : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
+}
+
 const content = {
   rooms: {
     landing: {
@@ -78,14 +84,14 @@ const content = {
         "EAST to the GRAND BEDROOM, NORTH to the HALL BEDROOM, and SOUTH to the STUDY. A frayed CORD dangles from a " +
         "trap-door in the ceiling. The stairs go DOWN. A MARBLE BUST of Great-Grandpa Blackwood stands beside the stairs, his heroic nose tilted into the light.",
       searchDesc(ctx) {
-        const ladder = ctx.getFlag("ladderDown")
-          ? "The lowered ATTIC ladder groans under its own weight. Climbing it while heavily laden would be suicidal."
-          : "The CORD is connected to the ceiling trap-door and has a clean, hand-width patch near its end. Pulling it should lower something.";
-        return `${ladder} The MARBLE BUST's left nostril holds a small silver glint.`;
+        const ladder = landingLadder(ctx);
+        return ctx.getFlag("manor:snuffboxFound")
+          ? ladder
+          : `${ladder} The MARBLE BUST's left nostril holds a small silver glint.`;
       },
       highDesc(ctx) {
         return ctx.getFlag("manor:snuffboxFound")
-          ? "The bust's left nostril is empty."
+          ? landingLadder(ctx)
           : "Hidden sight picks out a silver box lodged in the bust's left nostril. You can PICK NOSE to retrieve it.";
       },
     },
@@ -93,11 +99,14 @@ const content = {
   items: {
     marbleBust: {
       roomDesc: "A MARBLE BUST guards the stairs with a spectacular nose.",
-      desc: "Great-Grandpa Blackwood has the nose of a man who considered breathing a competitive sport. A silver glint peeks up his LEFT NOSTRIL.",
+      desc: (ctx) => "Great-Grandpa Blackwood has the nose of a man who considered breathing a competitive sport." +
+        (ctx.getFlag("manor:snuffboxFound") ? "" : " A silver glint peeks up his LEFT NOSTRIL."),
     },
     bustNose: {
       roomDesc: "Great-Grandpa's marble NOSE leads the way.",
-      desc: "The LEFT NOSTRIL of the bust shelters a silver glint you could reach by PICKing.",
+      desc: (ctx) => ctx.getFlag("manor:snuffboxFound")
+        ? "Great-Grandpa's marble NOSE, as heroic as ever."
+        : "The LEFT NOSTRIL of the bust shelters a silver glint you could reach by PICKing.",
     },
     snuffbox: {
       roomDesc: "A silver SNUFFBOX rests here, its lid decorated with a very smug nose.",

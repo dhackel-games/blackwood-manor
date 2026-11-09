@@ -1,4 +1,4 @@
-# manor-snuffbox.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-08.001:acoven.
+# manor-snuffbox.feature. Copyright (c) dhackel-games. All Rights Reserved. 2026...2026-11-09.001:acoven.
 
 @lane8
 Feature: Great-Grandpa Blackwood's snuffbox
@@ -18,6 +18,10 @@ Feature: Great-Grandpa Blackwood's snuffbox
     And the game score is 10
     When I send "pick nose"
     Then the output contains "already picked that nostril clean"
+    When I send "search"
+    Then the output does not contain "nostril"
+    When I send "examine bust"
+    Then the output does not contain "glint"
 
   Scenario: Hidden sight reveals the snuffbox before retrieval
     Given flag "high" is 1
