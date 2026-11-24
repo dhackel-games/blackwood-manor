@@ -158,6 +158,7 @@ export function createGame(world) {
   let deferStatusBanner = false;
   let describedRoomThisTurn = false;
   let checkpoints = {};
+  let commandPickups = null;
 
   // --- lookups ---------------------------------------------------------------
   game.room = () => world.rooms[state.room];
@@ -288,7 +289,18 @@ export function createGame(world) {
   game.setFlag = (f, v = true) => { state.flags[f] = v; };
   game.has = (id) => state.items[id] && state.items[id].loc === "inventory";
   game.here = (id) => state.items[id] && state.items[id].loc === state.room;
-  game.moveItem = (id, to) => { if (state.items[id]) state.items[id].loc = to; };
+  game.moveItem = (id, to) => {
+    const item = state.items[id];
+    if (item) {
+      if (to === "inventory" && item.loc !== "inventory") {
+        commandPickups?.push({
+          id: item.id,
+          shortName: item.shortName || world.itemShortNames?.[item.id],
+        });
+      }
+      item.loc = to;
+    }
+  };
   game.destroy = (id) => { if (state.items[id]) state.items[id].loc = null; };
   game.addScore = (n) => { state.score += n; };
   game.awardPickup = (item) => {
@@ -886,7 +898,20 @@ export function createGame(world) {
   const MAX_CHAIN = 256;
   let previousCommand = null;
 
-  function sendRaw(input) {
+  function runCommand(input, onOutput, prefix = "") {
+    if (!onOutput) return runOne(input);
+    const previousPickups = commandPickups;
+    commandPickups = [];
+    try {
+      const result = runOne(input);
+      onOutput({ text: game.showMessage(prefix + result.text), pickups: commandPickups });
+      return result;
+    } finally {
+      commandPickups = previousPickups;
+    }
+  }
+
+  function sendRaw(input, onOutput) {
     if (state.dead || state.won) {
       // The game's over — you're no longer on the phone. Clearing this keeps a
       // death or win that happened mid-call from stranding the player on the
@@ -917,7 +942,7 @@ export function createGame(world) {
         part = previousCommand;
       }
       previousCommand = part;
-      return runOne(part).text;
+      return runCommand(part, onOutput).text;
     }
 
     const run = parts.slice(0, MAX_CHAIN);
@@ -927,17 +952,25 @@ export function createGame(world) {
     for (let part of run) {
       // AGAIN/G inside a chain repeats the previous command on the same line.
       if (/^(again|g)$/i.test(part)) {
-        if (!prev) { out.push(`> ${part}\nNothing to repeat.`); stopped = true; break; }
+        if (!prev) {
+          const text = `> ${part}\nNothing to repeat.`;
+          out.push(text);
+          onOutput?.({ text, pickups: [] });
+          stopped = true;
+          break;
+        }
         part = prev;
       }
-      const { text, stop } = runOne(part);
+      const { text, stop } = runCommand(part, onOutput, `> ${part}\n`);
       out.push(`> ${part}\n${text}`);
       prev = part;
       previousCommand = part;
       if (stop) { stopped = true; break; }
     }
     if (!stopped && parts.length > MAX_CHAIN) {
-      out.push(`(Only the first ${MAX_CHAIN} commands on that line were carried out.)`);
+      const text = `(Only the first ${MAX_CHAIN} commands on that line were carried out.)`;
+      out.push(text);
+      onOutput?.({ text, pickups: [] });
     }
     return out.join("\n\n");
   }
@@ -950,7 +983,7 @@ export function createGame(world) {
     return game.showMessage(message);
   };
 
-  game.send = (input) => {
+  function send(input, onOutput) {
     if (game.needsPlayerName()) {
       const raw = String(input || "").trim();
       const useDefault = !raw
@@ -1001,7 +1034,18 @@ export function createGame(world) {
       }
       state.flags.awaitingPlayerName = false;
     }
-    return game.showMessage(sendRaw(input));
+    return game.showMessage(sendRaw(input, onOutput));
+  }
+
+  // Observations are command-local; the returned text and saved state stay unchanged.
+  game.send = (input, onOutput) => {
+    let observed = false;
+    const text = send(input, onOutput && ((output) => {
+      observed = true;
+      onOutput(output);
+    }));
+    if (!observed) onOutput?.({ text, pickups: [] });
+    return text;
   };
 
   // --- save / restore --------------------------------------------------------

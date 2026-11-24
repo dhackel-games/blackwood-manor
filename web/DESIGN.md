@@ -419,6 +419,7 @@ the mansion.
 - **`world.statusBanner(game)`** — returns a string appended to every room description
   (`core.describeRoom`). Drives the **ASCII fire / sickness art**.
 - **`world.endBadges(game)`** — returns extra lines for the **win screen** (achievement badges).
+* **`game.send(input, onOutput)`**: the optional synchronous observer receives `{ text, pickups: [{ id, shortName }] }` for each command's rendered plain-text output. `moveItem` captures detached identity values at each actual transition into inventory, resolving `shortName` from `item.shortName` or `world.itemShortNames` at acquisition, including puzzle grants and implicitly acquired items consumed immediately. These transient notifications expose no live game items and do not change the returned string, scoring, snapshots, or headless callers. A chain ending at the hint line renders its preceding command outputs in the main transcript before opening Gary's view.
 - **Room-handler injection** — at module load, `world.js` wraps every room's
   `on.light/burn/extinguish/off` with a self-immolation interceptor, so "light self on fire"
   works in **any** room without per-room code (falls through to the normal command otherwise).
@@ -563,6 +564,8 @@ and `core.js` runs each fragment through `runOne()` in order. So
 - Page load, RESTART, and successful RESTORE append unique local-time
   `#YYYYMMDD_HHMMSS` anchors. The win prompt links “top” to the latest anchor,
   rather than assuming the current session began at the document top.
+* Browser-only TOC reads `#got_<item shortname>` anchors from the text transcript, using `item.shortName` or `world.itemShortNames`. Each command's pickup anchors sit inside its own output message, including expanded SYSOP routes. The first existing anchor wins on retakes; consumed or deposited items remain listed while their messages remain. CLEAR removes that DOM record naturally, with no pickup ledger or save data. TOC and session links share the pinned transcript jump, so resize does not snap back to the bottom. During a Gary call, TOC prints local hang-up guidance without contacting Gary.
+* `npm test -- --tags @toc` exercises pickup identity, lifetime, command-local targets, unchanged headless output/state, and link/resize behavior through the existing VM DOM fixture.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
 `versions.json` is the single source of truth for the exact copyright-version shown in the intro,

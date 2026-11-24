@@ -144,6 +144,7 @@ spell/type <word> | Spell / Spell or type a word where content accepts one.
 start/run/activate <thing> | Start / Start an object when content supports it.
 stomp/stamp <thing> | Stomp / Stomp something when content makes it useful.
 throw <thing> at <target> | Throw / Throw a carried item.
+toc | Item pickups (text view only) / Link to the original pickup messages still in this scrollback.
 top | Top / Scroll to the top of the page.
 turn/rotate/spin <thing> | Turn / Turn an object when content gives it a position.
 unlock/(un) <thing> with <key> | Unlock / Unlock something with a matching key.

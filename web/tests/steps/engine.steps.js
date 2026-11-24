@@ -27,6 +27,9 @@ import {
   pickGaryVoice,
 } from "../../js/gary-voice.js";
 import { parse, splitCommands } from "../../js/parser.js";
+import { MAP_MARK } from "../../js/map.js";
+import { expandSysopCommand, sysopMenuAction } from "../../js/sysop-menu.js";
+import { world as manorWorld } from "../../js/world.js";
 
 const versionMetadata = JSON.parse(
   readFileSync(new URL("../../versions.json", import.meta.url), "utf8"));
@@ -541,6 +544,343 @@ Then("TOP and CLEAR manage both text transcripts without advancing the game", fu
   assert.equal(transcript.entries.at(-1), "restart link");
 });
 
+function pickupWorld() {
+  const world = fixture();
+  world.config.portableRewards = { pickup: 5, use: 5 };
+  world.itemShortNames = {
+    key: "key", candle: "candle", match: "match", note: "note",
+    ration: "ration", reward: "token",
+  };
+  world.items.key.shortName = "brasskey";
+  world.items.candle.lit = true;
+  world.items.candle.fuel = 30;
+  world.items.ration = {
+    names: ["ration"], loc: "study", takeable: true, edible: true,
+  };
+  world.items.reward = { names: ["token"], loc: null, takeable: true };
+  world.items.lever = {
+    names: ["lever"], loc: "hall", fixed: true,
+    on: {
+      pull(ctx) {
+        ctx.moveItem("reward", "inventory");
+        return "The mechanism clicks.";
+      },
+    },
+  };
+  world.hotline = () => "Gary answers.";
+  world.hotlineTalk = (ctx) => {
+    ctx.setFlag("phoneBill", (ctx.getFlag("phoneBill") || 0) + 99);
+    return "Gary heard you.";
+  };
+  world.garyTurnInfo = () => null;
+  return world;
+}
+
+function textTranscript(game) {
+  const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
+  class Element {
+    constructor(tagName) {
+      this.tagName = tagName.toUpperCase();
+      this.childNodes = [];
+      this.parentElement = null;
+      this.id = "";
+      this.className = "";
+      this.attributes = {};
+      this.listeners = {};
+      this.scrollTop = 0;
+    }
+    get children() { return this.childNodes.filter((node) => node instanceof Element); }
+    get textContent() {
+      return this.childNodes.map((node) => typeof node === "string" ? node : node.textContent).join("");
+    }
+    set textContent(text) { this.replaceChildren(String(text)); }
+    get scrollHeight() { return this.children.length * 60; }
+    get hash() { return this.href?.slice(this.href.indexOf("#")) || ""; }
+    append(...nodes) {
+      for (const node of nodes) {
+        if (node instanceof Element) node.parentElement = this;
+        this.childNodes.push(node);
+      }
+    }
+    appendChild(node) { this.append(node); return node; }
+    prepend(...nodes) {
+      for (const node of nodes) {
+        if (node instanceof Element) node.parentElement = this;
+      }
+      this.childNodes.unshift(...nodes);
+    }
+    replaceChildren(...nodes) {
+      for (const node of this.children) node.parentElement = null;
+      this.childNodes = [];
+      this.append(...nodes);
+    }
+    setAttribute(name, text) { this.attributes[name] = String(text); }
+    getAttribute(name) { return this.attributes[name] ?? this[name] ?? null; }
+    addEventListener(type, listener) { this.listeners[type] = listener; }
+    querySelectorAll(selector) {
+      const matches = (node) => {
+        if (selector === "a") return node.tagName === "A";
+        if (selector === '[id^="got_"]') return node.id.startsWith("got_");
+        if (selector.startsWith(".")) {
+          return selector.slice(1).split(".").every((name) => node.className.split(/\s+/).includes(name));
+        }
+        throw new Error(`Unsupported fixture selector: ${selector}`);
+      };
+      return this.children.flatMap((node) => [
+        ...(matches(node) ? [node] : []), ...node.querySelectorAll(selector),
+      ]);
+    }
+    getBoundingClientRect() {
+      if (!this.parentElement) return { top: 100 };
+      const parent = this.parentElement;
+      return {
+        top: parent.getBoundingClientRect().top
+          + parent.children.indexOf(this) * 60 - parent.scrollTop,
+      };
+    }
+    focus(options) { document.activeElement = this; this.focusOptions = options; }
+    click() {
+      let prevented = false;
+      this.listeners.click?.({
+        preventDefault() { prevented = true; },
+        currentTarget: this,
+      });
+      assert.equal(prevented, true, "transcript links use the pinned jump handler");
+    }
+  }
+  const transcript = new Element("section");
+  const phoneT = new Element("section");
+  const document = {
+    createElement: (tagName) => new Element(tagName),
+    getElementById: (id) => [transcript, phoneT].flatMap(
+      (root) => [root, ...descendants(root)],
+    ).find((node) => node.id === id) || null,
+    activeElement: null,
+  };
+  function descendants(root) {
+    return root.children.flatMap((node) => [node, ...descendants(node)]);
+  }
+  const window = {
+    location: { hash: "" },
+    scrollTo() {},
+    listeners: {},
+    addEventListener(type, listener) { this.listeners[type] = listener; },
+  };
+  window.history = {
+    pushState(_state, _title, hash) { window.location.hash = hash; },
+    replaceState(_state, _title, hash) { window.location.hash = hash; },
+  };
+  const sent = [];
+  const send = game.send;
+  game.send = (...args) => {
+    const text = send(...args);
+    sent.push(text);
+    return text;
+  };
+  const spoken = [];
+  const sandbox = {
+    document, window, transcript, phoneT, game, world: game.world, MAP_MARK,
+    transcriptPinnedToTop: false, phoneTranscriptPinnedToTop: false,
+    currentSessionAnchorId: "", introBannerElement: null,
+    endingCall: false, history: [], hi: 0, bugTrace: createBugTrace("TOC fixture"),
+    recordBugCommand, recordBugDialogue, bugReportDescription, parseRestartTarget, splitCommands,
+    Native: { isMobileApp: () => false },
+    updateHud() {}, updatePhoneStatus() {}, syncNameGate() {}, saveGame: () => true,
+    showPhone() { phoneT.replaceChildren(); },
+    ambientSfxKind: () => null, garyReacts: () => null,
+    garySpeak: (text) => spoken.push(text),
+    canType: false, mainEntry: { setValue() {} },
+    queueMicrotask: (callback) => callback(),
+    setTimeout: (callback) => callback(),
+  };
+  const api = runInNewContext(
+    sourceBetween(ui, "function emit(", "// --- phone-call screen ---") +
+    sourceBetween(ui, "function printToPhone(", "function garyLineLabel(") +
+    sourceBetween(ui, "function handle(raw) {", "function applySysopCommand(") +
+    sourceBetween(ui, "const scrollBottom =", "// Keep controls visible") +
+    "\n({ handle, print, markSessionStart, printRestartPrompt })",
+    sandbox,
+  );
+  api.markSessionStart();
+  api.print(game.describeRoom());
+  return { ...api, game, transcript, phoneT, document, window, sent, spoken };
+}
+
+Given("a fixture text transcript", function () {
+  this.game = createGame(pickupWorld());
+  this.terminal = textTranscript(this.game);
+});
+
+Given("a manor text transcript with the sysop menu unlocked", function () {
+  this.game = createGame(manorWorld);
+  this.game.useDefaultPlayerName();
+  this.game.setFlag("sysopMenuUnlocked");
+  this.terminal = textTranscript(this.game);
+});
+
+Given("Gary's call screen is active", function () {
+  this.game.setFlag("onCall");
+});
+
+Given("the fixture lever renames the key", function () {
+  const pull = this.game.world.items.lever.on.pull;
+  this.game.world.items.lever.on.pull = (ctx) => {
+    ctx.item("key").shortName = "changedkey";
+    return pull(ctx);
+  };
+});
+
+When("I modify a received pickup observation", function () {
+  const headless = createGame(this.game.world);
+  headless.restore(this.game.snapshot());
+  this.headlessOutput = headless.send("take key");
+  this.headlessSnapshot = headless.snapshot();
+  this.output = this.game.send("take key", ({ pickups }) => {
+    const pickup = pickups[0];
+    assert.ok(pickup, "the acquisition must produce a pickup observation");
+    this.pickupIdentity = { id: pickup.id, shortName: pickup.shortName };
+    this.pickupFields = Object.keys(pickup).sort();
+    pickup.loc = null;
+    pickup.id = "changed";
+    pickup.shortName = "changedkey";
+  });
+});
+
+Then("the acquired item and snapshot match an unobserved pickup", function () {
+  assert.equal(this.game.has("key"), true);
+  assert.equal(this.output, this.headlessOutput);
+  assert.deepEqual(this.game.snapshot(), this.headlessSnapshot);
+  assert.deepEqual(this.pickupIdentity, { id: "key", shortName: "brasskey" });
+  assert.deepEqual(this.pickupFields, ["id", "shortName"]);
+});
+
+Then("the shared INFO entry marks TOC as text-view-only", function () {
+  const entry = createGame(pickupWorld()).send("info").split("\n")
+    .find((line) => line.startsWith("toc |"));
+  assert.ok(entry, "the shared command reference must include TOC");
+  assert.match(entry, /\btext view only\b/i);
+});
+
+When("I type {string} in the text transcript", function (command) {
+  this.beforeDisplay = this.game.snapshot();
+  this.beforeSendCount = this.terminal.sent.length;
+  this.beforeSpeechCount = this.terminal.spoken.length;
+  if (!["toc", "top", "clear"].includes(command) && !this.game.getFlag("onCall")) {
+    const headless = createGame(this.game.world);
+    headless.restore(this.beforeDisplay);
+    this.headlessOutput = headless.send(command);
+    this.headlessSnapshot = headless.snapshot();
+  }
+  this.terminal.handle(command);
+});
+
+When("I remember the pickup target for {string}", function (shortName) {
+  this.originalPickup = this.terminal.document.getElementById(`got_${shortName}`);
+  assert.ok(this.originalPickup, "the initial acquisition needs an anchor");
+  this.originalPickupMessage = this.originalPickup.parentElement;
+});
+
+When("I click the TOC link for {string}", function (shortName) {
+  this.clickedPickup = this.terminal.document.getElementById(`got_${shortName}`);
+  const link = this.terminal.transcript.querySelectorAll("a")
+    .find((node) => node.href === `#got_${shortName}`);
+  assert.ok(link, "TOC needs a real fragment link");
+  link.click();
+});
+
+When("I run the SYSOP win route in the text transcript", function () {
+  const action = sysopMenuAction("::win", true);
+  this.terminal.handle(expandSysopCommand(action.shortcut, this.game));
+});
+
+Then("pickup {string} marks the message {string}", function (shortName, text) {
+  const anchor = this.terminal.document.getElementById(`got_${shortName}`);
+  assert.ok(anchor, `Missing original pickup anchor got_${shortName}`);
+  assert.notEqual(anchor.parentElement, this.terminal.transcript);
+  assert.notEqual(anchor.parentElement.className, "echo");
+  assert.ok(anchor.parentElement.textContent.includes(text), anchor.parentElement.textContent);
+  assert.equal(anchor.tabIndex, -1);
+  assert.ok(anchor.getAttribute("aria-label"));
+});
+
+Then("the transcript pickup anchors are {string}", function (names) {
+  assert.deepEqual(
+    this.terminal.transcript.querySelectorAll('[id^="got_"]').map((node) => node.id),
+    names ? names.split(",").map((name) => `got_${name}`) : [],
+  );
+});
+
+Then("the TOC links are {string}", function (names) {
+  const links = this.terminal.transcript.querySelectorAll("a")
+    .filter((node) => node.href.startsWith("#got_"));
+  assert.deepEqual(links.map((node) => node.href), names.split(",").map((name) => `#got_${name}`));
+  assert.ok(links.every((node) => node.textContent.trim()), "every TOC link needs a label");
+});
+
+Then("the display command leaves gameplay and Gary untouched", function () {
+  assert.deepEqual(this.game.snapshot(), this.beforeDisplay);
+  assert.equal(this.terminal.sent.length, this.beforeSendCount);
+  assert.equal(this.terminal.spoken.length, this.beforeSpeechCount);
+});
+
+Then("that pickup stays in view after a transcript resize", function () {
+  const { transcript, document, window } = this.terminal;
+  assert.equal(this.clickedPickup.getBoundingClientRect().top, transcript.getBoundingClientRect().top);
+  assert.equal(document.activeElement, this.clickedPickup);
+  assert.equal(this.clickedPickup.focusOptions.preventScroll, true);
+  assert.equal(window.location.hash, `#${this.clickedPickup.id}`);
+  const position = transcript.scrollTop;
+  assert.ok(position < transcript.scrollHeight, "the jump must leave the bottom of scrollback");
+  window.listeners.resize();
+  assert.equal(transcript.scrollTop, position);
+});
+
+Then("the original pickup target for {string} is unchanged", function (shortName) {
+  const matches = this.terminal.transcript.querySelectorAll('[id^="got_"]');
+  assert.equal(matches.filter((node) => node.id === `got_${shortName}`).length, 1);
+  assert.equal(this.terminal.document.getElementById(`got_${shortName}`), this.originalPickup);
+  assert.equal(this.originalPickup.parentElement, this.originalPickupMessage);
+});
+
+Then("the TOC honestly reports no pickup locations", function () {
+  assert.ok(this.terminal.transcript.textContent.includes("No item pickups in this scrollback yet."));
+  assert.equal(this.terminal.transcript.querySelectorAll("a").filter(
+    (node) => node.href.startsWith("#got_")).length, 0);
+});
+
+Then("the transcript ration has been consumed", function () {
+  assert.equal(this.game.roomOf("ration"), null);
+});
+
+Then("observed and headless gameplay output and snapshots agree", function () {
+  assert.equal(typeof this.terminal.sent.at(-1), "string");
+  assert.equal(this.terminal.sent.at(-1), this.headlessOutput);
+  assert.deepEqual(this.game.snapshot(), this.headlessSnapshot);
+});
+
+Then("pickups {string} have distinct output messages", function (names) {
+  const messages = names.split(",").map((name) =>
+    this.terminal.document.getElementById(`got_${name}`)?.parentElement);
+  assert.ok(messages.every(Boolean), "each pickup needs its original output");
+  assert.equal(new Set(messages).size, messages.length);
+});
+
+Then("the route reaches the clock with separate original key and clock pickup messages", function () {
+  assert.equal(this.game.getFlag("bellRung"), true);
+  assert.equal(this.game.has("clockTalisman"), true);
+  const key = this.terminal.document.getElementById(`got_${manorWorld.itemShortNames.frontKey}`);
+  const clock = this.terminal.document.getElementById(`got_${manorWorld.itemShortNames.clockTalisman}`);
+  assert.ok(key, "the route's key pickup must be anchored");
+  assert.ok(clock, "the route's clock pickup must be anchored");
+  assert.notEqual(key.parentElement, clock.parentElement);
+  assert.ok(key.parentElement.textContent.startsWith("> "));
+  assert.ok(clock.parentElement.textContent.startsWith("> "));
+});
+
+Then("the phone transcript says {string}", function (text) {
+  assert.ok(this.terminal.phoneT.textContent.includes(text), this.terminal.phoneT.textContent);
+});
+
 Then("the 2D command trail supports TOP and CLEAR", function () {
   const view = readFileSync(new URL("../../view2d/tilemap.html", import.meta.url), "utf8");
   const trailList = { scrollTop: 80 };
@@ -761,7 +1101,7 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.equal(url.searchParams.get("body").split("\n")[0], "Copyright test 1.2.3");
   assert.equal(url.searchParams.get("body").split("\n")[1], description);
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
+  assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd,"));
 });
 
 Then("bug reports include the full session trail, HUD state, and inventory", function () {
@@ -856,7 +1196,7 @@ Then("bug reports include numbered Gary dialogue with compact speaker labels", f
 
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /if \(onCall\) recordBugDialogue\(bugTrace, "user", submitted\)/);
-  assert.match(ui, /const dialogueEntry = recordBugDialogue\(bugTrace, "gary", out\)/);
+  assert.match(ui, /const dialogueEntry = recordBugDialogue\(bugTrace, "gary", phoneOutput\)/);
   assert.match(ui, /updateBugDialogue\(dialogueEntry, spoken\)/);
   assert.match(ui, /dialogue: bugTrace\.dialogue/);
   assert.match(ui, /userName: bugTrace\.userName/);
@@ -910,19 +1250,30 @@ Then("game-over restart text links to the latest session start", function () {
     /function sessionAnchorId\(date\)[\s\S]*date\.getFullYear\(\)[\s\S]*date\.getMonth\(\) \+ 1[\s\S]*date\.getDate\(\)[\s\S]*_` \+[\s\S]*date\.getHours\(\)[\s\S]*date\.getMinutes\(\)[\s\S]*date\.getSeconds\(\)/s);
   assert.match(ui, /anchor\.id = id/);
   assert.match(ui, /currentSessionAnchorId = id/);
-  assert.match(ui, /link\.href = `#\$\{currentSessionAnchorId\}`/);
   assert.match(ui, /line\.append\("Type RESTART to play again\. \(Jump to the "\)/);
   assert.match(ui, /link\.textContent = "top"/);
   assert.match(ui,
     /function jumpToSessionStart\(id\)[\s\S]*anchor\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.scrollTop \+= anchorTop - transcriptTop/s);
   assert.match(ui,
-    /link\.addEventListener\("click", \(event\) => \{[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(currentSessionAnchorId\)/s);
+    /function followTranscriptLink\(event, link, id\)[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(id\)/s);
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
   assert.match(ui, /function newGame[\s\S]*beginSession\(\{ showSavedNotice: true/);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
   assert.match(ui, /\/\/ --- boot ---[\s\S]*takeModeHandoff\(\)[\s\S]*beginSession\(\{ showSavedNotice: true, resumed:/s);
   assert.match(ui, /if \(game\.state\.won\) printRestartPrompt\(\)/);
   assert.match(css, /\.session-restart a\s*\{[^}]*color:\s*var\(--green-bright\)[^}]*text-decoration:\s*underline/s);
+
+  const terminal = textTranscript(createGame(pickupWorld()));
+  terminal.printRestartPrompt();
+  const link = terminal.transcript.querySelectorAll("a")[0];
+  const target = terminal.document.getElementById(link.hash.slice(1));
+  const latest = terminal.markSessionStart();
+  assert.notEqual(latest, target.id);
+  link.click();
+  assert.equal(link.href, `#${target.id}`);
+  assert.equal(terminal.window.location.hash, link.hash);
+  assert.equal(terminal.document.activeElement, target);
+  assert.equal(target.getBoundingClientRect().top, terminal.transcript.getBoundingClientRect().top);
 });
 
 Then("Gary offers robot and human voice icons", function () {

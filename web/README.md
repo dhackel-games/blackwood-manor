@@ -233,9 +233,10 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   depend on the objects in the current room. `DIAL <setting>` sets the visible
   dial; bare `DIAL` (or `DIAL GARY`) calls Gary instead.
 - **Meta:** `score`, `save`, `restore`, `restart`, `ver`/`version`/`build`,
-  `reload`/`refresh`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
+  `reload`/`refresh`, `toc`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
   INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
   TOP scrolls to the top of the page; CLEAR erases the entire scrollback and redisplays the basic prompt for the current room.
+  TOC links to each item's original pickup message in the current text scrollback without spending a turn, fuel, points, or a call to Gary. Retakes keep the first target; consumed and deposited items stay listed until CLEAR removes their messages. On Gary's call screen, TOC asks you to hang up first.
   In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
   remote content source; RELOAD still puts the greatest content version into
