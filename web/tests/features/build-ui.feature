@@ -18,9 +18,98 @@ Feature: Build metadata and touch-control contract
     And the controls remain pinned inside the viewport
     And the local launcher serves every file with no-store headers
 
+  @toc
   Scenario: TOP and CLEAR manage scrollback without advancing the game
     Then TOP and CLEAR manage both text transcripts without advancing the game
     And the 2D command trail supports TOP and CLEAR
+
+  @toc
+  Scenario: TOC jumps to a pickup without advancing the game
+    Given a fixture text transcript
+    When I type "take key" in the text transcript
+    Then pickup "brasskey" marks the message "Taken."
+    When I type "toc" in the text transcript
+    Then the TOC links are "brasskey"
+    And the display command leaves gameplay and Gary untouched
+    When I click the TOC link for "brasskey"
+    Then that pickup stays in view after a transcript resize
+
+  @toc
+  Scenario: Retaking and depositing an item preserve its original pickup target
+    Given a fixture text transcript
+    When I type "take key" in the text transcript
+    And I remember the pickup target for "brasskey"
+    And I type "drop key; take key; open box with key; put key in box" in the text transcript
+    Then the original pickup target for "brasskey" is unchanged
+    And item "key" is in "box"
+    When I type "toc" in the text transcript
+    Then the TOC links are "brasskey"
+
+  @toc
+  Scenario: Discovery and refused takes do not create TOC entries
+    Given a fixture text transcript
+    When I type "look; examine key; take box; take desk" in the text transcript
+    Then the transcript pickup anchors are ""
+    When I type "toc" in the text transcript
+    Then the TOC honestly reports no pickup locations
+
+  @toc
+  Scenario: TAKE ALL records every acquired object using its canonical short name
+    Given a fixture text transcript
+    When I type "take all" in the text transcript
+    Then the transcript pickup anchors are "brasskey,candle,match"
+    When I type "toc" in the text transcript
+    Then the TOC links are "brasskey,candle,match"
+
+  @toc
+  Scenario Outline: Implicit acquisition survives consumption in the same command
+    Given a fixture text transcript
+    And the player is in fixture room "study"
+    When I type "<command>" in the text transcript
+    Then pickup "ration" marks the message "You eat the ration."
+    And the transcript ration has been consumed
+    When I type "toc" in the text transcript
+    Then the TOC links are "ration"
+
+    Examples:
+      | command    |
+      | use ration |
+      | eat ration |
+
+  @toc
+  Scenario: A chain anchors ordinary pickups and puzzle grants before calling Gary
+    Given a fixture text transcript
+    When I type "take key; pull lever; north; eat ration; call" in the text transcript
+    Then observed and headless gameplay output and snapshots agree
+    And pickup "brasskey" marks the message "> take key"
+    And pickup "token" marks the message "> pull lever"
+    And pickup "ration" marks the message "> eat ration"
+    And pickups "brasskey,token,ration" have distinct output messages
+
+  @toc
+  Scenario: The full SYSOP win route keeps pickup targets inside individual command outputs
+    Given a manor text transcript with the sysop menu unlocked
+    When I run the SYSOP win route in the text transcript
+    Then the route reaches the clock with separate original key and clock pickup messages
+
+  @toc
+  Scenario: CLEAR removes the DOM pickup record without removing carried items
+    Given a fixture text transcript
+    When I type "take key" in the text transcript
+    And I type "clear" in the text transcript
+    Then item "key" is in "inventory"
+    And the transcript pickup anchors are ""
+    When I type "toc" in the text transcript
+    Then the TOC honestly reports no pickup locations
+    And the display command leaves gameplay and Gary untouched
+
+  @toc
+  Scenario: TOC on Gary's call screen gives local guidance without contacting Gary
+    Given a fixture text transcript
+    And Gary's call screen is active
+    When I type "toc" in the text transcript
+    Then the phone transcript says "Hang up, then type TOC to jump to item pickups in the game transcript."
+    And the display command leaves gameplay and Gary untouched
 
   Scenario: The HUD exposes inventory, reliquary, digestive, mushroom, vision, flight, fire, and light status
     Then the HUD has inventory, reliquary, bowel pressure, sickness phase, mushroom, vision, flight, fire, and light indicators
@@ -61,6 +150,7 @@ Feature: Build metadata and touch-control contract
     And overlong bug histories preserve both ends and mark the omission
     And the iOS wrapper opens new-window web links externally
 
+  @toc
   Scenario: Game and Gary use large icon-only submit controls
     Then both submit controls use the same extra-thick SVG arrow
     And Gary's circular voice toggle contains a speaker icon

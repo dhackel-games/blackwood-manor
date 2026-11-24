@@ -156,18 +156,23 @@ body { -webkit-text-size-adjust: 100%; }
 #transcript .echo { color: var(--green-bright); opacity: 0.85; }
 #transcript .over { color: var(--green-bright); font-weight: bold; }
 #transcript div { margin: 0 0 0.15rem; }
+.pickup-anchor,
 .session-anchor {
   display: block;
   height: 0;
   scroll-margin-top: 0.5rem;
 }
+.pickup-anchor:focus,
 .session-anchor:focus { outline: none; }
 .session-restart { margin-top: 0.5rem; }
+.toc ul { margin: 0; padding-left: 1.5rem; }
+.toc a,
 .session-restart a {
   color: var(--green-bright);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
+.toc a:active,
 .session-restart a:active { color: var(--green); }
 
 /* --- touch controls --- */

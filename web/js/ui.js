@@ -313,7 +313,7 @@ function beginSession({ showSavedNotice = false, message = "", resumed = false }
 // --- terminal output ---
 // Text may contain MAP_MARK-delimited ASCII blocks. Those must not word-wrap,
 // so they're emitted as their own `.map` element; everything else wraps normally.
-function emit(container, text, cls, prefix = "") {
+function emit(container, text, cls, prefix = "", pickups = []) {
   let last = null;
   const rendered = game?.showMessage ? game.showMessage(text) : String(text);
   const parts = String(rendered).split(MAP_MARK);
@@ -324,6 +324,21 @@ function emit(container, text, cls, prefix = "") {
     div.className = isMap ? "map" : (cls || "");
     div.textContent = (!isMap && prefix ? prefix : "") +
       (isMap || cls === "banner" ? part : part.trim());
+    if (container === transcript && !last && pickups.length) {
+      const anchors = [];
+      for (const item of pickups) {
+        const shortName = item.shortName || world.itemShortNames[item.id];
+        const id = `got_${shortName}`;
+        if (document.getElementById(id)) continue;
+        const anchor = document.createElement("span");
+        anchor.id = id;
+        anchor.className = "pickup-anchor";
+        anchor.tabIndex = -1;
+        anchor.setAttribute("aria-label", `Picked up ${shortName}`);
+        anchors.push(anchor);
+      }
+      div.prepend(...anchors);
+    }
     container.appendChild(div);
     last = div;
   });
@@ -333,9 +348,9 @@ function emit(container, text, cls, prefix = "") {
   return last;
 }
 
-function print(text, cls) {
+function print(text, cls, pickups = []) {
   if (text == null) return null;
-  return emit(transcript, text, cls);
+  return emit(transcript, text, cls, "", pickups);
 }
 
 function sessionAnchorId(date) {
@@ -371,6 +386,16 @@ function jumpToSessionStart(id) {
   anchor.focus({ preventScroll: true });
 }
 
+function followTranscriptLink(event, link, id) {
+  event.preventDefault();
+  if (window.location.hash === link.hash) {
+    window.history.replaceState(null, "", link.hash);
+  } else {
+    window.history.pushState(null, "", link.hash);
+  }
+  jumpToSessionStart(id);
+}
+
 function printRestartPrompt() {
   const line = document.createElement("div");
   line.className = "over session-restart";
@@ -378,21 +403,49 @@ function printRestartPrompt() {
   const link = document.createElement("a");
   link.href = `#${currentSessionAnchorId}`;
   link.textContent = "top";
-  link.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (window.location.hash === link.hash) {
-      window.history.replaceState(null, "", link.hash);
-    } else {
-      window.history.pushState(null, "", link.hash);
-    }
-    jumpToSessionStart(currentSessionAnchorId);
-  });
+  link.addEventListener("click", (event) => followTranscriptLink(event, link, currentSessionAnchorId));
   line.append(link, ".)");
   transcript.appendChild(line);
   transcript.scrollTop = transcript.scrollHeight;
 }
 
+function printToc() {
+  const anchors = transcript.querySelectorAll('[id^="got_"]');
+  if (!anchors.length) {
+    print("No item pickups in this scrollback yet.");
+    return;
+  }
+  const toc = document.createElement("nav");
+  toc.className = "toc";
+  toc.setAttribute("aria-label", "Item pickups");
+  const heading = document.createElement("div");
+  heading.textContent = "ITEM PICKUPS";
+  toc.appendChild(heading);
+  const list = document.createElement("ul");
+  for (const anchor of anchors) {
+    const entry = document.createElement("li");
+    const link = document.createElement("a");
+    link.href = `#${anchor.id}`;
+    link.textContent = anchor.id.slice(4);
+    link.addEventListener("click", (event) => followTranscriptLink(event, link, anchor.id));
+    entry.appendChild(link);
+    list.appendChild(entry);
+  }
+  toc.appendChild(list);
+  transcript.appendChild(toc);
+  transcriptPinnedToTop = false;
+  transcript.scrollTop = transcript.scrollHeight;
+}
+
 function handleDisplayCommand(command, onCall) {
+  if (command === "toc") {
+    if (onCall) {
+      printToPhone("Hang up, then type TOC to jump to item pickups in the game transcript.", "sys");
+    } else {
+      printToc();
+    }
+    return true;
+  }
   if (command === "top") {
     if (onCall) phoneTranscriptPinnedToTop = true;
     else transcriptPinnedToTop = true;
@@ -1105,13 +1158,18 @@ function handle(raw) {
   if (onCall) recordBugDialogue(bugTrace, "user", submitted);
   const prevFlags = { ...game.state.flags };
   const turnsBefore = game.state.turns;
-  const out = game.send(cmd);
+  const output = [];
+  const out = game.send(cmd, (entry) => output.push(entry));
   bugTrace.turns += Math.max(0, game.state.turns - turnsBefore);
   const nowOnCall = !!game.state.flags.onCall;
 
   if (nowOnCall) {
-    if (!onCall) showPhone();          // the call just connected → switch to the phone screen
-    const dialogueEntry = recordBugDialogue(bugTrace, "gary", out);
+    const phoneOutput = output.at(-1).text;
+    if (!onCall) {
+      for (const entry of output.slice(0, -1)) print(entry.text, null, entry.pickups);
+      showPhone();
+    }
+    const dialogueEntry = recordBugDialogue(bugTrace, "gary", phoneOutput);
     // If an on-device model is available and this turn is pure conversation,
     // let Gary actually think. The canned line is kept as the fallback and the
     // mechanical tail (meter / bill milestone) is preserved either way.
@@ -1126,7 +1184,7 @@ function handle(raw) {
       updatePhoneStatus();
       updateHud();
       garyBrain.speak(info).then((line) => {
-        const spoken = game.showMessage(line ? line + (info.tail || "") : out);
+        const spoken = game.showMessage(line ? line + (info.tail || "") : phoneOutput);
         updateBugDialogue(dialogueEntry, spoken);
         // Only model-written lines get a marker. Scripted fallbacks remain
         // unmarked rather than adding a second status label to every response.
@@ -1137,8 +1195,8 @@ function handle(raw) {
       });
       return;
     }
-    printToPhone(out, "gary");
-    garySpeak(out);                    // Gary complains out loud
+    printToPhone(phoneOutput, "gary");
+    garySpeak(phoneOutput);            // Gary complains out loud
     updatePhoneStatus();
     updateHud();
     return;
@@ -1152,7 +1210,7 @@ function handle(raw) {
 
   // normal terminal turn
   const gameOver = game.state.dead || game.state.won;
-  print(out, gameOver ? "over" : null);
+  for (const entry of output) print(entry.text, gameOver ? "over" : null, entry.pickups);
   updateHud();
   syncNameGate();  // reset the "type your name" placeholder once the name gate closes
   const mirrorRoute = game.getFlag("mirrorRoutePrefill");
