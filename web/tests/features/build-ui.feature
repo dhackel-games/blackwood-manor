@@ -62,6 +62,26 @@ Feature: Build metadata and touch-control contract
     Then the TOC links are "brasskey,candle,match"
 
   @toc
+  Scenario: Pickup observations cannot change inventory or saved gameplay
+    Given a fixture text transcript
+    When I modify a received pickup observation
+    Then the acquired item and snapshot match an unobserved pickup
+
+  @toc
+  Scenario: A later same-chain rename does not rewrite an earlier pickup anchor
+    Given a fixture text transcript
+    And the fixture lever renames the key
+    When I type "take key; pull lever" in the text transcript
+    Then pickup "brasskey" marks the message "> take key"
+    And the transcript pickup anchors are "brasskey,token"
+    When I type "toc" in the text transcript
+    Then the TOC links are "brasskey,token"
+
+  @toc
+  Scenario: Shared INFO identifies TOC as a text-view-only command
+    Then the shared INFO entry marks TOC as text-view-only
+
+  @toc
   Scenario Outline: Implicit acquisition survives consumption in the same command
     Given a fixture text transcript
     And the player is in fixture room "study"

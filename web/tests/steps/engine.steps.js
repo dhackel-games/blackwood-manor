@@ -722,6 +722,45 @@ Given("Gary's call screen is active", function () {
   this.game.setFlag("onCall");
 });
 
+Given("the fixture lever renames the key", function () {
+  const pull = this.game.world.items.lever.on.pull;
+  this.game.world.items.lever.on.pull = (ctx) => {
+    ctx.item("key").shortName = "changedkey";
+    return pull(ctx);
+  };
+});
+
+When("I modify a received pickup observation", function () {
+  const headless = createGame(this.game.world);
+  headless.restore(this.game.snapshot());
+  this.headlessOutput = headless.send("take key");
+  this.headlessSnapshot = headless.snapshot();
+  this.output = this.game.send("take key", ({ pickups }) => {
+    const pickup = pickups[0];
+    assert.ok(pickup, "the acquisition must produce a pickup observation");
+    this.pickupIdentity = { id: pickup.id, shortName: pickup.shortName };
+    this.pickupFields = Object.keys(pickup).sort();
+    pickup.loc = null;
+    pickup.id = "changed";
+    pickup.shortName = "changedkey";
+  });
+});
+
+Then("the acquired item and snapshot match an unobserved pickup", function () {
+  assert.equal(this.game.has("key"), true);
+  assert.equal(this.output, this.headlessOutput);
+  assert.deepEqual(this.game.snapshot(), this.headlessSnapshot);
+  assert.deepEqual(this.pickupIdentity, { id: "key", shortName: "brasskey" });
+  assert.deepEqual(this.pickupFields, ["id", "shortName"]);
+});
+
+Then("the shared INFO entry marks TOC as text-view-only", function () {
+  const entry = createGame(pickupWorld()).send("info").split("\n")
+    .find((line) => line.startsWith("toc |"));
+  assert.ok(entry, "the shared command reference must include TOC");
+  assert.match(entry, /\btext view only\b/i);
+});
+
 When("I type {string} in the text transcript", function (command) {
   this.beforeDisplay = this.game.snapshot();
   this.beforeSendCount = this.terminal.sent.length;
@@ -1211,14 +1250,12 @@ Then("game-over restart text links to the latest session start", function () {
     /function sessionAnchorId\(date\)[\s\S]*date\.getFullYear\(\)[\s\S]*date\.getMonth\(\) \+ 1[\s\S]*date\.getDate\(\)[\s\S]*_` \+[\s\S]*date\.getHours\(\)[\s\S]*date\.getMinutes\(\)[\s\S]*date\.getSeconds\(\)/s);
   assert.match(ui, /anchor\.id = id/);
   assert.match(ui, /currentSessionAnchorId = id/);
-  assert.match(ui, /link\.href = `#\$\{currentSessionAnchorId\}`/);
   assert.match(ui, /line\.append\("Type RESTART to play again\. \(Jump to the "\)/);
   assert.match(ui, /link\.textContent = "top"/);
   assert.match(ui,
     /function jumpToSessionStart\(id\)[\s\S]*anchor\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.getBoundingClientRect\(\)\.top[\s\S]*transcript\.scrollTop \+= anchorTop - transcriptTop/s);
   assert.match(ui,
     /function followTranscriptLink\(event, link, id\)[\s\S]*event\.preventDefault\(\)[\s\S]*window\.history\.(?:pushState|replaceState)[\s\S]*jumpToSessionStart\(id\)/s);
-  assert.match(ui, /followTranscriptLink\(event, link, currentSessionAnchorId\)/);
   assert.match(ui, /line\.append\(link, "\.\)"\)/);
   assert.match(ui, /function newGame[\s\S]*beginSession\(\{ showSavedNotice: true/);
   assert.match(ui, /if \(restored\) \{[\s\S]*markSessionStart\(\)/s);
@@ -1229,9 +1266,14 @@ Then("game-over restart text links to the latest session start", function () {
   const terminal = textTranscript(createGame(pickupWorld()));
   terminal.printRestartPrompt();
   const link = terminal.transcript.querySelectorAll("a")[0];
+  const target = terminal.document.getElementById(link.hash.slice(1));
   const latest = terminal.markSessionStart();
+  assert.notEqual(latest, target.id);
   link.click();
-  assert.equal(terminal.document.activeElement.id, latest);
+  assert.equal(link.href, `#${target.id}`);
+  assert.equal(terminal.window.location.hash, link.hash);
+  assert.equal(terminal.document.activeElement, target);
+  assert.equal(target.getBoundingClientRect().top, terminal.transcript.getBoundingClientRect().top);
 });
 
 Then("Gary offers robot and human voice icons", function () {

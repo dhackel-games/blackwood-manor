@@ -326,8 +326,7 @@ function emit(container, text, cls, prefix = "", pickups = []) {
       (isMap || cls === "banner" ? part : part.trim());
     if (container === transcript && !last && pickups.length) {
       const anchors = [];
-      for (const item of pickups) {
-        const shortName = item.shortName || world.itemShortNames[item.id];
+      for (const { shortName } of pickups) {
         const id = `got_${shortName}`;
         if (document.getElementById(id)) continue;
         const anchor = document.createElement("span");
@@ -400,10 +399,11 @@ function printRestartPrompt() {
   const line = document.createElement("div");
   line.className = "over session-restart";
   line.append("Type RESTART to play again. (Jump to the ");
+  const targetId = currentSessionAnchorId;
   const link = document.createElement("a");
-  link.href = `#${currentSessionAnchorId}`;
+  link.href = `#${targetId}`;
   link.textContent = "top";
-  link.addEventListener("click", (event) => followTranscriptLink(event, link, currentSessionAnchorId));
+  link.addEventListener("click", (event) => followTranscriptLink(event, link, targetId));
   line.append(link, ".)");
   transcript.appendChild(line);
   transcript.scrollTop = transcript.scrollHeight;

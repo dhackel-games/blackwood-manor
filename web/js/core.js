@@ -292,7 +292,12 @@ export function createGame(world) {
   game.moveItem = (id, to) => {
     const item = state.items[id];
     if (item) {
-      if (to === "inventory" && item.loc !== "inventory") commandPickups?.push(item);
+      if (to === "inventory" && item.loc !== "inventory") {
+        commandPickups?.push({
+          id: item.id,
+          shortName: item.shortName || world.itemShortNames?.[item.id],
+        });
+      }
       item.loc = to;
     }
   };

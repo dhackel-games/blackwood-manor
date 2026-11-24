@@ -419,7 +419,7 @@ the mansion.
 - **`world.statusBanner(game)`** — returns a string appended to every room description
   (`core.describeRoom`). Drives the **ASCII fire / sickness art**.
 - **`world.endBadges(game)`** — returns extra lines for the **win screen** (achievement badges).
-* **`game.send(input, onOutput)`**: the optional synchronous observer receives `{ text, pickups }` for each command's rendered plain-text output. `moveItem` records actual transitions into inventory only while that observed command runs, including puzzle grants and implicitly acquired items consumed immediately. These transient notifications do not change the returned string, scoring, snapshots, or headless callers. A chain ending at the hint line renders its preceding command outputs in the main transcript before opening Gary's view.
+* **`game.send(input, onOutput)`**: the optional synchronous observer receives `{ text, pickups: [{ id, shortName }] }` for each command's rendered plain-text output. `moveItem` captures detached identity values at each actual transition into inventory, resolving `shortName` from `item.shortName` or `world.itemShortNames` at acquisition, including puzzle grants and implicitly acquired items consumed immediately. These transient notifications expose no live game items and do not change the returned string, scoring, snapshots, or headless callers. A chain ending at the hint line renders its preceding command outputs in the main transcript before opening Gary's view.
 - **Room-handler injection** — at module load, `world.js` wraps every room's
   `on.light/burn/extinguish/off` with a self-immolation interceptor, so "light self on fire"
   works in **any** room without per-room code (falls through to the normal command otherwise).
