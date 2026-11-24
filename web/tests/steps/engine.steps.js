@@ -1062,7 +1062,7 @@ Then("a Bug command uses its phrase as the issue description", function () {
   assert.equal(url.searchParams.get("body").split("\n")[0], "Copyright test 1.2.3");
   assert.equal(url.searchParams.get("body").split("\n")[1], description);
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
-  assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd)"));
+  assert.ok(ui.indexOf("bugReportDescription(cmd)") < ui.indexOf("game.send(cmd,"));
 });
 
 Then("bug reports include the full session trail, HUD state, and inventory", function () {
@@ -1157,7 +1157,7 @@ Then("bug reports include numbered Gary dialogue with compact speaker labels", f
 
   const ui = readFileSync(new URL("../../js/ui.js", import.meta.url), "utf8");
   assert.match(ui, /if \(onCall\) recordBugDialogue\(bugTrace, "user", submitted\)/);
-  assert.match(ui, /const dialogueEntry = recordBugDialogue\(bugTrace, "gary", out\)/);
+  assert.match(ui, /const dialogueEntry = recordBugDialogue\(bugTrace, "gary", phoneOutput\)/);
   assert.match(ui, /updateBugDialogue\(dialogueEntry, spoken\)/);
   assert.match(ui, /dialogue: bugTrace\.dialogue/);
   assert.match(ui, /userName: bugTrace\.userName/);
