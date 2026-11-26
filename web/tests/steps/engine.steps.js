@@ -28,7 +28,12 @@ import {
 } from "../../js/gary-voice.js";
 import { parse, splitCommands } from "../../js/parser.js";
 import { MAP_MARK } from "../../js/map.js";
-import { expandSysopCommand, sysopMenuAction } from "../../js/sysop-menu.js";
+import {
+  expandSysopCommand,
+  persistSysopMenuUnlock,
+  renderSysopMenu,
+  sysopMenuAction,
+} from "../../js/sysop-menu.js";
 import { world as manorWorld } from "../../js/world.js";
 
 const versionMetadata = JSON.parse(
@@ -650,6 +655,9 @@ function textTranscript(game) {
   }
   const transcript = new Element("section");
   const phoneT = new Element("section");
+  const input = new Element("input");
+  input.value = "";
+  input.setSelectionRange = () => {};
   const document = {
     createElement: (tagName) => new Element(tagName),
     getElementById: (id) => [transcript, phoneT].flatMap(
@@ -671,8 +679,10 @@ function textTranscript(game) {
     replaceState(_state, _title, hash) { window.location.hash = hash; },
   };
   const sent = [];
+  const sentCommands = [];
   const send = game.send;
   game.send = (...args) => {
+    sentCommands.push(args[0]);
     const text = send(...args);
     sent.push(text);
     return text;
@@ -684,26 +694,53 @@ function textTranscript(game) {
     currentSessionAnchorId: "", introBannerElement: null,
     endingCall: false, history: [], hi: 0, bugTrace: createBugTrace("TOC fixture"),
     recordBugCommand, recordBugDialogue, bugReportDescription, parseRestartTarget, splitCommands,
+    expandSysopCommand, persistSysopMenuUnlock, renderSysopMenu, sysopMenuAction,
+    sysopMenuUnlocked: !!game.getFlag("sysopMenuUnlocked"), input,
     Native: { isMobileApp: () => false },
     updateHud() {}, updatePhoneStatus() {}, syncNameGate() {}, saveGame: () => true,
     showPhone() { phoneT.replaceChildren(); },
     ambientSfxKind: () => null, garyReacts: () => null,
     garySpeak: (text) => spoken.push(text),
-    canType: false, mainEntry: { setValue() {} },
+    canType: false,
+    mainEntry: {
+      setValue(value) { input.value = value; },
+      clear() { input.value = ""; },
+    },
     queueMicrotask: (callback) => callback(),
     setTimeout: (callback) => callback(),
   };
   const api = runInNewContext(
     sourceBetween(ui, "function emit(", "// --- phone-call screen ---") +
     sourceBetween(ui, "function printToPhone(", "function garyLineLabel(") +
-    sourceBetween(ui, "function handle(raw) {", "function applySysopCommand(") +
+    sourceBetween(ui, "function handle(raw) {", "// --- input wiring (terminal) ---") +
     sourceBetween(ui, "const scrollBottom =", "// Keep controls visible") +
-    "\n({ handle, print, markSessionStart, printRestartPrompt })",
+    "\n({ handle, applySysopCommand, print, markSessionStart, printRestartPrompt })",
     sandbox,
   );
   api.markSessionStart();
   api.print(game.describeRoom());
-  return { ...api, game, transcript, phoneT, document, window, sent, spoken };
+  return {
+    ...api, game, transcript, phoneT, input, document, window, sent, sentCommands, spoken,
+    history: sandbox.history, bugTrace: sandbox.bugTrace,
+  };
+}
+
+function prefillTextShortcut(terminal, command) {
+  const action = sysopMenuAction(command, true);
+  const gameplay = expandSysopCommand(action.shortcut, terminal.game);
+  const snapshot = terminal.game.snapshot();
+  const sendCount = terminal.sent.length;
+  const transcript = terminal.transcript.textContent;
+  assert.equal(terminal.applySysopCommand(command), true);
+  return { gameplay, snapshot, sendCount, transcript };
+}
+
+function assertTextShortcutPrefill(terminal, prefill) {
+  assert.equal(terminal.input.value, `${prefill.gameplay}; toc`);
+  assert.equal(splitCommands(terminal.input.value).filter((command) => command === "toc").length, 1);
+  assert.deepEqual(terminal.game.snapshot(), prefill.snapshot);
+  assert.equal(terminal.sent.length, prefill.sendCount);
+  assert.equal(terminal.transcript.textContent, prefill.transcript);
 }
 
 Given("a fixture text transcript", function () {
@@ -715,7 +752,13 @@ Given("a manor text transcript with the sysop menu unlocked", function () {
   this.game = createGame(manorWorld);
   this.game.useDefaultPlayerName();
   this.game.setFlag("sysopMenuUnlocked");
+  this.game.setFlag("__noChaos", true);
+  this.game.setFlag("realm:radioSeed", 1);
   this.terminal = textTranscript(this.game);
+});
+
+Given("the text game is {word}", function (state) {
+  this.game.state[state] = true;
 });
 
 Given("Gary's call screen is active", function () {
@@ -762,6 +805,7 @@ Then("the shared INFO entry marks TOC as text-view-only", function () {
 });
 
 When("I type {string} in the text transcript", function (command) {
+  this.submittedText = command;
   this.beforeDisplay = this.game.snapshot();
   this.beforeSendCount = this.terminal.sent.length;
   this.beforeSpeechCount = this.terminal.spoken.length;
@@ -772,6 +816,20 @@ When("I type {string} in the text transcript", function (command) {
     this.headlessSnapshot = headless.snapshot();
   }
   this.terminal.handle(command);
+});
+
+When("I prefill sysop command {string} in the text transcript", function (command) {
+  this.prefill = prefillTextShortcut(this.terminal, command);
+});
+
+Then("the text prefill appends TOC without executing its gameplay", function () {
+  assertTextShortcutPrefill(this.terminal, this.prefill);
+});
+
+Then("the text prefill for {string} appends TOC without executing", function (command) {
+  this.game.setFlag("sysopMenuUnlocked");
+  const terminal = textTranscript(this.game);
+  assertTextShortcutPrefill(terminal, prefillTextShortcut(terminal, command));
 });
 
 When("I remember the pickup target for {string}", function (shortName) {
@@ -789,8 +847,43 @@ When("I click the TOC link for {string}", function (shortName) {
 });
 
 When("I run the SYSOP win route in the text transcript", function () {
-  const action = sysopMenuAction("::win", true);
-  this.terminal.handle(expandSysopCommand(action.shortcut, this.game));
+  this.prefill = prefillTextShortcut(this.terminal, "::win");
+  assertTextShortcutPrefill(this.terminal, this.prefill);
+  const headless = createGame(this.game.world);
+  headless.restore(this.prefill.snapshot);
+  this.headlessOutput = headless.send(this.prefill.gameplay);
+  this.headlessSnapshot = headless.snapshot();
+  this.terminal.handle(this.terminal.input.value);
+  assert.equal(this.terminal.sentCommands.at(-1), this.prefill.gameplay);
+});
+
+Then("trailing TOC preserves the gameplay of {string}", function (command) {
+  const headless = createGame(this.game.world);
+  headless.restore(this.beforeDisplay);
+  assert.equal(this.terminal.sentCommands.at(-1), command);
+  assert.equal(this.terminal.sent.at(-1), headless.send(command));
+  assert.deepEqual(this.game.snapshot(), headless.snapshot());
+});
+
+Then("the submitted chain remains in command history and the bug trail", function () {
+  assert.equal(this.terminal.history.at(-1), this.submittedText);
+  const commands = splitCommands(this.submittedText);
+  assert.deepEqual(this.terminal.bugTrace.commands.slice(-commands.length), commands);
+});
+
+Then("the final TOC links every original pickup", function () {
+  const tocs = this.terminal.transcript.querySelectorAll(".toc");
+  assert.equal(tocs.length, 1);
+  assert.equal(this.terminal.transcript.children.at(-1), tocs[0]);
+  const anchors = this.terminal.transcript.querySelectorAll('[id^="got_"]');
+  assert.deepEqual(
+    tocs[0].querySelectorAll("a").map((link) => link.href),
+    anchors.map((anchor) => `#${anchor.id}`),
+  );
+});
+
+Then("no TOC has been displayed", function () {
+  assert.equal(this.terminal.transcript.querySelectorAll(".toc").length, 0);
 });
 
 Then("pickup {string} marks the message {string}", function (shortName, text) {

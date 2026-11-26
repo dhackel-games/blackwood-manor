@@ -1303,7 +1303,7 @@ Then("hidden shortcuts replace the editable command prompt without executing", f
   assert.match(ui, /sysopMenuAction\(command, sysopMenuUnlocked\)/);
   assert.match(ui, /persistSysopMenuUnlock\(game, action\)/);
   assert.match(ui, /if \(action\.showMenu\)/);
-  assert.match(ui, /mainEntry\.setValue\(expandSysopCommand\(action\.shortcut, game\)\)/);
+  assert.match(ui, /mainEntry\.setValue\(`\$\{expandSysopCommand\(action\.shortcut, game\)\}; toc`\)/);
   assert.match(ui, /input\.setSelectionRange\(input\.value\.length, input\.value\.length\)/);
   assert.equal(sysopCommand("::"), null);
   assert.equal(sysopCommand(":powerup"), null);

@@ -133,6 +133,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   but never opens the random MYSTERY PACKAGE; opening it yourself changes the
   game before it is consumed. `::powerup` remains available
   for reusable equipment.
+  In text view, `::baron`, `::powerup`, and every `::win` prefill end with `; toc`; submit to run the original route and then show pickup links. Shared headless and 2D routes are unchanged.
 - **Flavor variety:** recurring ambient and Gary lines use 12-entry round-robin
   pools whose counters persist in saved games, so a line cannot repeat early.
 - **Things:** `take <x>` / `t <x>`, `take/get all [from <container>]`, `drop <x>`,
@@ -236,7 +237,7 @@ auto-saves to your browser. The launcher sends `no-store` headers so a changed
   `reload`/`refresh`, `toc`, `top`, `clear`, `verbose`, `brief`, `info`/`?`, `quit`.
   INFO prints the command reference for free; HELP, CALL, or HINT dials Gary's paid hint line.
   TOP scrolls to the top of the page; CLEAR erases the entire scrollback and redisplays the basic prompt for the current room.
-  TOC links to each item's original pickup message in the current text scrollback without spending a turn, fuel, points, or a call to Gary. Retakes keep the first target; consumed and deposited items stay listed until CLEAR removes their messages. On Gary's call screen, TOC asks you to hang up first.
+  TOC links to each item's original pickup message in the current text scrollback without spending a turn, fuel, points, or a call to Gary. A trailing `; toc` displays those links after the gameplay chain, including after an error or game-over output; quoted speech remains gameplay. Retakes keep the first target; consumed and deposited items stay listed until CLEAR removes their messages. On Gary's call screen, TOC asks you to hang up first.
   In the iOS app, VERSION reports the
   installed native app identity separately from the local selected content and
   remote content source; RELOAD still puts the greatest content version into

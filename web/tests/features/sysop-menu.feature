@@ -186,7 +186,7 @@ Feature: Maintained sysop shortcuts
     And flag "progressAward:candelabraRestored" is set
     And the game score is 1236
 
-  @win @maxscore
+  @win @maxscore @toc
   Scenario: Repeating the completed prompt cannot choose the front-door ending
     When I execute sysop command "::win"
     Then the game is alive
@@ -195,6 +195,7 @@ Feature: Maintained sysop shortcuts
     And item "clockTalisman" is carried
     And the game score is 1236
     And both endings remain independently available
+    And the text prefill for "::win" appends TOC without executing
     Then sysop command "::win" includes "read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
@@ -209,7 +210,7 @@ Feature: Maintained sysop shortcuts
     And flag "partII" is unset
     And the game score is 1236
 
-  @win @maxscore
+  @win @maxscore @toc
   Scenario: After the bell, the prompt opens the sealed reliquary and takes the clock safely
     When I execute sysop command "::win" through "pull closetrope"
     Then the current room is "grandHall"
@@ -220,6 +221,7 @@ Feature: Maintained sysop shortcuts
     And sysop command "::win" contains sequence "o rq; read gclock"
     And sysop command "::win" omits "s"
     And sysop command "::win" omits "d"
+    And the text prefill for "::win" appends TOC without executing
     When I execute sysop command "::win"
     Then the game is not won
     And the current room is "grandHall"
@@ -227,7 +229,7 @@ Feature: Maintained sysop shortcuts
     And the game score is 1236
     And both endings remain independently available
 
-  @win @maxscore
+  @win @maxscore @toc
   Scenario: After the bell, the prompt takes the clock from an already open reliquary
     When I execute sysop command "::win" through "pull closetrope"
     And I send "open reliquary"
@@ -235,12 +237,20 @@ Feature: Maintained sysop shortcuts
     And sysop command "::win" contains sequence "read gclock"
     And sysop command "::win" omits "o rq"
     And sysop command "::win" omits "s"
+    And the text prefill for "::win" appends TOC without executing
     When I execute sysop command "::win"
     Then the game is not won
     And the current room is "grandHall"
     And item "clockTalisman" is carried
     And the game score is 1236
     And both endings remain independently available
+
+  @toc
+  Scenario: After the bell, a dropped clock prefills inventory followed by TOC
+    When I execute sysop command "::win"
+    And I send "drop clock"
+    Then sysop command "::win" contains sequence "i"
+    And the text prefill for "::win" appends TOC without executing
 
   @win
   Scenario: The complete route recovers physically when both mushroom batches are gone
