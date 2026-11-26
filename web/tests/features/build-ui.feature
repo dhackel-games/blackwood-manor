@@ -24,6 +24,65 @@ Feature: Build metadata and touch-control contract
     And the 2D command trail supports TOP and CLEAR
 
   @toc
+  Scenario Outline: Text shortcuts prefill their original gameplay followed by one TOC
+    Given a manor text transcript with the sysop menu unlocked
+    When I prefill sysop command "<shortcut>" in the text transcript
+    Then the text prefill appends TOC without executing its gameplay
+
+    Examples:
+      | shortcut  |
+      | ::baron   |
+      | ::powerup |
+      | ::win     |
+
+  @toc
+  Scenario: Chained TOC links this submission's pickup without a gameplay turn
+    Given a fixture text transcript
+    When I type "take key; toc" in the text transcript
+    Then pickup "brasskey" marks the message "Taken."
+    And the TOC links are "brasskey"
+    And the final TOC links every original pickup
+    And trailing TOC preserves the gameplay of "take key"
+    And the submitted chain remains in command history and the bug trail
+
+  @toc
+  Scenario: Trailing TOC preserves a gameplay error and the stopped command chain
+    Given a fixture text transcript
+    When I type "take key; flummox; take match; toc" in the text transcript
+    Then trailing TOC preserves the gameplay of "take key; flummox; take match"
+    And item "match" is in "hall"
+    And the TOC links are "brasskey"
+    And the final TOC links every original pickup
+
+  @toc
+  Scenario: Trailing TOC respects quoted speech command boundaries
+    Given a fixture text transcript
+    When I type "take key; say \"toc; toc\"; toc" in the text transcript
+    Then trailing TOC preserves the gameplay of "take key; say \"toc; toc\""
+    And the final TOC links every original pickup
+
+  @toc
+  Scenario: Quoted TOC is speech rather than a display command
+    Given a fixture text transcript
+    When I type "take key; say \"toc; toc\"" in the text transcript
+    Then observed and headless gameplay output and snapshots agree
+    And no TOC has been displayed
+
+  @toc
+  Scenario Outline: Trailing TOC remains available after the game ends
+    Given a fixture text transcript
+    When I type "take key" in the text transcript
+    Given the text game is <state>
+    When I type "look; toc" in the text transcript
+    Then trailing TOC preserves the gameplay of "look"
+    And the final TOC links every original pickup
+
+    Examples:
+      | state |
+      | dead  |
+      | won   |
+
+  @toc
   Scenario: TOC jumps to a pickup without advancing the game
     Given a fixture text transcript
     When I type "take key" in the text transcript
@@ -99,18 +158,21 @@ Feature: Build metadata and touch-control contract
   @toc
   Scenario: A chain anchors ordinary pickups and puzzle grants before calling Gary
     Given a fixture text transcript
-    When I type "take key; pull lever; north; eat ration; call" in the text transcript
-    Then observed and headless gameplay output and snapshots agree
+    When I type "take key; pull lever; north; eat ration; call; toc" in the text transcript
+    Then trailing TOC preserves the gameplay of "take key; pull lever; north; eat ration; call"
     And pickup "brasskey" marks the message "> take key"
     And pickup "token" marks the message "> pull lever"
     And pickup "ration" marks the message "> eat ration"
     And pickups "brasskey,token,ration" have distinct output messages
+    And the phone transcript says "Hang up, then type TOC to jump to item pickups in the game transcript."
 
   @toc
   Scenario: The full SYSOP win route keeps pickup targets inside individual command outputs
     Given a manor text transcript with the sysop menu unlocked
     When I run the SYSOP win route in the text transcript
     Then the route reaches the clock with separate original key and clock pickup messages
+    And observed and headless gameplay output and snapshots agree
+    And the final TOC links every original pickup
 
   @toc
   Scenario: CLEAR removes the DOM pickup record without removing carried items

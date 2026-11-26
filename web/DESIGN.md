@@ -331,6 +331,8 @@ the clock if it remains inside, or safely rereads the clock already in hand.
 It never walks SOUTH into an ending on a repeat invocation.
 `::powerup` remains as the reusable-equipment helper.
 
+The text adapter appends `; toc` once to each maintained scripted prefill (`::baron`, `::powerup`, `::win`), including after-bell and recovery paths; the player still submits it. The shared expansion stays gameplay-only, preserving the route's commands, waits, turns, score, and 2D behavior.
+
 For reference, the deterministic fresh `::win` expansion has 191 commands,
 68 directional walking transitions, four lift transitions, one forced
 ejection, and 73 total non-flight room changes. Its 2.83 walking transitions
@@ -565,7 +567,8 @@ and `core.js` runs each fragment through `runOne()` in order. So
   `#YYYYMMDD_HHMMSS` anchors. The win prompt links “top” to the latest anchor,
   rather than assuming the current session began at the document top.
 * Browser-only TOC reads `#got_<item shortname>` anchors from the text transcript, using `item.shortName` or `world.itemShortNames`. Each command's pickup anchors sit inside its own output message, including expanded SYSOP routes. The first existing anchor wins on retakes; consumed or deposited items remain listed while their messages remain. CLEAR removes that DOM record naturally, with no pickup ledger or save data. TOC and session links share the pinned transcript jump, so resize does not snap back to the bottom. During a Gary call, TOC prints local hang-up guidance without contacting Gary.
-* `npm test -- --tags @toc` exercises pickup identity, lifetime, command-local targets, unchanged headless output/state, and link/resize behavior through the existing VM DOM fixture.
+* For a trailing chained TOC, text view uses quote-aware `splitCommands()`, preserves the original history and bug trail, sends only the gameplay prefix to the core, renders its per-command pickups, then displays the TOC even after a gameplay error or game over.
+* `npm test -- --tags @toc` exercises actual shortcut prefills and chained dispatch, quoted speech, stopped chains, game-over display, pickup identity, lifetime, command-local targets, unchanged headless output/state, and link/resize behavior through the existing VM DOM fixture.
 
 ## 12.13 The copyright-version stamp (introduced v2.1.0)
 `versions.json` is the single source of truth for the exact copyright-version shown in the intro,

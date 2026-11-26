@@ -1155,6 +1155,9 @@ function handle(raw) {
     }
   }
 
+  const trailingToc = traceCommands.length > 1 && traceCommands.at(-1).toLowerCase() === "toc";
+  if (trailingToc) cmd = traceCommands.slice(0, -1).join("; ");
+
   if (onCall) recordBugDialogue(bugTrace, "user", submitted);
   const prevFlags = { ...game.state.flags };
   const turnsBefore = game.state.turns;
@@ -1199,6 +1202,7 @@ function handle(raw) {
     garySpeak(phoneOutput);            // Gary complains out loud
     updatePhoneStatus();
     updateHud();
+    if (trailingToc) handleDisplayCommand("toc", true);
     return;
   }
 
@@ -1232,6 +1236,7 @@ function handle(raw) {
       }
     });
   }
+  if (trailingToc) handleDisplayCommand("toc", false);
 }
 
 function applySysopCommand(raw) {
@@ -1256,7 +1261,7 @@ function applySysopCommand(raw) {
     return true;
   }
   try {
-    mainEntry.setValue(expandSysopCommand(action.shortcut, game));
+    mainEntry.setValue(`${expandSysopCommand(action.shortcut, game)}; toc`);
   } catch (error) {
     print(error.message, "sys");
     return true;
